@@ -816,12 +816,15 @@ if (!CID) { window.location.href = 'login.html'; }
 // ═══════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async () => {
   setGreeting();
-  fillBasicUI();
+  fillBasicUI(null); // show localStorage data immediately
   showLoader('ড্যাশবোর্ড লোড হচ্ছে...');
   try {
     const [cust, metrics, analysis, orders, notes] = await Promise.all([
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
+
+    // Update UI with fresh Supabase data
+    fillBasicUI(cust);
 
     // Fully active = super admin activated (is_active=true AND admin_approved=true)
     const approved = (cust?.is_active === true && cust?.admin_approved === true) ||
@@ -966,45 +969,6 @@ function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
   else main.prepend(banner);
 }
 
-  const banner = document.createElement('div');
-  banner.id = 'accessBanner';
-  banner.style.cssText = `position:relative;z-index:50;margin:0 0 1.25rem;`;
-  banner.innerHTML = `
-    <div style="background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(233,30,140,.07));
-      border:1px solid rgba(245,158,11,.3);border-radius:18px;padding:1.25rem 1.5rem;">
-      <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
-        <div style="font-size:2rem;flex-shrink:0">⏳</div>
-        <div style="flex:1">
-          <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#FCD34D;font-weight:700;margin-bottom:.35rem">
-            ${paidReg ? 'পেমেন্ট সম্পন্ন — সুপার অ্যাডমিনের অনুমোদনের অপেক্ষায়' : 'অ্যাকাউন্ট সক্রিয়করণের অপেক্ষায়'}
-          </div>
-          <div style="font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.75;margin-bottom:.85rem">
-            ${paidReg
-              ? 'আপনার পেমেন্ট পেয়েছি। সুপার অ্যাডমিন যাচাই করে অ্যাকাউন্ট সক্রিয় করলে <strong style="color:#fff">মেনু, অর্ডার, AI বিশ্লেষণ</strong> ব্যবহার করতে পারবেন। ড্যাশবোর্ড ও মেট্রিক্স এখনই ব্যবহার করুন।'
-              : 'নিবন্ধন ফি পরিশোধ করুন এবং WhatsApp-এ স্ক্রিনশট পাঠান। অ্যাডমিন অনুমোদনের আগ পর্যন্ত <strong style="color:#fff">মেনু ও অর্ডার</strong> বন্ধ থাকবে।'
-            }
-          </div>
-          <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center">
-            ${!paidReg ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:10px;padding:.55rem 1.25rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem">💳 নিবন্ধন ফি দিন ৳১,০০০</a>` : ''}
-            <a href="${waUrl}" target="_blank" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:.5rem 1.1rem;color:#4ade80;font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem">💬 WhatsApp স্ক্রিনশট পাঠান</a>
-            <button onclick="checkApprovalStatus()" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.5rem 1rem;color:#FCD34D;font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem" id="checkApprovalBtn">🔄 অনুমোদন পরীক্ষা করুন</button>
-          </div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.25);margin-bottom:.25rem">সদস্য নং</div>
-          <div style="font-family:'Space Mono',monospace;font-size:.82rem;color:#FCD34D">${mid}</div>
-          <a href="metrics.html" target="_blank" style="display:inline-block;margin-top:.65rem;background:rgba(5,150,105,.12);border:1px solid rgba(52,211,153,.25);border-radius:9px;padding:.4rem .85rem;color:#34D399;font-size:.75rem;font-weight:600;text-decoration:none">📊 মেট্রিক্স পূরণ করুন</a>
-        </div>
-      </div>
-    </div>`;
-
-  // Insert at top of main content
-  const main = document.querySelector('.dash-main') || document.querySelector('main') || document.body;
-  const firstChild = main.querySelector('.section, .card, [id]');
-  if (firstChild) main.insertBefore(banner, firstChild);
-  else main.prepend(banner);
-}
-
 function checkApprovalGate(event, action){
   const approved = localStorage.getItem('sar_admin_approved') === 'true' ||
     JSON.parse(localStorage.getItem('sar_customer')||'{}')?.admin_approved === true;
@@ -1083,71 +1047,117 @@ function setGreeting() {
   const gr = h < 12 ? 'শুভ সকাল' : h < 17 ? 'শুভ দুপুর' : h < 20 ? 'শুভ বিকেল' : 'শুভ সন্ধ্যা';
   const days = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
   const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
-  document.getElementById('greetTime').textContent =
-    `${gr} ✦ ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+  const el = document.getElementById('greetTime');
+  if(el) el.textContent = `${gr} ✦ ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 }
 
-function fillBasicUI() {
-  const first = CNAME.split(' ')[0];
-  document.getElementById('greetName').textContent = `স্বাগতম, ${first} আপা!`;
-  document.getElementById('sbMemberId').textContent = CMID;
-  document.getElementById('sbName').textContent = CNAME;
-  document.getElementById('sbAvatar').textContent = CNAME.charAt(0).toUpperCase();
+function fillBasicUI(cust) {
+  const setEl = (id, val) => { try{ const e=document.getElementById(id); if(e) e.textContent=val; }catch(e){} };
+  // Use Supabase fresh data first, fallback to localStorage
+  const name = (cust && cust.full_name) || CNAME || 'আপা';
+  const mid  = (cust && cust.member_id)  || CMID  || '—';
+  const tier = (cust && cust.membership_tier) || 'Basic';
+  const first = (name||'আপা').split(' ')[0];
+  setEl('greetName',  `স্বাগতম, ${first} আপা!`);
+  setEl('sbName',      name);
+  setEl('sbMemberId',  mid);
+  setEl('sbAvatar',    (name||'A').charAt(0).toUpperCase());
+  setEl('sbTier',      tier + ' সদস্য');
+  setEl('statPoints',  (cust && cust.loyalty_points) || '০');
+  setEl('statTier',    tier);
 }
 
 // ═══════════════════════════════════════
-// FETCH
+// FETCH — সব fetch-এ error handling
 // ═══════════════════════════════════════
 async function fetchCustomer() {
-  const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H});
-  const d = await r.json(); return d[0] || {};
+  try {
+    if (!CID) return {};
+    const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H});
+    if (!r.ok) { console.warn('fetchCustomer error:', r.status); return {}; }
+    const d = await r.json();
+    const c = d?.[0] || {};
+    // Update localStorage with fresh data from Supabase
+    if (c.id) {
+      const stored = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+      Object.assign(stored, c);
+      localStorage.setItem('sar_customer', JSON.stringify(stored));
+      localStorage.setItem('sar_admin_approved', c.admin_approved ? 'true' : 'false');
+    }
+    return c;
+  } catch(e) { console.warn('fetchCustomer:', e); return {}; }
 }
+
 async function fetchMetrics() {
-  const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*`, {headers:H});
-  const d = await r.json(); return d[0] || {};
+  try {
+    if (!CID) return {};
+    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    if (!r.ok) return {};
+    const d = await r.json();
+    return d?.[0] || {};
+  } catch(e) { return {}; }
 }
+
 async function fetchAnalysis() {
-  const today = new Date().toISOString().slice(0,10);
-  const r = await fetch(
-    `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1&select=*`,
-    {headers:H});
-  const d = await r.json(); return d[0] || null;
+  try {
+    if (!CID) return null;
+    const r = await fetch(
+      `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1&select=*`,
+      {headers:H});
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d?.[0] || null;
+  } catch(e) { return null; }
 }
+
 async function fetchOrders() {
-  const r = await fetch(
-    `${SUPA}/rest/v1/orders?customer_id=eq.${CID}&order=created_at.desc&limit=5&select=*`,
-    {headers:H});
-  return await r.json() || [];
+  try {
+    if (!CID) return [];
+    const r = await fetch(
+      `${SUPA}/rest/v1/orders?customer_id=eq.${CID}&order=created_at.desc&limit=5&select=*`,
+      {headers:H});
+    if (!r.ok) return [];
+    return await r.json() || [];
+  } catch(e) { return []; }
 }
+
 async function fetchNotes() {
-  const r = await fetch(
-    `${SUPA}/rest/v1/sar_notes?customer_id=eq.${CID}&order=created_at.desc&limit=3&select=*`,
-    {headers:H});
-  return await r.json() || [];
+  try {
+    if (!CID) return [];
+    const r = await fetch(
+      `${SUPA}/rest/v1/sar_notes?customer_id=eq.${CID}&order=created_at.desc&limit=3&select=*`,
+      {headers:H});
+    if (!r.ok) return [];
+    return await r.json() || [];
+  } catch(e) { return []; }
 }
 
 // ═══════════════════════════════════════
 // RENDER CUSTOMER
 // ═══════════════════════════════════════
 function renderCustomer(c) {
-  if (!c.id) return;
-  document.getElementById('sbTier').textContent = (c.membership_tier||'Basic') + ' সদস্য';
-  document.getElementById('statPoints').textContent = c.loyalty_points || '০';
-  document.getElementById('statTier').textContent = c.membership_tier || 'Basic';
+  if (!c || !c.id) return;
+  const setEl = (id, val) => { try{ const e=document.getElementById(id); if(e) e.textContent=val; }catch(e){} };
 
-  // Days left
+  setEl('sbTier',      (c.membership_tier||'Basic') + ' সদস্য');
+  setEl('statPoints',   c.loyalty_points || '০');
+  setEl('statTier',     c.membership_tier || 'Basic');
+
+  // Subscription days left
   if (c.monthly_sub_expiry_date) {
-    const exp = new Date(c.monthly_sub_expiry_date);
+    const exp  = new Date(c.monthly_sub_expiry_date);
     const diff = Math.ceil((exp - new Date()) / 86400000);
-    document.getElementById('statDaysLeft').textContent = diff > 0 ? diff : '০';
+    setEl('statDaysLeft', diff > 0 ? diff : '০');
     const st = document.getElementById('statSubStatus');
-    if (diff > 7) { st.className='stat-trend up'; st.textContent='দিন বাকি' }
-    else if (diff > 0) { st.className='stat-trend down'; st.textContent='শীঘ্রই শেষ' }
-    else { st.className='stat-trend down'; st.textContent='মেয়াদ শেষ' }
+    if(st){
+      if (diff > 7)      { st.className='stat-trend up';   st.textContent='দিন বাকি'; }
+      else if (diff > 0) { st.className='stat-trend down'; st.textContent='শীঘ্রই শেষ'; }
+      else               { st.className='stat-trend down'; st.textContent='মেয়াদ শেষ'; }
+    }
   } else {
-    document.getElementById('statDaysLeft').textContent = '০';
-    document.getElementById('statSubStatus').className = 'stat-trend down';
-    document.getElementById('statSubStatus').textContent = 'সক্রিয় নেই';
+    setEl('statDaysLeft', '০');
+    const st = document.getElementById('statSubStatus');
+    if(st){ st.className='stat-trend down'; st.textContent='সক্রিয় নেই'; }
   }
 
   // Membership panel
