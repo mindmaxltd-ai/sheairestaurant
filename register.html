@@ -736,79 +736,110 @@ async function submitReg(){
   lTxt.textContent='অ্যাকাউন্ট তৈরি হচ্ছে...';
 
   try{
-    // 1. Save to customers table
+    // 1. Collect all form data
     const custData={
-      full_name:g('full_name'),
-      phone:g('phone'),
-      email:g('email'),
-      date_of_birth:g('date_of_birth'),
-      blood_group:g('blood_group'),
-      height_cm:gn('height_cm'),
-      weight_kg:gn('weight_kg'),
-      bmi:parseFloat(document.getElementById('bmiVal').textContent)||null,
-      nid_number:g('nid_number'),
-      address:g('address'),
-      division:g('division'),
-      district:g('district'),
-      upazila:g('upazila'),
-      preferred_language:g('preferred_language')||'bn',
-      referred_by:g('referred_by'),
-      emergency_contact_name:g('emergency_contact_name'),
-      emergency_contact_phone:g('emergency_contact_phone'),
-      registration_fee_paid:false,
-      monthly_sub_paid:false,
-      membership_tier:'Basic',
-      is_active:true,
-      admin_approved: false,
-      account_status: 'pending_payment',
-      password_hash: btoa(unescape(encodeURIComponent(document.getElementById('reg_password').value)))
+      full_name:              g('full_name'),
+      phone:                  g('phone'),
+      email:                  g('email')||null,
+      date_of_birth:          g('date_of_birth')||null,
+      blood_group:            g('blood_group')||null,
+      height_cm:              gn('height_cm')||null,
+      weight_kg:              gn('weight_kg')||null,
+      bmi:                    parseFloat(document.getElementById('bmiVal')?.textContent)||null,
+      nid_number:             g('nid_number')||null,
+      address:                g('address')||null,
+      division:               g('division')||null,
+      district:               g('district')||null,
+      upazila:                g('upazila')||null,
+      preferred_language:     g('preferred_language')||'bn',
+      referred_by:            g('referred_by')||null,
+      emergency_contact_name: g('emergency_contact_name')||null,
+      emergency_contact_phone:g('emergency_contact_phone')||null,
+      sar_category:           g('sar_category')||'DM',
+      registration_fee_paid:  false,
+      monthly_sub_paid:       false,
+      membership_tier:        'Basic',
+      is_active:              false,
+      admin_approved:         false,
+      account_status:         'pending_payment',
+      password_hash:          btoa(unescape(encodeURIComponent(document.getElementById('reg_password')?.value||'')))
     };
 
+    // Validate minimum required fields
+    if(!custData.full_name || !custData.phone){
+      loader.classList.remove('show');
+      showMsg('m3','⚠️ নাম ও ফোন নম্বর দেওয়া আবশ্যক।','error');
+      return;
+    }
+
+    lTxt.textContent='Supabase-এ সেভ হচ্ছে...';
+
     const res=await fetch(`${SUPA_URL}/rest/v1/customers`,{
-      method:'POST',headers:H,body:JSON.stringify(custData)
+      method:'POST',
+      headers:{...H,'Prefer':'return=representation'},
+      body:JSON.stringify(custData)
     });
-    if(!res.ok){const e=await res.json();throw new Error(e.message||'সেভ করতে সমস্যা হয়েছে')}
+
+    // Show full error to help debug
+    if(!res.ok){
+      const errText = await res.text();
+      console.error('Supabase error:', res.status, errText);
+      let errMsg = 'সেভ করতে সমস্যা হয়েছে ('+res.status+')';
+      try{
+        const errObj = JSON.parse(errText);
+        if(errObj.message) errMsg = errObj.message;
+        if(errObj.code === '23505') errMsg = '⚠️ এই ফোন নম্বর ইতিমধ্যে নিবন্ধিত। লগইন করুন।';
+        if(errObj.code === '42501') errMsg = '⚠️ Supabase RLS policy — anon INSERT অনুমতি নেই। Admin-কে জানান।';
+      }catch(e){}
+      throw new Error(errMsg);
+    }
+
     const arr=await res.json();
-    const cust=arr[0];
+    const cust=arr?.[0] || {};
+    console.log('Registration success:', cust);
 
     lTxt.textContent='পেমেন্ট রেকর্ড করা হচ্ছে...';
 
-    // 2. Save payment record
-    await fetch(`${SUPA_URL}/rest/v1/payments`,{
-      method:'POST',headers:H,
-      body:JSON.stringify({
-        customer_id:cust.id,
-        payment_type:'registration',
-        amount:2000,
-        discount_applied:1000,
-        discount_reason:'প্রথম ১ লাখ গ্রাহক ৫০% ছাড়',
-        final_amount:1000,
-        payment_method:selPayMethod,
-        status:'pending'
-      })
-    });
+    // 2. Payment record
+    if(cust.id){
+      await fetch(`${SUPA_URL}/rest/v1/payments`,{
+        method:'POST',
+        headers:{...H,'Prefer':'return=minimal'},
+        body:JSON.stringify({
+          customer_id:     cust.id,
+          payment_type:    'registration',
+          amount:          2000,
+          discount_applied:1000,
+          discount_reason: 'প্রথম ১ লাখ গ্রাহক ৫০% ছাড়',
+          final_amount:    1000,
+          payment_method:  typeof selPayMethod!=='undefined'?selPayMethod:'bkash',
+          status:          'pending'
+        })
+      }).catch(e=>console.warn('Payment record:', e));
 
-    // 3. Notification log
-    await fetch(`${SUPA_URL}/rest/v1/notifications_log`,{
-      method:'POST',headers:H,
-      body:JSON.stringify({
-        customer_id:cust.id,
-        notification_type:'whatsapp',
-        trigger_event:'registration',
-        message_preview:`স্বাগতম ${cust.full_name}! SAR ID: ${cust.member_id}`,
-        status:'pending'
-      })
-    });
+      // 3. Notification log
+      await fetch(`${SUPA_URL}/rest/v1/notifications_log`,{
+        method:'POST',
+        headers:{...H,'Prefer':'return=minimal'},
+        body:JSON.stringify({
+          customer_id:       cust.id,
+          notification_type: 'whatsapp',
+          trigger_event:     'registration',
+          message_preview:   `স্বাগতম ${cust.full_name||custData.full_name}! SAR ID: ${cust.member_id||''}`,
+          status:            'pending'
+        })
+      }).catch(e=>console.warn('Notification log:', e));
+    }
 
     // 4. Store session
-    const fullCust = {...custData, id:cust?.id||'', member_id:cust?.member_id||''};
-    localStorage.setItem('sar_customer', JSON.stringify(fullCust));
-    localStorage.setItem('sar_customer_id', cust?.id||'');
-    localStorage.setItem('sar_member_id', cust?.member_id||'');
+    const fullCust = {...custData, id:cust.id||'', member_id:cust.member_id||''};
+    localStorage.setItem('sar_customer',      JSON.stringify(fullCust));
+    localStorage.setItem('sar_customer_id',   cust.id||'');
+    localStorage.setItem('sar_member_id',     cust.member_id||'');
     localStorage.setItem('sar_customer_name', custData.full_name);
-    localStorage.setItem('sar_phone', custData.phone);
-    localStorage.setItem('sar_admin_approved', 'false');
-    localStorage.setItem('sar_login_time', new Date().toISOString());
+    localStorage.setItem('sar_phone',         custData.phone);
+    localStorage.setItem('sar_admin_approved','false');
+    localStorage.setItem('sar_login_time',    new Date().toISOString());
 
     loader.classList.remove('show');
 
