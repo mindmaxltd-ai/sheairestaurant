@@ -204,6 +204,15 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 /* INVENTORY */
 .inventory-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem;margin-bottom:1.5rem}
 .inv-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:.9rem;transition:all .25s}
+.api-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Space Mono',monospace;font-size:.78rem;outline:none;transition:border-color .25s}
+.api-input:focus{border-color:var(--green2)}
+.api-input.changed{border-color:var(--yellow2)}
+.input-with-eye{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;overflow:hidden;transition:border-color .25s}
+.input-with-eye:focus-within{border-color:var(--green2)}
+.input-with-eye .api-input{border:none;background:none;flex:1}
+.eye-btn{background:none;border:none;padding:0 .6rem;cursor:pointer;font-size:.82rem;color:rgba(255,255,255,.3);transition:color .2s}
+.eye-btn:hover{color:var(--yellow2)}
+.super-admin-only{}
 .inv-card:hover{background:rgba(255,255,255,.06)}
 .inv-card.low{border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.04)}
 .inv-card.warning{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04)}
@@ -306,7 +315,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <button class="sb-item" onclick="showSection('reports',this)"><span class="sb-item-icon">📋</span>দৈনিক রিপোর্ট</button>
       <button class="sb-item" onclick="showSection('pnl',this)"><span class="sb-item-icon">💰</span>লাভ-লোকসান</button>
       <div class="sb-section">সেটিংস</div>
-      <button class="sb-item" onclick="showSection('settings',this)"><span class="sb-item-icon">⚙️</span>ওয়েবসাইট সেটিংস</button>
+      <button class="sb-item super-admin-only" onclick="showSection('settings',this)"><span class="sb-item-icon">⚙️</span>ওয়েবসাইট সেটিংস</button>
+      <button class="sb-item super-admin-only" onclick="showSection('apikeys',this)"><span class="sb-item-icon">🔑</span>API Keys</button>
       <button class="sb-item" onclick="showSection('notifications',this)"><span class="sb-item-icon">🔔</span>বিজ্ঞপ্তি</button>
       <button class="sb-item" onclick="showSection('articles',this)"><span class="sb-item-icon">✏️</span>Why SAR লেখা</button>
     </div>
@@ -327,9 +337,10 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         <div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:.15rem" id="pageSubtitle">SAR Admin Dashboard</div>
       </div>
       <div class="topbar-right">
+        <span id="adminRoleBadge" style="font-size:.72rem;padding:.25rem .65rem;border-radius:50px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--yellow2);font-family:'Space Mono',monospace"></span>
         <button class="topbar-btn ghost" onclick="loadAllData()">↻ রিফ্রেশ</button>
         <button class="topbar-btn ghost" onclick="window.open('dashboard.html','_blank')">গ্রাহক ভিউ ↗</button>
-        <button class="topbar-btn primary" onclick="openModal('addStaff')">+ নতুন স্টাফ</button>
+        <button class="topbar-btn primary super-admin-only" onclick="openModal('addStaff')">+ নতুন স্টাফ</button>
       </div>
     </div>
 
@@ -614,6 +625,171 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         <div id="articleWriterSection">লোড হচ্ছে...</div>
       </div>
 
+      <!-- API KEYS SECTION (super admin only) -->
+      <div class="section super-admin-only" id="sec-apikeys">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+          <div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">Super Admin Only</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#fff">🔑 API Keys ও সংযোগ</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.5rem;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);border-radius:10px;padding:.4rem .85rem;font-size:.75rem;color:#F87171">
+            ⚠️ এই পেজ শুধুমাত্র Super Admin দেখতে পারেন
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem" id="apiKeysGrid">
+
+          <!-- Claude / AI -->
+          <div class="inv-card" style="background:rgba(107,33,168,.08);border-color:rgba(168,85,247,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">🤖</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--purple2)">Claude AI API Key</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Anthropic Claude — AI Health Analysis</div>
+              </div>
+            </div>
+            <div class="input-with-eye">
+              <input type="password" id="apiClaude" placeholder="sk-ant-api03-..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiClaude',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: console.anthropic.com</div>
+          </div>
+
+          <!-- Twilio -->
+          <div class="inv-card" style="background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">💬</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:#FB7185">Twilio API Keys</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">WhatsApp + SMS Notifications</div>
+              </div>
+            </div>
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Account SID</label>
+            <input type="password" id="apiTwilioSid" placeholder="ACxxxxxxxxxxxxxxxx" class="api-input" style="margin-bottom:.5rem" oninput="markChanged(this)">
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Auth Token</label>
+            <div class="input-with-eye">
+              <input type="password" id="apiTwilioToken" placeholder="Auth token..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiTwilioToken',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: console.twilio.com</div>
+          </div>
+
+          <!-- ShurjoPay / Payment -->
+          <div class="inv-card" style="background:rgba(234,179,8,.08);border-color:rgba(234,179,8,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">☀️</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--yellow2)">ShurjoPay API</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Payment Gateway Bangladesh</div>
+              </div>
+            </div>
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Merchant ID</label>
+            <input type="text" id="apiShurjoMid" placeholder="sp_merchant_id" class="api-input" style="margin-bottom:.5rem" oninput="markChanged(this)">
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">API Key / Password</label>
+            <div class="input-with-eye">
+              <input type="password" id="apiShurjoKey" placeholder="sp_password..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiShurjoKey',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: shurjopay.com.bd</div>
+          </div>
+
+          <!-- SSLCommerz -->
+          <div class="inv-card" style="background:rgba(0,180,216,.08);border-color:rgba(0,180,216,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">🔒</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:#00B4D8">SSLCommerz API</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Alternative Payment Gateway</div>
+              </div>
+            </div>
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Store ID</label>
+            <input type="text" id="apiSslStoreId" placeholder="store_id..." class="api-input" style="margin-bottom:.5rem" oninput="markChanged(this)">
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Store Password</label>
+            <div class="input-with-eye">
+              <input type="password" id="apiSslPass" placeholder="store_password..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiSslPass',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: sslcommerz.com</div>
+          </div>
+
+          <!-- Email / Resend -->
+          <div class="inv-card" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">📧</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--yellow2)">Resend Email API</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Email receipts & notifications</div>
+              </div>
+            </div>
+            <div class="input-with-eye">
+              <input type="password" id="apiResend" placeholder="re_xxxxxxxxxx" class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiResend',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: resend.com</div>
+          </div>
+
+          <!-- Google Maps -->
+          <div class="inv-card" style="background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">🗺️</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--green2)">Google Maps API</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Order tracking & delivery map</div>
+              </div>
+            </div>
+            <div class="input-with-eye">
+              <input type="password" id="apiGoogleMaps" placeholder="AIzaSy..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiGoogleMaps',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: console.cloud.google.com</div>
+          </div>
+
+          <!-- Supabase -->
+          <div class="inv-card" style="background:rgba(62,207,142,.08);border-color:rgba(62,207,142,.2)">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">🗄️</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:#3ECF8E">Supabase Service Key</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Backend database & Edge Functions</div>
+              </div>
+            </div>
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Project URL</label>
+            <input type="text" id="apiSupaUrl" placeholder="https://xxx.supabase.co" class="api-input" style="margin-bottom:.5rem" oninput="markChanged(this)">
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Service Role Key</label>
+            <div class="input-with-eye">
+              <input type="password" id="apiSupaKey" placeholder="eyJhbGci..." class="api-input" oninput="markChanged(this)">
+              <button onclick="toggleKey('apiSupaKey',this)" class="eye-btn">👁</button>
+            </div>
+            <div style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:.4rem">Get from: supabase.com dashboard</div>
+          </div>
+
+          <!-- Others -->
+          <div class="inv-card">
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem">
+              <span style="font-size:1.25rem">🔧</span>
+              <div>
+                <div style="font-size:.85rem;font-weight:700;color:rgba(255,255,255,.6)">অন্যান্য API Keys</div>
+                <div style="font-size:.68rem;color:rgba(255,255,255,.3)">Firebase, Blockchain, others</div>
+              </div>
+            </div>
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Firebase / FCM Key</label>
+            <input type="password" id="apiFirebase" placeholder="AAAA..." class="api-input" style="margin-bottom:.5rem" oninput="markChanged(this)">
+            <label style="font-size:.68rem;color:rgba(255,255,255,.35);display:block;margin-bottom:.3rem">Blockchain RPC URL</label>
+            <input type="text" id="apiBlockchain" placeholder="https://rpc.example.com" class="api-input" oninput="markChanged(this)">
+          </div>
+
+        </div><!-- /apiKeysGrid -->
+
+        <div style="display:flex;gap:.85rem;margin-top:1.5rem;flex-wrap:wrap;align-items:center">
+          <button onclick="saveApiKeys()" style="background:linear-gradient(135deg,var(--green),var(--green2));border:none;border-radius:12px;padding:.75rem 2rem;color:#000;font-family:'Hind Siliguri',sans-serif;font-size:.92rem;font-weight:800;cursor:pointer">✅ API Keys সেভ করুন</button>
+          <button onclick="loadApiKeys()" style="background:var(--glass2);border:1px solid var(--border2);border-radius:12px;padding:.75rem 1.5rem;color:rgba(255,255,255,.6);font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer">↺ লোড করুন</button>
+          <span id="apiSaveStatus" style="font-size:.78rem;color:var(--green2);display:none">✅ সেভ হয়েছে!</span>
+        </div>
+        <div style="margin-top:1rem;padding:.9rem;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.15);border-radius:12px;font-size:.75rem;color:rgba(255,255,255,.4);line-height:1.65">
+          ⚠️ <strong style="color:#F87171">নিরাপত্তা সতর্কতা:</strong> API keys browser localStorage-এ এনক্রিপ্টেড আকারে সংরক্ষিত হয়। Production-এ Supabase Secrets ব্যবহার করুন। কাউকে এই keys শেয়ার করবেন না।
+        </div>
+      </div><!-- /sec-apikeys -->
+
     </div><!-- .content -->
   </div><!-- .main -->
 
@@ -659,13 +835,28 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
-// ADMIN CREDENTIALS
-const ADMIN_CREDS = [
-  { user: 'tutul', pass: 'aimthm@2008', role: 'super_admin', name: 'Tutul' }
-];
+// ADMIN CREDENTIALS — from localStorage (set via API keys section) or hardcoded defaults
+const ADMIN_CREDS = JSON.parse(localStorage.getItem('sar_admin_creds') || JSON.stringify([
+  { user: 'kaku',           pass: 'aimthm@2008', role: 'super_admin', name: 'কাকু (Super Admin)' },
+  { user: 'sar_dietitian',  pass: 'sar2024',      role: 'sar_dietitian', name: 'SAR ডায়েটিশিয়ান' },
+  { user: 'sar_nutrition',  pass: 'sar2024',      role: 'sar_nutritionist', name: 'SAR নিউট্রিশনিস্ট' },
+]));
 
 let currentAdmin = null;
 let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
+
+// Check if current user is super admin
+function isSuperAdmin(){ return currentAdmin?.role === 'super_admin'; }
+
+// Hide super-admin-only elements for non-super
+function applySuperAdminAccess(){
+  document.querySelectorAll('.super-admin-only').forEach(el=>{
+    el.style.display = isSuperAdmin() ? '' : 'none';
+  });
+  // Show role badge
+  const rb = document.getElementById('adminRoleBadge');
+  if(rb) rb.textContent = currentAdmin?.role === 'super_admin' ? '👑 Super Admin' : currentAdmin?.name || '';
+}
 
 // LOGIN
 function adminLogin() {
@@ -677,6 +868,7 @@ function adminLogin() {
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('adminApp').style.display = 'flex';
     sessionStorage.setItem('sar_admin', JSON.stringify(found));
+    applySuperAdminAccess();
     loadAllData();
   } else {
     document.getElementById('loginError').classList.add('show');
@@ -697,6 +889,7 @@ if (saved) {
   currentAdmin = JSON.parse(saved);
   document.getElementById('loginOverlay').classList.add('hidden');
   document.getElementById('adminApp').style.display = 'flex';
+  applySuperAdminAccess();
   loadAllData();
 }
 
@@ -1361,12 +1554,66 @@ function renderNotifications() {
 function showSection(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('sec-' + id).classList.add('active');
+  document.getElementById('sec-' + id)?.classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা' };
+  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা', apikeys:'API Keys' };
   document.getElementById('pageTitle').textContent = titles[id] || id;
-  if(id === 'articles') renderArticleWriter();
-  if(id === 'inventory') renderInventory();
+  if(id==='articles') renderArticleWriter();
+  if(id==='inventory') renderInventory();
+  if(id==='apikeys'){ if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin এই section দেখতে পারেন।'); return; } loadApiKeys(); }
+  if(id==='settings' && !isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin সেটিংস পরিবর্তন করতে পারেন।'); return; }
+}
+
+// ─── API KEY HELPERS ───
+const API_KEY_STORE = 'sar_api_keys_v1';
+const API_KEY_MAP = {
+  apiClaude:'CLAUDE_API_KEY', apiTwilioSid:'TWILIO_SID', apiTwilioToken:'TWILIO_TOKEN',
+  apiShurjoMid:'SHURJO_MID', apiShurjoKey:'SHURJO_KEY', apiSslStoreId:'SSL_STORE_ID',
+  apiSslPass:'SSL_PASS', apiResend:'RESEND_KEY', apiGoogleMaps:'GOOGLE_MAPS_KEY',
+  apiSupaUrl:'SUPABASE_URL_OVERRIDE', apiSupaKey:'SUPABASE_SERVICE_KEY',
+  apiFirebase:'FIREBASE_KEY', apiBlockchain:'BLOCKCHAIN_RPC'
+};
+
+function toggleKey(id, btn){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(el.type==='password'){ el.type='text'; btn.textContent='🙈'; }
+  else { el.type='password'; btn.textContent='👁'; }
+}
+
+function markChanged(el){ el.classList.add('changed'); }
+
+function loadApiKeys(){
+  const stored = JSON.parse(localStorage.getItem(API_KEY_STORE)||'{}');
+  Object.entries(API_KEY_MAP).forEach(([inputId, storeKey])=>{
+    const el = document.getElementById(inputId);
+    if(el && stored[storeKey]) el.value = atob(stored[storeKey]);
+  });
+}
+
+function saveApiKeys(){
+  if(!isSuperAdmin()){ showToast('⛔ Super Admin only'); return; }
+  const data = {};
+  Object.entries(API_KEY_MAP).forEach(([inputId, storeKey])=>{
+    const el = document.getElementById(inputId);
+    if(el && el.value.trim()) data[storeKey] = btoa(el.value.trim());
+  });
+  localStorage.setItem(API_KEY_STORE, JSON.stringify(data));
+  // Also save to sar_settings for use by edge functions
+  const settings = JSON.parse(localStorage.getItem('sar_settings')||'{}');
+  Object.assign(settings, data);
+  localStorage.setItem('sar_settings', JSON.stringify(settings));
+  // Mark all as saved
+  document.querySelectorAll('.api-input.changed').forEach(el=>el.classList.remove('changed'));
+  const status = document.getElementById('apiSaveStatus');
+  if(status){ status.style.display='inline'; setTimeout(()=>status.style.display='none', 3000); }
+  showToast('✅ API Keys সেভ হয়েছে! Edge Functions আপডেট করুন।');
+}
+
+// Helper: get saved API key
+function getApiKey(key){
+  const stored = JSON.parse(localStorage.getItem(API_KEY_STORE)||'{}');
+  return stored[key] ? atob(stored[key]) : null;
 }
 
 // MODAL
