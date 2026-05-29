@@ -759,6 +759,8 @@ async function submitReg(){
       monthly_sub_paid:false,
       membership_tier:'Basic',
       is_active:true,
+      admin_approved: false,
+      account_status: 'pending_payment',
       password_hash: btoa(unescape(encodeURIComponent(document.getElementById('reg_password').value)))
     };
 
@@ -799,26 +801,44 @@ async function submitReg(){
     });
 
     // 4. Store session
-    localStorage.setItem('sar_cid',cust.id);
-    localStorage.setItem('sar_mid',cust.member_id||'');
-    localStorage.setItem('sar_name',cust.full_name);
-    localStorage.setItem('sar_phone',cust.phone);
-    localStorage.setItem('sar_cat',g('sar_category'));
+    const fullCust = {...custData, id:cust?.id||'', member_id:cust?.member_id||''};
+    localStorage.setItem('sar_customer', JSON.stringify(fullCust));
+    localStorage.setItem('sar_customer_id', cust?.id||'');
+    localStorage.setItem('sar_member_id', cust?.member_id||'');
+    localStorage.setItem('sar_customer_name', custData.full_name);
+    localStorage.setItem('sar_phone', custData.phone);
+    localStorage.setItem('sar_admin_approved', 'false');
+    localStorage.setItem('sar_login_time', new Date().toISOString());
 
     loader.classList.remove('show');
 
-    // Show success
+    // Show success with pending message
     document.getElementById('p3').classList.remove('active');
-    const sp=document.getElementById('sucPanel');
-    sp.style.display='block';
-    document.getElementById('midBox').textContent=cust.member_id||'SAR-2026-XXXXXX';
+    const sp = document.getElementById('sucPanel');
+    sp.style.display = 'block';
+    document.getElementById('midBox').textContent = cust?.member_id || 'SAR-2026-XXXXXX';
 
-    // Set metrics link with customer id
-    document.getElementById('metricsLink').href=`metrics.html?cid=${cust.id}`;
+    // Add pending notice to success panel
+    const pendingNotice = document.createElement('div');
+    pendingNotice.innerHTML = `
+      <div style="margin-top:1.25rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+        border-radius:14px;padding:1rem 1.25rem;text-align:left">
+        <div style="font-weight:700;color:#FCD34D;margin-bottom:.4rem">⏳ পেমেন্ট যাচাইয়ের অপেক্ষায়</div>
+        <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.7">
+          নিবন্ধন ফি পরিশোধ করুন এবং <strong style="color:#fff">নিচের নম্বরে WhatsApp করুন:</strong><br>
+          📱 <strong style="color:#FCD34D">01346098892</strong><br><br>
+          পেমেন্ট স্ক্রিনশট পাঠান। অ্যাডমিন যাচাই করার পরে সব features চালু হবে।<br>
+          <span style="color:rgba(255,255,255,.4);font-size:.75rem">আপনার সদস্য নং: ${cust?.member_id||''}</span>
+        </div>
+      </div>`;
+    sp.appendChild(pendingNotice);
 
-  }catch(err){
+    // Set metrics link
+    document.getElementById('metricsLink').href = `metrics.html?cid=${cust?.id}`;
+
+  } catch(err) {
     loader.classList.remove('show');
-    showMsg('m3','❌ সমস্যা: '+err.message,'error');
+    showMsg('m3', '❌ সমস্যা: ' + err.message, 'error');
     console.error(err);
   }
 }
