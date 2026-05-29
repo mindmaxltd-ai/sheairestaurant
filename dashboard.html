@@ -839,7 +839,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderLoyalty(cust);
 
     // Metrics data entry always available
-    renderMetrics(metrics);
+    renderMetrics(metrics, cust);
 
     if (approved) {
       // FULL ACCESS
@@ -1202,70 +1202,120 @@ function renderCustomer(c) {
 // ═══════════════════════════════════════
 // RENDER METRICS
 // ═══════════════════════════════════════
-function renderMetrics(m) {
-  if (!m || !m.customer_id) {
-    document.getElementById('keyMetrics').innerHTML = `<div class="metric-chip sp2" style="grid-column:span 2;text-align:center;padding:1rem">
-      <a href="metrics.html" style="color:var(--pink2);font-size:.82rem">স্বাস্থ্য মেট্রিক্স পূরণ করুন →</a></div>`;
+function renderMetrics(m, cust) {
+  // m = customer_metrics row, cust = customers row (for BMI fallback)
+  const hasMetrics = m && (m.customer_id || m.bmi || m.fbg_mmol || m.fasting_glucose);
+
+  if (!hasMetrics) {
+    // Show BMI from customer profile if available
+    const custBmi = cust?.bmi;
+    if(custBmi){
+      const el = document.getElementById('mBMI');
+      if(el){
+        el.innerHTML = `${parseFloat(custBmi).toFixed(1)}`;
+        const st = el.parentElement?.querySelector('.mc-status');
+        const b = parseFloat(custBmi);
+        let txt = 'স্বাভাবিক ✓', cls = 's-normal';
+        if(b<18.5){txt='কম ওজন';cls='s-low'}
+        else if(b>=25&&b<30){txt='অতিরিক্ত';cls='s-low'}
+        else if(b>=30){txt='স্থূলতা';cls='s-high'}
+        if(st){st.className=`mc-status ${cls}`;st.textContent=txt;}
+      }
+    }
+    // Show "fill metrics" link for missing fields
+    const km = document.getElementById('keyMetrics');
+    if(km && !custBmi){
+      km.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:1rem 0">
+        <a href="metrics.html" target="_blank" style="color:var(--pink2);font-size:.85rem;text-decoration:none">
+          📊 স্বাস্থ্য মেট্রিক্স পূরণ করুন → আরও তথ্য পাবেন</a></div>`;
+    }
     return;
   }
 
-  // BMI
-  const bmi = m.bmi || null;
+  // Helper: try multiple possible column names
+  const get = (keys) => { for(const k of keys){ if(m[k]!=null) return m[k]; } return null; };
+
+  // BMI — try multiple column names
+  const bmi = get(['bmi','body_mass_index']) || cust?.bmi;
   let bmiSt = 's-na', bmiTxt = 'তথ্য নেই';
   if (bmi) {
-    if (bmi < 18.5) { bmiSt='s-low'; bmiTxt='কম ওজন' }
-    else if (bmi < 25) { bmiSt='s-normal'; bmiTxt='স্বাভাবিক ✓' }
-    else if (bmi < 30) { bmiSt='s-low'; bmiTxt='অতিরিক্ত ওজন' }
-    else { bmiSt='s-high'; bmiTxt='স্থূলতা' }
+    const b = parseFloat(bmi);
+    if (b < 18.5)      { bmiSt='s-low';    bmiTxt='কম ওজন' }
+    else if (b < 25)   { bmiSt='s-normal'; bmiTxt='স্বাভাবিক ✓' }
+    else if (b < 30)   { bmiSt='s-low';    bmiTxt='অতিরিক্ত ওজন' }
+    else               { bmiSt='s-high';   bmiTxt='স্থূলতা' }
   }
-  document.getElementById('mBMI').innerHTML = `${bmi||'—'}`;
-  document.getElementById('mBMI').parentElement.querySelector('.mc-status').className = `mc-status ${bmiSt}`;
-  document.getElementById('mBMI').parentElement.querySelector('.mc-status').textContent = bmiTxt;
+  const mBMI = document.getElementById('mBMI');
+  if(mBMI){
+    mBMI.innerHTML = bmi ? parseFloat(bmi).toFixed(1) : '—';
+    const st = mBMI.parentElement?.querySelector('.mc-status');
+    if(st){ st.className=`mc-status ${bmiSt}`; st.textContent=bmiTxt; }
+  }
 
-  // BP
-  const bp = (m.bp_systolic && m.bp_diastolic) ? `${m.bp_systolic}/${m.bp_diastolic}` : '—';
-  document.getElementById('mBP').textContent = bp;
+  // BP — try multiple column names
+  const sys = get(['bp_systolic','systolic_bp','blood_pressure_systolic']);
+  const dia = get(['bp_diastolic','diastolic_bp','blood_pressure_diastolic']);
+  const bp = (sys && dia) ? `${sys}/${dia}` : '—';
+  const mBP = document.getElementById('mBP');
+  if(mBP) mBP.textContent = bp;
 
-  // Glucose
-  const glu = m.fasting_glucose;
+  // Glucose — try multiple column names
+  const glu = get(['fasting_glucose','fbg_mmol','fasting_blood_glucose','glucose_fasting']);
   let gluSt = 's-na', gluTxt = 'তথ্য নেই';
   if (glu) {
-    if (glu < 3.9) { gluSt='s-low'; gluTxt='নিম্ন' }
-    else if (glu <= 5.5) { gluSt='s-normal'; gluTxt='স্বাভাবিক ✓' }
-    else if (glu <= 7.0) { gluSt='s-low'; gluTxt='প্রি-ডায়াবেটিক' }
-    else { gluSt='s-high'; gluTxt='উচ্চ ⚠️' }
+    const g = parseFloat(glu);
+    if (g < 3.9)       { gluSt='s-low';    gluTxt='নিম্ন' }
+    else if (g <= 5.5) { gluSt='s-normal'; gluTxt='স্বাভাবিক ✓' }
+    else if (g <= 7.0) { gluSt='s-low';    gluTxt='প্রি-ডায়াবেটিক' }
+    else               { gluSt='s-high';   gluTxt='উচ্চ ⚠️' }
   }
-  document.getElementById('mGlu').innerHTML = `${glu||'—'}<span class="mc-unit">mmol/L</span>`;
-  document.getElementById('mGlu').parentElement.querySelector('.mc-status').className = `mc-status ${gluSt}`;
-  document.getElementById('mGlu').parentElement.querySelector('.mc-status').textContent = gluTxt;
+  const mGlu = document.getElementById('mGlu');
+  if(mGlu){
+    mGlu.innerHTML = `${glu||'—'}<span class="mc-unit">mmol/L</span>`;
+    const st = mGlu.parentElement?.querySelector('.mc-status');
+    if(st){ st.className=`mc-status ${gluSt}`; st.textContent=gluTxt; }
+  }
 
   // HbA1c
-  document.getElementById('mHba').innerHTML = `${m.hba1c||'—'}<span class="mc-unit">%</span>`;
+  const hba = get(['hba1c','hba1c_percent','glycated_hemoglobin','hba1c_percentage']);
+  const mHba = document.getElementById('mHba');
+  if(mHba) mHba.innerHTML = `${hba||'—'}<span class="mc-unit">%</span>`;
 
   // Hemoglobin
-  const hb = m.hemoglobin;
+  const hb = get(['hemoglobin','hemoglobin_g_dl','haemoglobin']);
   let hbSt = 's-na', hbTxt = 'তথ্য নেই';
   if (hb) {
-    if (hb < 8) { hbSt='s-high'; hbTxt='তীব্র কম ⚠️' }
-    else if (hb < 11) { hbSt='s-low'; hbTxt='কম' }
-    else if (hb <= 16) { hbSt='s-normal'; hbTxt='স্বাভাবিক ✓' }
-    else { hbSt='s-low'; hbTxt='বেশি' }
+    const h = parseFloat(hb);
+    if (h < 8)         { hbSt='s-high';   hbTxt='তীব্র কম ⚠️' }
+    else if (h < 11)   { hbSt='s-low';    hbTxt='কম' }
+    else if (h <= 16)  { hbSt='s-normal'; hbTxt='স্বাভাবিক ✓' }
+    else               { hbSt='s-low';    hbTxt='বেশি' }
   }
-  document.getElementById('mHemo').innerHTML = `${hb||'—'}<span class="mc-unit">g/dL</span>`;
-  document.getElementById('mHemo').parentElement.querySelector('.mc-status').className = `mc-status ${hbSt}`;
-  document.getElementById('mHemo').parentElement.querySelector('.mc-status').textContent = hbTxt;
-  document.getElementById('statHb').textContent = hb || '—';
-  document.getElementById('statHbS').className = `stat-trend ${hbSt === 's-normal' ? 'up' : hbSt === 's-high' ? 'down' : 'neu'}`;
-  document.getElementById('statHbS').textContent = hbTxt;
+  const mHemo = document.getElementById('mHemo');
+  if(mHemo){
+    mHemo.innerHTML = `${hb||'—'}<span class="mc-unit">g/dL</span>`;
+    const st = mHemo.parentElement?.querySelector('.mc-status');
+    if(st){ st.className=`mc-status ${hbSt}`; st.textContent=hbTxt; }
+  }
+  const sHb = document.getElementById('statHb');
+  const sHbS = document.getElementById('statHbS');
+  if(sHb) sHb.textContent = hb||'—';
+  if(sHbS){ sHbS.className=`stat-trend ${hbSt==='s-normal'?'up':hbSt==='s-high'?'down':'neu'}`; sHbS.textContent=hbTxt; }
 
   // Vitamin D
-  const vd = m.vitamin_d;
-  let vdSt = 's-na';
-  if (vd) { vdSt = vd < 20 ? 's-high' : vd < 30 ? 's-low' : 's-normal'; }
-  document.getElementById('mVD').innerHTML = `${vd||'—'}<span class="mc-unit">ng/mL</span>`;
-  document.getElementById('mVD').parentElement.querySelector('.mc-status').className = `mc-status ${vdSt}`;
-  document.getElementById('mVD').parentElement.querySelector('.mc-status').textContent =
-    !vd ? 'তথ্য নেই' : vd < 20 ? 'ঘাটতি ⚠️' : vd < 30 ? 'অপর্যাপ্ত' : 'যথেষ্ট ✓';
+  const vd = get(['vitamin_d','vitamin_d_ng_ml','vit_d']);
+  let vdSt = 's-na', vdTxt = 'তথ্য নেই';
+  if (vd) {
+    const v = parseFloat(vd);
+    vdSt = v < 20 ? 's-high' : v < 30 ? 's-low' : 's-normal';
+    vdTxt = v < 20 ? 'ঘাটতি ⚠️' : v < 30 ? 'অপর্যাপ্ত' : 'যথেষ্ট ✓';
+  }
+  const mVD = document.getElementById('mVD');
+  if(mVD){
+    mVD.innerHTML = `${vd||'—'}<span class="mc-unit">ng/mL</span>`;
+    const st = mVD.parentElement?.querySelector('.mc-status');
+    if(st){ st.className=`mc-status ${vdSt}`; st.textContent=vdTxt; }
+  }
 
   // Cycle phase
   renderCyclePhase(m);
