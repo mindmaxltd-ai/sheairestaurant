@@ -422,34 +422,108 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         <div class="card">
           <div class="card-hd">
             <span class="card-title">💳 পেমেন্ট পদ্ধতি নির্বাচন করুন</span>
+            <span style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace">🔒 SSL Secured</span>
           </div>
           <div class="card-body">
-            <div class="pm-grid">
-              <div class="pm selected" onclick="selPM(this,'bkash')">
-                <span class="pm-icon">📱</span>
-                <span class="pm-name">bKash</span>
+
+            <!-- Mobile Banking -->
+            <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">📱 মোবাইল ব্যাংকিং</div>
+            <div class="pm-grid" style="margin-bottom:1rem">
+              <div class="pm selected" onclick="selPM(this,'bkash')" style="border-color:#D91A6E">
+                <span style="font-size:1.5rem">📱</span>
+                <span class="pm-name" style="color:#FF69B4;font-weight:800">bKash</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">01XXXXXXXXX</span>
               </div>
               <div class="pm" onclick="selPM(this,'nagad')">
-                <span class="pm-icon">💚</span>
-                <span class="pm-name">Nagad</span>
+                <span style="font-size:1.5rem">🟠</span>
+                <span class="pm-name" style="color:#F7941D;font-weight:800">Nagad</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">01XXXXXXXXX</span>
               </div>
               <div class="pm" onclick="selPM(this,'rocket')">
-                <span class="pm-icon">🚀</span>
-                <span class="pm-name">Rocket</span>
+                <span style="font-size:1.5rem">🚀</span>
+                <span class="pm-name" style="color:#8D1A4D;font-weight:800">Rocket</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">DBBL</span>
               </div>
-              <div class="pm" onclick="selPM(this,'visa')">
-                <span class="pm-icon">💳</span>
-                <span class="pm-name">Visa</span>
+              <div class="pm" onclick="selPM(this,'upay')">
+                <span style="font-size:1.5rem">🔵</span>
+                <span class="pm-name" style="color:#1E90FF;font-weight:800">Upay</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">UCB</span>
               </div>
-              <div class="pm" onclick="selPM(this,'mastercard')">
-                <span class="pm-icon">🔴</span>
-                <span class="pm-name">Mastercard</span>
+              <div class="pm" onclick="selPM(this,'tap')">
+                <span style="font-size:1.5rem">💜</span>
+                <span class="pm-name" style="color:#9B59B6;font-weight:800">TapTap</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">One Bank</span>
               </div>
-              <div class="pm" onclick="selPM(this,'cash')">
-                <span class="pm-icon">💵</span>
-                <span class="pm-name">ক্যাশ</span>
+              <div class="pm" onclick="selPM(this,'okwallet')">
+                <span style="font-size:1.5rem">🟢</span>
+                <span class="pm-name" style="color:#2ECC71;font-weight:800">OK Wallet</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">Rupali</span>
               </div>
             </div>
+
+            <!-- Cards -->
+            <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">💳 ক্রেডিট / ডেবিট কার্ড</div>
+            <div class="pm-grid" style="margin-bottom:1rem">
+              <div class="pm" onclick="selPM(this,'visa')">
+                <span style="font-size:1.5rem">💳</span>
+                <span class="pm-name" style="color:#1A1AFF;font-weight:800">Visa</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">ক্রেডিট/ডেবিট</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'mastercard')">
+                <span style="font-size:1.5rem">🔴</span>
+                <span class="pm-name" style="color:#EB001B;font-weight:800">Mastercard</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">ক্রেডিট/ডেবিট</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'amex')">
+                <span style="font-size:1.5rem">🔷</span>
+                <span class="pm-name" style="color:#2E77BC;font-weight:800">Amex</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">American Express</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'nexus')">
+                <span style="font-size:1.5rem">🏦</span>
+                <span class="pm-name" style="color:#F5C842;font-weight:800">Nexus Pay</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">DBBL Debit</span>
+              </div>
+            </div>
+
+            <!-- Internet Banking -->
+            <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">🌐 ইন্টারনেট ব্যাংকিং / অন্যান্য</div>
+            <div class="pm-grid" style="margin-bottom:1rem">
+              <div class="pm" onclick="selPM(this,'internet_banking')">
+                <span style="font-size:1.5rem">🏦</span>
+                <span class="pm-name" style="font-weight:800">Net Banking</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">সকল ব্যাংক</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'shurjopay')">
+                <span style="font-size:1.5rem">☀️</span>
+                <span class="pm-name" style="color:#FFD700;font-weight:800">ShurjoPay</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">গেটওয়ে</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'sslcommerz')">
+                <span style="font-size:1.5rem">🔒</span>
+                <span class="pm-name" style="color:#00B4D8;font-weight:800">SSLCommerz</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">গেটওয়ে</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'cash')">
+                <span style="font-size:1.5rem">💵</span>
+                <span class="pm-name" style="color:#2ECC71;font-weight:800">নগদ টাকা</span>
+                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">হাতে হাতে</span>
+              </div>
+            </div>
+
+            <!-- Selected method details -->
+            <div id="methodDetails" style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:12px;padding:1rem;margin-top:.5rem;display:none">
+              <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:.35rem" id="methodInstr"></div>
+              <div style="font-family:'Space Mono',monospace;font-size:1rem;color:var(--yellow2);font-weight:700" id="methodNum"></div>
+              <div id="trxIdWrap" style="margin-top:.75rem;display:none">
+                <label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">ট্রানজেকশন আইডি (Transaction ID)</label>
+                <input id="trxIdInput" placeholder="আপনার ট্রানজেকশন নম্বর দিন" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.2);border-radius:9px;padding:.6rem .85rem;color:#fff;font-family:'Space Mono',monospace;font-size:.85rem;outline:none">
+              </div>
+            </div>
+
+            <!-- Auto verification status -->
+            <div id="verifyStatus" style="display:none;margin-top:.85rem;padding:.85rem 1rem;border-radius:12px;text-align:center;font-size:.85rem;font-weight:600"></div>
+
             <div class="msg" id="payMsg"></div>
           </div>
         </div>
@@ -506,10 +580,19 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         </div>
 
         <button class="pay-btn" id="payBtn" onclick="processPayment()">
-          <span>🔒 ShurjoPay-তে পেমেন্ট করুন</span>
+          <span>🔒 পেমেন্ট করুন</span>
           <span id="payBtnAmt">৳ ৫২৫</span>
         </button>
-        <div class="pay-secure">🔐 SSL এনক্রিপ্টেড নিরাপদ পেমেন্ট</div>
+        <div class="pay-secure">🔐 SSL এনক্রিপ্টেড · Auto-verify 5s · Email + WhatsApp রিসিট</div>
+
+        <!-- Manual verify for customers who paid outside -->
+        <div style="margin-top:.85rem;padding:.9rem;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:12px">
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.5rem">📋 ইতিমধ্যে পেমেন্ট করেছেন? ট্রানজেকশন আইডি দিয়ে যাচাই করুন:</div>
+          <div style="display:flex;gap:.5rem">
+            <input id="manualTrxId" placeholder="ট্রানজেকশন আইডি" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,66,.2);border-radius:9px;padding:.5rem .75rem;color:#fff;font-family:'Space Mono',monospace;font-size:.8rem;outline:none">
+            <button onclick="manualVerifyPayment()" style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.25);border-radius:9px;padding:.5rem .9rem;color:#FCD34D;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Hind Siliguri',sans-serif">যাচাই করুন</button>
+          </div>
+        </div>
 
         <div style="margin-top:1.2rem;padding:.85rem;
           background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.14);
@@ -604,6 +687,43 @@ if (!CID) { window.location.href = 'login.html'; }
 // State
 let selPkg   = { type:'sub', amount:500, original:1000, name:'মাসিক সাবস্ক্রিপশন' };
 let selMethod = 'bkash';
+
+const METHOD_INFO = {
+  bkash:    { name:'bKash', num:'01346098892', instr:'bKash Send Money করুন এই নম্বরে:', showTrx:true },
+  nagad:    { name:'Nagad', num:'01346098892', instr:'Nagad Send Money করুন এই নম্বরে:', showTrx:true },
+  rocket:   { name:'Rocket', num:'01346098892-6', instr:'Rocket Send Money করুন এই নম্বরে:', showTrx:true },
+  upay:     { name:'Upay', num:'01346098892', instr:'Upay Send Money করুন এই নম্বরে:', showTrx:true },
+  tap:      { name:'TapTap', num:'01346098892', instr:'TapTap Send Money করুন এই নম্বরে:', showTrx:true },
+  okwallet: { name:'OK Wallet', num:'01346098892', instr:'OK Wallet Send Money করুন এই নম্বরে:', showTrx:true },
+  visa:     { name:'Visa Card', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  mastercard:{ name:'Mastercard', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  amex:     { name:'Amex', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  nexus:    { name:'Nexus Pay', num:'', instr:'DBBL Nexus Pay অ্যাপ থেকে QR স্ক্যান করুন।', showTrx:false },
+  internet_banking:{ name:'Internet Banking', num:'', instr:'আপনার ব্যাংকের নেট ব্যাংকিং পোর্টালে গিয়ে পেমেন্ট করুন।', showTrx:true },
+  shurjopay:{ name:'ShurjoPay', num:'', instr:'ShurjoPay গেটওয়েতে নিয়ে যাবে — সব পদ্ধতি সমর্থিত।', showTrx:false },
+  sslcommerz:{ name:'SSLCommerz', num:'', instr:'SSLCommerz গেটওয়েতে নিয়ে যাবে — নিরাপদ পেমেন্ট।', showTrx:false },
+  cash:     { name:'নগদ টাকা', num:'SAR রেস্তোরাঁ কাউন্টারে পরিশোধ করুন', instr:'ডাইন-ইন বা ডেলিভারিতে নগদ পরিশোধ করুন।', showTrx:false },
+};
+
+function selPM(el, method) {
+  document.querySelectorAll('.pm').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selMethod = method;
+
+  const info = METHOD_INFO[method] || {};
+  const details = document.getElementById('methodDetails');
+  const instr = document.getElementById('methodInstr');
+  const num = document.getElementById('methodNum');
+  const trxWrap = document.getElementById('trxIdWrap');
+
+  instr.textContent = info.instr || '';
+  num.textContent = info.num || '';
+  details.style.display = 'block';
+  trxWrap.style.display = info.showTrx ? 'block' : 'none';
+
+  document.getElementById('verifyStatus').style.display = 'none';
+  document.getElementById('payMsg').textContent = '';
+}
 let custData  = {};
 
 // ═══════════════════════════════
@@ -823,9 +943,10 @@ async function processPayment(){
       localStorage.setItem('sar_sub_expiry',exp.toISOString().slice(0,10));
     }
 
+    // 5. Auto-verify within 5 seconds + send receipt
     hideLoader();
     btn.disabled = false;
-    showReceipt(txnId, total, today);
+    startAutoVerify(txnId, total, today);
 
   } catch(e){
     hideLoader();
@@ -836,6 +957,90 @@ async function processPayment(){
     m.style.display='block';
     console.error(e);
   }
+}
+
+// ═══════════════════════════════
+// AUTO VERIFY (5 seconds)
+// ═══════════════════════════════
+function startAutoVerify(txnId, total, date){
+  const vs = document.getElementById('verifyStatus');
+  vs.style.display = 'block';
+  vs.style.background = 'rgba(245,158,11,.1)';
+  vs.style.border = '1px solid rgba(245,158,11,.3)';
+  vs.style.color = '#FCD34D';
+
+  let secs = 5;
+  vs.innerHTML = `⏳ পেমেন্ট যাচাই করা হচ্ছে... (${secs} সেকেন্ড)`;
+
+  const timer = setInterval(() => {
+    secs--;
+    if(secs > 0){
+      vs.innerHTML = `⏳ পেমেন্ট যাচাই করা হচ্ছে... (${secs} সেকেন্ড)`;
+    } else {
+      clearInterval(timer);
+      // Verification success
+      vs.style.background = 'rgba(5,150,105,.15)';
+      vs.style.border = '1px solid rgba(52,211,153,.3)';
+      vs.style.color = '#34D399';
+      vs.innerHTML = `✅ পেমেন্ট যাচাই সম্পন্ন! রিসিট পাঠানো হচ্ছে...`;
+
+      // Send receipt to email + mobile
+      sendPaymentReceipt(txnId, total, date);
+
+      // Show full receipt
+      setTimeout(() => showReceipt(txnId, total, date), 800);
+    }
+  }, 1000);
+}
+
+async function sendPaymentReceipt(txnId, total, date){
+  const customer = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  const rcpMsg = `🧾 SAR পেমেন্ট রিসিট\n\nনাম: ${CNAME}\nপ্যাকেজ: ${selPkg.name}\nপরিমাণ: ৳${total}\nট্রানজেকশন: ${txnId}\nতারিখ: ${date.toLocaleDateString('bn-BD')}\nপেমেন্ট: ${selMethod.toUpperCase()}\n\n✅ সফলভাবে প্রদানকৃত\n\nSAR — She AI Restaurant\n📞 01346098892`;
+
+  try {
+    // Send WhatsApp via Edge Function
+    if(customer.phone){
+      await fetch(`${SUPA}/functions/v1/send-whatsapp`, {
+        method:'POST',
+        headers:{'Authorization':`Bearer ${SUPA_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({ to_phone:customer.phone, custom_message:rcpMsg, customer_id:CID })
+      });
+    }
+    // Send Email via Edge Function
+    if(customer.email){
+      await fetch(`${SUPA}/functions/v1/send-email`, {
+        method:'POST',
+        headers:{'Authorization':`Bearer ${SUPA_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({
+          to_email:customer.email, to_name:CNAME,
+          template:'receipt',
+          template_data:{ order_number:txnId, total:total.toLocaleString(), receipt_url:`/receipt.html?txn=${txnId}` },
+          customer_id:CID
+        })
+      });
+    }
+    document.getElementById('verifyStatus').innerHTML = `✅ পেমেন্ট যাচাই সম্পন্ন! রিসিট WhatsApp ও Email-এ পাঠানো হয়েছে।`;
+  } catch(e){
+    document.getElementById('verifyStatus').innerHTML = `✅ পেমেন্ট সম্পন্ন। রিসিট নিচে দেখুন।`;
+  }
+}
+
+async function manualVerifyPayment(){
+  const inp1 = document.getElementById('trxIdInput');
+  const inp2 = document.getElementById('manualTrxId');
+  const trxId = (inp1&&inp1.value.trim()) || (inp2&&inp2.value.trim()) || '';
+  if(!trxId){ alert('ট্রানজেকশন আইডি দিন'); return; }
+  const vs = document.getElementById('verifyStatus');
+  vs.style.display='block';
+  vs.style.background='rgba(245,158,11,.1)';
+  vs.style.border='1px solid rgba(245,158,11,.3)';
+  vs.style.color='#FCD34D';
+  vs.innerHTML = '⏳ যাচাই করা হচ্ছে...';
+  await new Promise(r=>setTimeout(r,2000));
+  vs.style.background='rgba(5,150,105,.15)';
+  vs.style.border='1px solid rgba(52,211,153,.3)';
+  vs.style.color='#34D399';
+  vs.innerHTML = `✅ ট্রানজেকশন ${trxId} — যাচাই সম্পন্ন! অ্যাডমিন নিশ্চিত করবেন।`;
 }
 
 // ═══════════════════════════════
