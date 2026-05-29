@@ -699,6 +699,13 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
                   <span class="qa-icon">💳</span>
                   <span class="qa-label">পেমেন্ট করুন</span>
                 </a>
+                <!-- DOCTOR CONSULTATION BUTTON -->
+                <a href="javascript:void(0)" class="qa-btn approved-only"
+                  onclick="return openDoctorPortal(event)"
+                  style="grid-column:1/-1;background:linear-gradient(135deg,rgba(5,150,105,.15),rgba(52,211,153,.08));border-color:rgba(52,211,153,.3)">
+                  <span class="qa-icon">👨‍⚕️</span>
+                  <span class="qa-label" style="color:var(--green2)">ডাক্তার পরামর্শ — AI + ২৫০ মেট্রিক্স বিশ্লেষণ ও প্রেসক্রিপশন</span>
+                </a>
               </div>
             </div>
           </div>
@@ -816,12 +823,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
 
-    const approved = (cust?.admin_approved === true && cust?.subscription_approved === true) ||
+    // Fully active = super admin activated (is_active=true AND admin_approved=true)
+    const approved = (cust?.is_active === true && cust?.admin_approved === true) ||
                      localStorage.getItem('sar_admin_approved') === 'true';
-    const paidReg   = cust?.registration_fee_paid === true ||
-                     localStorage.getItem('sar_reg_paid') === 'true';
+    const paidReg     = cust?.registration_fee_paid === true;
     const memApproved = cust?.admin_approved === true;
-    const subApproved = cust?.subscription_approved === true;
+    const subApproved = cust?.is_active === true;
 
     // Always render these (all users)
     renderCustomer(cust);
@@ -1011,6 +1018,25 @@ function checkApprovalGate(event, action){
   return true;
 }
 
+function openDoctorPortal(event){
+  if(!checkApprovalGate(event, 'ডাক্তার পরামর্শ পেতে')) return false;
+  // Pass customer metrics to doctor portal via sessionStorage
+  const sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const metrics = JSON.parse(localStorage.getItem('sar_latest_metrics')||'{}');
+  sessionStorage.setItem('doctor_patient', JSON.stringify({
+    id:         sc.id || CID,
+    name:       sc.full_name || CNAME,
+    member_id:  sc.member_id || CMID,
+    category:   sc.sar_category || '',
+    bmi:        sc.bmi || metrics.bmi || '',
+    age:        sc.date_of_birth ? Math.floor((new Date()-new Date(sc.date_of_birth))/31557600000) : '',
+    metrics:    metrics,
+    complaint:  '',
+  }));
+  window.open('doctor.html', '_blank');
+  return false;
+}
+
 function removePendingBanner(){
   const b = document.getElementById('accessBanner');
   if(b) b.remove();
@@ -1023,8 +1049,15 @@ async function checkApprovalStatus() {
     const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=admin_approved,account_status,registration_fee_paid`, {headers:H});
     const data = await r.json();
     const cust = data?.[0];
-    if (cust?.admin_approved === true && cust?.subscription_approved === true) {
+    // Super admin activate করলে is_active=true + admin_approved=true → সব features চালু
+    const fullyActive = cust?.is_active === true && cust?.admin_approved === true;
+    if (fullyActive) {
       localStorage.setItem('sar_admin_approved', 'true');
+      // Update localStorage customer object too
+      const stored = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+      Object.assign(stored, {admin_approved:true, is_active:true, account_status:'active',
+        registration_fee_paid:true, monthly_sub_paid:true, subscription_approved:true});
+      localStorage.setItem('sar_customer', JSON.stringify(stored));
       toast('✅ অ্যাকাউন্ট সম্পূর্ণ সক্রিয়! সব features চালু হচ্ছে... 🎉', true);
       document.querySelectorAll('.lock-overlay').forEach(o=>o.remove());
       removePendingBanner();
@@ -1032,11 +1065,8 @@ async function checkApprovalStatus() {
       const [c,m,a,o,n]=await Promise.all([fetchCustomer(),fetchMetrics(),fetchAnalysis(),fetchOrders(),fetchNotes()]);
       renderAnalysis(a,c);renderOrders(o,c);renderNotes(n);renderDailyMenu(a,c);renderSubAlert(c);
       hideLoader();
-    } else if(cust?.admin_approved === true && !cust?.subscription_approved){
-      toast('📅 মেম্বারশিপ অনুমোদিত! এখন সাবস্ক্রিপশন পেমেন্ট করুন এবং স্ক্রিনশট পাঠান।', true);
-      if(btn){ btn.textContent='🔄 স্ট্যাটাস পরীক্ষা করুন'; btn.disabled=false; }
     } else {
-      toast('⏳ এখনো অনুমোদন হয়নি। WhatsApp-এ স্ক্রিনশট পাঠান: 01346098892', false);
+      toast('⏳ এখনো সক্রিয় হয়নি। WhatsApp-এ স্ক্রিনশট পাঠান: 01346098892', false);
       if(btn){ btn.textContent='🔄 স্ট্যাটাস পরীক্ষা করুন'; btn.disabled=false; }
     }
   } catch(e) {
@@ -1558,7 +1588,8 @@ function closeSidebar() {
 // ═══════════════════════════════════════
 function logout() {
   localStorage.clear();
-  window.location.href = 'login.html';
+  sessionStorage.clear();
+  window.location.href = 'login.html?logout=1';
 }
 
 // ═══════════════════════════════════════
