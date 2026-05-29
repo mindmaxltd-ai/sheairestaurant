@@ -540,6 +540,24 @@ const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}'); const CID=_sc.
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
 if (!CID) { window.location.href = 'login.html'; }
 
+// Approval gate — redirect to dashboard if not approved
+const _menuApproved = _sc?.admin_approved === true || localStorage.getItem('sar_admin_approved') === 'true';
+if(!_menuApproved){
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.innerHTML = `<div style="min-height:100vh;background:#060608;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:'Hind Siliguri',sans-serif">
+      <div style="max-width:480px">
+        <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;background:linear-gradient(135deg,#F59E0B,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.75rem">মেনু দেখতে অনুমোদন দরকার</h2>
+        <p style="color:rgba(255,255,255,.5);font-size:.88rem;line-height:1.8;margin-bottom:1.5rem">সুপার অ্যাডমিন আপনার অ্যাকাউন্ট সক্রিয় করার পরে মেনু দেখতে ও অর্ডার করতে পারবেন।<br><br>নিবন্ধন ফি পরিশোধ করে WhatsApp-এ স্ক্রিনশট পাঠান:<br><strong style="color:#FCD34D;font-size:1.1rem">01346098892</strong></p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+          <a href="dashboard.html" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:12px;padding:.75rem 1.5rem;color:#fff;text-decoration:none;font-size:.88rem;font-weight:700">← ড্যাশবোর্ডে যান</a>
+          <a href="payment.html" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.75rem 1.5rem;color:#FCD34D;text-decoration:none;font-size:.88rem;font-weight:700">💳 পেমেন্ট করুন</a>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
 // State
 let allMenuItems   = [];
 let pinnedItems    = [];
