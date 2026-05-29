@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>রিসিট — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.08;animation:orbF 20s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:8s}
+.o3{width:350px;height:350px;background:var(--green);top:40%;left:42%;animation-delay:16s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-18px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.025)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.025)1px,transparent 1px);
+  background-size:72px 72px}
+
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* NAV */
+.top-nav{width:100%;max-width:900px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.75rem;padding:.65rem 1.4rem;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;gap:.75rem}
+.nav-btn{padding:.4rem 1rem;border-radius:50px;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .25s;text-decoration:none;border:1px solid var(--border)}
+.nav-btn.secondary{background:var(--glass);color:rgba(255,255,255,.7)}
+.nav-btn.secondary:hover{background:var(--glass2);color:#fff}
+.nav-btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent}
+.nav-btn.primary:hover{opacity:.9;transform:translateY(-1px)}
+
+/* RECEIPT CONTAINER */
+.receipt-wrap{width:100%;max-width:900px}
+
+/* RECEIPT CARD */
+.receipt-card{
+  background:rgba(15,15,26,.8);backdrop-filter:blur(24px);
+  border:1px solid var(--border2);border-radius:24px;overflow:hidden;
+  animation:fadeIn .5s ease both;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* RECEIPT HEADER */
+.rcp-header{
+  background:linear-gradient(135deg,rgba(233,30,140,.2),rgba(107,33,168,.2));
+  border-bottom:1px solid var(--border);padding:2rem;
+  position:relative;overflow:hidden;
+}
+.rcp-header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23E91E8C' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.rcp-brand-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.rcp-brand{display:flex;align-items:center;gap:1rem}
+.rcp-brand-logo{width:56px;height:56px;border-radius:16px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1.5rem;
+  box-shadow:0 0 24px rgba(233,30,140,.4)}
+.rcp-brand-info h1{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;
+  background:linear-gradient(135deg,#FFD700,var(--pink2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.rcp-brand-info p{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.2rem}
+.rcp-brand-info .contact{font-size:.76rem;color:rgba(255,255,255,.4);margin-top:.3rem}
+.rcp-brand-info .contact span{color:var(--pink2);margin-right:.5rem}
+.rcp-meta{text-align:right}
+.rcp-number{font-family:'Space Mono',monospace;font-size:1.1rem;color:var(--yellow2);font-weight:700}
+.rcp-date{font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.3rem}
+.rcp-status{display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(5,150,105,.2);border:1px solid rgba(52,211,153,.3);
+  border-radius:50px;padding:.3rem .8rem;font-size:.78rem;color:var(--green2);margin-top:.5rem}
+.rcp-status-dot{width:6px;height:6px;background:var(--green2);border-radius:50%;animation:blink 1.2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* CUSTOMER INFO */
+.rcp-customer{padding:1.25rem 2rem;background:rgba(255,255,255,.02);
+  border-bottom:1px solid var(--border);display:flex;gap:2rem;flex-wrap:wrap}
+.rcp-cust-item{display:flex;flex-direction:column;gap:.2rem}
+.rcp-cust-label{font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;font-family:'Space Mono',monospace}
+.rcp-cust-val{font-size:.9rem;color:#fff;font-weight:500}
+
+/* ITEMS TABLE */
+.rcp-items{padding:1.5rem 2rem}
+.rcp-section-title{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;margin-bottom:1rem}
+.items-table{width:100%;border-collapse:collapse}
+.items-table th{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;
+  padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+.items-table td{padding:.75rem .75rem;font-size:.88rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.items-table tr:last-child td{border-bottom:none}
+.item-name{font-weight:600;color:#fff}
+.item-name small{display:block;font-size:.75rem;color:rgba(255,255,255,.4);font-weight:400;margin-top:.15rem}
+.item-cat{display:inline-block;padding:.15rem .5rem;border-radius:50px;font-size:.7rem;font-weight:700}
+.cat-DM{background:rgba(245,158,11,.15);color:var(--yellow2);border:1px solid rgba(245,158,11,.25)}
+.cat-OB{background:rgba(107,33,168,.15);color:var(--purple2);border:1px solid rgba(107,33,168,.25)}
+.cat-FL{background:rgba(5,150,105,.15);color:var(--green2);border:1px solid rgba(5,150,105,.25)}
+.cat-IB{background:rgba(233,30,140,.15);color:var(--pink2);border:1px solid rgba(233,30,140,.25)}
+.cat-PR{background:rgba(239,68,68,.15);color:var(--red2);border:1px solid rgba(239,68,68,.25)}
+.item-qty{color:rgba(255,255,255,.5);text-align:center}
+.item-price{text-align:right;font-family:'Space Mono',monospace;color:var(--yellow2);font-weight:700}
+.item-upgrade{font-size:.7rem;background:rgba(233,30,140,.12);color:var(--pink2);
+  border:1px solid rgba(233,30,140,.2);border-radius:50px;padding:.1rem .4rem;display:inline-block;margin-top:.2rem}
+
+/* TOTALS */
+.totals-section{padding:0 2rem 1.5rem}
+.totals-box{background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;gap:.6rem}
+.total-row{display:flex;justify-content:space-between;align-items:center;font-size:.88rem}
+.total-row.subtotal{color:rgba(255,255,255,.6)}
+.total-row.discount{color:var(--green2)}
+.total-row.tax{color:rgba(255,255,255,.5)}
+.total-row.delivery{color:rgba(255,255,255,.5)}
+.total-divider{height:1px;background:var(--border);margin:.3rem 0}
+.total-row.grand{font-size:1.2rem;font-weight:700;color:#fff;font-family:'Space Mono',monospace}
+.total-row.grand .amount{color:var(--yellow2)}
+.payment-method{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;
+  background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.2);
+  border-radius:50px;font-size:.8rem;color:var(--green2);margin-top:.5rem;align-self:flex-start}
+
+/* NUTRITION */
+.nutrition-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.nutrition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin-top:1rem}
+.nutr-card{background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:14px;padding:.85rem;text-align:center;transition:all .25s}
+.nutr-card:hover{background:rgba(255,255,255,.07);transform:translateY(-2px)}
+.nutr-icon{font-size:1.4rem;margin-bottom:.35rem}
+.nutr-val{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:#fff}
+.nutr-label{font-size:.7rem;color:rgba(255,255,255,.4);margin-top:.15rem}
+.nutr-bar-wrap{margin-top:.4rem;height:3px;background:rgba(255,255,255,.08);border-radius:50px;overflow:hidden}
+.nutr-bar{height:100%;border-radius:50px;transition:width 1s ease}
+
+/* BENEFITS */
+.benefits-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media(max-width:600px){.benefits-grid{grid-template-columns:1fr}}
+.benefit-card{background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:16px;padding:1rem;transition:all .25s}
+.benefit-card:hover{border-color:rgba(233,30,140,.3);background:rgba(233,30,140,.05)}
+.benefit-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem}
+.benefit-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.benefit-title{font-size:.85rem;font-weight:700;color:#fff}
+.benefit-text{font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.6}
+.benefit-tag{display:inline-block;padding:.15rem .5rem;border-radius:50px;
+  font-size:.68rem;font-weight:600;margin-top:.4rem;margin-right:.25rem}
+
+/* MEDICINE SECTION */
+.medicine-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.med-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;margin-bottom:1rem}
+.med-tab{padding:.4rem 1rem;border-radius:50px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:all .25s;border:1px solid var(--border);
+  background:var(--glass);color:rgba(255,255,255,.6)}
+.med-tab.active{background:linear-gradient(135deg,var(--pink3),var(--purple3));
+  border-color:rgba(233,30,140,.3);color:#fff}
+.med-panel{display:none}
+.med-panel.active{display:block;animation:fadeIn .3s ease}
+.med-item{display:flex;gap:1rem;padding:.85rem;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:.6rem;transition:all .25s}
+.med-item:hover{background:rgba(255,255,255,.06)}
+.med-item-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.med-item-body h4{font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.25rem}
+.med-item-body p{font-size:.8rem;color:rgba(255,255,255,.5);line-height:1.5}
+.med-dose{font-size:.72rem;font-family:'Space Mono',monospace;
+  background:rgba(245,158,11,.1);color:var(--yellow2);
+  border:1px solid rgba(245,158,11,.2);border-radius:50px;
+  padding:.15rem .5rem;display:inline-block;margin-top:.3rem}
+
+/* POWDERS */
+.powders-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.powders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-top:1rem}
+.powder-card{background:linear-gradient(135deg,rgba(233,30,140,.08),rgba(107,33,168,.08));
+  border:1px solid rgba(233,30,140,.18);border-radius:14px;padding:.85rem;display:flex;align-items:center;gap:.75rem}
+.powder-dot{width:10px;height:10px;border-radius:50%;background:var(--pink);flex-shrink:0}
+.powder-name{font-size:.85rem;color:#fff;font-weight:600}
+.powder-effect{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.1rem}
+
+/* TRACKER */
+.tracker-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.tracker-steps{display:flex;gap:0;margin-top:1rem;overflow-x:auto;padding-bottom:.5rem}
+.tracker-step{display:flex;flex-direction:column;align-items:center;min-width:100px;position:relative}
+.tracker-step:not(:last-child)::after{content:'';position:absolute;top:18px;left:60%;width:80%;height:2px;
+  background:var(--border);z-index:0}
+.tracker-step.done::after{background:linear-gradient(90deg,var(--green),var(--green2))}
+.tracker-step.active::after{background:linear-gradient(90deg,var(--green),rgba(245,158,11,.4))}
+.step-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+  position:relative;z-index:1;background:var(--dark);transition:all .3s}
+.tracker-step.done .step-circle{background:linear-gradient(135deg,var(--green),var(--green2));border-color:transparent;color:#fff}
+.tracker-step.active .step-circle{background:linear-gradient(135deg,var(--pink),var(--purple));
+  border-color:transparent;box-shadow:0 0 16px rgba(233,30,140,.4);color:#fff}
+.step-label{font-size:.68rem;color:rgba(255,255,255,.4);text-align:center;margin-top:.4rem;max-width:80px;line-height:1.3}
+.tracker-step.done .step-label,.tracker-step.active .step-label{color:rgba(255,255,255,.7)}
+
+/* DISCLAIMER */
+.disclaimer-section{padding:1.5rem 2rem;border-top:1px solid var(--border)}
+.disclaimer-box{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
+  border-radius:16px;padding:1.25rem;display:flex;gap:1rem}
+.disclaimer-icon{font-size:1.5rem;flex-shrink:0;margin-top:.1rem}
+.disclaimer-text{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.7}
+.disclaimer-text strong{color:var(--yellow2);display:block;margin-bottom:.4rem;font-size:.85rem}
+
+/* ACTIONS */
+.rcp-actions{padding:1.5rem 2rem;border-top:1px solid var(--border);
+  display:flex;gap:.75rem;flex-wrap:wrap;justify-content:flex-end}
+.act-btn{padding:.65rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:all .25s;border:1px solid var(--border);
+  display:flex;align-items:center;gap:.5rem;font-family:'Hind Siliguri',sans-serif}
+.act-btn.ghost{background:var(--glass);color:rgba(255,255,255,.7)}
+.act-btn.ghost:hover{background:var(--glass2);color:#fff}
+.act-btn.solid{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent;
+  box-shadow:0 0 20px rgba(233,30,140,.3)}
+.act-btn.solid:hover{opacity:.9;transform:translateY(-2px)}
+.act-btn.green{background:linear-gradient(135deg,var(--green),#10b981);color:#fff;border-color:transparent}
+.act-btn.green:hover{opacity:.9;transform:translateY(-2px)}
+
+/* PRINT STYLES */
+@media print{
+  .bg-wrap,.grid-bg,.top-nav,.rcp-actions,.tracker-section{display:none!important}
+  body{background:#fff;color:#000}
+  .receipt-card{border:1px solid #ddd;border-radius:0;box-shadow:none}
+  .rcp-header{background:#f8f8f8;border-radius:0}
+  .page{padding:0}
+}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;
+  background:linear-gradient(135deg,var(--green),#10b981);color:#fff;
+  padding:.75rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:600;
+  z-index:9999;transform:translateY(100px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:600px){
+  .rcp-brand-row{flex-direction:column}
+  .rcp-meta{text-align:left}
+  .rcp-customer{gap:1rem}
+  .benefits-grid{grid-template-columns:1fr}
+  .rcp-items,.totals-section,.nutrition-section,.benefits-section,
+  .medicine-section,.powders-section,.tracker-section,.disclaimer-section,.rcp-actions{padding:1.25rem 1rem}
+  .rcp-header{padding:1.5rem 1rem}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+
+<div class="page">
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🌸</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="nav-btn secondary">← ড্যাশবোর্ড</a>
+      <a href="order.html" class="nav-btn secondary">অর্ডার</a>
+      <button class="nav-btn primary" onclick="printReceipt()">🖨️ প্রিন্ট</button>
+    </div>
+  </nav>
+
+  <div class="receipt-wrap">
+    <div class="receipt-card" id="receiptCard">
+
+      <!-- HEADER -->
+      <div class="rcp-header">
+        <div class="rcp-brand-row">
+          <div class="rcp-brand">
+            <div class="rcp-brand-logo">🌸</div>
+            <div class="rcp-brand-info">
+              <h1>SAR — শি এআই রেস্তোরাঁ</h1>
+              <p>She AI Restaurant | AI + EI + Blockchain Powered</p>
+              <div class="contact">
+                <span>🌐</span>mindmaxbd.xyz/sar
+                <span>📱</span>01346098892
+                <span>📧</span>mindmaxltd@gmail.com
+              </div>
+            </div>
+          </div>
+          <div class="rcp-meta">
+            <div class="rcp-number" id="rcpNumber">RCP-20260528-7841</div>
+            <div class="rcp-date" id="rcpDate">২৮ মে ২০২৬ | সকাল ১০:৩৫</div>
+            <div class="rcp-status">
+              <div class="rcp-status-dot"></div>
+              পেমেন্ট সফল ✓
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMER INFO -->
+      <div class="rcp-customer">
+        <div class="rcp-cust-item">
+          <span class="rcp-cust-label">সদস্য</span>
+          <span class="rcp-cust-val" id="custName">নাসরিন আক্তার</span>
+        </div>
+        <div class="rcp-cust-item">
+          <span class="rcp-cust-label">সদস্য আইডি</span>
+          <span class="rcp-cust-val" id="custId">SAR-2026-104872</span>
+        </div>
+        <div class="rcp-cust-item">
+          <span class="rcp-cust-label">রোগ বিভাগ</span>
+          <span class="rcp-cust-val"><span class="item-cat cat-DM">ডায়াবেটিস</span></span>
+        </div>
+        <div class="rcp-cust-item">
+          <span class="rcp-cust-label">অর্ডার ধরন</span>
+          <span class="rcp-cust-val">ডাইন-ইন | টেবিল T-04</span>
+        </div>
+        <div class="rcp-cust-item">
+          <span class="rcp-cust-label">অর্ডার নং</span>
+          <span class="rcp-cust-val" id="ordNum">ORD-20260528-5512</span>
+        </div>
+      </div>
+
+      <!-- ITEMS -->
+      <div class="rcp-items">
+        <div class="rcp-section-title">🍽️ অর্ডার বিবরণ</div>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>খাবার</th>
+              <th>বিভাগ</th>
+              <th style="text-align:center">পরিমাণ</th>
+              <th style="text-align:right">মূল্য</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+            <tr>
+              <td>
+                <div class="item-name">DM-11 — Stress-Ease Green Quinoa Plate
+                  <small>বৃহস্পতিবার দুপুর | মটন ডাল + কুইনোয়া + ডিম</small>
+                </div>
+                <span class="item-upgrade">+ ডিম আপগ্রেড</span>
+              </td>
+              <td><span class="item-cat cat-DM">DM</span></td>
+              <td class="item-qty">১</td>
+              <td class="item-price">৳৩৫০</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="item-name">সিড ক্রাঞ্চ টপিং (অতিরিক্ত)
+                  <small>কুমড়ার বীজ + সূর্যমুখী + তিসি + চিয়া</small>
+                </div>
+              </td>
+              <td><span class="item-cat cat-DM">add-on</span></td>
+              <td class="item-qty">১</td>
+              <td class="item-price">৳৫০</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TOTALS -->
+      <div class="totals-section">
+        <div class="totals-box">
+          <div class="total-row subtotal"><span>মূল মূল্য</span><span>৳৪০০</span></div>
+          <div class="total-row discount"><span>✓ লয়্যালটি ডিসকাউন্ট (৫%)</span><span>-৳২০</span></div>
+          <div class="total-row tax"><span>ভ্যাট (৫%)</span><span>৳১৯</span></div>
+          <div class="total-divider"></div>
+          <div class="total-row grand"><span>মোট পরিশোধ</span><span class="amount">৳৩৯৯</span></div>
+          <div class="payment-method">✓ bKash | ট্রানজেকশন: BK20260528XQ41</div>
+        </div>
+      </div>
+
+      <!-- NUTRITION -->
+      <div class="nutrition-section">
+        <div class="rcp-section-title">📊 পুষ্টিমান বিশ্লেষণ</div>
+        <div class="nutrition-grid">
+          <div class="nutr-card">
+            <div class="nutr-icon">🔥</div>
+            <div class="nutr-val">600</div>
+            <div class="nutr-label">ক্যালরি (kcal)</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:60%;background:linear-gradient(90deg,#E91E8C,#A855F7)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">💪</div>
+            <div class="nutr-val">26g</div>
+            <div class="nutr-label">প্রোটিন</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:72%;background:linear-gradient(90deg,#059669,#34D399)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🌾</div>
+            <div class="nutr-val">72g</div>
+            <div class="nutr-label">কার্বোহাইড্রেট</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:48%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🫒</div>
+            <div class="nutr-val">8g</div>
+            <div class="nutr-label">ফ্যাট</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:20%;background:linear-gradient(90deg,#A855F7,#6B21A8)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🌿</div>
+            <div class="nutr-val">12g</div>
+            <div class="nutr-label">ফাইবার</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:55%;background:linear-gradient(90deg,#10b981,#059669)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🩸</div>
+            <div class="nutr-val">8mg</div>
+            <div class="nutr-label">আয়রন</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:44%;background:linear-gradient(90deg,#DC2626,#F87171)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🦴</div>
+            <div class="nutr-val">120mg</div>
+            <div class="nutr-label">ক্যালসিয়াম</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:30%;background:linear-gradient(90deg,#60a5fa,#3b82f6)"></div></div>
+          </div>
+          <div class="nutr-card">
+            <div class="nutr-icon">🌊</div>
+            <div class="nutr-val">Low</div>
+            <div class="nutr-label">গ্লাইসেমিক ইনডেক্স</div>
+            <div class="nutr-bar-wrap"><div class="nutr-bar" style="width:25%;background:linear-gradient(90deg,#34D399,#059669)"></div></div>
+          </div>
+        </div>
+
+        <!-- Daily requirement bars -->
+        <div style="margin-top:1.25rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:1rem">
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.75rem;font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase">দৈনিক চাহিদার অবদান</div>
+          <div id="dailyBars"></div>
+        </div>
+      </div>
+
+      <!-- HEALTH BENEFITS -->
+      <div class="benefits-section">
+        <div class="rcp-section-title">✨ আজকের স্বাস্থ্য উপকার</div>
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon" style="background:rgba(245,158,11,.12)">🌿</div>
+              <span class="benefit-title">রক্তশর্করা নিয়ন্ত্রণ</span>
+            </div>
+            <div class="benefit-text">করলা গুঁড়া ও মেথি বীজ ইনসুলিন সংবেদনশীলতা উন্নত করে। কুইনোয়ার নিম্ন GI রক্তশর্করার ঊর্ধ্বমুখী পরিবর্তন রোধ করে।</div>
+            <span class="benefit-tag" style="background:rgba(245,158,11,.1);color:var(--yellow2);border:1px solid rgba(245,158,11,.2)">ডায়াবেটিস</span>
+            <span class="benefit-tag" style="background:rgba(5,150,105,.1);color:var(--green2);border:1px solid rgba(5,150,105,.2)">প্রমাণিত</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon" style="background:rgba(233,30,140,.12)">💚</div>
+              <span class="benefit-title">স্ট্রেস হ্রাস</span>
+            </div>
+            <div class="benefit-text">পার্সলে ও পুদিনা তাজা রাখে মস্তিষ্ককে। লেবু-জিরার ড্রেসিং কর্টিসল হরমোন কমাতে সাহায্য করে।</div>
+            <span class="benefit-tag" style="background:rgba(107,33,168,.1);color:var(--purple2);border:1px solid rgba(107,33,168,.2)">মানসিক স্বাস্থ্য</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon" style="background:rgba(5,150,105,.12)">🥚</div>
+              <span class="benefit-title">প্রোটিন ও কোলিন</span>
+            </div>
+            <div class="benefit-text">পোচড ডিম উচ্চমানের প্রোটিন ও কোলিন সরবরাহ করে। মস্তিষ্কের কার্যক্ষমতা এবং স্নায়ুতন্ত্রের জন্য অপরিহার্য।</div>
+            <span class="benefit-tag" style="background:rgba(233,30,140,.1);color:var(--pink2);border:1px solid rgba(233,30,140,.2)">নিউরো</span>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon" style="background:rgba(245,158,11,.12)">🌾</div>
+              <span class="benefit-title">পাচন স্বাস্থ্য</span>
+            </div>
+            <div class="benefit-text">ফাইবার সমৃদ্ধ কুইনোয়া অন্ত্রের উপকারী ব্যাকটেরিয়া পুষ্ট করে। চিয়া বীজ কোষ্ঠকাঠিন্য দূর করে।</div>
+            <span class="benefit-tag" style="background:rgba(5,150,105,.1);color:var(--green2);border:1px solid rgba(5,150,105,.2)">অন্ত্র</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDICINE SECTION -->
+      <div class="medicine-section">
+        <div class="rcp-section-title">💊 স্বাস্থ্য পরামর্শ</div>
+        <div class="med-tabs">
+          <button class="med-tab active" onclick="switchTab(this,'conventional')">প্রচলিত চিকিৎসা</button>
+          <button class="med-tab" onclick="switchTab(this,'homeopathic')">হোমিওপ্যাথিক</button>
+          <button class="med-tab" onclick="switchTab(this,'ayurvedic')">আয়ুর্বেদিক</button>
+          <button class="med-tab" onclick="switchTab(this,'home')">ঘরোয়া প্রতিকার</button>
+          <button class="med-tab" onclick="switchTab(this,'dosdonts')">করণীয় ও বর্জনীয়</button>
+        </div>
+
+        <div class="med-panel active" id="conventional">
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(59,130,246,.12)">💉</div>
+            <div class="med-item-body">
+              <h4>Metformin 500mg</h4>
+              <p>রক্তের গ্লুকোজ নিয়ন্ত্রণে সাহায্য করে। খাবারের সাথে অথবা পরে সেবন করুন।</p>
+              <span class="med-dose">ডাক্তারের পরামর্শ অনুযায়ী</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(233,30,140,.12)">🩺</div>
+            <div class="med-item-body">
+              <h4>ভিটামিন ডি৩ ও বি১২ পরীক্ষা</h4>
+              <p>ডায়াবেটিস রোগীদের ভিটামিন ডি ঘাটতি সাধারণ। আপনার চিকিৎসককে পরীক্ষা করতে বলুন।</p>
+              <span class="med-dose">বার্ষিক রক্ত পরীক্ষা</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(245,158,11,.12)">⚠️</div>
+            <div class="med-item-body">
+              <h4>HbA1c মনিটরিং</h4>
+              <p>প্রতি ৩ মাসে একবার HbA1c পরীক্ষা করুন। লক্ষ্যমাত্রা: ৭% এর নিচে।</p>
+              <span class="med-dose">প্রতি ৩ মাস</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="med-panel" id="homeopathic">
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(107,33,168,.12)">🫧</div>
+            <div class="med-item-body">
+              <h4>Syzygium Jambolanum 30C</h4>
+              <p>ডায়াবেটিসের জন্য ঐতিহ্যবাহী হোমিওপ্যাথিক ওষুধ। অতিরিক্ত তৃষ্ণা ও প্রস্রাব কমায়।</p>
+              <span class="med-dose">দিনে ২ বার, ৩ দানা</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(107,33,168,.12)">💧</div>
+            <div class="med-item-body">
+              <h4>Uranium Nitricum 6X</h4>
+              <p>মূত্রে শর্করা কমাতে ব্যবহৃত। অগ্ন্যাশয়ের কার্যক্ষমতা উন্নত করে।</p>
+              <span class="med-dose">হোমিওপ্যাথিক চিকিৎসকের পরামর্শে</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="med-panel" id="ayurvedic">
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(5,150,105,.12)">🌱</div>
+            <div class="med-item-body">
+              <h4>গুড়মার চূর্ণ (Gymnema Sylvestre)</h4>
+              <p>"শর্করার নাশক" নামে পরিচিত। অগ্ন্যাশয়ে ইনসুলিন উৎপাদন উদ্দীপিত করে।</p>
+              <span class="med-dose">৩-৬ গ্রাম, দিনে ২ বার</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(5,150,105,.12)">🌿</div>
+            <div class="med-item-body">
+              <h4>ত্রিফলা চূর্ণ</h4>
+              <p>পাচন উন্নত করে, রক্তশর্করা নিয়ন্ত্রণে সাহায্য করে। অ্যান্টিঅক্সিডেন্ট সমৃদ্ধ।</p>
+              <span class="med-dose">রাতে শোওয়ার আগে, গরম পানিতে</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="med-panel" id="home">
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(245,158,11,.12)">🧄</div>
+            <div class="med-item-body">
+              <h4>মেথি বীজ ভিজানো পানি</h4>
+              <p>রাতে ১ চামচ মেথি বীজ ১ গ্লাস পানিতে ভিজিয়ে রাখুন। সকালে খালি পেটে পান করুন।</p>
+              <span class="med-dose">প্রতিদিন সকাল</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(5,150,105,.12)">🥒</div>
+            <div class="med-item-body">
+              <h4>করলার রস</h4>
+              <p>সকালে খালি পেটে ৫০-১০০ মিলি করলার রস পান করুন। রক্তের গ্লুকোজ স্বাভাবিকভাবে কমায়।</p>
+              <span class="med-dose">সকাল, খালি পেটে</span>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-item-icon" style="background:rgba(233,30,140,.12)">🍋</div>
+            <div class="med-item-body">
+              <h4>দারুচিনি ও আদা চা</h4>
+              <p>১ টুকরো দারুচিনি + ১ চিমটি আদা গুঁড়া গরম পানিতে মিশিয়ে পান করুন।</p>
+              <span class="med-dose">খাবার ১৫ মিনিট পরে</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="med-panel" id="dosdonts">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div style="background:rgba(5,150,105,.06);border:1px solid rgba(5,150,105,.2);border-radius:14px;padding:1rem">
+              <div style="font-size:.85rem;font-weight:700;color:var(--green2);margin-bottom:.75rem">✅ করণীয়</div>
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem">
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--green2);flex-shrink:0">✓</span> প্রতিদিন ৩০ মিনিট হাঁটুন
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--green2);flex-shrink:0">✓</span> ৮ গ্লাস পানি পান করুন
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--green2);flex-shrink:0">✓</span> সময়মতো ওষুধ খান
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--green2);flex-shrink:0">✓</span> রক্তের গ্লুকোজ পরীক্ষা করুন
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--green2);flex-shrink:0">✓</span> রাত ১০টার আগে ঘুমান
+                </li>
+              </ul>
+            </div>
+            <div style="background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:14px;padding:1rem">
+              <div style="font-size:.85rem;font-weight:700;color:var(--red2);margin-bottom:.75rem">❌ বর্জনীয়</div>
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:.5rem">
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--red2);flex-shrink:0">✗</span> চিনি ও মিষ্টি খাবার
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--red2);flex-shrink:0">✗</span> সাদা ভাত ও আটা
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--red2);flex-shrink:0">✗</span> প্রক্রিয়াজাত খাবার
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--red2);flex-shrink:0">✗</span> দেরি করে খাওয়া
+                </li>
+                <li style="font-size:.82rem;color:rgba(255,255,255,.65);display:flex;gap:.5rem">
+                  <span style="color:var(--red2);flex-shrink:0">✗</span> অতিরিক্ত চা-কফি
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POWDERS USED -->
+      <div class="powders-section">
+        <div class="rcp-section-title">🌿 আজকের ঔষধি গুঁড়া (বাধ্যতামূলক ৩টি)</div>
+        <div class="powders-grid">
+          <div class="powder-card">
+            <div class="powder-dot"></div>
+            <div>
+              <div class="powder-name">করলা গুঁড়া</div>
+              <div class="powder-effect">রক্তশর্করা নিয়ন্ত্রণ</div>
+            </div>
+          </div>
+          <div class="powder-card">
+            <div class="powder-dot" style="background:var(--yellow)"></div>
+            <div>
+              <div class="powder-name">মেথি বীজ গুঁড়া</div>
+              <div class="powder-effect">ইনসুলিন সংবেদনশীলতা</div>
+            </div>
+          </div>
+          <div class="powder-card">
+            <div class="powder-dot" style="background:var(--purple2)"></div>
+            <div>
+              <div class="powder-name">দারুচিনি গুঁড়া</div>
+              <div class="powder-effect">গ্লুকোজ বিপাক</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER TRACKER -->
+      <div class="tracker-section">
+        <div class="rcp-section-title">📍 অর্ডার অবস্থান</div>
+        <div class="tracker-steps">
+          <div class="tracker-step done">
+            <div class="step-circle">✓</div>
+            <div class="step-label">পেমেন্ট সফল</div>
+          </div>
+          <div class="tracker-step done">
+            <div class="step-circle">✓</div>
+            <div class="step-label">অর্ডার নিশ্চিত</div>
+          </div>
+          <div class="tracker-step done">
+            <div class="step-circle">✓</div>
+            <div class="step-label">রান্না শুরু</div>
+          </div>
+          <div class="tracker-step active">
+            <div class="step-circle">🍳</div>
+            <div class="step-label">প্রস্তুত হচ্ছে</div>
+          </div>
+          <div class="tracker-step">
+            <div class="step-circle">📦</div>
+            <div class="step-label">প্যাকিং</div>
+          </div>
+          <div class="tracker-step">
+            <div class="step-circle">✨</div>
+            <div class="step-label">সম্পন্ন</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:.5rem;align-items:center;font-size:.82rem;color:rgba(255,255,255,.5)">
+          <span>⏱️</span> আনুমানিক সময়: <strong style="color:var(--yellow2)">১৫-২০ মিনিট</strong>
+        </div>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div class="disclaimer-section">
+        <div class="disclaimer-box">
+          <div class="disclaimer-icon">⚕️</div>
+          <div class="disclaimer-text">
+            <strong>গুরুত্বপূর্ণ স্বাস্থ্য বিজ্ঞপ্তি</strong>
+            SAR — শি এআই রেস্তোরাঁ কোনো চিকিৎসা প্রতিষ্ঠান নয়। আমরা ডাক্তার বা স্বাস্থ্যকর্মী নই। এখানে প্রদত্ত সমস্ত তথ্য শুধুমাত্র সচেতনতা বৃদ্ধি এবং অনুপ্রেরণার জন্য। যেকোনো শারীরিক অসুস্থতায় অবশ্যই একজন নিবন্ধিত চিকিৎসকের পরামর্শ নিন। নিজে নিজে ওষুধ সেবন করবেন না।
+            <br><br>
+            SAR motivates you to explore the power of food for your health. We are not doctors. Consult a physician before taking any medication. This is a therapeutic food system, not medical treatment.
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="rcp-actions">
+        <button class="act-btn ghost" onclick="shareReceipt()">📤 শেয়ার করুন</button>
+        <button class="act-btn ghost" onclick="downloadPDF()">⬇️ PDF ডাউনলোড</button>
+        <button class="act-btn green" onclick="sendWhatsApp()">📱 WhatsApp-এ পাঠান</button>
+        <button class="act-btn solid" onclick="printReceipt()">🖨️ প্রিন্ট করুন</button>
+      </div>
+
+    </div><!-- end receipt-card -->
+
+    <!-- PDF EXPIRE NOTE -->
+    <div style="text-align:center;font-size:.75rem;color:rgba(255,255,255,.3);margin-top:1rem">
+      📄 এই রিসিট ৭ দিন পর্যন্ত সংরক্ষিত থাকবে। গ্রাহক তথ্য ৫ বছর সংরক্ষিত থাকবে।
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Supabase config
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+// Load receipt from URL params
+const params = new URLSearchParams(location.search);
+const receiptId = params.get('id') || params.get('receipt_id');
+const orderId = params.get('order_id');
+
+// Load from Supabase if receipt ID provided
+async function loadReceipt() {
+  if (!receiptId && !orderId) return;
+  try {
+    const endpoint = receiptId
+      ? `${SUPABASE_URL}/rest/v1/receipts?id=eq.${receiptId}&select=*`
+      : `${SUPABASE_URL}/rest/v1/receipts?order_id=eq.${orderId}&select=*`;
+    const res = await fetch(endpoint, {
+      headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY}
+    });
+    const data = await res.json();
+    if (data && data[0]) populateReceipt(data[0]);
+  } catch(e) { console.error('Receipt load error:', e); }
+}
+
+function populateReceipt(r) {
+  if (r.receipt_number) document.getElementById('rcpNumber').textContent = r.receipt_number;
+  if (r.generated_at) {
+    const d = new Date(r.generated_at);
+    document.getElementById('rcpDate').textContent = d.toLocaleString('bn-BD');
+  }
+  if (r.customer_name) document.getElementById('custName').textContent = r.customer_name;
+  if (r.customer_id) document.getElementById('custId').textContent = r.customer_id;
+}
+
+// Daily requirement bars
+const dailyBars = [
+  {label:'ক্যালরি (২০০০ kcal)',pct:30,color:'linear-gradient(90deg,#E91E8C,#A855F7)'},
+  {label:'প্রোটিন (৫০g)',pct:52,color:'linear-gradient(90deg,#059669,#34D399)'},
+  {label:'আয়রন (১৮mg)',pct:44,color:'linear-gradient(90deg,#DC2626,#F87171)'},
+  {label:'ক্যালসিয়াম (১০০০mg)',pct:12,color:'linear-gradient(90deg,#60a5fa,#3b82f6)'},
+  {label:'ফাইবার (২৫g)',pct:48,color:'linear-gradient(90deg,#10b981,#059669)'},
+];
+const dBar = document.getElementById('dailyBars');
+dailyBars.forEach(b => {
+  dBar.innerHTML += `
+    <div style="margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:.3rem">
+        <span style="font-size:.78rem;color:rgba(255,255,255,.55)">${b.label}</span>
+        <span style="font-size:.78rem;font-family:'Space Mono',monospace;color:#fff">${b.pct}%</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.08);border-radius:50px;overflow:hidden">
+        <div style="height:100%;width:${b.pct}%;background:${b.color};border-radius:50px;transition:width 1.2s ease"></div>
+      </div>
+    </div>`;
+});
+
+// Tab switching
+function switchTab(btn, panelId) {
+  document.querySelectorAll('.med-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.med-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// Print
+function printReceipt() { window.print(); }
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Share
+function shareReceipt() {
+  if (navigator.share) {
+    navigator.share({ title: 'SAR রিসিট', url: location.href });
+  } else {
+    navigator.clipboard.writeText(location.href);
+    showToast('✓ লিংক কপি হয়েছে');
+  }
+}
+
+// WhatsApp
+function sendWhatsApp() {
+  const msg = encodeURIComponent('আমার SAR রিসিট: ' + location.href);
+  window.open('https://wa.me/8801346098892?text=' + msg, '_blank');
+  showToast('WhatsApp খুলছে...');
+}
+
+// PDF Download
+function downloadPDF() {
+  showToast('⏳ PDF তৈরি হচ্ছে...');
+  setTimeout(() => {
+    window.print();
+    showToast('✓ PDF প্রস্তুত');
+  }, 500);
+}
+
+// Animate bars on load
+window.addEventListener('load', () => {
+  document.querySelectorAll('.nutr-bar').forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0';
+    setTimeout(() => b.style.width = w, 300);
+  });
+  loadReceipt();
+});
+</script>
+</body>
+</html>

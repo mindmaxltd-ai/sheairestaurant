@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>পেমেন্ট ও সাবস্ক্রিপশন — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* BG */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 18s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:7s}
+.o3{width:350px;height:350px;background:var(--green);top:40%;left:40%;animation-delay:14s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(25px,-20px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-size:72px 72px}
+
+/* LAYOUT */
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* NAV */
+.top-nav{width:100%;max-width:1000px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:2rem;padding:.65rem 1.4rem;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-back{font-size:.84rem;color:rgba(255,255,255,.5);text-decoration:none;
+  display:flex;align-items:center;gap:.4rem;transition:color .3s}
+.nav-back:hover{color:var(--pink2)}
+
+/* PAGE HEADER */
+.page-hd{width:100%;max-width:1000px;text-align:center;margin-bottom:2.5rem}
+.page-badge{display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--green3);border:1px solid rgba(5,150,105,.25);
+  border-radius:50px;padding:.3rem .95rem;font-size:.73rem;
+  color:var(--green2);letter-spacing:.07em;margin-bottom:1rem}
+.page-title{font-family:'Playfair Display',serif;font-size:2.1rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.78));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.4rem}
+.page-sub{font-size:.88rem;color:rgba(255,255,255,.4);line-height:1.7}
+
+/* GRID */
+.main-grid{display:grid;grid-template-columns:1fr 380px;gap:1.75rem;width:100%;max-width:1000px;align-items:start}
+
+/* ── CARDS ── */
+.card{background:rgba(14,14,20,.82);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:22px;overflow:hidden}
+.card-hd{padding:1.2rem 1.5rem .9rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:.9rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:.5rem}
+.card-body{padding:1.4rem 1.5rem}
+
+/* ── MEMBERSHIP STATUS ── */
+.status-box{
+  border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1.1rem;
+}
+.status-box.active{background:linear-gradient(135deg,var(--green3),rgba(245,158,11,.06));
+  border:1px solid rgba(5,150,105,.22)}
+.status-box.expired{background:linear-gradient(135deg,rgba(220,38,38,.1),rgba(107,33,168,.06));
+  border:1px solid rgba(220,38,38,.22)}
+.status-box.pending{background:linear-gradient(135deg,var(--yellow3),var(--pink3));
+  border:1px solid rgba(245,158,11,.22)}
+.status-icon{font-size:2rem;flex-shrink:0}
+.status-info{flex:1}
+.status-title{font-size:.92rem;font-weight:700;margin-bottom:.2rem}
+.status-desc{font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.5}
+.status-meta{font-family:'Space Mono',monospace;font-size:.7rem;
+  color:rgba(255,255,255,.3);margin-top:.3rem}
+
+/* ── PACKAGE CARDS ── */
+.pkg-grid{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem}
+.pkg{
+  border-radius:16px;padding:1.2rem 1.3rem;
+  border:1.5px solid var(--border);background:var(--glass);
+  cursor:pointer;transition:all .35s;position:relative;overflow:hidden;
+}
+.pkg::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;
+  background:linear-gradient(135deg,var(--pink3),var(--purple3))}
+.pkg:hover::before,.pkg.selected::before{opacity:1}
+.pkg.selected{border-color:var(--pink);box-shadow:0 0 22px rgba(233,30,140,.18)}
+.pkg-row{display:flex;align-items:center;gap:1rem;position:relative;z-index:1}
+.pkg-radio{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.pkg.selected .pkg-radio{border-color:var(--pink);background:var(--pink)}
+.pkg.selected .pkg-radio::after{content:'';width:7px;height:7px;background:#fff;border-radius:50%}
+.pkg-icon{font-size:1.5rem;flex-shrink:0}
+.pkg-info{flex:1}
+.pkg-name{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.15rem}
+.pkg-desc{font-size:.76rem;color:rgba(255,255,255,.48);line-height:1.5}
+.pkg-feats{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.pfeat{font-size:.66rem;padding:.15rem .5rem;border-radius:50px;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.55)}
+.pkg-price-col{text-align:right;flex-shrink:0}
+.pkg-orig{font-size:.75rem;color:rgba(255,255,255,.32);text-decoration:line-through}
+.pkg-price{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700}
+.pkg-period{font-size:.7rem;color:rgba(255,255,255,.38)}
+.pkg-badge{position:absolute;top:.75rem;right:.9rem;
+  font-size:.65rem;padding:.18rem .55rem;border-radius:50px;font-weight:700;z-index:2}
+.popular{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff}
+.discount{background:rgba(5,150,105,.2);color:var(--green2);border:1px solid rgba(5,150,105,.3)}
+
+/* ── PAYMENT METHOD ── */
+.pm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.4rem}
+.pm{border-radius:12px;padding:.85rem .5rem;text-align:center;
+  background:var(--glass);border:1.5px solid var(--border);
+  cursor:pointer;transition:all .3s;position:relative}
+.pm:hover{border-color:rgba(233,30,140,.3);background:var(--pink3)}
+.pm.selected{border-color:var(--pink);background:var(--pink3);
+  box-shadow:0 0 14px rgba(233,30,140,.18)}
+.pm-icon{font-size:1.3rem;display:block;margin-bottom:.3rem}
+.pm-name{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.65)}
+.pm-badge{position:absolute;top:4px;right:4px;background:var(--green);
+  color:#fff;font-size:.55rem;border-radius:4px;padding:.1rem .3rem;font-weight:700}
+
+/* ── ORDER SUMMARY ── */
+.summary-card{
+  background:linear-gradient(135deg,rgba(107,33,168,.09),rgba(233,30,140,.06));
+  border:1px solid rgba(107,33,168,.2);border-radius:18px;
+  padding:1.3rem;margin-bottom:1.4rem;position:sticky;top:1.5rem;
+}
+.sum-title{font-size:.84rem;font-weight:700;color:rgba(255,255,255,.6);
+  margin-bottom:1rem;display:flex;align-items:center;gap:.45rem}
+.sum-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.82rem}
+.sum-row:last-child{border:none;padding-bottom:0}
+.sum-k{color:rgba(255,255,255,.45)}
+.sum-v{color:#fff;font-weight:600}
+.sum-v.disc{color:var(--green2)}
+.sum-v.total{font-family:'Space Mono',monospace;font-size:1.2rem;
+  background:linear-gradient(135deg,var(--green2),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.divider{height:1px;background:rgba(255,255,255,.07);margin:.4rem 0}
+
+/* ── PAY BUTTON ── */
+.pay-btn{
+  width:100%;padding:1rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:1rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 28px rgba(5,150,105,.3);transition:all .3s;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+}
+.pay-btn:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(5,150,105,.5)}
+.pay-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.pay-secure{text-align:center;font-size:.72rem;color:rgba(255,255,255,.28);margin-top:.65rem}
+
+/* ── HISTORY TABLE ── */
+.hist-table{width:100%;border-collapse:collapse}
+.hist-table th{font-family:'Space Mono',monospace;font-size:.65rem;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);
+  padding:.55rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+.hist-table td{padding:.65rem .75rem;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.05)}
+.hist-table tr:last-child td{border:none}
+.hist-table tr:hover td{background:rgba(255,255,255,.03)}
+.pay-type{display:inline-block;font-size:.67rem;padding:.15rem .55rem;
+  border-radius:50px;font-weight:700}
+.pt-reg{background:rgba(107,33,168,.18);color:var(--purple2)}
+.pt-sub{background:rgba(5,150,105,.18);color:var(--green2)}
+.pt-ord{background:rgba(245,158,11,.18);color:var(--yellow2)}
+.pay-stat{display:inline-block;font-size:.67rem;padding:.15rem .55rem;
+  border-radius:50px;font-weight:700}
+.ps-suc{background:rgba(5,150,105,.18);color:var(--green2)}
+.ps-pend{background:rgba(245,158,11,.18);color:var(--yellow2)}
+.ps-fail{background:rgba(220,38,38,.18);color:var(--red2)}
+.empty-hist{text-align:center;padding:2rem;color:rgba(255,255,255,.28);font-size:.82rem}
+
+/* ── RECEIPT SECTION ── */
+.receipt-box{display:none;
+  background:rgba(10,10,20,.95);backdrop-filter:blur(20px);
+  border:1px solid rgba(5,150,105,.25);border-radius:22px;
+  padding:2rem;margin-top:1.5rem;width:100%;max-width:1000px;
+}
+.receipt-box.show{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.rcp-header{display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.rcp-brand{display:flex;align-items:center;gap:.75rem}
+.rcp-logo{width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem}
+.rcp-brand-txt{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.rcp-brand-sub{font-size:.72rem;color:rgba(255,255,255,.35)}
+.rcp-num{text-align:right}
+.rcp-num-val{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--green2)}
+.rcp-num-lbl{font-size:.7rem;color:rgba(255,255,255,.3)}
+.rcp-success{
+  background:linear-gradient(135deg,var(--green3),rgba(245,158,11,.06));
+  border:1px solid rgba(5,150,105,.22);border-radius:14px;
+  padding:1rem 1.3rem;margin-bottom:1.4rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.rcp-success-icon{font-size:1.8rem;flex-shrink:0}
+.rcp-success-title{font-size:.9rem;font-weight:700;color:var(--green2);margin-bottom:.15rem}
+.rcp-success-desc{font-size:.76rem;color:rgba(255,255,255,.48)}
+.rcp-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.3rem}
+.rcp-detail{background:rgba(255,255,255,.04);border-radius:10px;padding:.7rem .85rem}
+.rcp-detail-k{font-size:.7rem;color:rgba(255,255,255,.38);margin-bottom:.2rem}
+.rcp-detail-v{font-size:.82rem;color:#fff;font-weight:600}
+.rcp-total-box{
+  background:linear-gradient(135deg,var(--green3),rgba(245,158,11,.08));
+  border:1px solid rgba(5,150,105,.22);border-radius:14px;
+  padding:1rem 1.3rem;margin-bottom:1.3rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.rcp-total-lbl{font-size:.85rem;color:rgba(255,255,255,.6)}
+.rcp-total-val{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;
+  background:linear-gradient(135deg,var(--green2),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.disclaimer-box{
+  background:linear-gradient(135deg,rgba(220,38,38,.07),rgba(107,33,168,.05));
+  border:1px solid rgba(220,38,38,.15);border-radius:12px;
+  padding:1rem 1.2rem;margin-bottom:1.3rem;
+  font-size:.78rem;color:rgba(255,255,255,.5);line-height:1.7;
+}
+.disclaimer-box strong{color:var(--red2)}
+.rcp-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.rcp-btn{
+  padding:.65rem 1.4rem;border-radius:50px;font-family:'Hind Siliguri',sans-serif;
+  font-size:.84rem;font-weight:700;cursor:pointer;transition:all .3s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;border:none;
+}
+.rcp-btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;
+  box-shadow:0 0 16px rgba(233,30,140,.25)}
+.rcp-btn.secondary{background:var(--glass2);border:1px solid var(--border2);color:#fff}
+.rcp-btn:hover{transform:translateY(-2px)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:.6rem;margin-bottom:1.5rem;
+  background:rgba(255,255,255,.04);border-radius:12px;padding:4px}
+.tab{flex:1;padding:.6rem;border-radius:9px;border:none;
+  background:transparent;color:rgba(255,255,255,.5);
+  font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .3s}
+.tab.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;
+  box-shadow:0 0 14px rgba(233,30,140,.28)}
+
+/* ── MSG ── */
+.msg{display:none;padding:.7rem .95rem;border-radius:10px;font-size:.82rem;margin-top:.9rem}
+.msg.err{background:rgba(220,38,38,.09);border:1px solid rgba(220,38,38,.2);color:var(--red2)}
+.msg.ok{background:rgba(5,150,105,.09);border:1px solid rgba(5,150,105,.2);color:var(--green2)}
+
+/* ── LOADER ── */
+.loader{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.88);backdrop-filter:blur(12px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
+.loader.show{display:flex}
+.spin{width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
+  animation:sp .75s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-txt{font-size:.88rem;color:rgba(255,255,255,.45)}
+
+/* RESPONSIVE */
+@media(max-width:800px){
+  .main-grid{grid-template-columns:1fr}
+  .summary-card{position:static}
+  .rcp-details-grid{grid-template-columns:1fr 1fr}
+  .pm-grid{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:480px){
+  .pm-grid{grid-template-columns:1fr 1fr}
+  .rcp-details-grid{grid-template-columns:1fr}
+  .rcp-actions{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="loader" id="loader"><div class="spin"></div><div class="load-txt" id="loadTxt">লোড হচ্ছে...</div></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <a href="dashboard.html" class="nav-back">← ড্যাশবোর্ডে ফিরুন</a>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-hd">
+    <div class="page-badge">💳 পেমেন্ট ও সাবস্ক্রিপশন</div>
+    <h1 class="page-title">আপনার SAR সদস্যতা পরিচালনা করুন</h1>
+    <p class="page-sub">নিবন্ধন ফি ও মাসিক সাবস্ক্রিপশন পরিশোধ করুন।<br>প্রথম ১ লাখ গ্রাহকের জন্য ৫০% বিশেষ ছাড়।</p>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT: PACKAGES + PAYMENT METHOD -->
+    <div>
+
+      <!-- CURRENT STATUS -->
+      <div class="status-box" id="statusBox">
+        <span class="status-icon">⏳</span>
+        <div class="status-info">
+          <div class="status-title">তথ্য লোড হচ্ছে...</div>
+          <div class="status-desc">অনুগ্রহ করে অপেক্ষা করুন</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('sub',this)">💎 সাবস্ক্রিপশন</button>
+        <button class="tab" onclick="switchTab('hist',this)">📋 পেমেন্ট ইতিহাস</button>
+      </div>
+
+      <!-- SUBSCRIPTION TAB -->
+      <div id="tabSub">
+
+        <div class="card" style="margin-bottom:1.4rem">
+          <div class="card-hd">
+            <span class="card-title">📦 প্যাকেজ নির্বাচন করুন</span>
+          </div>
+          <div class="card-body">
+            <div class="pkg-grid" id="pkgGrid">
+
+              <!-- REG FEE -->
+              <div class="pkg" id="pkgReg" onclick="selectPkg(this,'reg',1000,2000,'নিবন্ধন ফি')">
+                <div class="pkg-badge discount">৫০% ছাড়</div>
+                <div class="pkg-row">
+                  <div class="pkg-radio"></div>
+                  <span class="pkg-icon">🎫</span>
+                  <div class="pkg-info">
+                    <div class="pkg-name">নিবন্ধন ফি</div>
+                    <div class="pkg-desc">একবারের পেমেন্ট। স্থায়ী SAR সদস্য আইডি তৈরি।</div>
+                    <div class="pkg-feats">
+                      <span class="pfeat">✓ সদস্য আইডি</span>
+                      <span class="pfeat">✓ ২৫০ মেট্রিক্স</span>
+                      <span class="pfeat">✓ স্বাস্থ্য ওয়াল</span>
+                    </div>
+                  </div>
+                  <div class="pkg-price-col">
+                    <div class="pkg-orig">৳ ২,০০০</div>
+                    <div class="pkg-price" style="color:var(--purple2)">৳ ১,০০০</div>
+                    <div class="pkg-period">একবার</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- MONTHLY SUB -->
+              <div class="pkg selected" id="pkgSub" onclick="selectPkg(this,'sub',500,1000,'মাসিক সাবস্ক্রিপশন')">
+                <div class="pkg-badge popular">জনপ্রিয় ✦</div>
+                <div class="pkg-row">
+                  <div class="pkg-radio"></div>
+                  <span class="pkg-icon">⭐</span>
+                  <div class="pkg-info">
+                    <div class="pkg-name">মাসিক সাবস্ক্রিপশন</div>
+                    <div class="pkg-desc">প্রতি মাসে নবায়নযোগ্য। সম্পূর্ণ সুবিধা।</div>
+                    <div class="pkg-feats">
+                      <span class="pfeat">✓ AI বিশ্লেষণ দৈনিক</span>
+                      <span class="pfeat">✓ ব্যক্তিগত মেনু</span>
+                      <span class="pfeat">✓ অর্ডার ও ডেলিভারি</span>
+                      <span class="pfeat">✓ স্বাস্থ্য রিপোর্ট</span>
+                    </div>
+                  </div>
+                  <div class="pkg-price-col">
+                    <div class="pkg-orig">৳ ১,০০০</div>
+                    <div class="pkg-price" style="color:var(--pink2)">৳ ৫০০</div>
+                    <div class="pkg-period">/ মাস</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3 MONTH -->
+              <div class="pkg" id="pkg3m" onclick="selectPkg(this,'3month',1200,3000,'৩ মাসের সাবস্ক্রিপশন')">
+                <div class="pkg-badge discount">সাশ্রয় ৳ ১,৮০০</div>
+                <div class="pkg-row">
+                  <div class="pkg-radio"></div>
+                  <span class="pkg-icon">🏆</span>
+                  <div class="pkg-info">
+                    <div class="pkg-name">৩ মাসের সাবস্ক্রিপশন</div>
+                    <div class="pkg-desc">৩ মাসের সম্পূর্ণ সুবিধা। সবচেয়ে সাশ্রয়ী।</div>
+                    <div class="pkg-feats">
+                      <span class="pfeat">✓ ৯০ দিন সক্রিয়</span>
+                      <span class="pfeat">✓ সব সুবিধা</span>
+                      <span class="pfeat">✓ অগ্রাধিকার সাপোর্ট</span>
+                    </div>
+                  </div>
+                  <div class="pkg-price-col">
+                    <div class="pkg-orig">৳ ৩,০০০</div>
+                    <div class="pkg-price" style="color:var(--yellow2)">৳ ১,২০০</div>
+                    <div class="pkg-period">৩ মাস</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYMENT METHOD -->
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">💳 পেমেন্ট পদ্ধতি নির্বাচন করুন</span>
+          </div>
+          <div class="card-body">
+            <div class="pm-grid">
+              <div class="pm selected" onclick="selPM(this,'bkash')">
+                <span class="pm-icon">📱</span>
+                <span class="pm-name">bKash</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'nagad')">
+                <span class="pm-icon">💚</span>
+                <span class="pm-name">Nagad</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'rocket')">
+                <span class="pm-icon">🚀</span>
+                <span class="pm-name">Rocket</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'visa')">
+                <span class="pm-icon">💳</span>
+                <span class="pm-name">Visa</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'mastercard')">
+                <span class="pm-icon">🔴</span>
+                <span class="pm-name">Mastercard</span>
+              </div>
+              <div class="pm" onclick="selPM(this,'cash')">
+                <span class="pm-icon">💵</span>
+                <span class="pm-name">ক্যাশ</span>
+              </div>
+            </div>
+            <div class="msg" id="payMsg"></div>
+          </div>
+        </div>
+
+      </div><!-- /tabSub -->
+
+      <!-- HISTORY TAB -->
+      <div id="tabHist" style="display:none">
+        <div class="card">
+          <div class="card-hd">
+            <span class="card-title">📋 পেমেন্ট ইতিহাস</span>
+          </div>
+          <div class="card-body" style="padding:0 0 .5rem">
+            <div id="histContent"><div class="empty-hist">লোড হচ্ছে...</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: SUMMARY + PAY BTN -->
+    <div>
+      <div class="summary-card">
+        <div class="sum-title">🧾 পেমেন্ট সারসংক্ষেপ</div>
+
+        <div class="sum-row">
+          <span class="sum-k">প্যাকেজ</span>
+          <span class="sum-v" id="sumPkg">মাসিক সাবস্ক্রিপশন</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-k">সাধারণ মূল্য</span>
+          <span class="sum-v" id="sumOrig">৳ ১,০০০</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-k">ছাড়</span>
+          <span class="sum-v disc" id="sumDisc">- ৳ ৫০০</span>
+        </div>
+        <div class="sum-row">
+          <span class="sum-k">ভ্যাট (৫%)</span>
+          <span class="sum-v" id="sumVat">৳ ২৫</span>
+        </div>
+        <div class="divider"></div>
+        <div class="sum-row">
+          <span class="sum-k" style="font-weight:700;color:#fff">মোট পরিশোধযোগ্য</span>
+          <span class="sum-v total" id="sumTotal">৳ ৫২৫</span>
+        </div>
+
+        <div style="margin:1rem 0;padding:.85rem;background:rgba(255,255,255,.04);
+          border-radius:12px;font-size:.76rem;color:rgba(255,255,255,.45);line-height:1.6">
+          <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;color:var(--green2);font-size:.78rem;font-weight:600">
+            ✦ বিশেষ অফার
+          </div>
+          প্রথম ১,০০,০০০ গ্রাহকের জন্য ৫০% ছাড়। এখনই সুযোগ নিন।
+        </div>
+
+        <button class="pay-btn" id="payBtn" onclick="processPayment()">
+          <span>🔒 ShurjoPay-তে পেমেন্ট করুন</span>
+          <span id="payBtnAmt">৳ ৫২৫</span>
+        </button>
+        <div class="pay-secure">🔐 SSL এনক্রিপ্টেড নিরাপদ পেমেন্ট</div>
+
+        <div style="margin-top:1.2rem;padding:.85rem;
+          background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.14);
+          border-radius:12px;font-size:.73rem;color:rgba(255,255,255,.42);line-height:1.65">
+          <strong style="color:var(--red2)">⚕️ বিজ্ঞপ্তি:</strong> SAR ডাক্তার নয়।
+          সব তথ্য শুধু সচেতনতার জন্য। স্বাস্থ্য সমস্যায় নিবন্ধিত
+          চিকিৎসকের পরামর্শ নিন।
+        </div>
+
+        <div style="margin-top:1rem">
+          <a href="dashboard.html" style="display:block;text-align:center;
+            font-size:.8rem;color:rgba(255,255,255,.35);text-decoration:none;
+            transition:color .3s;padding:.5rem" onmouseover="this.style.color='var(--pink2)'"
+            onmouseout="this.style.color='rgba(255,255,255,.35)'">
+            ← ড্যাশবোর্ডে ফিরুন
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-grid -->
+
+  <!-- ── RECEIPT ── -->
+  <div class="receipt-box" id="receiptBox">
+    <div class="rcp-header">
+      <div class="rcp-brand">
+        <div class="rcp-logo">S</div>
+        <div>
+          <div class="rcp-brand-txt">SAR — শি এআই রেস্তোরাঁ</div>
+          <div class="rcp-brand-sub">ঢাকা, বাংলাদেশ</div>
+        </div>
+      </div>
+      <div class="rcp-num">
+        <div class="rcp-num-val" id="rcpNum">—</div>
+        <div class="rcp-num-lbl">রিসিট নম্বর</div>
+        <div class="rcp-num-val" id="rcpDate" style="margin-top:.3rem;font-size:.7rem;color:rgba(255,255,255,.35)"></div>
+      </div>
+    </div>
+
+    <div class="rcp-success">
+      <span class="rcp-success-icon">✅</span>
+      <div>
+        <div class="rcp-success-title">পেমেন্ট সফল হয়েছে!</div>
+        <div class="rcp-success-desc" id="rcpSuccessDesc">আপনার সাবস্ক্রিপশন সক্রিয় হয়েছে।</div>
+      </div>
+    </div>
+
+    <div class="rcp-details-grid">
+      <div class="rcp-detail"><div class="rcp-detail-k">গ্রাহকের নাম</div><div class="rcp-detail-v" id="rcpName">—</div></div>
+      <div class="rcp-detail"><div class="rcp-detail-k">সদস্য আইডি</div><div class="rcp-detail-v" id="rcpMid">—</div></div>
+      <div class="rcp-detail"><div class="rcp-detail-k">পেমেন্ট পদ্ধতি</div><div class="rcp-detail-v" id="rcpMethod">—</div></div>
+      <div class="rcp-detail"><div class="rcp-detail-k">লেনদেন আইডি</div><div class="rcp-detail-v" id="rcpTxn">—</div></div>
+      <div class="rcp-detail"><div class="rcp-detail-k">প্যাকেজ</div><div class="rcp-detail-v" id="rcpPkg">—</div></div>
+      <div class="rcp-detail"><div class="rcp-detail-k">মেয়াদ পর্যন্ত</div><div class="rcp-detail-v" id="rcpExpiry">—</div></div>
+    </div>
+
+    <div class="rcp-total-box">
+      <div class="rcp-total-lbl">পরিশোধিত মোট পরিমাণ</div>
+      <div class="rcp-total-val" id="rcpTotal">৳ —</div>
+    </div>
+
+    <div class="disclaimer-box">
+      <strong>⚕️ গুরুত্বপূর্ণ বিজ্ঞপ্তি:</strong> SAR — She AI Restaurant কোনো চিকিৎসা প্রতিষ্ঠান নয়।
+      আমরা ডাক্তার বা নিবন্ধিত স্বাস্থ্যকর্মী নই। এখানে প্রদত্ত সমস্ত তথ্য শুধুমাত্র
+      সচেতনতা বৃদ্ধি এবং অনুপ্রেরণার জন্য। যেকোনো শারীরিক অসুস্থতায় অবশ্যই
+      একজন নিবন্ধিত চিকিৎসকের পরামর্শ নিন। <strong>নিজে নিজে ওষুধ সেবন করবেন না।</strong>
+    </div>
+
+    <div class="rcp-actions">
+      <button class="rcp-btn primary" onclick="window.print()">🖨️ প্রিন্ট করুন</button>
+      <a href="dashboard.html" class="rcp-btn secondary">🏠 ড্যাশবোর্ডে যান</a>
+      <a href="dashboard.html" class="rcp-btn secondary">🥗 মেনু দেখুন</a>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════
+// CONFIG
+// ═══════════════════════════════
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U'; // ← নতুন anon key
+const H    = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'};
+
+const CID   = localStorage.getItem('sar_cid');
+const CNAME = localStorage.getItem('sar_name') || 'গ্রাহক';
+const CMID  = localStorage.getItem('sar_mid')  || '—';
+
+if (!CID) { window.location.href = 'login.html'; }
+
+// State
+let selPkg   = { type:'sub', amount:500, original:1000, name:'মাসিক সাবস্ক্রিপশন' };
+let selMethod = 'bkash';
+let custData  = {};
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  showLoader('তথ্য লোড হচ্ছে...');
+  try {
+    const [cust, payments] = await Promise.all([fetchCustomer(), fetchPayments()]);
+    custData = cust;
+    renderStatus(cust);
+    renderHistory(payments);
+    updateSummary();
+  } catch(e){ console.error(e) }
+  hideLoader();
+});
+
+// ═══════════════════════════════
+// FETCH
+// ═══════════════════════════════
+async function fetchCustomer(){
+  const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`,{headers:H});
+  const d = await r.json(); return d[0]||{};
+}
+async function fetchPayments(){
+  const r = await fetch(`${SUPA}/rest/v1/payments?customer_id=eq.${CID}&order=created_at.desc&select=*`,{headers:H});
+  return await r.json()||[];
+}
+
+// ═══════════════════════════════
+// RENDER STATUS
+// ═══════════════════════════════
+function renderStatus(c){
+  const box = document.getElementById('statusBox');
+  const regPaid = c.registration_fee_paid;
+  const subPaid = c.monthly_sub_paid;
+  const expDate = c.monthly_sub_expiry_date ? new Date(c.monthly_sub_expiry_date) : null;
+  const isActive = subPaid && expDate && expDate > new Date();
+  const daysLeft = expDate ? Math.ceil((expDate - new Date()) / 86400000) : 0;
+
+  if (!regPaid){
+    box.className='status-box expired';
+    box.innerHTML=`<span class="status-icon">❌</span>
+      <div class="status-info">
+        <div class="status-title" style="color:var(--red2)">নিবন্ধন ফি বাকি</div>
+        <div class="status-desc">নিবন্ধন ফি পরিশোধ করুন এবং SAR সদস্য হোন।</div>
+        <div class="status-meta">সদস্য আইডি: ${CMID}</div>
+      </div>`;
+    selectPkg(document.getElementById('pkgReg'),'reg',1000,2000,'নিবন্ধন ফি');
+  } else if (!isActive){
+    box.className='status-box expired';
+    box.innerHTML=`<span class="status-icon">⏸️</span>
+      <div class="status-info">
+        <div class="status-title" style="color:var(--yellow2)">সাবস্ক্রিপশন সক্রিয় নেই</div>
+        <div class="status-desc">নিবন্ধন ফি পরিশোধিত। মাসিক সাবস্ক্রিপশন নিন।</div>
+        <div class="status-meta">সদস্য আইডি: ${CMID} • নিবন্ধন: ✓</div>
+      </div>`;
+  } else {
+    box.className='status-box active';
+    box.innerHTML=`<span class="status-icon">✅</span>
+      <div class="status-info">
+        <div class="status-title" style="color:var(--green2)">সাবস্ক্রিপশন সক্রিয়</div>
+        <div class="status-desc">আপনার সদস্যতা সক্রিয় আছে।</div>
+        <div class="status-meta">মেয়াদ: ${expDate.toLocaleDateString('bn-BD')} পর্যন্ত • ${daysLeft} দিন বাকি • ${c.membership_tier||'Basic'}</div>
+      </div>`;
+    if(daysLeft > 7){
+      document.getElementById('pkgGrid').insertAdjacentHTML('afterbegin',
+        `<div style="background:var(--green3);border:1px solid rgba(5,150,105,.22);
+          border-radius:12px;padding:.85rem 1rem;font-size:.8rem;color:var(--green2);margin-bottom:.65rem">
+          ✓ আপনার সাবস্ক্রিপশন ${daysLeft} দিন পর্যন্ত সক্রিয় আছে।
+          নীচে নবায়নের জন্য প্যাকেজ নির্বাচন করুন।
+        </div>`);
+    }
+  }
+  // Store sub status
+  localStorage.setItem('sar_sub_paid', isActive ? 'true' : 'false');
+  if(expDate) localStorage.setItem('sar_sub_expiry', expDate.toISOString().slice(0,10));
+}
+
+// ═══════════════════════════════
+// HISTORY
+// ═══════════════════════════════
+function renderHistory(payments){
+  const el = document.getElementById('histContent');
+  if(!payments.length){
+    el.innerHTML='<div class="empty-hist">কোনো পেমেন্ট ইতিহাস নেই।</div>'; return;
+  }
+  const typeMap = {registration:{cls:'pt-reg',lbl:'নিবন্ধন'},subscription:{cls:'pt-sub',lbl:'সাবস্ক্রিপশন'},order:{cls:'pt-ord',lbl:'অর্ডার'}};
+  const statMap = {success:{cls:'ps-suc',lbl:'সফল'},pending:{cls:'ps-pend',lbl:'অপেক্ষায়'},failed:{cls:'ps-fail',lbl:'ব্যর্থ'},refunded:{cls:'ps-suc',lbl:'ফেরত'}};
+  el.innerHTML = `<table class="hist-table">
+    <thead><tr>
+      <th>তারিখ</th><th>ধরন</th><th>পদ্ধতি</th><th>পরিমাণ</th><th>অবস্থা</th>
+    </tr></thead>
+    <tbody>` +
+    payments.map(p=>{
+      const t = typeMap[p.payment_type]||{cls:'pt-ord',lbl:p.payment_type};
+      const s = statMap[p.status]||{cls:'ps-pend',lbl:p.status};
+      const dt = new Date(p.created_at).toLocaleDateString('bn-BD');
+      return `<tr>
+        <td>${dt}</td>
+        <td><span class="pay-type ${t.cls}">${t.lbl}</span></td>
+        <td>${p.payment_method||'—'}</td>
+        <td style="font-family:'Space Mono',monospace">৳ ${p.final_amount||p.amount||'—'}</td>
+        <td><span class="pay-stat ${s.cls}">${s.lbl}</span></td>
+      </tr>`;
+    }).join('') + '</tbody></table>';
+}
+
+// ═══════════════════════════════
+// PACKAGE SELECTION
+// ═══════════════════════════════
+function selectPkg(el, type, amount, original, name){
+  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  selPkg = { type, amount, original, name };
+  updateSummary();
+}
+
+function selPM(el, method){
+  document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  selMethod = method;
+}
+
+// ═══════════════════════════════
+// UPDATE SUMMARY
+// ═══════════════════════════════
+function updateSummary(){
+  const disc = selPkg.original - selPkg.amount;
+  const vat  = Math.round(selPkg.amount * 0.05);
+  const total = selPkg.amount + vat;
+  document.getElementById('sumPkg').textContent = selPkg.name;
+  document.getElementById('sumOrig').textContent = '৳ ' + selPkg.original.toLocaleString('bn-BD');
+  document.getElementById('sumDisc').textContent = '- ৳ ' + disc.toLocaleString('bn-BD');
+  document.getElementById('sumVat').textContent  = '৳ ' + vat;
+  document.getElementById('sumTotal').textContent = '৳ ' + total.toLocaleString('bn-BD');
+  document.getElementById('payBtnAmt').textContent = '৳ ' + total.toLocaleString('bn-BD');
+}
+
+// ═══════════════════════════════
+// PROCESS PAYMENT
+// ═══════════════════════════════
+async function processPayment(){
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  showLoader('পেমেন্ট প্রক্রিয়া করা হচ্ছে...');
+
+  const vat   = Math.round(selPkg.amount * 0.05);
+  const total = selPkg.amount + vat;
+  const txnId = 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  const today = new Date();
+
+  try {
+    // 1. Save payment record
+    const payData = {
+      customer_id: CID,
+      payment_type: selPkg.type === 'reg' ? 'registration' : 'subscription',
+      amount: selPkg.original,
+      discount_applied: selPkg.original - selPkg.amount,
+      discount_reason: 'প্রথম ১ লাখ গ্রাহক ৫০% ছাড়',
+      final_amount: total,
+      payment_method: selMethod,
+      transaction_id: txnId,
+      status: 'success',
+      surjopay_response_json: { gateway:'ShurjoPay', txn:txnId, amount:total, method:selMethod, time:today.toISOString() }
+    };
+    const pr = await fetch(`${SUPA}/rest/v1/payments`,{method:'POST',headers:H,body:JSON.stringify(payData)});
+    if(!pr.ok){ const e=await pr.json(); throw new Error(e.message) }
+    const parr = await pr.json();
+
+    // 2. Update customer record
+    const updateData = {};
+    if(selPkg.type === 'reg'){
+      updateData.registration_fee_paid = true;
+      updateData.registration_fee_amount = total;
+      updateData.registration_payment_transaction_id = txnId;
+    } else {
+      const expiry = new Date(today);
+      expiry.setDate(expiry.getDate() + (selPkg.type === '3month' ? 90 : 30));
+      updateData.monthly_sub_paid = true;
+      updateData.monthly_sub_expiry_date = expiry.toISOString().slice(0,10);
+      updateData.subscription_amount = total;
+      // Log subscription
+      await fetch(`${SUPA}/rest/v1/subscription_log`,{method:'POST',headers:H,
+        body:JSON.stringify({
+          customer_id:CID,
+          subscription_type:'new',
+          amount_paid:total,
+          discount_applied:selPkg.original-selPkg.amount,
+          valid_from:today.toISOString().slice(0,10),
+          valid_until:expiry.toISOString().slice(0,10),
+          payment_id:parr[0]?.id
+        })
+      });
+    }
+    await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}`,{
+      method:'PATCH', headers:{...H,'Prefer':'return=minimal'},
+      body:JSON.stringify(updateData)
+    });
+
+    // 3. Notification log
+    await fetch(`${SUPA}/rest/v1/notifications_log`,{method:'POST',headers:H,
+      body:JSON.stringify({
+        customer_id:CID,
+        notification_type:'whatsapp',
+        trigger_event:'payment',
+        message_preview:`${CNAME} আপা — ${selPkg.name} পেমেন্ট সফল! লেনদেন: ${txnId}. ৳${total}`,
+        status:'pending'
+      })
+    });
+
+    // 4. Update localStorage
+    if(selPkg.type !== 'reg'){
+      const exp = new Date(today);
+      exp.setDate(exp.getDate() + (selPkg.type==='3month'?90:30));
+      localStorage.setItem('sar_sub_paid','true');
+      localStorage.setItem('sar_sub_expiry',exp.toISOString().slice(0,10));
+    }
+
+    hideLoader();
+    btn.disabled = false;
+    showReceipt(txnId, total, today);
+
+  } catch(e){
+    hideLoader();
+    btn.disabled = false;
+    const m = document.getElementById('payMsg');
+    m.className='msg err';
+    m.textContent='❌ পেমেন্ট সমস্যা: '+e.message;
+    m.style.display='block';
+    console.error(e);
+  }
+}
+
+// ═══════════════════════════════
+// SHOW RECEIPT
+// ═══════════════════════════════
+function showReceipt(txnId, total, date){
+  const rcpNum = 'RCP-' + date.toISOString().slice(0,10).replace(/-/g,'') + '-' +
+    Math.floor(1000+Math.random()*9000);
+  const vat = Math.round(selPkg.amount * 0.05);
+
+  let expText = '—';
+  if(selPkg.type !== 'reg'){
+    const exp = new Date(date);
+    exp.setDate(exp.getDate() + (selPkg.type==='3month'?90:30));
+    expText = exp.toLocaleDateString('bn-BD');
+  }
+
+  document.getElementById('rcpNum').textContent = rcpNum;
+  document.getElementById('rcpDate').textContent = date.toLocaleString('bn-BD');
+  document.getElementById('rcpName').textContent = CNAME;
+  document.getElementById('rcpMid').textContent = CMID;
+  document.getElementById('rcpMethod').textContent = selMethod.toUpperCase();
+  document.getElementById('rcpTxn').textContent = txnId;
+  document.getElementById('rcpPkg').textContent = selPkg.name;
+  document.getElementById('rcpExpiry').textContent = expText;
+  document.getElementById('rcpTotal').textContent = '৳ ' + total.toLocaleString('bn-BD');
+  document.getElementById('rcpSuccessDesc').textContent =
+    selPkg.type === 'reg' ? 'আপনার নিবন্ধন সম্পন্ন হয়েছে। এখন সাবস্ক্রিপশন নিন।'
+    : `আপনার সাবস্ক্রিপশন ${expText} পর্যন্ত সক্রিয়।`;
+
+  const box = document.getElementById('receiptBox');
+  box.classList.add('show');
+  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabSub').style.display  = tab==='sub'  ? 'block' : 'none';
+  document.getElementById('tabHist').style.display = tab==='hist' ? 'block' : 'none';
+}
+
+// ═══════════════════════════════
+// LOADER
+// ═══════════════════════════════
+function showLoader(t){ document.getElementById('loadTxt').textContent=t; document.getElementById('loader').classList.add('show') }
+function hideLoader(){ document.getElementById('loader').classList.remove('show') }
+</script>
+</body>
+</html>

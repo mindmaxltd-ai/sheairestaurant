@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>থেরাপিউটিক মেনু — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* BG */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 18s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:7s}
+.o3{width:380px;height:380px;background:var(--yellow);top:40%;left:40%;animation-delay:14s}
+.o4{width:280px;height:280px;background:var(--green);top:20%;right:8%;animation-delay:5s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-18px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-size:72px 72px}
+
+/* LAYOUT */
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* NAV */
+.top-nav{width:100%;max-width:1200px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.75rem;padding:.65rem 1.4rem;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-back{font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .3s}
+.nav-back:hover{color:var(--pink2)}
+.cart-btn{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.45rem 1rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-size:.8rem;font-weight:700;text-decoration:none;
+  box-shadow:0 0 14px rgba(233,30,140,.28);transition:all .3s;border:none;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;
+}
+.cart-btn:hover{transform:translateY(-1px);box-shadow:0 0 22px rgba(233,30,140,.45)}
+.cart-count{background:rgba(255,255,255,.25);border-radius:50px;
+  padding:.05rem .45rem;font-family:'Space Mono',monospace;font-size:.72rem}
+
+/* PAGE HEADER */
+.page-hd{width:100%;max-width:1200px;margin-bottom:1.75rem}
+.hd-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.hd-left{}
+.hd-badge{display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--purple3);border:1px solid rgba(107,33,168,.25);
+  border-radius:50px;padding:.28rem .9rem;font-size:.72rem;
+  color:var(--purple2);letter-spacing:.07em;margin-bottom:.75rem}
+.hd-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.78));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.hd-sub{font-size:.84rem;color:rgba(255,255,255,.4)}
+.ai-btn{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.7rem 1.4rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;
+  border:none;cursor:pointer;box-shadow:0 0 20px rgba(107,33,168,.3);transition:all .3s;
+}
+.ai-btn:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(107,33,168,.5)}
+.ai-btn.loading{animation:aiPulse 1.2s ease infinite}
+@keyframes aiPulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* AI ANALYSIS BOX */
+.ai-box{
+  width:100%;max-width:1200px;margin-bottom:1.75rem;
+  border-radius:20px;padding:1.4rem 1.6rem;
+  background:linear-gradient(135deg,rgba(107,33,168,.1),rgba(233,30,140,.08));
+  border:1px solid rgba(107,33,168,.22);
+  display:none;animation:fadeIn .4s ease;
+}
+.ai-box.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.ai-box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.ai-box-title{font-size:.9rem;font-weight:700;color:var(--purple2);
+  display:flex;align-items:center;gap:.5rem}
+.ai-box-close{background:none;border:none;color:rgba(255,255,255,.35);
+  font-size:1.1rem;cursor:pointer;transition:color .3s;padding:.2rem}
+.ai-box-close:hover{color:#fff}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem}
+.ai-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:12px;padding:.8rem .95rem}
+.ai-chip-label{font-size:.68rem;color:rgba(255,255,255,.35);
+  font-family:'Space Mono',monospace;letter-spacing:.08em;margin-bottom:.35rem}
+.ai-chip-val{font-size:.82rem;color:#fff;line-height:1.5}
+.ai-rec-list{display:flex;flex-direction:column;gap:.4rem;margin-top:.9rem}
+.ai-rec-item{display:flex;align-items:flex-start;gap:.6rem;
+  background:rgba(107,33,168,.08);border-radius:9px;padding:.6rem .85rem;
+  font-size:.8rem;color:rgba(255,255,255,.72);line-height:1.5}
+.ai-rec-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  background:var(--purple2);margin-top:.28rem}
+.disclaimer-mini{
+  background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.14);
+  border-radius:10px;padding:.65rem .85rem;margin-top:.85rem;
+  font-size:.73rem;color:rgba(255,255,255,.42);line-height:1.6}
+.disclaimer-mini strong{color:var(--red2)}
+
+/* FILTERS */
+.filter-wrap{width:100%;max-width:1200px;margin-bottom:1.75rem}
+.filter-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.85rem}
+.filter-label{font-family:'Space Mono',monospace;font-size:.68rem;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);
+  white-space:nowrap;margin-right:.25rem}
+.ftab{
+  padding:.42rem 1rem;border-radius:50px;border:1px solid var(--border2);
+  background:transparent;color:rgba(255,255,255,.5);
+  font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .3s;white-space:nowrap;
+}
+.ftab:hover{color:#fff;border-color:rgba(255,255,255,.28)}
+.ftab.active{color:#fff;border-color:transparent}
+.ftab.cat-DM.active{background:linear-gradient(135deg,rgba(233,30,140,.8),rgba(107,33,168,.8));box-shadow:0 0 12px rgba(233,30,140,.3)}
+.ftab.cat-OB.active{background:linear-gradient(135deg,rgba(245,158,11,.8),rgba(234,88,12,.8));box-shadow:0 0 12px rgba(245,158,11,.3)}
+.ftab.cat-FL.active{background:linear-gradient(135deg,rgba(5,150,105,.8),rgba(16,185,129,.8));box-shadow:0 0 12px rgba(5,150,105,.3)}
+.ftab.cat-IB.active{background:linear-gradient(135deg,rgba(107,33,168,.8),rgba(124,58,237,.8));box-shadow:0 0 12px rgba(107,33,168,.3)}
+.ftab.cat-PR.active{background:linear-gradient(135deg,rgba(220,38,38,.8),rgba(239,68,68,.8));box-shadow:0 0 12px rgba(220,38,38,.3)}
+.ftab.cat-ALL.active{background:linear-gradient(135deg,var(--pink),var(--purple));box-shadow:0 0 12px rgba(233,30,140,.3)}
+.ftab.meal-b.active,.ftab.meal-l.active,.ftab.meal-d.active{
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+}
+.search-box{
+  display:flex;align-items:center;gap:.6rem;
+  background:var(--glass2);border:1px solid var(--border2);
+  border-radius:50px;padding:.4rem 1rem;flex:1;min-width:200px;max-width:320px;
+}
+.search-box input{
+  background:none;border:none;outline:none;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.84rem;width:100%;
+}
+.search-box input::placeholder{color:rgba(255,255,255,.25)}
+.search-icon{color:rgba(255,255,255,.3);font-size:.9rem;flex-shrink:0}
+.results-info{font-size:.78rem;color:rgba(255,255,255,.35);
+  font-family:'Space Mono',monospace;margin-top:.4rem}
+
+/* PINNED SECTION */
+.pinned-section{width:100%;max-width:1200px;margin-bottom:1.75rem;display:none}
+.pinned-section.show{display:block}
+.section-hd{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+.section-hd-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700}
+.section-hd-badge{font-size:.68rem;padding:.15rem .55rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:700}
+
+/* MENU GRID */
+.menu-section{width:100%;max-width:1200px}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem}
+
+/* MENU CARD */
+.mcard{
+  background:rgba(14,14,20,.85);backdrop-filter:blur(16px);
+  border:1px solid var(--border);border-radius:20px;overflow:hidden;
+  transition:all .38s;position:relative;
+}
+.mcard:hover{transform:translateY(-5px);border-color:var(--border2);
+  box-shadow:0 16px 48px rgba(0,0,0,.3)}
+.mcard.pinned{border-color:rgba(233,30,140,.3);
+  box-shadow:0 0 20px rgba(233,30,140,.1)}
+.mcard.ai-recommended{border-color:rgba(107,33,168,.4);
+  box-shadow:0 0 22px rgba(107,33,168,.15)}
+.mcard.locked{opacity:.6;filter:grayscale(.3)}
+
+/* CARD TOP BAR */
+.mcard-top{
+  height:4px;
+  background:linear-gradient(90deg,var(--cat-c1),var(--cat-c2));
+}
+.mcard[data-cat=DM]{--cat-c1:var(--pink);--cat-c2:var(--purple2)}
+.mcard[data-cat=OB]{--cat-c1:var(--yellow);--cat-c2:#EA580C}
+.mcard[data-cat=FL]{--cat-c1:var(--green);--cat-c2:var(--green2)}
+.mcard[data-cat=IB]{--cat-c1:var(--purple);--cat-c2:var(--purple2)}
+.mcard[data-cat=PR]{--cat-c1:var(--red);--cat-c2:var(--red2)}
+
+/* CARD HEADER */
+.mcard-hd{padding:1rem 1.1rem .6rem;display:flex;justify-content:space-between;align-items:flex-start}
+.mcard-badges{display:flex;gap:.4rem;flex-wrap:wrap}
+.badge{font-size:.64rem;padding:.15rem .55rem;border-radius:50px;font-weight:700;white-space:nowrap}
+.b-cat-DM{background:rgba(233,30,140,.16);color:var(--pink2)}
+.b-cat-OB{background:rgba(245,158,11,.16);color:var(--yellow2)}
+.b-cat-FL{background:rgba(5,150,105,.16);color:var(--green2)}
+.b-cat-IB{background:rgba(107,33,168,.16);color:var(--purple2)}
+.b-cat-PR{background:rgba(220,38,38,.16);color:var(--red2)}
+.b-meal-b{background:rgba(245,158,11,.13);color:var(--yellow2)}
+.b-meal-l{background:rgba(5,150,105,.13);color:var(--green2)}
+.b-meal-d{background:rgba(107,33,168,.13);color:var(--purple2)}
+.b-ai{background:linear-gradient(135deg,rgba(107,33,168,.2),rgba(233,30,140,.2));
+  color:var(--purple2);border:1px solid rgba(107,33,168,.3)}
+.b-pinned{background:linear-gradient(135deg,rgba(233,30,140,.2),rgba(245,158,11,.15));
+  color:var(--pink2)}
+.b-locked{background:rgba(255,255,255,.08);color:rgba(255,255,255,.35)}
+.mcard-code{font-family:'Space Mono',monospace;font-size:.65rem;
+  color:rgba(255,255,255,.28);white-space:nowrap}
+
+/* CARD BODY */
+.mcard-body{padding:.4rem 1.1rem .9rem}
+.mcard-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:.35rem;line-height:1.3}
+.mcard-ai-reason{
+  display:none;font-size:.75rem;color:var(--purple2);
+  background:rgba(107,33,168,.09);border-radius:7px;
+  padding:.35rem .65rem;margin-bottom:.6rem;line-height:1.5;
+}
+.mcard-ai-reason.show{display:block}
+.mcard-courses{display:flex;flex-direction:column;gap:.28rem;margin-bottom:.75rem}
+.course-row{display:flex;align-items:flex-start;gap:.5rem;font-size:.76rem;
+  color:rgba(255,255,255,.55);line-height:1.5}
+.course-num{font-family:'Space Mono',monospace;font-size:.62rem;
+  color:rgba(255,255,255,.25);width:14px;flex-shrink:0;margin-top:.1rem}
+.mcard-powders{font-size:.72rem;color:rgba(255,255,255,.4);
+  background:rgba(255,255,255,.04);border-radius:8px;
+  padding:.4rem .7rem;margin-bottom:.7rem;line-height:1.5}
+.mcard-powders span{color:var(--yellow2)}
+
+/* NUTRITION ROW */
+.nutr-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.85rem}
+.nchip{display:flex;align-items:center;gap:.28rem;
+  background:rgba(255,255,255,.055);border-radius:50px;
+  padding:.18rem .6rem;font-size:.69rem;color:rgba(255,255,255,.65)}
+.ndot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+
+/* TOPPING/CHUTNEY ROW */
+.tc-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.85rem}
+.tc-chip{font-size:.67rem;padding:.14rem .5rem;border-radius:50px;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);
+  border:1px solid rgba(255,255,255,.08)}
+
+/* CARD FOOTER */
+.mcard-ft{
+  padding:.8rem 1.1rem;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+}
+.price-col{}
+.price-main{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--yellow2)}
+.price-up{font-size:.68rem;color:rgba(255,255,255,.32);margin-top:.1rem}
+.card-actions{display:flex;gap:.55rem}
+.pin-btn{
+  padding:.42rem .75rem;border-radius:50px;
+  background:var(--glass2);border:1px solid var(--border2);
+  color:rgba(255,255,255,.55);font-size:.75rem;cursor:pointer;transition:all .3s;
+}
+.pin-btn:hover{border-color:var(--pink);color:var(--pink2)}
+.pin-btn.pinned{background:var(--pink3);border-color:rgba(233,30,140,.3);color:var(--pink2)}
+.order-btn{
+  padding:.42rem 1rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.78rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 12px rgba(233,30,140,.25);transition:all .3s;
+}
+.order-btn:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(233,30,140,.4)}
+.order-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* LOCKED OVERLAY */
+.lock-overlay{
+  position:absolute;inset:0;background:rgba(10,10,20,.65);
+  backdrop-filter:blur(4px);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.5rem;z-index:10;
+  border-radius:20px;
+}
+.lock-overlay-icon{font-size:1.8rem}
+.lock-overlay-txt{font-size:.78rem;color:rgba(255,255,255,.55);text-align:center}
+.lock-overlay-btn{
+  margin-top:.3rem;padding:.42rem 1rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-size:.76rem;font-weight:700;text-decoration:none;
+  font-family:'Hind Siliguri',sans-serif;
+}
+
+/* CART DRAWER */
+.cart-drawer{
+  position:fixed;right:0;top:0;bottom:0;width:360px;z-index:500;
+  background:rgba(12,12,22,.95);backdrop-filter:blur(24px);
+  border-left:1px solid var(--border);
+  transform:translateX(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+}
+.cart-drawer.open{transform:translateX(0)}
+.cart-overlay{
+  position:fixed;inset:0;z-index:499;background:rgba(0,0,0,.5);
+  backdrop-filter:blur(4px);display:none;
+}
+.cart-overlay.show{display:block}
+.cart-hd{padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.cart-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;gap:.5rem}
+.cart-close{background:none;border:none;color:rgba(255,255,255,.4);
+  font-size:1.2rem;cursor:pointer;transition:color .3s;padding:.2rem}
+.cart-close:hover{color:#fff}
+.cart-body{flex:1;overflow-y:auto;padding:1rem 1.4rem}
+.cart-item{
+  display:flex;align-items:flex-start;gap:.85rem;
+  padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.cart-item:last-child{border:none}
+.ci-emoji{font-size:1.4rem;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.15rem}
+.ci-meta{font-size:.72rem;color:rgba(255,255,255,.4)}
+.ci-price{font-family:'Space Mono',monospace;font-size:.84rem;color:var(--yellow2);flex-shrink:0}
+.ci-qty-row{display:flex;align-items:center;gap:.6rem;margin-top:.45rem}
+.qty-btn{width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  color:#fff;font-size.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .3s;font-size:.9rem}
+.qty-btn:hover{background:rgba(233,30,140,.2);border-color:rgba(233,30,140,.3)}
+.qty-val{font-family:'Space Mono',monospace;font-size:.8rem;color:#fff;min-width:18px;text-align:center}
+.ci-del{background:none;border:none;color:rgba(255,255,255,.3);
+  font-size:.8rem;cursor:pointer;margin-left:auto;transition:color .3s}
+.ci-del:hover{color:var(--red2)}
+.cart-empty{text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.28);font-size:.85rem}
+.cart-ft{padding:1.2rem 1.4rem;border-top:1px solid var(--border)}
+.cart-total-row{display:flex;justify-content:space-between;margin-bottom:.85rem}
+.cart-total-lbl{font-size:.85rem;color:rgba(255,255,255,.55)}
+.cart-total-val{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;
+  background:linear-gradient(135deg,var(--yellow2),var(--green2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.checkout-btn{
+  width:100%;padding:.9rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.92rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 20px rgba(5,150,105,.28);transition:all .3s;
+}
+.checkout-btn:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(5,150,105,.45)}
+.checkout-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* SPECIAL NOTE INPUT */
+.note-input{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);border-radius:9px;
+  padding:.5rem .75rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.78rem;outline:none;margin-top:.4rem;resize:none;
+}
+.note-input:focus{border-color:var(--pink);background:rgba(233,30,140,.06)}
+.note-input::placeholder{color:rgba(255,255,255,.22)}
+
+/* UPGRADE TOGGLE */
+.upgrade-row{display:flex;align-items:center;gap:.6rem;margin-top:.4rem;cursor:pointer}
+.upgrade-chk{width:15px;height:15px;accent-color:var(--pink);cursor:pointer}
+.upgrade-lbl{font-size:.74rem;color:rgba(255,255,255,.55)}
+.upgrade-price{font-size:.7rem;color:var(--yellow2);font-weight:700}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
+  background:rgba(20,20,30,.95);backdrop-filter:blur(16px);
+  border:1px solid var(--border2);border-radius:14px;
+  padding:.85rem 1.2rem;font-size:.83rem;color:#fff;
+  display:flex;align-items:center;gap:.65rem;
+  transform:translateY(80px);opacity:0;
+  transition:all .38s cubic-bezier(.4,0,.2,1);max-width:300px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* LOADER */
+.loader{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.88);backdrop-filter:blur(12px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
+.loader.show{display:flex}
+.spin{width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
+  animation:sp .75s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-txt{font-size:.88rem;color:rgba(255,255,255,.45)}
+
+/* EMPTY STATE */
+.empty-state{
+  grid-column:1/-1;text-align:center;padding:4rem 2rem;
+  color:rgba(255,255,255,.28);font-size:.88rem;
+}
+.empty-state-icon{font-size:2.5rem;display:block;margin-bottom:.75rem}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .ai-grid{grid-template-columns:1fr}
+  .menu-grid{grid-template-columns:1fr}
+  .cart-drawer{width:100%}
+  .filter-row{gap:.5rem}
+}
+@media(max-width:480px){
+  .hd-row{flex-direction:column}
+  .filter-row .search-box{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="orb o3"></div><div class="orb o4"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="loader" id="loader"><div class="spin"></div><div class="load-txt" id="loadTxt">মেনু লোড হচ্ছে...</div></div>
+<div class="toast" id="toast">✓ <span id="toastMsg"></span></div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-hd">
+    <span class="cart-title">🛒 আপনার কার্ট</span>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">কার্ট খালি। মেনু থেকে আইটেম যোগ করুন।</div>
+  </div>
+  <div class="cart-ft">
+    <div class="cart-total-row">
+      <span class="cart-total-lbl">মোট</span>
+      <span class="cart-total-val" id="cartTotal">৳ ০</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="goCheckout()" disabled>
+      অর্ডার করুন →
+    </button>
+  </div>
+</div>
+
+<div class="page">
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <div class="nav-right">
+      <a href="dashboard.html" class="nav-back">← ড্যাশবোর্ড</a>
+      <button class="cart-btn" onclick="openCart()">
+        🛒 কার্ট <span class="cart-count" id="cartCountBadge">০</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-hd">
+    <div class="hd-row">
+      <div class="hd-left">
+        <div class="hd-badge">🥗 ১০৫টি থেরাপিউটিক রেসিপি</div>
+        <h1 class="hd-title">SAR থেরাপিউটিক মেনু</h1>
+        <p class="hd-sub">গ্লুটেন-মুক্ত · পরিশোধিত তেল-মুক্ত · চিনি-মুক্ত · ১০০% জৈব</p>
+      </div>
+      <button class="ai-btn" id="aiBtn" onclick="runClaudeAnalysis()">
+        🤖 Claude AI — আমার জন্য মেনু বিশ্লেষণ করুন
+      </button>
+    </div>
+  </div>
+
+  <!-- AI ANALYSIS BOX -->
+  <div class="ai-box" id="aiBox">
+    <div class="ai-box-header">
+      <span class="ai-box-title">🤖 Claude AI — আপনার ব্যক্তিগতকৃত মেনু বিশ্লেষণ</span>
+      <button class="ai-box-close" onclick="closeAiBox()">✕</button>
+    </div>
+    <div class="ai-grid" id="aiGrid"></div>
+    <div class="ai-rec-list" id="aiRecList"></div>
+    <div class="disclaimer-mini">
+      <strong>⚕️ বিজ্ঞপ্তি:</strong> এই বিশ্লেষণ শুধুমাত্র সচেতনতা ও অনুপ্রেরণার জন্য।
+      SAR ডাক্তার নয়। যেকোনো স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-wrap">
+    <div class="filter-row">
+      <span class="filter-label">রোগ:</span>
+      <button class="ftab cat-ALL active" onclick="filterCat('ALL',this)">সব</button>
+      <button class="ftab cat-DM" onclick="filterCat('DM',this)">🩸 ডায়াবেটিস</button>
+      <button class="ftab cat-OB" onclick="filterCat('OB',this)">⚖️ স্থূলতা</button>
+      <button class="ftab cat-FL" onclick="filterCat('FL',this)">🫀 ফ্যাটি লিভার</button>
+      <button class="ftab cat-IB" onclick="filterCat('IB',this)">🌿 IBS/গ্যাস্ট্রিক</button>
+      <button class="ftab cat-PR" onclick="filterCat('PR',this)">🤱 গর্ভাবস্থা</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">বেলা:</span>
+      <button class="ftab active" data-meal="ALL" onclick="filterMeal('ALL',this)">সব</button>
+      <button class="ftab meal-b" data-meal="breakfast" onclick="filterMeal('breakfast',this)">🌅 সকাল</button>
+      <button class="ftab meal-l" data-meal="lunch" onclick="filterMeal('lunch',this)">☀️ দুপুর</button>
+      <button class="ftab meal-d" data-meal="dinner" onclick="filterMeal('dinner',this)">🌙 রাত</button>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="মেনু খুঁজুন..." oninput="applyFilters()">
+      </div>
+    </div>
+    <div class="results-info" id="resultsInfo">সব ১০৫টি রেসিপি দেখানো হচ্ছে</div>
+  </div>
+
+  <!-- PINNED SECTION -->
+  <div class="pinned-section" id="pinnedSection">
+    <div class="section-hd">
+      <span class="section-hd-title">📌 SAR টিমের বিশেষ সুপারিশ</span>
+      <span class="section-hd-badge">পিন করা</span>
+    </div>
+    <div class="menu-grid" id="pinnedGrid"></div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div class="menu-section">
+    <div class="menu-grid" id="menuGrid">
+      <div class="empty-state">
+        <span class="empty-state-icon">⏳</span>
+        মেনু লোড হচ্ছে...
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const SUPA   = 'https://xlkrggspepnysbouatec.supabase.co';
+const SKEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const CLAUDE = 'YOUR_CLAUDE_API_KEY_HERE';
+const SH = {'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json'};
+
+const CID   = localStorage.getItem('sar_cid');
+const CNAME = localStorage.getItem('sar_name') || 'আপা';
+if (!CID) { window.location.href = 'login.html'; }
+
+// State
+let allMenuItems   = [];
+let pinnedItems    = [];
+let customerMetrics= {};
+let cart           = JSON.parse(localStorage.getItem('sar_cart') || '[]');
+let activeCat      = 'ALL';
+let activeMeal     = 'ALL';
+let subActive      = localStorage.getItem('sar_sub_paid') === 'true';
+let aiRecommended  = new Set();
+
+// ═══════════════════════════════════════
+// STATIC MENU DATA — 105 SAR Recipes
+// ═══════════════════════════════════════
+const STATIC_MENU = [
+  // ── DIABETES ──
+  {id:'DM-1',code:'DM-1',cat:'DM',meal:'breakfast',day:'সোমবার',
+   name:'গোল্ডেন কুইনোয়া কঞ্জি ও তিক্ত শাক',
+   c1:'মরিঙ্গা-হলুদ স্যুপ — আদা, কারি পাতা, লেবু',
+   c2:'নারকেল দুধ কুইনোয়া রাইস কঞ্জি — পালং, মরিঙ্গা পাতা, হলুদ',
+   c3:'শসার স্লাইস + চাটনি ১ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'14g',fiber:'9g',kcal:420,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-2',code:'DM-2',cat:'DM',meal:'lunch',day:'সোমবার',
+   name:'মেথি কুইনোয়া বাউল ও নারকেল ডাল',
+   c1:'পাতলা মুগ ডাল স্যুপ — আদা, হলুদ, ধনেপাতা',
+   c2:'সেদ্ধ কুইনোয়া + মেথি শাক + লাল মসুর নারকেল ডাল + বাঁধাকপি সালাদ + পোচড ডিম (ঐচ্ছিক)',
+   c3:'কাঁচা পেঁপে + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'26g',fiber:'14g',kcal:580,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-3',code:'DM-3',cat:'DM',meal:'dinner',day:'সোমবার',
+   name:'ফুলকপি ভাত স্টির বাউল ও ঘি-পোচড চিকেন',
+   c1:'পালং-মরিঙ্গা ঘন স্যুপ — আদা, লেবু, রসুন',
+   c2:'ফুলকপি ভাত + ক্যাপসিকাম + ফরাসি বিন + হলুদ + ঘি-পোচড চিকেন ব্রেস্ট ৮০গ্রাম',
+   c3:'নারকেল দুধ দই (আগার-সেট) + টপিং ২ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'30g',fiber:'11g',kcal:480,gi:'Very Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-4',code:'DM-4',cat:'DM',meal:'breakfast',day:'মঙ্গলবার',
+   name:'কুলিং মুগ খিচুড়ি বাউল',
+   c1:'মরিঙ্গা-হলুদ উষ্ণ স্যুপ — কারি পাতা, আদা',
+   c2:'হালকা মুগ ডাল খিচুড়ি (কুইনোয়া বেস) — ধনেপাতা, জিরা, আদা',
+   c3:'তরুণ করলার আচার + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'16g',fiber:'8g',kcal:390,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-5',code:'DM-5',cat:'DM',meal:'lunch',day:'মঙ্গলবার',
+   name:'ইমিউনিটি ডাল প্লেটার ও সেদ্ধ ডিম',
+   c1:'পেপার রাসাম — পাতলা টমেটো-তেঁতুল স্যুপ',
+   c2:'তুর ডাল + কুইনোয়া + সেদ্ধ করলা + GF রাইস পাপড় + ১টি সেদ্ধ ডিম',
+   c3:'নারকেল দই লাচ্ছি + চাটনি ১ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'28g',fiber:'13g',kcal:630,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-6',code:'DM-6',cat:'DM',meal:'dinner',day:'মঙ্গলবার',
+   name:'রাইস-গ্রাস গ্রিন স্টু ও ঘি চিকেন',
+   c1:'পালং-মরিঙ্গা-পুদিনা ঘন সবুজ ব্রোথ',
+   c2:'কুইনোয়া + তিন্দোরা স্টু + সজনে ডাঁটা + ঘি-পোচড চিকেন ব্রেস্ট ৮০গ্রাম',
+   c3:'নারকেল দুধ আগার জেলি + সাবজা + টপিং ২ + চাটনি ৫',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'32g',fiber:'10g',kcal:500,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-7',code:'DM-7',cat:'DM',meal:'breakfast',day:'বুধবার',
+   name:'কলা ওটস পোরিজ (GF)',
+   c1:'মরিঙ্গা-আদা উষ্ণ স্যুপ',c2:'GF ওটস পোরিজ নারকেল দুধে — পাকা কলা, দারুচিনি, এলাচ',
+   c3:'স্টিউড আপেল + দারুচিনি + টপিং ১ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'11g',fiber:'13g',kcal:410,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-8',code:'DM-8',cat:'DM',meal:'lunch',day:'বুধবার',
+   name:'BRAT-প্লাস হিলিং বাউল ও পোচড ডিম',
+   c1:'পাতলা কুইনোয়া কাঁজি — আদা সহ',
+   c2:'সেদ্ধ কুইনোয়া + কাঁচকলা + গাজর + জুকিনি + নারকেল-আদা সস + ১টি পোচড ডিম',
+   c3:'সাইলিয়াম হাস্ক মিশ্রণ + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'18g',fiber:'10g',kcal:520,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-9',code:'DM-9',cat:'DM',meal:'dinner',day:'বুধবার',
+   name:'ব্লান্ড হিলিং কিচারি ও ঘি চিকেন',
+   c1:'মরিঙ্গা-পালং ঘন স্যুপ — রসুন, লেবু',
+   c2:'ক্লাসিক আয়ুর্বেদিক কিচারি — মুগ ডাল + কুইনোয়া + হলুদ + আদা + জিরা + ঘি-পোচড চিকেন ৮০গ্রাম',
+   c3:'স্লিপারি এলম-মৌরি পাতলা পোরিজ',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'32g',fiber:'9g',kcal:470,gi:'Very Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-10',code:'DM-10',cat:'DM',meal:'breakfast',day:'বৃহস্পতিবার',
+   name:'অ্যাডাপটোজেন কলা স্মুদি বাউল',
+   c1:'মরিঙ্গা-স্পিরুলিনা উষ্ণ স্যুপ',
+   c2:'ঘন স্মুদি বাউল — কলা + নারকেল দুধ + মরিঙ্গা + স্পিরুলিনা; কুমড়ার বীজ, ফ্ল্যাক্স, কিউই স্লাইস টপিংসহ',
+   c3:'ভেজানো বাদাম (৫টি) + মেথি স্প্রাউট + টপিং ২ + চাটনি ৫',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'15g',fiber:'10g',kcal:450,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-11',code:'DM-11',cat:'DM',meal:'lunch',day:'বৃহস্পতিবার',
+   name:'স্ট্রেস-ইজ গ্রিন কুইনোয়া প্লেট ও ডিম',
+   c1:'শসা-পুদিনা ঠান্ডা স্যুপ',
+   c2:'কুইনোয়া তাবুলেহ স্টাইল + পার্সলে + পুদিনা + টমেটো + শসা + লেবু-জিরা ড্রেসিং + তেল-মুক্ত হুমাস + ১টি সেদ্ধ ডিম',
+   c3:'তরমুজ + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'26g',fiber:'12g',kcal:600,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-12',code:'DM-12',cat:'DM',meal:'dinner',day:'বৃহস্পতিবার',
+   name:'ক্যামিং কোকোনাট কারি রাইস ও ঘি চিকেন',
+   c1:'পালং-মরিঙ্গা স্যুপ — হলুদ, আদা',
+   c2:'কুইনোয়া + হালকা নারকেল-পালং কারি + সেদ্ধ ব্রকলি + সজনে ডাঁটা + ঘি-পোচড চিকেন ৮০গ্রাম',
+   c3:'সাবজা বীজ নারকেল পুডিং + টপিং ১ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'34g',fiber:'11g',kcal:530,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-13',code:'DM-13',cat:'DM',meal:'breakfast',day:'শুক্রবার',
+   name:'আয়রন-রিচ রেড পোরিজ',
+   c1:'হলুদ-আদা উষ্ণ স্যুপ — কারি পাতা, ধনেপাতা',
+   c2:'রেড রাইস পোহা — বিটরুট, গাজর, হলুদ, কারি পাতা, নারকেল',
+   c3:'ডালিম বীজ + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'12g',fiber:'9g',kcal:430,iron:'6mg',gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-14',code:'DM-14',cat:'DM',meal:'lunch',day:'শুক্রবার',
+   name:'হরমোন-ব্যালেন্স ডাল বাউল ও ডিম',
+   c1:'বিটরুট-আদা স্যুপ',
+   c2:'কালো মসুর + কুইনোয়া + তিল-হলুদ ড্রেসিং + সেদ্ধ কেল + এডামামে + ফ্ল্যাক্স বীজ + ১টি পোচড ডিম',
+   c3:'চাটনি ৫ + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'31g',fiber:'14g',kcal:650,iron:'8mg',gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-15',code:'DM-15',cat:'DM',meal:'dinner',day:'শুক্রবার',
+   name:'ওয়ার্মিং স্যাফ্রন কুইনোয়া গ্রিনস ও ঘি চিকেন',
+   c1:'মরিঙ্গা-পালং স্যুপ — রসুন, লেবু',
+   c2:'জাফরান-ইনফিউজড কুইনোয়া + পালং, মেথি শাক, চেরি টমেটো + ঘি-পোচড চিকেন ৮০গ্রাম',
+   c3:'নারকেল দুধ এলাচ পুডিং + টপিং ২ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'33g',fiber:'10g',kcal:500,gi:'Very Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-16',code:'DM-16',cat:'DM',meal:'breakfast',day:'শনিবার',
+   name:'হলুদ-আদা মিলেট উপমা',
+   c1:'মরিঙ্গা-আদা ঘন স্যুপ — ধনেপাতা, জিরা',
+   c2:'ফক্সটেইল মিলেট উপমা (GF) — সরিষার বীজ, কারি পাতা, সবুজ মটর, গাজর',
+   c3:'আমলা স্লাইস + চাটনি ১ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'13g',fiber:'9g',kcal:400,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-17',code:'DM-17',cat:'DM',meal:'lunch',day:'শনিবার',
+   name:'ড্রামস্টিক ডাল প্লেটার ও পোচড ডিম',
+   c1:'মরিঙ্গা পাতার রাসাম — পাতলা, পাচক',
+   c2:'তুর ডাল + কুইনোয়া + সেদ্ধ করলা + GF পাপড় + ১টি পোচড ডিম',
+   c3:'নারকেল দই লাচ্ছি + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'28g',fiber:'13g',kcal:620,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-18',code:'DM-18',cat:'DM',meal:'dinner',day:'শনিবার',
+   name:'নাইট হিল — স্যুপ, গ্রেইন ও ঘি চিকেন',
+   c1:'পালং-মরিঙ্গা-পুদিনা ঘন স্যুপ',
+   c2:'ঘন পালং-মরিঙ্গা স্যুপ + ভাসমান কুইনোয়া দানা + রোস্টেড রসুন, লেবু + ঘি-পোচড চিকেন ৮০গ্রাম',
+   c3:'GF চিয়া পুডিং (নারকেল দুধ) + টপিং ২ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'30g',fiber:'11g',kcal:480,gi:'Very Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'DM-19',code:'DM-19',cat:'DM',meal:'breakfast',day:'রবিবার',
+   name:'লাইট কোকোনাট কঞ্জি',
+   c1:'হলুদ-মরিঙ্গা উষ্ণ স্যুপ',
+   c2:'পাতলা নারকেল দুধ কঞ্জি — কুইনোয়া, মরিঙ্গা পাতা, হলুদ',
+   c3:'তরুণ নারকেলের শাঁস + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'10g',fiber:'7g',kcal:350,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'DM-20',code:'DM-20',cat:'DM',meal:'lunch',day:'রবিবার',
+   name:'ডিটক্স ডাল-কুইনোয়া প্লেট ও ডিম',
+   c1:'মরিঙ্গা-ধনেপাতা স্যুপ — জিরা, লেবু',
+   c2:'মুগ ডাল স্যুপ-বাউল (কুইনোয়ার উপরে) + সেদ্ধ চিচিঙ্গা, চালকুমড়া, লেবু + ১টি সেদ্ধ ডিম',
+   c3:'কাঁচা পেঁপে + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ৫',protein:'25g',fiber:'11g',kcal:540,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'DM-21',code:'DM-21',cat:'DM',meal:'dinner',day:'রবিবার',
+   name:'রেস্টোরেশন নাইট কিচারি ও ঘি চিকেন',
+   c1:'পালং-মরিঙ্গা স্যুপ — আদা, গোলমরিচ',
+   c2:'সফট মুগ + কুইনোয়া কিচারি — ধনেপাতা, আদা, লেবু, হলুদ + ঘি-পোচড চিকেন ৮০গ্রাম',
+   c3:'সাবজা বীজ নারকেল পুডিং + টপিং ২ + চাটনি ১',
+   powders:'করলা গুঁড়া + মেথি গুঁড়া + দারুচিনি গুঁড়া',
+   chutney:'চাটনি ১',protein:'32g',fiber:'9g',kcal:490,gi:'Very Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+
+  // ── OBESITY ──
+  {id:'OB-22',code:'OB-22',cat:'OB',meal:'breakfast',day:'সোমবার',
+   name:'প্রোটিন-ঘন বীজ পোরিজ',
+   c1:'মরিঙ্গা-স্পিরুলিনা উষ্ণ স্যুপ',
+   c2:'হেম্প + চিয়া + বাকওয়িট পোরিজ নারকেল দুধে — বেরি, ফ্ল্যাক্স, মরিঙ্গা গুঁড়া',
+   c3:'সবুজ আপেল + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৫',protein:'18g',fiber:'14g',kcal:380,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'OB-23',code:'OB-23',cat:'OB',meal:'lunch',day:'সোমবার',
+   name:'ভলিউম-ইটিং রেইনবো বাউল',
+   c1:'শসা-পুদিনা ঠান্ডা স্যুপ',
+   c2:'বড় সালাদ বাউল — বাঁধাকপি + গাজর + বিটরুট + ছোলা + কুইনোয়া + ২টি সেদ্ধ ডিমের সাদা অংশ',
+   c3:'আমলা স্লাইস + চাটনি ৩ + টপিং ১ + টপিং ২',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৩',protein:'28g',fiber:'18g',kcal:520,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'OB-24',code:'OB-24',cat:'OB',meal:'dinner',day:'সোমবার',
+   name:'লাইট মিসো-স্টাইল ব্রোথ বাউল',
+   c1:'পালং-মরিঙ্গা স্যুপ — আদা, লেবু, গোলমরিচ',
+   c2:'ফার্মেন্টেড ছোলা-মিসো স্টাইল ব্রোথ (চিকেন ব্রোথ বেস) — কুইনোয়া নুডলস, পালং, মাশরুম',
+   c3:'আগার জেলি + সাবজা বীজ + টপিং ২ + চাটনি ৫',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৫',protein:'15g',fiber:'8g',kcal:320,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'OB-25',code:'OB-25',cat:'OB',meal:'breakfast',day:'মঙ্গলবার',
+   name:'লো-ক্যাল কুলিং মুগ স্প্রাউট বাউল',
+   c1:'ধনেপাতা-মরিঙ্গা হালকা স্যুপ',
+   c2:'মুগ স্প্রাউট বাউল — শসা, টমেটো, ধনেপাতা, লেবু, রক সল্ট',
+   c3:'তরুণ নারকেলের শাঁস + চাটনি ৩ + টপিং ১ + টপিং ২',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৩',protein:'14g',fiber:'10g',kcal:270,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'OB-26',code:'OB-26',cat:'OB',meal:'lunch',day:'মঙ্গলবার',
+   name:'ফ্যাট-ফাইটিং ফাইব্রাস ডাল প্লেট',
+   c1:'গোলমরিচ-জিরা পাচক স্যুপ',
+   c2:'হাই-ফাইবার কুলথি ডাল + কুইনোয়া + কাঁচা পেঁয়াজ-টমেটো সালাদ + তেল-মুক্ত করলা ভাজি + ২টি ডিমের সাদা অংশ',
+   c3:'কাঁচা পেঁপে-লেবু সালাদ + চাটনি ৫ + টপিং ১ + টপিং ২',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৫',protein:'28g',fiber:'16g',kcal:540,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'OB-27',code:'OB-27',cat:'OB',meal:'dinner',day:'মঙ্গলবার',
+   name:'ডিটক্স নাইট ব্রোথ',
+   c1:'পালং-মরিঙ্গা ঘন স্যুপ',
+   c2:'ক্লিয়ার চিকেন ব্রোথ + ভাসমান কুইনোয়া + পালং + আদা; সেদ্ধ ব্রকলি + ফুলকপি পাশে',
+   c3:'চিয়া-লেবু মিশ্রণ + চাটনি ৩ + টপিং ২ + টপিং ১',
+   powders:'গার্সিনিয়া গুঁড়া + গ্রিন কফি গুঁড়া + ত্রিফলা গুঁড়া',
+   chutney:'চাটনি ৩',protein:'13g',fiber:'9g',kcal:270,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+
+  // ── FATTY LIVER ──
+  {id:'FL-43',code:'FL-43',cat:'FL',meal:'breakfast',day:'সোমবার',
+   name:'লিভার-ডিটক্স মর্নিং গ্রিন বাউল',
+   c1:'ড্যান্ডেলিয়ন-মরিঙ্গা উষ্ণ স্যুপ — আদা, লেবু',
+   c2:'গ্রিন স্মুদি বাউল — স্পিরুলিনা + মরিঙ্গা + কলা + নারকেল দুধ; কুমড়ার বীজ, আমলা গুঁড়া, লেবুর খোসা টপিং',
+   c3:'সেদ্ধ ব্রকলি + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'মিল্ক থিসল গুঁড়া + ড্যান্ডেলিয়ন গুঁড়া + ভূমি আমলা গুঁড়া',
+   chutney:'চাটনি ২',protein:'14g',fiber:'11g',kcal:390,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'FL-44',code:'FL-44',cat:'FL',meal:'lunch',day:'সোমবার',
+   name:'লিভার-ক্লিনজ হলুদ ভাত প্লেট ও পোচড ডিম',
+   c1:'ড্যান্ডেলিয়ন-আদা লিভার চা (উষ্ণ)',
+   c2:'হলুদ কুইনোয়া + সেদ্ধ বিটরুট-গাজর + তেল-মুক্ত রোস্টেড ছোলা + কাঁচা ধনেপাতা সালাদ + ১টি পোচড ডিম',
+   c3:'তাজা করলার রস + চাটনি ৪ + টপিং ১ + টপিং ২',
+   powders:'মিল্ক থিসল গুঁড়া + ড্যান্ডেলিয়ন গুঁড়া + ভূমি আমলা গুঁড়া',
+   chutney:'চাটনি ৪',protein:'25g',fiber:'14g',kcal:600,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'FL-45',code:'FL-45',cat:'FL',meal:'dinner',day:'সোমবার',
+   name:'অ্যালকালাইন নাইট রিসেট ও চিকেন ব্রোথ',
+   c1:'মরিঙ্গা-পালং ঘন স্যুপ — আদা, রসুন, লেবু',
+   c2:'সেদ্ধ সবুজ মুগ + কুইনোয়া + গ্রেটেড মুলা + আদা, লেবু; ক্লিয়ার চিকেন বোন ব্রোথে সিমার করা',
+   c3:'নারকেল দুধ সেট দই + কারি পাতা + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'মিল্ক থিসল গুঁড়া + ড্যান্ডেলিয়ন গুঁড়া + ভূমি আমলা গুঁড়া',
+   chutney:'চাটনি ২',protein:'18g',fiber:'10g',kcal:380,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+
+  // ── IBS ──
+  {id:'IB-64',code:'IB-64',cat:'IB',meal:'breakfast',day:'সোমবার',
+   name:'গাট-সুদিং মর্নিং বাউল',
+   c1:'স্লিপারি এলম-মৌরি উষ্ণ স্যুপ — আদা, ধনেপাতা',
+   c2:'GF ওটস পোরিজ নারকেল দুধে — কলা, এলাচ, দারুচিনি — অন্ত্র-আবরণকারী',
+   c3:'স্টিউড আপেল + আদা + চাটনি ১ + টপিং ১ + টপিং ২',
+   powders:'স্লিপারি এলম গুঁড়া + মৌরি বীজ গুঁড়া + জিরা গুঁড়া',
+   chutney:'চাটনি ১',protein:'10g',fiber:'12g',kcal:390,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'IB-65',code:'IB-65',cat:'IB',meal:'lunch',day:'সোমবার',
+   name:'গাট-রিপেয়ার কিচারি বাউল',
+   c1:'মৌরি-আদা পাচক স্যুপ',
+   c2:'মুগ-কুইনোয়া সফট কিচারি — জিরা, ধনেপাতা, লেবু; সেদ্ধ লাউ পাশে',
+   c3:'নারকেল দুধ পাতলা দই + চাটনি ১ + টপিং ১ + টপিং ২',
+   powders:'স্লিপারি এলম গুঁড়া + মৌরি বীজ গুঁড়া + জিরা গুঁড়া',
+   chutney:'চাটনি ১',protein:'14g',fiber:'10g',kcal:420,gi:'Low',
+   has_egg:false,has_chicken:false,price:300,upgrade:350},
+  {id:'IB-66',code:'IB-66',cat:'IB',meal:'dinner',day:'সোমবার',
+   name:'অ্যালো-জিঞ্জার সুথিং নাইট বাউল',
+   c1:'পালং-মরিঙ্গা হালকা স্যুপ',
+   c2:'সফট সেদ্ধ কুইনোয়া + চালকুমড়া + আদা-নারকেল দুধ সস; খুব হালকা মশলা',
+   c3:'সাইলিয়াম হাস্ক মিশ্রণ + চাটনি ৪ + টপিং ১ + টপিং ২',
+   powders:'স্লিপারি এলম গুঁড়া + মৌরি বীজ গুঁড়া + জিরা গুঁড়া',
+   chutney:'চাটনি ৪',protein:'10g',fiber:'11g',kcal:320,gi:'Low',
+   has_egg:false,has_chicken:false,price:300,upgrade:350},
+
+  // ── PREGNANCY ──
+  {id:'PR-85',code:'PR-85',cat:'PR',meal:'breakfast',day:'সোমবার',
+   name:'নারিশিং মামা মর্নিং বাউল',
+   c1:'মরিঙ্গা-হলুদ উষ্ণ স্যুপ — এলাচ, আদা',
+   c2:'কুইনোয়া পোরিজ নারকেল দুধে — মরিঙ্গা, ৩টি খেজুর, কলা, তিল — ফোলেট + আয়রন + ক্যালসিয়াম',
+   c3:'তাজা ডালিম + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ২',protein:'16g',fiber:'12g',kcal:480,folate:'180mcg',iron:'6mg',calcium:'120mg',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'PR-86',code:'PR-86',cat:'PR',meal:'lunch',day:'সোমবার',
+   name:'ফোটাল নারিশ প্লেট ও পূর্ণ সেদ্ধ ডিম',
+   c1:'মৌরি-আদা উষ্ণ স্যুপ',
+   c2:'কুইনোয়া + ছোলার ডাল + সেদ্ধ মরিঙ্গা পাতা (ফোলেট-সমৃদ্ধ) + সাউটেড পালং + নারকেল দুধ + ১টি সম্পূর্ণ সেদ্ধ ডিম (৭০°C+)',
+   c3:'আমলা স্লাইস + চাটনি ৩ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ৩',protein:'30g',fiber:'12g',kcal:680,folate:'220mcg',iron:'8mg',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'PR-87',code:'PR-87',cat:'PR',meal:'dinner',day:'সোমবার',
+   name:'ক্যাম মামা নাইট ও ঘি-পোচড চিকেন',
+   c1:'মরিঙ্গা-পালং স্যুপ — আদা, হলুদ',
+   c2:'নারকেল দুধ ডাল (মুগ) + কুইনোয়া + সেদ্ধ ব্রকলি, কেল, তিল, লেবু + ঘি-পোচড চিকেন ব্রেস্ট বোন ব্রোথে (৮০গ্রাম)',
+   c3:'নারকেল দুধ সেট দই + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ২',protein:'34g',fiber:'12g',kcal:550,calcium:'150mg',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+  {id:'PR-88',code:'PR-88',cat:'PR',meal:'breakfast',day:'মঙ্গলবার',
+   name:'কুলিং ফিভার-সেফ মামা বাউল',
+   c1:'মরিঙ্গা-হলুদ স্যুপ — তুলসী, আদা (নিম সম্পূর্ণ বাদ)',
+   c2:'পাতলা নারকেল দুধ কঞ্জি + কুইনোয়া, মরিঙ্গা, হলুদ, গ্রেটেড আদা',
+   c3:'নারকেলের শাঁস + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ২',protein:'12g',fiber:'8g',kcal:390,gi:'Low',
+   has_egg:false,has_chicken:false,price:200,upgrade:250},
+  {id:'PR-89',code:'PR-89',cat:'PR',meal:'lunch',day:'মঙ্গলবার',
+   name:'ফিভার কমফোর্ট মামা প্লেট ও সেদ্ধ ডিম',
+   c1:'ধনেপাতা-জিরা কুলিং স্যুপ',
+   c2:'সফট মুগ + কুইনোয়া খিচুড়ি + হলুদ, আদা, লেবু, কারি পাতা; সেদ্ধ চালকুমড়া + ১টি সম্পূর্ণ সেদ্ধ ডিম',
+   c3:'আমলা স্লাইস + চাটনি ৩ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ৩',protein:'24g',fiber:'11g',kcal:570,gi:'Low',
+   has_egg:true,has_chicken:false,price:300,upgrade:350},
+  {id:'PR-90',code:'PR-90',cat:'PR',meal:'dinner',day:'মঙ্গলবার',
+   name:'সেফ ফিভার নাইট মামা ও ঘি চিকেন',
+   c1:'মরিঙ্গা-পালং স্যুপ — হলুদ, আদা',
+   c2:'কুইনোয়া + সেদ্ধ চিচিঙ্গা, ঝিঙে + নারকেল দুধ সস, মরিঙ্গা পাতা + ঘি-পোচড চিকেন বোন ব্রোথে (৮০গ্রাম)',
+   c3:'সাবজা-নারকেল পুডিং + চাটনি ২ + টপিং ১ + টপিং ২',
+   powders:'আদা গুঁড়া + রেড রাসবেরি লিফ গুঁড়া + শতমূলী গুঁড়া',
+   chutney:'চাটনি ২',protein:'32g',fiber:'10g',kcal:510,gi:'Low',
+   has_egg:false,has_chicken:true,price:300,upgrade:350},
+];
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  showLoader('মেনু লোড হচ্ছে...');
+  try {
+    const [supaMenus, pins, metrics] = await Promise.all([
+      fetchMenuItems(), fetchPins(), fetchMetrics()
+    ]);
+    // Merge Supabase data with static (Supabase takes priority)
+    allMenuItems = supaMenus.length > 10 ? supaMenus : STATIC_MENU;
+    pinnedItems  = pins;
+    customerMetrics = metrics;
+    renderPinned();
+    applyFilters();
+    updateCartUI();
+  } catch(e){ console.error(e); allMenuItems = STATIC_MENU; applyFilters(); }
+  hideLoader();
+});
+
+// ═══════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════
+async function fetchMenuItems(){
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/menu_items?is_available=eq.true&select=*&order=menu_code`,{headers:SH});
+    return await r.json() || [];
+  }catch{return []}
+}
+async function fetchPins(){
+  try{
+    const r = await fetch(
+      `${SUPA}/rest/v1/sar_recipe_pins?customer_id=eq.${CID}&is_active=eq.true&select=*`,
+      {headers:SH});
+    return await r.json() || [];
+  }catch{return []}
+}
+async function fetchMetrics(){
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*`,{headers:SH});
+    const d = await r.json(); return d[0] || {};
+  }catch{return {}}
+}
+
+// ═══════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════
+function filterCat(cat, btn){
+  activeCat = cat;
+  document.querySelectorAll('.ftab[class*="cat-"]').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function filterMeal(meal, btn){
+  activeMeal = meal;
+  document.querySelectorAll('.ftab[data-meal]').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function applyFilters(){
+  const q = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  let items = allMenuItems.filter(m=>{
+    const catOk  = activeCat === 'ALL' || (m.cat||m.disease_category) === activeCat;
+    const mealOk = activeMeal === 'ALL' || (m.meal||m.meal_type) === activeMeal;
+    const nm = (m.name||m.name_bn||'').toLowerCase();
+    const co = (m.c1||m.course_1_bn||''+m.c2||m.course_2_bn||'').toLowerCase();
+    const qOk = !q || nm.includes(q) || co.includes(q) || (m.code||m.menu_code||'').toLowerCase().includes(q);
+    return catOk && mealOk && qOk;
+  });
+  document.getElementById('resultsInfo').textContent =
+    `${items.length}টি রেসিপি দেখানো হচ্ছে (মোট ${allMenuItems.length}টির মধ্যে)`;
+  renderMenuGrid(items);
+}
+
+// ═══════════════════════════════════════
+// RENDER PINNED
+// ═══════════════════════════════════════
+function renderPinned(){
+  if(!pinnedItems.length) return;
+  document.getElementById('pinnedSection').classList.add('show');
+  const pinCodes = pinnedItems.map(p=>p.menu_item_id||p.menu_code||'');
+  const pinned = allMenuItems.filter(m=> pinCodes.includes(m.id||m.code||m.menu_code));
+  const grid = document.getElementById('pinnedGrid');
+  grid.innerHTML = pinned.map(m=>buildCard(m,true,false)).join('');
+}
+
+// ═══════════════════════════════════════
+// RENDER GRID
+// ═══════════════════════════════════════
+function renderMenuGrid(items){
+  const grid = document.getElementById('menuGrid');
+  if(!items.length){
+    grid.innerHTML=`<div class="empty-state"><span class="empty-state-icon">🔍</span>কোনো মেনু পাওয়া যায়নি।</div>`;
+    return;
+  }
+  const pinCodes = pinnedItems.map(p=>p.menu_item_id||p.menu_code||'');
+  grid.innerHTML = items.map(m=>{
+    const isPinned = pinCodes.includes(m.id||m.code||m.menu_code);
+    const isAiRec  = aiRecommended.has(m.id||m.code||m.menu_code);
+    return buildCard(m, isPinned, isAiRec);
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// BUILD CARD
+// ═══════════════════════════════════════
+function buildCard(m, isPinned, isAiRec){
+  const cat  = m.cat || m.disease_category || 'DM';
+  const meal = m.meal || m.meal_type || 'breakfast';
+  const code = m.code || m.menu_code || '';
+  const name = m.name || m.name_bn || '';
+  const c1   = m.c1 || m.course_1_bn || '';
+  const c2   = m.c2 || m.course_2_bn || '';
+  const c3   = m.c3 || m.course_3_bn || '';
+  const pw   = m.powders || (m.disease_powders_json ? JSON.stringify(m.disease_powders_json) : '');
+  const cht  = m.chutney || m.chutney_name || '';
+  const kcal = m.kcal || m.calories || '—';
+  const prot = m.protein || m.protein_g ? (m.protein_g ? m.protein_g+'g' : m.protein) : '—';
+  const fib  = m.fiber || m.fiber_g ? (m.fiber_g ? m.fiber_g+'g' : m.fiber) : '—';
+  const price = m.price || 200;
+  const upgrade = m.upgrade || m.price_with_upgrade || (price + 50);
+  const hasEgg = m.has_egg;
+  const hasChk = m.has_chicken;
+  const aiReason = m._ai_reason || '';
+  const catClr = {DM:'var(--pink2)',OB:'var(--yellow2)',FL:'var(--green2)',IB:'var(--purple2)',PR:'var(--red2)'}[cat]||'var(--pink2)';
+  const mealLbl = {breakfast:'🌅 সকাল',lunch:'☀️ দুপুর',dinner:'🌙 রাত'}[meal]||meal;
+  const mealCls = {breakfast:'b-meal-b',lunch:'b-meal-l',dinner:'b-meal-d'}[meal]||'';
+  const mealEmoji = {breakfast:'🌅',lunch:'🌿',dinner:'🌙'}[meal]||'🍽️';
+
+  const lockDiv = !subActive ? `<div class="lock-overlay">
+    <span class="lock-overlay-icon">🔒</span>
+    <span class="lock-overlay-txt">সাবস্ক্রিপশন সক্রিয় করুন</span>
+    <a href="payment.html" class="lock-overlay-btn">সাবস্ক্রাইব করুন</a>
+  </div>` : '';
+
+  return `<div class="mcard${isPinned?' pinned':''}${isAiRec?' ai-recommended':''}${!subActive?' locked':''}"
+    data-cat="${cat}" data-meal="${meal}" data-id="${m.id||code}">
+    <div class="mcard-top"></div>
+    <div class="mcard-hd">
+      <div class="mcard-badges">
+        <span class="badge b-cat-${cat}">${{DM:'🩸 ডায়াবেটিস',OB:'⚖️ স্থূলতা',FL:'🫀 ফ্যাটি লিভার',IB:'🌿 IBS',PR:'🤱 গর্ভাবস্থা'}[cat]||cat}</span>
+        <span class="badge ${mealCls}">${mealLbl}</span>
+        ${isPinned?'<span class="badge b-pinned">📌 SAR সুপারিশ</span>':''}
+        ${isAiRec?'<span class="badge b-ai">🤖 AI সুপারিশ</span>':''}
+        ${hasEgg?'<span class="badge" style="background:rgba(245,158,11,.14);color:var(--yellow2)">🥚 ডিম</span>':''}
+        ${hasChk?'<span class="badge" style="background:rgba(5,150,105,.14);color:var(--green2)">🐓 চিকেন ঘি</span>':''}
+      </div>
+      <span class="mcard-code">${code}</span>
+    </div>
+    <div class="mcard-body">
+      <div class="mcard-name">${mealEmoji} ${name}</div>
+      ${aiReason?`<div class="mcard-ai-reason show">🤖 ${aiReason}</div>`:''}
+      <div class="mcard-courses">
+        ${c1?`<div class="course-row"><span class="course-num">১.</span><span>${c1}</span></div>`:''}
+        ${c2?`<div class="course-row"><span class="course-num">২.</span><span>${c2}</span></div>`:''}
+        ${c3?`<div class="course-row"><span class="course-num">৩.</span><span>${c3}</span></div>`:''}
+      </div>
+      ${pw?`<div class="mcard-powders">💊 <span>ঔষধি গুঁড়া:</span> ${pw}</div>`:''}
+      <div class="nutr-row">
+        <span class="nchip"><span class="ndot" style="background:${catClr}"></span>${kcal} kcal</span>
+        ${prot&&prot!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--purple2)"></span>প্রোটিন ${prot}</span>`:''}
+        ${fib&&fib!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--green2)"></span>ফাইবার ${fib}</span>`:''}
+        ${m.iron||m.iron_mg?`<span class="nchip"><span class="ndot" style="background:var(--red2)"></span>আয়রন ${m.iron||m.iron_mg}</span>`:''}
+        ${m.folate||m.folate_mcg?`<span class="nchip"><span class="ndot" style="background:var(--yellow2)"></span>ফোলেট ${m.folate||m.folate_mcg}</span>`:''}
+      </div>
+      <div class="tc-row">
+        ${cht?`<span class="tc-chip">🍶 ${cht}</span>`:''}
+        <span class="tc-chip">🌱 টপিং ১ + ২</span>
+        ${hasEgg&&meal==='pregnancy'?`<span class="tc-chip" style="color:var(--red2)">⚠️ ৭০°C+ সেদ্ধ</span>`:''}
+      </div>
+    </div>
+    <div class="mcard-ft">
+      <div class="price-col">
+        <div class="price-main">৳ ${price}</div>
+        ${hasEgg||hasChk?`<div class="price-up">চিকেন/ডিম আপগ্রেড: ৳ ${upgrade}</div>`:''}
+      </div>
+      <div class="card-actions">
+        <button class="pin-btn${isPinned?' pinned':''}" onclick="togglePin('${m.id||code}','${name}')"
+          ${!subActive?'disabled':''}>
+          ${isPinned?'📌 পিন করা':'📌 পিন'}
+        </button>
+        <button class="order-btn" onclick="addToCart('${m.id||code}','${name}','${cat}',${price},'${meal}')"
+          ${!subActive?'disabled':''}>
+          কার্টে যোগ করুন +
+        </button>
+      </div>
+    </div>
+    ${lockDiv}
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// CLAUDE AI ANALYSIS
+// ═══════════════════════════════════════
+async function runClaudeAnalysis(){
+  if(!subActive){ showToast('সাবস্ক্রিপশন সক্রিয় করুন',false); return; }
+
+  const btn = document.getElementById('aiBtn');
+  btn.classList.add('loading');
+  btn.textContent = '🤖 বিশ্লেষণ চলছে...';
+
+  // Build patient profile
+  const m = customerMetrics;
+  const profile = `
+গ্রাহকের নাম: ${CNAME}
+বয়স: ${m.age_calculated||'—'}
+ওজন: ${m.weight_kg||'—'} কেজি, উচ্চতা: ${m.height_cm||'—'} সেমি, BMI: ${m.bmi||'—'}
+ফাস্টিং গ্লুকোজ: ${m.fasting_glucose||'—'} mmol/L
+HbA1c: ${m.hba1c||'—'}%
+হিমোগ্লোবিন: ${m.hemoglobin||'—'} g/dL
+রক্তচাপ: ${m.bp_systolic||'—'}/${m.bp_diastolic||'—'} mmHg
+কোলেস্টেরল (মোট): ${m.cholesterol_total||'—'} mmol/L
+ভিটামিন ডি: ${m.vitamin_d||'—'} ng/mL
+ভিটামিন বি১২: ${m.vitamin_b12||'—'} pg/mL
+TSH: ${m.tsh||'—'} mIU/L
+ALT/SGPT: ${m.alt_sgpt||'—'} U/L
+মাসিক চক্রের অবস্থা: ${m.menstrual_status||'—'}
+শেষ মাসিকের তারিখ: ${m.last_period_date||'—'}
+মাসিক চক্রের দৈর্ঘ্য: ${m.cycle_length_days||'28'} দিন
+গর্ভাবস্থার অবস্থা: ${m.pregnancy_status||'না'}
+PCOS: ${m.pcos_status||'—'}
+থাইরয়েড রোগ: ${m.thyroid_disease||'—'}
+ফ্যাটি লিভার: ${m.fatty_liver_grade||'না'}
+IBS ধরন: ${m.ibs_type||'—'}
+ডায়াবেটিস ধরন: ${m.diabetes_type||'—'}
+প্রাথমিক স্বাস্থ্য লক্ষ্য: ${m.primary_health_goal||'—'}
+SAR বিভাগ পছন্দ: ${m.sar_category_interest||'—'}
+খাদ্য অ্যালার্জি: ${(m.food_allergies||[]).join(', ')||'নেই'}
+খাদ্যাভ্যাস: ${m.dietary_pattern||'—'}
+স্ট্রেস স্তর: ${m.stress_level||'—'}/১০
+ঘুমের মান: ${m.sleep_quality||'—'}
+শারীরিক কার্যকলাপ: ${m.activity_level||'—'}
+`;
+
+  const availableCodes = allMenuItems.slice(0,20).map(i=>i.code||i.menu_code).join(', ');
+
+  const prompt = `তুমি SAR — She AI Restaurant-এর বিশেষজ্ঞ থেরাপিউটিক মেনু পরামর্শদাতা।
+
+একজন বাংলাদেশি নারীর স্বাস্থ্য প্রোফাইল বিশ্লেষণ করে তার জন্য সবচেয়ে উপযুক্ত SAR মেনু কোডগুলো সুপারিশ করো।
+
+গ্রাহকের স্বাস্থ্য প্রোফাইল:
+${profile}
+
+উপলব্ধ মেনু কোডের নমুনা: ${availableCodes}
+
+SAR মেনু বিভাগ:
+- DM (ডায়াবেটিস): করলা + মেথি + দারুচিনি গুঁড়া
+- OB (স্থূলতা): গার্সিনিয়া + গ্রিন কফি + ত্রিফলা গুঁড়া  
+- FL (ফ্যাটি লিভার): মিল্ক থিসল + ড্যান্ডেলিয়ন + ভূমি আমলা গুঁড়া
+- IB (IBS/গ্যাস্ট্রিক): স্লিপারি এলম + মৌরি + জিরা গুঁড়া
+- PR (গর্ভাবস্থা): আদা + রেড রাসবেরি লিফ + শতমূলী গুঁড়া
+
+JSON ফরম্যাটে উত্তর দাও (অন্য কিছু লিখবে না):
+{
+  "primary_category": "DM বা OB বা FL বা IB বা PR",
+  "health_summary": "২-৩ বাক্যে বাংলায় স্বাস্থ্যের সংক্ষেপ",
+  "cycle_phase": "বর্তমান মাসিক চক্রের ফেজ বাংলায়",
+  "cycle_recommendation": "চক্র ফেজ অনুযায়ী পুষ্টি পরামর্শ বাংলায়",
+  "top_recommendations": [
+    {"code": "মেনু কোড", "reason": "কেন সুপারিশ করা হচ্ছে বাংলায়"},
+    {"code": "মেনু কোড", "reason": "কারণ বাংলায়"},
+    {"code": "মেনু কোড", "reason": "কারণ বাংলায়"},
+    {"code": "মেনু কোড", "reason": "কারণ বাংলায়"},
+    {"code": "মেনু কোড", "reason": "কারণ বাংলায়"}
+  ],
+  "avoid_items": "কী এড়িয়ে চলবেন বাংলায়",
+  "daily_focus": "আজকের জন্য প্রধান পুষ্টি ফোকাস বাংলায়",
+  "motivational": "অনুপ্রেরণামূলক বাংলা বার্তা"
+}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    const data = await resp.json();
+    const raw = data.content[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(clean);
+    renderAiBox(result);
+
+  } catch(e){
+    console.error(e);
+    // Fallback: rule-based
+    const fallback = buildRuleBasedRecommendation();
+    renderAiBox(fallback);
+  }
+
+  btn.classList.remove('loading');
+  btn.textContent = '🤖 পুনরায় বিশ্লেষণ করুন';
+}
+
+// Rule-based fallback
+function buildRuleBasedRecommendation(){
+  const m = customerMetrics;
+  let cat = 'DM';
+  if(m.sar_category_interest) cat = m.sar_category_interest;
+  else if(m.pregnancy_status && m.pregnancy_status !== 'না') cat = 'PR';
+  else if(m.diabetes_type && m.diabetes_type !== 'না') cat = 'DM';
+  else if(m.fatty_liver_grade && m.fatty_liver_grade !== 'না') cat = 'FL';
+  else if(m.ibs_type && m.ibs_type !== 'না') cat = 'IB';
+  else if(m.bmi && m.bmi > 25) cat = 'OB';
+
+  const catItems = allMenuItems.filter(i=>(i.cat||i.disease_category)===cat).slice(0,5);
+  return {
+    primary_category: cat,
+    health_summary: `আপনার স্বাস্থ্য প্রোফাইল বিশ্লেষণ করে ${{DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'}[cat]} মেনু সুপারিশ করা হচ্ছে।`,
+    cycle_phase: 'মাসিক তারিখ থেকে গণনা করা হচ্ছে',
+    cycle_recommendation: 'আয়রন ও ফোলেট সমৃদ্ধ খাবার গ্রহণ করুন।',
+    top_recommendations: catItems.map(i=>({code:i.code||i.menu_code,reason:'আপনার স্বাস্থ্য অবস্থার সাথে সামঞ্জস্যপূর্ণ।'})),
+    avoid_items: 'প্রক্রিয়াজাত খাবার, পরিশোধিত তেল, চিনি এড়িয়ে চলুন।',
+    daily_focus: 'প্রোটিন ও ফাইবার সমৃদ্ধ থেরাপিউটিক মেনু।',
+    motivational: 'সঠিক পুষ্টিই আপনার সেরা ওষুধ।'
+  };
+}
+
+// Render AI Box
+function renderAiBox(result){
+  const recCodes = new Set((result.top_recommendations||[]).map(r=>r.code));
+  aiRecommended = recCodes;
+
+  // Mark recommended cards
+  (result.top_recommendations||[]).forEach(rec=>{
+    const m = allMenuItems.find(i=>(i.code||i.menu_code)===rec.code);
+    if(m) m._ai_reason = rec.reason;
+  });
+
+  document.getElementById('aiGrid').innerHTML = `
+    <div class="ai-chip">
+      <div class="ai-chip-label">প্রাথমিক বিভাগ</div>
+      <div class="ai-chip-val" style="color:var(--purple2);font-weight:700">
+        ${{DM:'🩸 ডায়াবেটিস',OB:'⚖️ স্থূলতা',FL:'🫀 ফ্যাটি লিভার',IB:'🌿 IBS',PR:'🤱 গর্ভাবস্থা'}[result.primary_category]||result.primary_category}
+      </div>
+    </div>
+    <div class="ai-chip">
+      <div class="ai-chip-label">মাসিক চক্রের ফেজ</div>
+      <div class="ai-chip-val">${result.cycle_phase||'—'}</div>
+    </div>
+    <div class="ai-chip">
+      <div class="ai-chip-label">আজকের ফোকাস</div>
+      <div class="ai-chip-val">${result.daily_focus||'—'}</div>
+    </div>
+  `;
+
+  const recs = [
+    {icon:'🎯',label:'স্বাস্থ্য সারসংক্ষেপ',val:result.health_summary},
+    {icon:'🌸',label:'চক্র ফেজ পরামর্শ',val:result.cycle_recommendation},
+    {icon:'⚠️',label:'এড়িয়ে চলুন',val:result.avoid_items},
+    {icon:'✨',label:'অনুপ্রেরণা',val:result.motivational},
+  ].filter(r=>r.val);
+
+  document.getElementById('aiRecList').innerHTML = recs.map(r=>
+    `<div class="ai-rec-item"><span class="ai-rec-dot"></span>
+    <span><strong>${r.icon} ${r.label}:</strong> ${r.val}</span></div>`
+  ).join('');
+
+  document.getElementById('aiBox').classList.add('show');
+
+  // Re-render menu with AI recommendations highlighted
+  applyFilters();
+  // Scroll to AI box
+  document.getElementById('aiBox').scrollIntoView({behavior:'smooth',block:'start'});
+  showToast('✓ AI বিশ্লেষণ সম্পন্ন!', true);
+}
+
+function closeAiBox(){
+  document.getElementById('aiBox').classList.remove('show');
+  aiRecommended.clear();
+  allMenuItems.forEach(m => delete m._ai_reason);
+  applyFilters();
+}
+
+// ═══════════════════════════════════════
+// PIN / UNPIN
+// ═══════════════════════════════════════
+async function togglePin(id, name){
+  if(!subActive) return;
+  const existing = pinnedItems.find(p=>(p.menu_item_id||p.menu_code||'')=== id);
+  if(existing){
+    // Unpin
+    await fetch(`${SUPA}/rest/v1/sar_recipe_pins?id=eq.${existing.id}`,{
+      method:'PATCH',headers:{...SH,'Prefer':'return=minimal'},
+      body:JSON.stringify({is_active:false})
+    });
+    pinnedItems = pinnedItems.filter(p=>p.id!==existing.id);
+    showToast(`📌 পিন সরানো হয়েছে`, true);
+  } else {
+    // Pin
+    const res = await fetch(`${SUPA}/rest/v1/sar_recipe_pins`,{
+      method:'POST',headers:{...SH,'Prefer':'return=representation'},
+      body:JSON.stringify({
+        customer_id:CID, menu_item_id:id, menu_code:id,
+        is_active:true, clinical_reason_bn:'গ্রাহক নিজেই পিন করেছেন'
+      })
+    });
+    const d = await res.json();
+    if(d[0]) pinnedItems.push(d[0]);
+    showToast(`📌 "${name}" পিন করা হয়েছে`, true);
+  }
+  renderPinned();
+  applyFilters();
+}
+
+// ═══════════════════════════════════════
+// CART
+// ═══════════════════════════════════════
+function addToCart(id, name, cat, price, meal){
+  if(!subActive){ showToast('সাবস্ক্রিপশন সক্রিয় করুন',false); return; }
+  const existing = cart.find(i=>i.id===id);
+  if(existing){ existing.qty++; }
+  else { cart.push({id,name,cat,price,meal,qty:1,upgrade:false,note:''}); }
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  updateCartUI();
+  showToast(`✓ "${name.substring(0,25)}" কার্টে যোগ হয়েছে`, true);
+}
+
+function removeFromCart(id){
+  cart = cart.filter(i=>i.id!==id);
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function changeQty(id, delta){
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) removeFromCart(id);
+  else { localStorage.setItem('sar_cart', JSON.stringify(cart)); updateCartUI(); }
+}
+
+function toggleUpgrade(id, checked){
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.upgrade = checked;
+  item.price = checked ? (item.basePrice||item.price) + 50 : (item.basePrice||(item.price-50));
+  if(!item.basePrice) item.basePrice = checked ? item.price - 50 : item.price;
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function updateCartUI(){
+  const count = cart.reduce((s,i)=>s+i.qty,0);
+  const total = cart.reduce((s,i)=>s+(i.price*i.qty),0);
+  document.getElementById('cartCountBadge').textContent = count;
+  document.getElementById('cartTotal').textContent = '৳ ' + total.toLocaleString('bn-BD');
+  document.getElementById('checkoutBtn').disabled = !count;
+
+  const body = document.getElementById('cartBody');
+  if(!cart.length){
+    body.innerHTML='<div class="cart-empty">কার্ট খালি।</div>';
+    return;
+  }
+  const catEmoji = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱'};
+  body.innerHTML = cart.map(item=>`
+    <div class="cart-item">
+      <span class="ci-emoji">${catEmoji[item.cat]||'🍽️'}</span>
+      <div class="ci-info">
+        <div class="ci-name">${item.name.substring(0,35)}</div>
+        <div class="ci-meta">${{breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'}[item.meal]||item.meal} • ৳ ${item.price} প্রতিটি</div>
+        <div class="ci-qty-row">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+          <button class="ci-del" onclick="removeFromCart('${item.id}')">🗑️</button>
+        </div>
+        <textarea class="note-input" rows="1" placeholder="বিশেষ নির্দেশনা (ঐচ্ছিক)"
+          onchange="updateNote('${item.id}',this.value)">${item.note||''}</textarea>
+      </div>
+      <span class="ci-price">৳ ${(item.price*item.qty).toLocaleString('bn-BD')}</span>
+    </div>`).join('');
+}
+
+function updateNote(id, note){
+  const item = cart.find(i=>i.id===id);
+  if(item){ item.note=note; localStorage.setItem('sar_cart',JSON.stringify(cart)); }
+}
+
+function openCart(){ document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('show') }
+function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('show') }
+function goCheckout(){ if(cart.length){ closeCart(); window.location.href='order.html'; } }
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function showLoader(t){ document.getElementById('loadTxt').textContent=t; document.getElementById('loader').classList.add('show') }
+function hideLoader(){ document.getElementById('loader').classList.remove('show') }
+function showToast(msg, ok=true){
+  const el=document.getElementById('toast');
+  el.textContent=(ok?'✓ ':'⚠️ ')+msg;
+  el.style.borderColor=ok?'rgba(5,150,105,.35)':'rgba(220,38,38,.35)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// Init cart badge on load
+updateCartUI();
+</script>
+</body>
+</html>

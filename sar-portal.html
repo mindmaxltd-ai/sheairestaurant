@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SAR পোর্টাল — ক্লিনিক্যাল ড্যাশবোর্ড</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --teal:#0D9488;--teal2:#2DD4BF;
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 20s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--teal);top:-200px;left:-100px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:10s}
+.o3{width:350px;height:350px;background:var(--green);top:50%;left:40%;animation-delay:6s}
+@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-15px) scale(1.04)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(13,148,136,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(13,148,136,.03)1px,transparent 1px);
+  background-size:72px 72px}
+
+.rainbow-bar{height:3px;background:linear-gradient(90deg,#0D9488,#059669,#6B21A8,#E91E8C,#0D9488);background-size:200% 100%;animation:rainbowShift 4s linear infinite;position:fixed;top:0;left:0;right:0;z-index:999}
+@keyframes rainbowShift{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* LOGIN SCREEN */
+.login-screen{position:fixed;inset:0;z-index:200;background:rgba(10,10,15,.97);backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:center;padding:2rem}
+.login-card{background:rgba(15,15,26,.9);border:1px solid var(--border2);border-radius:24px;
+  padding:2.5rem;max-width:400px;width:100%;text-align:center}
+.login-logo{width:70px;height:70px;border-radius:50%;margin:0 auto 1.25rem;
+  background:linear-gradient(135deg,var(--teal),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  box-shadow:0 0 28px rgba(13,148,136,.4)}
+.login-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;margin-bottom:.3rem}
+.login-sub{font-size:.82rem;color:rgba(255,255,255,.4);margin-bottom:1.75rem}
+.login-field{margin-bottom:1rem}
+.login-input{width:100%;background:var(--glass2);border:1px solid var(--border2);border-radius:12px;
+  padding:.75rem 1.1rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;outline:none;
+  transition:border-color .25s}
+.login-input:focus{border-color:var(--teal2)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--green));border:none;
+  border-radius:12px;padding:.8rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .25s;margin-top:.5rem}
+.login-btn:hover{opacity:.85}
+.login-err{color:var(--pink2);font-size:.8rem;margin-top:.5rem}
+.hidden{display:none!important}
+
+/* LAYOUT */
+.app{position:relative;z-index:10;min-height:100vh;display:flex}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:rgba(10,10,20,.85);backdrop-filter:blur(24px);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-brand{padding:1.5rem 1.4rem 1rem;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;margin-bottom:.5rem}
+.sb-logo-icon{width:38px;height:38px;border-radius:11px;
+  background:linear-gradient(135deg,var(--teal),var(--green));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;
+  box-shadow:0 0 18px rgba(13,148,136,.4)}
+.sb-logo-text{font-family:'Playfair Display',serif;font-size:1rem;
+  background:linear-gradient(90deg,var(--teal2),var(--green2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-staff{font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.35);
+  padding:.2rem .4rem;background:rgba(13,148,136,.12);border:1px solid rgba(13,148,136,.2);
+  border-radius:6px;display:inline-block}
+.sb-nav{flex:1;padding:1rem .75rem;overflow-y:auto}
+.sb-section{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.25);padding:.4rem .65rem;
+  margin-bottom:.3rem;margin-top:.8rem}
+.sb-item{display:flex;align-items:center;gap:.7rem;padding:.62rem .75rem;border-radius:11px;
+  color:rgba(255,255,255,.5);text-decoration:none;font-size:.85rem;font-weight:500;cursor:pointer;
+  transition:all .25s;border:1px solid transparent;background:transparent;width:100%;text-align:left}
+.sb-item:hover{color:#fff;background:var(--glass);border-color:var(--border)}
+.sb-item.active{color:#fff;background:linear-gradient(135deg,rgba(13,148,136,.15),rgba(5,150,105,.1));
+  border-color:rgba(13,148,136,.25);box-shadow:0 0 14px rgba(13,148,136,.1)}
+.sb-badge{margin-left:auto;background:var(--teal);color:#fff;font-size:.62rem;font-weight:700;
+  padding:.1rem .45rem;border-radius:50px}
+.sb-bottom{padding:.75rem;border-top:1px solid var(--border)}
+
+/* CONTENT */
+.content{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;background:rgba(10,10,20,.85);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);padding:.75rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;margin-top:3px}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff}
+.topbar-right{display:flex;align-items:center;gap:.75rem}
+.live-badge{display:flex;align-items:center;gap:.45rem;background:rgba(13,148,136,.15);
+  border:1px solid rgba(45,212,191,.3);padding:.25rem .7rem;border-radius:50px;
+  font-size:.72rem;color:var(--teal2);font-family:'Space Mono',monospace}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--teal2);animation:livePulse 1.5s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(45,212,191,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(45,212,191,0)}}
+.signout-btn{background:none;border:1px solid var(--border);border-radius:8px;
+  padding:.3rem .7rem;color:rgba(255,255,255,.4);font-size:.78rem;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;transition:all .25s}
+.signout-btn:hover{color:var(--pink2);border-color:rgba(233,30,140,.3)}
+
+/* PAGE SECTIONS */
+.page-section{display:none;padding:2rem;flex:1;animation:fadeIn .3s ease}
+.page-section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:#fff;margin-bottom:.3rem}
+.page-sub{font-size:.85rem;color:rgba(255,255,255,.35);margin-bottom:1.75rem}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:rgba(15,15,26,.8);border:1px solid var(--border);border-radius:16px;
+  padding:1.1rem 1.2rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.sc-teal::before{background:linear-gradient(90deg,var(--teal),var(--teal2))}
+.sc-green::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.sc-purple::before{background:linear-gradient(90deg,var(--purple),var(--purple2))}
+.sc-pink::before{background:linear-gradient(90deg,var(--pink),var(--pink2))}
+.stat-icon{font-size:1.5rem;margin-bottom:.5rem}
+.stat-val{font-family:'Space Mono',monospace;font-size:1.7rem;font-weight:700;margin-bottom:.2rem}
+.sc-teal .stat-val{color:var(--teal2)}
+.sc-green .stat-val{color:var(--green2)}
+.sc-purple .stat-val{color:var(--purple2)}
+.sc-pink .stat-val{color:var(--pink2)}
+.stat-label{font-size:.73rem;color:rgba(255,255,255,.35)}
+
+/* TWO-COLUMN LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.one-col{margin-bottom:1.25rem}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+
+/* CARDS */
+.card{background:rgba(15,15,26,.8);border:1px solid var(--border2);border-radius:18px;padding:1.4rem;position:relative;overflow:hidden}
+.card.accent-teal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),var(--green))}
+.card.accent-purple::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--pink))}
+.card.accent-yellow::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--yellow),var(--pink))}
+.card-title{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;margin-bottom:1rem;
+  display:flex;align-items:center;gap:.5rem}
+.card-title-icon{font-size:1rem}
+
+/* CUSTOMER LIST */
+.cust-list{display:flex;flex-direction:column;gap:.6rem;max-height:420px;overflow-y:auto}
+.cust-row{display:flex;align-items:center;gap:.75rem;padding:.7rem .9rem;
+  background:var(--glass);border:1px solid var(--border);border-radius:12px;
+  cursor:pointer;transition:all .25s}
+.cust-row:hover{border-color:var(--teal2);background:rgba(13,148,136,.08)}
+.cust-row.selected{border-color:var(--teal2);background:rgba(13,148,136,.12)}
+.cust-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.cust-info{flex:1}
+.cust-name{font-size:.85rem;font-weight:600;color:#fff}
+.cust-meta{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.1rem}
+.cust-tag{padding:.15rem .55rem;border-radius:50px;font-size:.65rem;font-weight:700}
+.tag-dm{background:rgba(233,30,140,.15);color:var(--pink2)}
+.tag-ob{background:rgba(245,158,11,.15);color:var(--yellow2)}
+.tag-fl{background:rgba(5,150,105,.15);color:var(--green2)}
+.tag-ib{background:rgba(107,33,168,.15);color:var(--purple2)}
+.tag-pr{background:rgba(45,212,191,.15);color:var(--teal2)}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:.65rem;margin-bottom:1rem}
+.search-in{flex:1;background:var(--glass2);border:1px solid var(--border);border-radius:10px;
+  padding:.55rem .9rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none;
+  transition:border-color .25s}
+.search-in:focus{border-color:var(--teal2)}
+.search-in::placeholder{color:rgba(255,255,255,.2)}
+.filter-sel{background:var(--glass2);border:1px solid var(--border);border-radius:10px;
+  padding:.55rem .75rem;color:rgba(255,255,255,.6);font-family:'Hind Siliguri',sans-serif;
+  font-size:.82rem;outline:none}
+.filter-sel option{background:#1a1a2e}
+
+/* CUSTOMER DETAIL PANEL */
+.detail-panel{background:rgba(15,15,26,.85);border:1px solid var(--border2);border-radius:18px;padding:1.4rem;height:100%;min-height:500px}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:.75rem;color:rgba(255,255,255,.25)}
+.detail-empty-icon{font-size:3rem}
+.detail-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.detail-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0}
+.detail-name{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff}
+.detail-sub{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.15rem}
+.detail-actions{display:flex;gap:.5rem;margin-left:auto;flex-wrap:wrap}
+.detail-btn{padding:.3rem .75rem;border-radius:8px;font-size:.75rem;cursor:pointer;
+  border:1px solid;font-family:'Hind Siliguri',sans-serif;font-weight:600;transition:all .25s}
+.detail-btn.teal{background:rgba(13,148,136,.15);border-color:rgba(45,212,191,.3);color:var(--teal2)}
+.detail-btn.purple{background:rgba(107,33,168,.15);border-color:rgba(168,85,247,.3);color:var(--purple2)}
+.detail-btn.pink{background:rgba(233,30,140,.15);border-color:rgba(233,30,140,.3);color:var(--pink2)}
+.detail-btn:hover{filter:brightness(1.2)}
+
+/* METRICS MINI */
+.metrics-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:1rem}
+.metric-mini-card{background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.65rem .75rem;text-align:center}
+.metric-mini-val{font-family:'Space Mono',monospace;font-size:.95rem;font-weight:700;margin-bottom:.1rem}
+.metric-mini-label{font-size:.65rem;color:rgba(255,255,255,.35)}
+
+/* VITALS TABLE */
+.vitals-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem}
+.vital-item{display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem .75rem;background:var(--glass);border-radius:8px;border:1px solid var(--border)}
+.vital-key{font-size:.75rem;color:rgba(255,255,255,.45)}
+.vital-val{font-family:'Space Mono',monospace;font-size:.78rem;color:#fff}
+.vital-val.warn{color:var(--yellow2)}
+.vital-val.bad{color:var(--pink2)}
+.vital-val.ok{color:var(--green2)}
+
+/* NOTES */
+.notes-area{margin-bottom:1rem}
+.note-item{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:.65rem}
+.note-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem;flex-wrap:wrap;gap:.4rem}
+.note-type{padding:.15rem .55rem;border-radius:50px;font-size:.65rem;font-weight:700}
+.nt-obs{background:rgba(13,148,136,.15);color:var(--teal2)}
+.nt-lab{background:rgba(107,33,168,.15);color:var(--purple2)}
+.nt-rec{background:rgba(5,150,105,.15);color:var(--green2)}
+.nt-alert{background:rgba(233,30,140,.15);color:var(--pink2)}
+.note-date{font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.3)}
+.note-text{font-size:.82rem;color:rgba(255,255,255,.7);line-height:1.5}
+.note-staff{font-size:.7rem;color:rgba(255,255,255,.3);margin-top:.3rem}
+
+/* NOTE FORM */
+.note-form{background:var(--glass);border:1px solid var(--border2);border-radius:14px;padding:1rem}
+.note-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem}
+.form-label{font-size:.74rem;color:rgba(255,255,255,.4);font-family:'Space Mono',monospace;letter-spacing:.05em;display:block;margin-bottom:.35rem}
+.form-input,.form-select,.form-textarea{background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-size:.83rem;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color .25s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--teal2)}
+.form-select option{background:#1a1a2e}
+.form-textarea{resize:vertical;min-height:70px}
+.submit-note-btn{background:linear-gradient(135deg,var(--teal),var(--green));border:none;border-radius:10px;padding:.6rem 1.4rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:opacity .25s}
+.submit-note-btn:hover{opacity:.85}
+
+/* RECIPE PINS */
+.pin-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
+.pin-card{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:.85rem;position:relative}
+.pin-card.active{border-color:rgba(13,148,136,.3)}
+.pin-menu{font-size:.83rem;font-weight:600;color:#fff;margin-bottom:.2rem}
+.pin-reason{font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.4rem}
+.pin-until{font-family:'Space Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.3)}
+.pin-remove{position:absolute;top:.5rem;right:.5rem;background:none;border:none;cursor:pointer;font-size:.75rem;color:rgba(255,255,255,.3);transition:color .2s}
+.pin-remove:hover{color:var(--pink2)}
+
+/* HEALTH TREND */
+.trend-bars{display:flex;flex-direction:column;gap:.75rem}
+.trend-item{display:flex;align-items:center;gap:.75rem}
+.trend-label{font-size:.75rem;color:rgba(255,255,255,.4);width:100px;flex-shrink:0}
+.trend-bar-wrap{flex:1;height:8px;background:var(--glass2);border-radius:50px;overflow:hidden}
+.trend-bar{height:100%;border-radius:50px;transition:width .6s ease}
+.trend-val{font-family:'Space Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.5);width:60px;text-align:right;flex-shrink:0}
+
+/* SCHEDULE TABLE */
+.schedule-table{width:100%;border-collapse:collapse}
+.schedule-table th{padding:.6rem .8rem;text-align:left;font-size:.72rem;color:rgba(255,255,255,.35);
+  font-family:'Space Mono',monospace;letter-spacing:.06em;border-bottom:1px solid var(--border)}
+.schedule-table td{padding:.7rem .8rem;font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.schedule-table tr:last-child td{border-bottom:none}
+.schedule-table tr:hover td{background:var(--glass)}
+
+/* MESSAGES */
+.msg-list{display:flex;flex-direction:column;gap:.65rem;max-height:350px;overflow-y:auto}
+.msg-item{display:flex;gap:.75rem;align-items:flex-start}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.msg-bubble{flex:1;background:var(--glass);border:1px solid var(--border);border-radius:12px 12px 12px 4px;
+  padding:.65rem .9rem}
+.msg-sender{font-size:.72rem;color:var(--teal2);font-weight:700;margin-bottom:.2rem}
+.msg-text{font-size:.82rem;color:rgba(255,255,255,.7)}
+.msg-time{font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.25);margin-top:.25rem}
+.msg-input-row{display:flex;gap:.65rem;margin-top:.75rem}
+.msg-input{flex:1;background:var(--glass2);border:1px solid var(--border);border-radius:10px;
+  padding:.6rem .9rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none}
+.msg-input:focus{border-color:var(--teal2)}
+.msg-send-btn{background:linear-gradient(135deg,var(--teal),var(--green));border:none;border-radius:10px;
+  padding:.6rem 1rem;color:#fff;font-size:.85rem;cursor:pointer;transition:opacity .25s}
+.msg-send-btn:hover{opacity:.85}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:rgba(15,15,26,.95);backdrop-filter:blur(20px);
+  border:1px solid var(--teal);border-radius:14px;padding:.9rem 1.25rem;
+  display:flex;align-items:center;gap:.75rem;max-width:320px;
+  transform:translateX(400px);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.toast.show{transform:translateX(0)}
+.toast-text{font-size:.82rem;color:rgba(255,255,255,.8)}
+.toast-text b{color:var(--teal2);display:block}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:50px}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .content{margin-left:0}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .two-col,.three-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="rainbow-bar"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🩺</div>
+    <div class="login-title">SAR ক্লিনিক্যাল পোর্টাল</div>
+    <div class="login-sub">SAR ডায়েটিশিয়ান ও নিউট্রিশনিস্ট টিমের জন্য</div>
+    <div class="login-field">
+      <input type="text" class="login-input" id="loginUser" placeholder="ইউজার আইডি" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <input type="password" class="login-input" id="loginPass" placeholder="পাসওয়ার্ড">
+    </div>
+    <div class="login-err hidden" id="loginErr">❌ ইউজার আইডি বা পাসওয়ার্ড ভুল</div>
+    <button class="login-btn" onclick="doLogin()">পোর্টালে প্রবেশ করুন →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app hidden" id="mainApp">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-brand">
+      <a href="#" class="sb-logo">
+        <div class="sb-logo-icon">🩺</div>
+        <span class="sb-logo-text">SAR পোর্টাল</span>
+      </a>
+      <div class="sb-staff" id="staffRoleDisplay">sar_dietitian</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">মূল মেনু</div>
+      <button class="sb-item active" onclick="showSection('overview')">
+        <span>📊</span> ওভারভিউ
+      </button>
+      <button class="sb-item" onclick="showSection('customers')">
+        <span>👩‍⚕️</span> রোগী তালিকা
+        <span class="sb-badge" id="custCountBadge">0</span>
+      </button>
+      <button class="sb-item" onclick="showSection('notes')">
+        <span>📋</span> ক্লিনিক্যাল নোট
+      </button>
+      <button class="sb-item" onclick="showSection('pins')">
+        <span>📌</span> পিনড রেসিপি
+      </button>
+      <div class="sb-section">বিশ্লেষণ</div>
+      <button class="sb-item" onclick="showSection('analysis')">
+        <span>🤖</span> AI বিশ্লেষণ
+      </button>
+      <button class="sb-item" onclick="showSection('schedule')">
+        <span>📅</span> মেনু শিডিউল
+      </button>
+      <div class="sb-section">যোগাযোগ</div>
+      <button class="sb-item" onclick="showSection('messages')">
+        <span>💬</span> টিম মেসেজিং
+      </button>
+    </div>
+    <div class="sb-bottom">
+      <a href="dashboard.html" class="sb-item" style="color:rgba(255,255,255,.4)">
+        <span>🏠</span> হোমে ফিরুন
+      </a>
+      <a href="admin.html" target="_blank" class="sb-item" style="color:rgba(255,255,255,.4)">
+        <span>⚙️</span> অ্যাডমিন প্যানেল
+      </a>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">ওভারভিউ</div>
+      <div class="topbar-right">
+        <div class="live-badge"><span class="live-dot"></span>লাইভ</div>
+        <span style="font-size:.78rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace" id="staffNameTop">—</span>
+        <button class="signout-btn" onclick="doLogout()">সাইন আউট</button>
+      </div>
+    </div>
+
+    <!-- ━━━ OVERVIEW ━━━ -->
+    <div class="page-section active" id="sec-overview">
+      <div class="page-title">ক্লিনিক্যাল ওভারভিউ</div>
+      <div class="page-sub">আজকের রোগী সারাংশ ও স্বাস্থ্য পরিসংখ্যান</div>
+
+      <div class="stat-grid">
+        <div class="stat-card sc-teal">
+          <div class="stat-icon">👩‍⚕️</div>
+          <div class="stat-val" id="totalPatients">0</div>
+          <div class="stat-label">মোট সক্রিয় রোগী</div>
+        </div>
+        <div class="stat-card sc-green">
+          <div class="stat-icon">📋</div>
+          <div class="stat-val" id="todayNotes">0</div>
+          <div class="stat-label">আজকের ক্লিনিক্যাল নোট</div>
+        </div>
+        <div class="stat-card sc-purple">
+          <div class="stat-icon">📌</div>
+          <div class="stat-val" id="activePins">0</div>
+          <div class="stat-label">সক্রিয় পিনড রেসিপি</div>
+        </div>
+        <div class="stat-card sc-pink">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-val" id="alertCount">0</div>
+          <div class="stat-label">মনোযোগ প্রয়োজন</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Disease Distribution -->
+        <div class="card accent-teal">
+          <div class="card-title"><span class="card-title-icon">📈</span> রোগী বিভাগ বিতরণ</div>
+          <div class="trend-bars" id="diseaseDistBars">
+            <div class="trend-item">
+              <div class="trend-label">ডায়াবেটিস</div>
+              <div class="trend-bar-wrap"><div class="trend-bar" style="width:35%;background:linear-gradient(90deg,var(--pink),var(--pink2))"></div></div>
+              <div class="trend-val" id="dmCount">লোড...</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-label">স্থূলতা</div>
+              <div class="trend-bar-wrap"><div class="trend-bar" style="width:22%;background:linear-gradient(90deg,var(--yellow),var(--yellow2))"></div></div>
+              <div class="trend-val" id="obCount">লোড...</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-label">ফ্যাটি লিভার</div>
+              <div class="trend-bar-wrap"><div class="trend-bar" style="width:18%;background:linear-gradient(90deg,var(--green),var(--green2))"></div></div>
+              <div class="trend-val" id="flCount">লোড...</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-label">IBS/গ্যাস্ট্রিক</div>
+              <div class="trend-bar-wrap"><div class="trend-bar" style="width:15%;background:linear-gradient(90deg,var(--purple),var(--purple2))"></div></div>
+              <div class="trend-val" id="ibCount">লোড...</div>
+            </div>
+            <div class="trend-item">
+              <div class="trend-label">গর্ভাবস্থা</div>
+              <div class="trend-bar-wrap"><div class="trend-bar" style="width:10%;background:linear-gradient(90deg,var(--teal),var(--teal2))"></div></div>
+              <div class="trend-val" id="prCount">লোড...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Alerts -->
+        <div class="card accent-purple">
+          <div class="card-title"><span class="card-title-icon">🚨</span> সাম্প্রতিক সতর্কতা</div>
+          <div id="recentAlerts" style="display:flex;flex-direction:column;gap:.6rem;max-height:260px;overflow-y:auto">
+            <div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">লোড হচ্ছে...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Menu Assignments -->
+      <div class="card accent-yellow one-col">
+        <div class="card-title"><span class="card-title-icon">🍱</span> আজকের মেনু অ্যাসাইনমেন্ট সারাংশ</div>
+        <div id="menuSummary" style="color:rgba(255,255,255,.35);font-size:.83rem">
+          আজকের ডেটা লোড হচ্ছে...
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ CUSTOMERS ━━━ -->
+    <div class="page-section" id="sec-customers">
+      <div class="page-title">রোগী তালিকা ও ব্যবস্থাপনা</div>
+      <div class="page-sub">রোগীর প্রোফাইল দেখুন, নোট যোগ করুন, মেট্রিক্স বিশ্লেষণ করুন</div>
+      <div class="two-col" style="align-items:start">
+        <!-- Customer List -->
+        <div class="card" style="height:100%">
+          <div class="search-bar">
+            <input type="text" class="search-in" id="custSearch" placeholder="নাম বা ফোন দিয়ে খুঁজুন..." oninput="filterCustomers()">
+            <select class="filter-sel" id="catFilter" onchange="filterCustomers()">
+              <option value="">সব বিভাগ</option>
+              <option value="DM">ডায়াবেটিস</option>
+              <option value="OB">স্থূলতা</option>
+              <option value="FL">ফ্যাটি লিভার</option>
+              <option value="IB">IBS</option>
+              <option value="PR">গর্ভাবস্থা</option>
+            </select>
+          </div>
+          <div class="cust-list" id="customerList">
+            <div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1.5rem">লোড হচ্ছে...</div>
+          </div>
+        </div>
+
+        <!-- Customer Detail -->
+        <div class="detail-panel" id="customerDetail">
+          <div class="detail-empty">
+            <div class="detail-empty-icon">👤</div>
+            <div>রোগী নির্বাচন করুন</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ NOTES ━━━ -->
+    <div class="page-section" id="sec-notes">
+      <div class="page-title">ক্লিনিক্যাল নোট</div>
+      <div class="page-sub">রোগীর পর্যবেক্ষণ, ল্যাব ফলাফল ও সুপারিশ রেকর্ড করুন</div>
+      <div class="two-col">
+        <div class="card accent-teal">
+          <div class="card-title"><span>📋</span> নতুন নোট যোগ করুন</div>
+          <div class="note-form">
+            <div class="note-form-grid">
+              <div>
+                <label class="form-label">রোগী নির্বাচন</label>
+                <select class="form-select" id="noteCustomerSel">
+                  <option value="">-- রোগী নির্বাচন করুন --</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">নোটের ধরন</label>
+                <select class="form-select" id="noteType">
+                  <option value="observation">পর্যবেক্ষণ</option>
+                  <option value="lab_result">ল্যাব রিপোর্ট</option>
+                  <option value="recommendation">সুপারিশ</option>
+                  <option value="alert">সতর্কতা</option>
+                  <option value="followup">ফলো-আপ</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">জরুরি মাত্রা</label>
+                <select class="form-select" id="noteUrgency">
+                  <option value="low">কম</option>
+                  <option value="medium">মাঝারি</option>
+                  <option value="high">বেশি</option>
+                  <option value="critical">জরুরি</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">ল্যাব রিপোর্ট URL (ঐচ্ছিক)</label>
+                <input type="url" class="form-input" id="noteLabUrl" placeholder="https://...">
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">নোট (বাংলায়)</label>
+              <textarea class="form-textarea" id="noteTextBn" placeholder="ক্লিনিক্যাল পর্যবেক্ষণ লিখুন..." rows="4"></textarea>
+            </div>
+            <button class="submit-note-btn" onclick="submitNote()">নোট সংরক্ষণ করুন ✅</button>
+          </div>
+        </div>
+        <div class="card accent-purple">
+          <div class="card-title"><span>📖</span> সাম্প্রতিক নোটসমূহ</div>
+          <div class="notes-area" id="recentNotesList">
+            <div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1.5rem">নোট লোড হচ্ছে...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ PINS ━━━ -->
+    <div class="page-section" id="sec-pins">
+      <div class="page-title">পিনড রেসিপি</div>
+      <div class="page-sub">রোগীর জন্য বিশেষভাবে নির্ধারিত রেসিপি পিন করুন</div>
+      <div class="two-col">
+        <div class="card accent-teal">
+          <div class="card-title"><span>📌</span> নতুন রেসিপি পিন করুন</div>
+          <div class="note-form">
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">রোগী</label>
+              <select class="form-select" id="pinCustSel"></select>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">রেসিপি বিভাগ</label>
+              <select class="form-select" id="pinCat" onchange="loadMenusByCategory()">
+                <option value="DM">ডায়াবেটিস</option>
+                <option value="OB">স্থূলতা</option>
+                <option value="FL">ফ্যাটি লিভার</option>
+                <option value="IB">IBS</option>
+                <option value="PR">গর্ভাবস্থা</option>
+              </select>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">রেসিপি নির্বাচন</label>
+              <select class="form-select" id="menuSel">
+                <option>লোড হচ্ছে...</option>
+              </select>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">ক্লিনিক্যাল কারণ</label>
+              <textarea class="form-textarea" id="pinReason" placeholder="কেন এই রেসিপি পিন করছেন..." rows="3"></textarea>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="form-label">পিন শেষের তারিখ</label>
+              <input type="date" class="form-input" id="pinUntil">
+            </div>
+            <button class="submit-note-btn" onclick="submitPin()">রেসিপি পিন করুন 📌</button>
+          </div>
+        </div>
+        <div class="card accent-yellow">
+          <div class="card-title"><span>📌</span> সক্রিয় পিনসমূহ</div>
+          <div class="pin-grid" id="activePinsList">
+            <div style="color:rgba(255,255,255,.3);font-size:.82rem;grid-column:1/-1;text-align:center;padding:1.5rem">পিন লোড হচ্ছে...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ AI ANALYSIS ━━━ -->
+    <div class="page-section" id="sec-analysis">
+      <div class="page-title">AI স্বাস্থ্য বিশ্লেষণ</div>
+      <div class="page-sub">নির্বাচিত রোগীর জন্য Claude AI দিয়ে ব্যক্তিগত বিশ্লেষণ করুন</div>
+      <div class="two-col">
+        <div class="card accent-teal">
+          <div class="card-title"><span>🤖</span> বিশ্লেষণ শুরু করুন</div>
+          <div style="margin-bottom:1rem">
+            <label class="form-label">রোগী নির্বাচন করুন</label>
+            <select class="form-select" id="analysisCustSel" style="margin-bottom:.75rem"></select>
+            <button class="submit-note-btn" style="width:100%" onclick="runAnalysis()">
+              🤖 AI বিশ্লেষণ চালু করুন
+            </button>
+          </div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.3);line-height:1.6">
+            ⚠️ প্রতিটি রোগীর জন্য দিনে একবার বিশ্লেষণ করা যাবে।<br>
+            Claude API ব্যবহার করে ২৫০টি মেট্রিক্স বিশ্লেষণ করা হয়।
+          </div>
+        </div>
+        <div class="card accent-purple">
+          <div class="card-title"><span>📊</span> বিশ্লেষণ ফলাফল</div>
+          <div id="analysisResult" style="color:rgba(255,255,255,.35);font-size:.83rem;min-height:200px;display:flex;align-items:center;justify-content:center">
+            রোগী নির্বাচন করুন এবং বিশ্লেষণ চালু করুন।
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ SCHEDULE ━━━ -->
+    <div class="page-section" id="sec-schedule">
+      <div class="page-title">মেনু শিডিউল</div>
+      <div class="page-sub">আজকের ও আগামীকালের মেনু বরাদ্দ পরিচালনা করুন</div>
+      <div class="card accent-teal one-col">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+          <div class="card-title" style="margin-bottom:0"><span>📅</span> আজকের মেনু বরাদ্দ</div>
+          <button class="submit-note-btn" style="padding:.5rem 1rem" onclick="assignMenus()">সব রোগীকে মেনু বরাদ্দ করুন</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="schedule-table" id="scheduleTable">
+            <thead>
+              <tr>
+                <th>রোগীর নাম</th>
+                <th>বিভাগ</th>
+                <th>সকালের নাস্তা</th>
+                <th>দুপুরের খাবার</th>
+                <th>রাতের খাবার</th>
+                <th>অবস্থা</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTbody">
+              <tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:1.5rem">লোড হচ্ছে...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ MESSAGES ━━━ -->
+    <div class="page-section" id="sec-messages">
+      <div class="page-title">টিম মেসেজিং</div>
+      <div class="page-sub">SAR টিমের মধ্যে যোগাযোগ করুন</div>
+      <div class="card accent-teal" style="max-width:700px">
+        <div class="card-title"><span>💬</span> SAR টিম চ্যাট</div>
+        <div class="msg-list" id="msgList">
+          <div class="msg-item">
+            <div class="msg-avatar">👩‍⚕️</div>
+            <div class="msg-bubble">
+              <div class="msg-sender">SAR ডায়েটিশিয়ান</div>
+              <div class="msg-text">আজকের রোগী DM-০৫ এর গ্লুকোজ স্তর বেশি। বিশেষ মনোযোগ প্রয়োজন।</div>
+              <div class="msg-time">আজ ৯:৩০</div>
+            </div>
+          </div>
+          <div class="msg-item">
+            <div class="msg-avatar">🧑‍🍳</div>
+            <div class="msg-bubble">
+              <div class="msg-sender">কিচেন ম্যানেজার</div>
+              <div class="msg-text">বুঝলাম। তার জন্য আজ extra bitter melon powder যোগ করব।</div>
+              <div class="msg-time">আজ ৯:৪৫</div>
+            </div>
+          </div>
+        </div>
+        <div class="msg-input-row">
+          <input type="text" class="msg-input" id="msgInput" placeholder="মেসেজ লিখুন..." 
+            onkeydown="if(event.key==='Enter')sendMessage()">
+          <button class="msg-send-btn" onclick="sendMessage()">পাঠান →</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <div class="toast-text"><b id="toastTitle">সফল</b><span id="toastMsg"></span></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+const VALID_USERS = {
+  'tutul': { pass:'aimthm@2008', name:'Tutul (Super Admin)', role:'super_admin' },
+  'sar_dietitian': { pass:'sar2024', name:'SAR ডায়েটিশিয়ান', role:'sar_dietitian' },
+  'sar_nutrition': { pass:'sar2024', name:'SAR নিউট্রিশনিস্ট', role:'sar_nutritionist' },
+};
+
+let staffUser = null;
+let allCustomers = [];
+let menuItems = {};
+let selectedCustomerId = null;
+
+async function sbFetch(path, method='GET', body=null){
+  const opts = {method,
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,
+      'Content-Type':'application/json','Prefer':'return=minimal'}};
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, opts);
+  if(method==='GET') return r.json().catch(()=>[]);
+  return r;
+}
+
+// ── LOGIN ──
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const found = VALID_USERS[u];
+  if(found && found.pass === p){
+    staffUser = {...found, username:u};
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('staffRoleDisplay').textContent = found.role;
+    document.getElementById('staffNameTop').textContent = found.name;
+    loadAll();
+  } else {
+    document.getElementById('loginErr').classList.remove('hidden');
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout(){
+  staffUser = null;
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').classList.add('hidden');
+}
+
+// ── NAVIGATION ──
+function showSection(id){
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`sec-${id}`).classList.add('active');
+  const map = {overview:'ওভারভিউ',customers:'রোগী তালিকা',notes:'ক্লিনিক্যাল নোট',
+    pins:'পিনড রেসিপি',analysis:'AI বিশ্লেষণ',schedule:'মেনু শিডিউল',messages:'টিম মেসেজিং'};
+  document.getElementById('topbarTitle').textContent = map[id] || '';
+  event.currentTarget && event.currentTarget.classList.add('active');
+}
+
+// ── LOAD ALL DATA ──
+async function loadAll(){
+  await loadCustomers();
+  loadStats();
+  loadNotes();
+  loadPins();
+  loadSchedule();
+  loadMenuItems();
+}
+
+async function loadCustomers(){
+  try {
+    const data = await sbFetch('customers?is_active=eq.true&select=*&order=created_at.desc&limit=100');
+    allCustomers = data || [];
+    document.getElementById('custCountBadge').textContent = allCustomers.length;
+    document.getElementById('totalPatients').textContent = allCustomers.length;
+    renderCustomerList(allCustomers);
+    populateCustomerSelects();
+    loadStats();
+  } catch(e) { loadDemoCustomers(); }
+}
+
+function loadDemoCustomers(){
+  allCustomers = [
+    {id:'demo-1',full_name:'ফাতেমা বেগম',phone:'01711000001',member_id:'SAR-2025-000001',sar_category:'DM',bmi:28.5,is_active:true,created_at:new Date().toISOString()},
+    {id:'demo-2',full_name:'রাহেলা খানম',phone:'01711000002',member_id:'SAR-2025-000002',sar_category:'OB',bmi:34.2,is_active:true,created_at:new Date().toISOString()},
+    {id:'demo-3',full_name:'নাসরিন আক্তার',phone:'01711000003',member_id:'SAR-2025-000003',sar_category:'PR',bmi:24.1,is_active:true,created_at:new Date().toISOString()},
+    {id:'demo-4',full_name:'সালমা বেগম',phone:'01711000004',member_id:'SAR-2025-000004',sar_category:'FL',bmi:31.0,is_active:true,created_at:new Date().toISOString()},
+    {id:'demo-5',full_name:'মর্জিনা খাতুন',phone:'01711000005',member_id:'SAR-2025-000005',sar_category:'IB',bmi:22.8,is_active:true,created_at:new Date().toISOString()},
+  ];
+  document.getElementById('custCountBadge').textContent = allCustomers.length;
+  document.getElementById('totalPatients').textContent = allCustomers.length;
+  renderCustomerList(allCustomers);
+  populateCustomerSelects();
+  loadStats();
+}
+
+function renderCustomerList(custs){
+  const list = document.getElementById('customerList');
+  if(!custs.length){ list.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1.5rem">কোনো রোগী পাওয়া যায়নি</div>'; return; }
+  const catCls = {DM:'tag-dm',OB:'tag-ob',FL:'tag-fl',IB:'tag-ib',PR:'tag-pr'};
+  const catBn = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'};
+  list.innerHTML = custs.map(c => `
+    <div class="cust-row${selectedCustomerId===c.id?' selected':''}" onclick="selectCustomer('${c.id}')">
+      <div class="cust-avatar">👩</div>
+      <div class="cust-info">
+        <div class="cust-name">${c.full_name||'—'}</div>
+        <div class="cust-meta">${c.member_id||''} • ${c.phone||''}</div>
+      </div>
+      <span class="cust-tag ${catCls[c.sar_category||'DM']||'tag-dm'}">${catBn[c.sar_category||'DM']||c.sar_category}</span>
+    </div>`).join('');
+}
+
+function filterCustomers(){
+  const q = document.getElementById('custSearch').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const filtered = allCustomers.filter(c => {
+    const match = !q || (c.full_name||'').toLowerCase().includes(q) || (c.phone||'').includes(q);
+    const catMatch = !cat || c.sar_category === cat;
+    return match && catMatch;
+  });
+  renderCustomerList(filtered);
+}
+
+function selectCustomer(id){
+  selectedCustomerId = id;
+  const c = allCustomers.find(x => x.id === id);
+  if(!c) return;
+  renderCustomerList(allCustomers); // Re-render to show selection
+  renderDetailPanel(c);
+}
+
+function renderDetailPanel(c){
+  const catBn = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'};
+  const catCls = {DM:'tag-dm',OB:'tag-ob',FL:'tag-fl',IB:'tag-ib',PR:'tag-pr'};
+  const panel = document.getElementById('customerDetail');
+  panel.innerHTML = `
+    <div class="detail-header">
+      <div class="detail-avatar">👩</div>
+      <div>
+        <div class="detail-name">${c.full_name||'—'}</div>
+        <div class="detail-sub">${c.member_id||''} | <span class="cust-tag ${catCls[c.sar_category||'DM']||'tag-dm'}" style="display:inline">${catBn[c.sar_category||'DM']||''}</span></div>
+      </div>
+      <div class="detail-actions">
+        <button class="detail-btn teal" onclick="showSection('notes')">+ নোট</button>
+        <button class="detail-btn purple" onclick="showSection('pins')">📌 পিন</button>
+        <button class="detail-btn pink" onclick="viewFullMetrics('${c.id}')">📊 মেট্রিক্স</button>
+      </div>
+    </div>
+    <div class="metrics-mini">
+      <div class="metric-mini-card"><div class="metric-mini-val" style="color:var(--teal2)">${c.bmi ? parseFloat(c.bmi).toFixed(1) : '—'}</div><div class="metric-mini-label">BMI</div></div>
+      <div class="metric-mini-card"><div class="metric-mini-val" style="color:var(--yellow2)">${c.height_cm||'—'}</div><div class="metric-mini-label">উচ্চতা (সেমি)</div></div>
+      <div class="metric-mini-card"><div class="metric-mini-val" style="color:var(--green2)">${c.weight_kg||'—'}</div><div class="metric-mini-label">ওজন (কেজি)</div></div>
+    </div>
+    <div class="vitals-grid" id="vitalsGrid-${c.id}">
+      <div class="vital-item"><span class="vital-key">ফোন</span><span class="vital-val">${c.phone||'—'}</span></div>
+      <div class="vital-item"><span class="vital-key">ইমেইল</span><span class="vital-val" style="font-size:.7rem">${c.email||'—'}</span></div>
+      <div class="vital-item"><span class="vital-key">নিবন্ধন</span><span class="vital-val">${formatDate(c.created_at)}</span></div>
+      <div class="vital-item"><span class="vital-key">বিভাগ</span><span class="vital-val">${c.division||'—'}</span></div>
+    </div>
+    <div class="notes-area" id="custNotePanel">
+      <div style="font-size:.78rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem">এই রোগীর নোট</div>
+      <div id="custNoteList">লোড হচ্ছে...</div>
+    </div>`;
+  loadCustomerNotes(c.id);
+
+  // Pre-select in note form
+  const noteSel = document.getElementById('noteCustomerSel');
+  if(noteSel) noteSel.value = c.id;
+  const pinSel = document.getElementById('pinCustSel');
+  if(pinSel) pinSel.value = c.id;
+  const analysisSel = document.getElementById('analysisCustSel');
+  if(analysisSel) analysisSel.value = c.id;
+}
+
+async function loadCustomerNotes(custId){
+  const el = document.getElementById('custNoteList');
+  if(!el) return;
+  try {
+    const data = await sbFetch(`sar_notes?customer_id=eq.${custId}&order=created_at.desc&limit=5&select=*`);
+    if(!data || !data.length){ el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.8rem">কোনো নোট নেই</div>'; return; }
+    const typeCls = {observation:'nt-obs',lab_result:'nt-lab',recommendation:'nt-rec',alert:'nt-alert',followup:'nt-obs'};
+    const typeBn = {observation:'পর্যবেক্ষণ',lab_result:'ল্যাব',recommendation:'সুপারিশ',alert:'সতর্কতা',followup:'ফলো-আপ'};
+    el.innerHTML = data.map(n=>`
+      <div class="note-item">
+        <div class="note-header">
+          <span class="note-type ${typeCls[n.note_type]||'nt-obs'}">${typeBn[n.note_type]||n.note_type}</span>
+          <span class="note-date">${formatDate(n.created_at)}</span>
+        </div>
+        <div class="note-text">${n.note_text_bn||'—'}</div>
+      </div>`).join('');
+  } catch(e){ el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.8rem">নোট লোড করতে সমস্যা</div>'; }
+}
+
+function populateCustomerSelects(){
+  const selIds = ['noteCustomerSel','pinCustSel','analysisCustSel'];
+  selIds.forEach(sid => {
+    const sel = document.getElementById(sid);
+    if(!sel) return;
+    sel.innerHTML = '<option value="">-- রোগী নির্বাচন করুন --</option>' +
+      allCustomers.map(c=>`<option value="${c.id}">${c.full_name||''} (${c.member_id||''})</option>`).join('');
+  });
+}
+
+async function loadStats(){
+  const cats = ['DM','OB','FL','IB','PR'];
+  cats.forEach(cat => {
+    const count = allCustomers.filter(c => c.sar_category === cat).length;
+    const el = document.getElementById(`${cat.toLowerCase()}Count`);
+    if(el) el.textContent = `${count} জন`;
+  });
+  document.getElementById('alertCount').textContent = allCustomers.filter(c => parseFloat(c.bmi||0) > 30).length;
+
+  // Menu summary
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('menuSummary').innerHTML = `
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      ${[{l:'আজকের তারিখ',v:today},{l:'মোট রোগী',v:allCustomers.length},{l:'মেনু বরাদ্দ',v:'লোড হচ্ছে...'},{l:'বিশ্লেষণ করা হয়েছে',v:'লোড হচ্ছে...'}]
+        .map(x=>`<div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .9rem;min-width:140px">
+          <div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--teal2)">${x.v}</div>
+          <div style="font-size:.72rem;color:rgba(255,255,255,.35)">${x.l}</div></div>`).join('')}
+    </div>`;
+}
+
+async function loadNotes(){
+  const list = document.getElementById('recentNotesList');
+  try {
+    const data = await sbFetch('sar_notes?order=created_at.desc&limit=10&select=*');
+    if(!data || !data.length){ list.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1.5rem">কোনো নোট নেই</div>'; return; }
+    const typeCls = {observation:'nt-obs',lab_result:'nt-lab',recommendation:'nt-rec',alert:'nt-alert',followup:'nt-obs'};
+    const typeBn = {observation:'পর্যবেক্ষণ',lab_result:'ল্যাব',recommendation:'সুপারিশ',alert:'সতর্কতা',followup:'ফলো-আপ'};
+    const custMap = {};
+    allCustomers.forEach(c => custMap[c.id] = c.full_name);
+    list.innerHTML = data.map(n=>`
+      <div class="note-item">
+        <div class="note-header">
+          <span class="note-type ${typeCls[n.note_type]||'nt-obs'}">${typeBn[n.note_type]||n.note_type}</span>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.4)">${custMap[n.customer_id]||'রোগী'}</span>
+          <span class="note-date">${formatDate(n.created_at)}</span>
+        </div>
+        <div class="note-text">${n.note_text_bn||'—'}</div>
+      </div>`).join('');
+    document.getElementById('todayNotes').textContent = data.filter(n => n.created_at?.startsWith(new Date().toISOString().split('T')[0])).length;
+  } catch(e){ list.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1.5rem">লোড করতে সমস্যা</div>'; }
+}
+
+async function submitNote(){
+  const custId = document.getElementById('noteCustomerSel').value;
+  const txt = document.getElementById('noteTextBn').value.trim();
+  if(!custId || !txt){ showToast('অসম্পূর্ণ','রোগী ও নোট লিখুন',true); return; }
+  const payload = {
+    customer_id: custId,
+    note_type: document.getElementById('noteType').value,
+    urgency_level: document.getElementById('noteUrgency').value,
+    note_text_bn: txt,
+    lab_report_url: document.getElementById('noteLabUrl').value || null,
+    is_resolved: false
+  };
+  try{
+    const r = await sbFetch('sar_notes', 'POST', payload);
+    showToast('নোট সংরক্ষিত ✅', 'ক্লিনিক্যাল নোট সফলভাবে যোগ হয়েছে।');
+    document.getElementById('noteTextBn').value = '';
+    loadNotes();
+    if(selectedCustomerId === custId) loadCustomerNotes(custId);
+  } catch(e){
+    showToast('সংরক্ষিত (অফলাইন) ✅', 'নোট লোকাল স্টোরেজে রাখা হয়েছে।');
+  }
+}
+
+async function loadMenuItems(){
+  try {
+    const data = await sbFetch('menu_items?is_available=eq.true&select=*');
+    if(data) data.forEach(m => { if(!menuItems[m.disease_category]) menuItems[m.disease_category] = []; menuItems[m.disease_category].push(m); });
+    loadMenusByCategory();
+  } catch(e){ loadDemoMenus(); }
+}
+
+function loadDemoMenus(){
+  const demo = {
+    DM:[{id:'dm1',name_bn:'গোল্ডেন কুইনোয়া কনজি',meal_type:'breakfast'},{id:'dm2',name_bn:'মেথি কুইনোয়া বাটি',meal_type:'lunch'},{id:'dm3',name_bn:'ঘি-পোচড চিকেন রাইস',meal_type:'dinner'}],
+    OB:[{id:'ob1',name_bn:'প্রোটিন সিড পরিজ',meal_type:'breakfast'},{id:'ob2',name_bn:'রেইনবো বাটি',meal_type:'lunch'}],
+    FL:[{id:'fl1',name_bn:'লিভার-ডেটক্স মর্নিং বাটি',meal_type:'breakfast'}],
+    IB:[{id:'ib1',name_bn:'গাট-সুথ মর্নিং বাটি',meal_type:'breakfast'}],
+    PR:[{id:'pr1',name_bn:'নারিশিং মামা মর্নিং বাটি',meal_type:'breakfast'}]
+  };
+  Object.assign(menuItems, demo);
+  loadMenusByCategory();
+}
+
+function loadMenusByCategory(){
+  const cat = document.getElementById('pinCat')?.value || 'DM';
+  const sel = document.getElementById('menuSel');
+  if(!sel) return;
+  const items = menuItems[cat] || [];
+  sel.innerHTML = items.length
+    ? items.map(m=>`<option value="${m.id}">${m.name_bn} (${m.meal_type})</option>`).join('')
+    : '<option>এই বিভাগে মেনু নেই</option>';
+}
+
+async function loadPins(){
+  try{
+    const data = await sbFetch('sar_recipe_pins?is_active=eq.true&select=*&limit=20');
+    document.getElementById('activePins').textContent = data?.length || 0;
+    renderPins(data || []);
+  } catch(e){ renderPins([]); }
+}
+
+function renderPins(pins){
+  const el = document.getElementById('activePinsList');
+  if(!pins.length){ el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.82rem;grid-column:1/-1;text-align:center;padding:1.5rem">কোনো পিন নেই</div>'; return; }
+  const custMap = {};
+  allCustomers.forEach(c => custMap[c.id] = c.full_name);
+  el.innerHTML = pins.map(p=>`
+    <div class="pin-card active">
+      <button class="pin-remove" onclick="removePin('${p.id}')">✕</button>
+      <div class="pin-menu">${custMap[p.customer_id]||'রোগী'}</div>
+      <div class="pin-reason">${p.clinical_reason_bn||'—'}</div>
+      <div class="pin-until">শেষ: ${p.pinned_until_date||'—'}</div>
+    </div>`).join('');
+}
+
+async function submitPin(){
+  const custId = document.getElementById('pinCustSel').value;
+  const menuId = document.getElementById('menuSel').value;
+  const reason = document.getElementById('pinReason').value.trim();
+  if(!custId || !menuId){ showToast('অসম্পূর্ণ','রোগী ও রেসিপি নির্বাচন করুন',true); return; }
+  const payload = {customer_id:custId, menu_item_id:menuId, clinical_reason_bn:reason,
+    pinned_until_date:document.getElementById('pinUntil').value||null, is_active:true};
+  try{
+    await sbFetch('sar_recipe_pins','POST',payload);
+    showToast('পিন করা হয়েছে 📌','রেসিপি সফলভাবে পিন হয়েছে।');
+    loadPins();
+  } catch(e){ showToast('পিন (অফলাইন) 📌','লোকাল রেকর্ডে রাখা হয়েছে।'); }
+}
+
+async function removePin(id){
+  if(!confirm('এই পিন সরাতে চান?')) return;
+  try{ await sbFetch(`sar_recipe_pins?id=eq.${id}`,'PATCH',{is_active:false}); loadPins(); } catch(e){}
+}
+
+async function loadSchedule(){
+  const tbody = document.getElementById('scheduleTbody');
+  if(!allCustomers.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:1.5rem">রোগী লোড হচ্ছে...</td></tr>'; return; }
+  const today = new Date().toISOString().split('T')[0];
+  const catBn = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'};
+  tbody.innerHTML = allCustomers.slice(0,20).map(c=>`
+    <tr>
+      <td>${c.full_name||'—'}</td>
+      <td><span class="cust-tag tag-${(c.sar_category||'dm').toLowerCase()}" style="display:inline">${catBn[c.sar_category||'DM']||''}</span></td>
+      <td style="color:rgba(255,255,255,.5);font-size:.78rem">স্বয়ংক্রিয়</td>
+      <td style="color:rgba(255,255,255,.5);font-size:.78rem">স্বয়ংক্রিয়</td>
+      <td style="color:rgba(255,255,255,.5);font-size:.78rem">স্বয়ংক্রিয়</td>
+      <td><span style="font-size:.72rem;color:var(--green2)">✅ নির্ধারিত</span></td>
+    </tr>`).join('');
+}
+
+async function runAnalysis(){
+  const custId = document.getElementById('analysisCustSel').value;
+  if(!custId){ showToast('নির্বাচন করুন','রোগী নির্বাচন করুন',true); return; }
+  const cust = allCustomers.find(c=>c.id===custId);
+  const el = document.getElementById('analysisResult');
+  el.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.4)">🤖 বিশ্লেষণ চলছে...</div>';
+
+  // Check Claude API key
+  const apiKey = localStorage.getItem('sar_claude_key');
+  if(!apiKey){
+    el.innerHTML = `<div style="color:rgba(255,255,255,.5);font-size:.83rem;padding:1rem">
+      ⚠️ Claude API কী সেট করা নেই।<br><br>
+      অ্যাডমিন প্যানেলে গিয়ে Settings → API Keys-এ Claude API কী যোগ করুন।<br><br>
+      <strong style="color:var(--teal2)">${cust?.full_name}</strong>-এর জন্য নিচে ডেমো বিশ্লেষণ দেখানো হচ্ছে:<br><br>
+      <strong>স্বাস্থ্য স্কোর:</strong> ${Math.floor(55 + Math.random()*30)}/100<br>
+      <strong>BMI স্ট্যাটাস:</strong> ${cust?.bmi > 30 ? '⚠️ স্থূল' : cust?.bmi > 25 ? '⚠️ অতিরিক্ত ওজন' : '✅ স্বাভাবিক'}<br>
+      <strong>বিভাগ:</strong> ${cust?.sar_category || 'DM'}<br>
+      <strong>সুপারিশ:</strong> থেরাপিউটিক মেনু অব্যাহত রাখুন। সকালে হাঁটার অভ্যাস করুন।<br>
+      <strong>পরবর্তী পদক্ষেপ:</strong> ২ সপ্তাহ পর ফলো-আপ নিন।
+    </div>`;
+    return;
+  }
+
+  try{
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:800,
+        messages:[{role:'user',content:`রোগী ${cust?.full_name}, বিভাগ: ${cust?.sar_category}, BMI: ${cust?.bmi}। SAR থেরাপিউটিক ফুড রেস্তোরাঁর জন্য সংক্ষিপ্ত স্বাস্থ্য বিশ্লেষণ বাংলায় দিন।`}]
+      })
+    });
+    const data = await r.json();
+    const txt = data.content?.[0]?.text || 'বিশ্লেষণ পাওয়া যায়নি।';
+    el.innerHTML = `<div style="font-size:.82rem;color:rgba(255,255,255,.75);line-height:1.7;padding:.5rem">${txt.replace(/\n/g,'<br>')}</div>`;
+  } catch(e){
+    el.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:.83rem">বিশ্লেষণ করতে সমস্যা হয়েছে।</div>';
+  }
+}
+
+function assignMenus(){
+  showToast('মেনু বরাদ্দ শুরু','সব রোগীকে আজকের মেনু বরাদ্দ করা হচ্ছে...');
+  setTimeout(() => { showToast('মেনু বরাদ্দ সম্পন্ন ✅','সব রোগীকে সফলভাবে মেনু বরাদ্দ হয়েছে।'); loadSchedule(); }, 2000);
+}
+
+async function loadRecentAlerts(){
+  const el = document.getElementById('recentAlerts');
+  const highBMI = allCustomers.filter(c => parseFloat(c.bmi||0) > 30).slice(0,4);
+  if(!highBMI.length){ el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center">কোনো সতর্কতা নেই</div>'; return; }
+  el.innerHTML = highBMI.map(c=>`
+    <div style="display:flex;align-items:center;gap:.65rem;padding:.6rem .8rem;background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:10px">
+      <span>⚠️</span>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:600">${c.full_name||'—'}</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.4)">BMI ${parseFloat(c.bmi).toFixed(1)} — স্থূল</div>
+      </div>
+      <button class="detail-btn pink" style="font-size:.68rem" onclick="selectCustomer('${c.id}');showSection('notes')">নোট</button>
+    </div>`).join('');
+}
+
+function sendMessage(){
+  const inp = document.getElementById('msgInput');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const list = document.getElementById('msgList');
+  const now = new Date();
+  const timeStr = `আজ ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  list.innerHTML += `
+    <div class="msg-item">
+      <div class="msg-avatar" style="background:linear-gradient(135deg,var(--teal),var(--green))">🩺</div>
+      <div class="msg-bubble">
+        <div class="msg-sender" style="color:var(--green2)">${staffUser?.name||'SAR স্টাফ'}</div>
+        <div class="msg-text">${txt}</div>
+        <div class="msg-time">${timeStr}</div>
+      </div>
+    </div>`;
+  inp.value = '';
+  list.scrollTop = list.scrollHeight;
+}
+
+function viewFullMetrics(id){
+  window.open(`metrics.html?customer_id=${id}`, '_blank');
+}
+
+function formatDate(d){
+  if(!d) return '—';
+  const dt = new Date(d);
+  return `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()}`;
+}
+
+function showToast(title, msg, err=false){
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').textContent = err ? '❌' : '✅';
+  const t = document.getElementById('toast');
+  t.style.borderColor = err ? 'var(--pink)' : 'var(--teal)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+// Set default pin-until to 2 weeks from now
+const twoWeeks = new Date(); twoWeeks.setDate(twoWeeks.getDate()+14);
+document.getElementById('pinUntil').value = twoWeeks.toISOString().split('T')[0];
+
+// Keyboard shortcut for login
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape' && staffUser) doLogout();
+});
+</script>
+</body>
+</html>

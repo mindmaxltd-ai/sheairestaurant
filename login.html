@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>লগইন — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;
+  --purple:#6B21A8;--purple2:#A855F7;
+  --yellow:#F59E0B;--yellow2:#FCD34D;
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;
+  --dark:#0A0A0F;--dark2:#12121A;
+  --glass:rgba(255,255,255,0.05);
+  --border:rgba(255,255,255,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--dark);color:#fff;
+  font-family:'Hind Siliguri',sans-serif;
+  min-height:100vh;overflow-x:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+
+.bg-anim{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.13;animation:orbF 14s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:7s}
+.o3{width:300px;height:300px;background:var(--yellow);top:50%;left:50%;animation-delay:3s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(25px,-20px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.04) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.04) 1px,transparent 1px);
+  background-size:60px 60px}
+
+.page{position:relative;z-index:10;width:100%;max-width:480px;padding:2rem 1rem}
+
+/* SPLIT DESIGN TOP */
+.brand-top{text-align:center;margin-bottom:2.5rem}
+.brand-glow{
+  width:72px;height:72px;border-radius:20px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1rem;font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:900;
+  box-shadow:0 0 40px rgba(233,30,140,.5);
+  animation:glowPulse 3s ease infinite;
+}
+@keyframes glowPulse{
+  0%,100%{box-shadow:0 0 40px rgba(233,30,140,.5)}
+  50%{box-shadow:0 0 60px rgba(233,30,140,.7),0 0 80px rgba(168,85,247,.4)}
+}
+.brand-name{
+  font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--pink),var(--purple2),var(--yellow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.25rem;
+}
+.brand-sub{font-size:.85rem;color:rgba(255,255,255,.4);letter-spacing:.05em}
+
+/* LOGIN CARD */
+.login-card{
+  background:rgba(15,15,22,.85);backdrop-filter:blur(30px);
+  border:1px solid var(--border);border-radius:28px;
+  padding:2.5rem;box-shadow:0 0 80px rgba(233,30,140,.08);
+  position:relative;overflow:hidden;
+}
+.login-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--pink),var(--purple2),var(--yellow),var(--green));
+}
+
+.login-title{
+  font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;
+  color:#fff;margin-bottom:.3rem;
+}
+.login-sub{font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:2rem}
+
+/* TABS */
+.auth-tabs{display:flex;gap:.5rem;margin-bottom:2rem;
+  background:rgba(255,255,255,.04);border-radius:12px;padding:4px}
+.auth-tab{
+  flex:1;padding:.6rem;border-radius:9px;border:none;
+  background:transparent;color:rgba(255,255,255,.5);
+  font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
+  font-weight:600;cursor:pointer;transition:all .3s;
+}
+.auth-tab.active{
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;box-shadow:0 0 15px rgba(233,30,140,.3);
+}
+
+/* PANELS */
+.auth-panel{display:none}
+.auth-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* FIELDS */
+.field{margin-bottom:1.25rem}
+.field label{
+  display:block;font-size:.82rem;color:rgba(255,255,255,.6);
+  font-weight:500;margin-bottom:.4rem;
+}
+.input-wrap{position:relative}
+.input-wrap input{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);border-radius:12px;
+  padding:.8rem 1rem .8rem 2.75rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.95rem;
+  transition:all .3s;outline:none;
+}
+.input-wrap input:focus{
+  border-color:var(--pink);background:rgba(233,30,140,.07);
+  box-shadow:0 0 0 3px rgba(233,30,140,.12);
+}
+.input-wrap input::placeholder{color:rgba(255,255,255,.25)}
+.input-icon{
+  position:absolute;left:.9rem;top:50%;transform:translateY(-50%);
+  font-size:1rem;pointer-events:none;
+}
+.eye-btn{
+  position:absolute;right:.9rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,.4);
+  cursor:pointer;font-size:.9rem;transition:color .3s;
+}
+.eye-btn:hover{color:var(--pink2)}
+
+/* OTP PANEL */
+.otp-info{
+  background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);
+  border-radius:12px;padding:1rem;margin-bottom:1.25rem;
+  font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.6;
+}
+.otp-info strong{color:var(--pink2)}
+.otp-inputs{display:flex;gap:.75rem;justify-content:center;margin-bottom:1.25rem}
+.otp-input{
+  width:52px;height:56px;text-align:center;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);
+  border-radius:12px;color:#fff;font-family:'Space Mono',monospace;
+  font-size:1.4rem;font-weight:700;outline:none;transition:all .3s;
+}
+.otp-input:focus{
+  border-color:var(--pink);background:rgba(233,30,140,.1);
+  box-shadow:0 0 0 3px rgba(233,30,140,.15);transform:scale(1.05);
+}
+.resend-row{display:flex;justify-content:center;margin-bottom:1rem}
+.resend-btn{
+  background:none;border:none;color:var(--pink2);
+  font-family:'Hind Siliguri',sans-serif;font-size:.82rem;
+  cursor:pointer;transition:opacity .3s;
+}
+.resend-btn:disabled{opacity:.4;cursor:not-allowed}
+.resend-timer{font-size:.8rem;color:rgba(255,255,255,.4)}
+
+/* PASSWORD STRENGTH */
+.strength-bar{height:3px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:.5rem;overflow:hidden}
+.strength-fill{height:100%;border-radius:3px;transition:all .4s;width:0}
+.strength-text{font-size:.72rem;margin-top:.3rem}
+
+/* FORGOT */
+.forgot-row{text-align:right;margin-top:-.5rem;margin-bottom:1.25rem}
+.forgot-link{
+  font-size:.82rem;color:rgba(255,255,255,.4);text-decoration:none;
+  transition:color .3s;
+}
+.forgot-link:hover{color:var(--pink2)}
+
+/* BUTTONS */
+.btn-login{
+  width:100%;padding:.95rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:1rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 25px rgba(233,30,140,.3);transition:all .3s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(233,30,140,.5)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-otp-send{
+  width:100%;padding:.85rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.95rem;font-weight:600;cursor:pointer;
+  box-shadow:0 0 20px rgba(107,33,168,.3);transition:all .3s;margin-bottom:1.25rem;
+}
+.btn-otp-send:hover{transform:translateY(-2px)}
+
+/* DIVIDER */
+.divider-or{
+  display:flex;align-items:center;gap:1rem;margin:1.5rem 0;
+  color:rgba(255,255,255,.25);font-size:.8rem;
+}
+.divider-or::before,.divider-or::after{
+  content:'';flex:1;height:1px;background:rgba(255,255,255,.08);
+}
+
+/* REGISTER LINK */
+.reg-link-box{
+  text-align:center;margin-top:1.5rem;
+  font-size:.85rem;color:rgba(255,255,255,.4);
+}
+.reg-link-box a{color:var(--pink2);text-decoration:none;font-weight:600;transition:color .3s}
+.reg-link-box a:hover{color:var(--pink)}
+
+/* MSG */
+.msg{
+  padding:.75rem 1rem;border-radius:10px;
+  font-size:.83rem;margin-top:1rem;display:none;
+}
+.msg.error{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:var(--red2)}
+.msg.success{background:rgba(5,150,105,.1);border:1px solid rgba(5,150,105,.25);color:var(--green2)}
+.msg.info{background:rgba(107,33,168,.1);border:1px solid rgba(107,33,168,.25);color:var(--purple2)}
+
+/* LOADING */
+.loading-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.85);backdrop-filter:blur(10px);
+  flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+}
+.loading-overlay.show{display:flex}
+.spinner{
+  width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.2);
+  border-top-color:var(--pink);animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:.9rem;color:rgba(255,255,255,.5)}
+
+/* BOTTOM LINKS */
+.bottom-links{
+  display:flex;justify-content:center;gap:1.5rem;
+  margin-top:1.5rem;
+}
+.bottom-links a{
+  font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:none;transition:color .3s;
+}
+.bottom-links a:hover{color:var(--pink2)}
+
+@media(max-width:480px){
+  .login-card{padding:1.75rem 1.25rem}
+  .otp-input{width:42px;height:48px;font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-anim">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">যাচাই করা হচ্ছে...</div>
+</div>
+
+<div class="page">
+
+  <!-- BRAND -->
+  <div class="brand-top">
+    <div class="brand-glow">S</div>
+    <div class="brand-name">SAR</div>
+    <div class="brand-sub">She AI Restaurant — আপনার সুস্থতার সঙ্গী</div>
+  </div>
+
+  <!-- LOGIN CARD -->
+  <div class="login-card">
+    <div class="login-title">স্বাগতম ফিরে আসুন 👋</div>
+    <div class="login-sub">আপনার অ্যাকাউন্টে প্রবেশ করুন</div>
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('password',this)">পাসওয়ার্ড দিয়ে</button>
+      <button class="auth-tab" onclick="switchTab('otp',this)">OTP দিয়ে</button>
+    </div>
+
+    <!-- PASSWORD LOGIN PANEL -->
+    <div class="auth-panel active" id="panel-password">
+      <div class="field">
+        <label>মোবাইল নম্বর</label>
+        <div class="input-wrap">
+          <span class="input-icon">📱</span>
+          <input type="tel" id="login_phone" placeholder="01XXXXXXXXX" maxlength="11">
+        </div>
+      </div>
+      <div class="field">
+        <label>পাসওয়ার্ড</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="login_password" placeholder="আপনার পাসওয়ার্ড">
+          <button class="eye-btn" onclick="toggleEye('login_password',this)" type="button">👁️</button>
+        </div>
+      </div>
+      <div class="forgot-row">
+        <a href="#" class="forgot-link" onclick="switchTab('otp',document.querySelectorAll('.auth-tab')[1]);return false">পাসওয়ার্ড ভুলে গেছেন?</a>
+      </div>
+      <button class="btn-login" onclick="loginWithPassword()" id="btnPassLogin">
+        <span>লগইন করুন</span> <span>→</span>
+      </button>
+      <div class="msg" id="msgPass"></div>
+    </div>
+
+    <!-- OTP LOGIN PANEL -->
+    <div class="auth-panel" id="panel-otp">
+      <div id="otpPhasePhone">
+        <div class="field">
+          <label>মোবাইল নম্বর</label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="otp_phone" placeholder="01XXXXXXXXX" maxlength="11">
+          </div>
+        </div>
+        <button class="btn-otp-send" onclick="sendOTP()">OTP পাঠান →</button>
+        <div class="msg" id="msgOtpPhone"></div>
+      </div>
+
+      <div id="otpPhaseCode" style="display:none">
+        <div class="otp-info">
+          <strong id="otpSentTo">01XXXXXXXXX</strong> নম্বরে OTP পাঠানো হয়েছে।<br>
+          <span style="font-size:.78rem;color:rgba(255,255,255,.4)">
+            (পরীক্ষার জন্য যেকোনো ৬ সংখ্যা দিন)
+          </span>
+        </div>
+        <div class="otp-inputs">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,0)" id="otp0">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,1)" id="otp1">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,2)" id="otp2">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,3)" id="otp3">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,4)" id="otp4">
+          <input class="otp-input" maxlength="1" oninput="otpNext(this,5)" id="otp5">
+        </div>
+        <div class="resend-row">
+          <button class="resend-btn" id="resendBtn" onclick="resendOTP()" disabled>
+            পুনরায় পাঠান (<span id="resendTimer">৩০</span>s)
+          </button>
+        </div>
+        <button class="btn-login" onclick="verifyOTP()" id="btnOtpVerify">
+          <span>যাচাই করুন</span> <span>✓</span>
+        </button>
+        <div class="msg" id="msgOtpCode"></div>
+        <p style="text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.35);cursor:pointer" onclick="resetOTP()">← অন্য নম্বর ব্যবহার করুন</p>
+      </div>
+    </div>
+
+    <!-- REGISTER LINK -->
+    <div class="reg-link-box">
+      নতুন সদস্য? <a href="register.html">এখনই নিবন্ধন করুন →</a>
+    </div>
+
+  </div><!-- end login-card -->
+
+  <!-- BOTTOM LINKS -->
+  <div class="bottom-links">
+    <a href="index.html">← হোম</a>
+    <a href="#">গোপনীয়তা নীতি</a>
+    <a href="#">সাহায্য</a>
+  </div>
+
+</div><!-- end page -->
+
+<script>
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+const headers = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json'
+};
+
+let resendInterval;
+let otpPhoneNum = '';
+let generatedOTP = '';
+
+// ═══════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════
+function switchTab(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ═══════════════════════════════
+// EYE TOGGLE
+// ═══════════════════════════════
+function toggleEye(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') {
+    inp.type = 'text'; btn.textContent = '🙈';
+  } else {
+    inp.type = 'password'; btn.textContent = '👁️';
+  }
+}
+
+// ═══════════════════════════════
+// SHOW MSG
+// ═══════════════════════════════
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
+  if (type !== 'success') setTimeout(() => el.style.display = 'none', 5000);
+}
+
+// ═══════════════════════════════
+// PASSWORD LOGIN
+// ═══════════════════════════════
+async function loginWithPassword() {
+  const phone = document.getElementById('login_phone').value.trim();
+  const password = document.getElementById('login_password').value;
+
+  if (!phone || !/^01[3-9]\d{8}$/.test(phone)) {
+    showMsg('msgPass', '⚠️ সঠিক মোবাইল নম্বর দিন', 'error'); return;
+  }
+  if (!password) {
+    showMsg('msgPass', '⚠️ পাসওয়ার্ড দিন', 'error'); return;
+  }
+
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/customers?phone=eq.${phone}&select=*`,
+      { headers }
+    );
+    const customers = await res.json();
+
+    if (!customers || customers.length === 0) {
+      overlay.classList.remove('show');
+      showMsg('msgPass', '❌ এই নম্বরে কোনো অ্যাকাউন্ট পাওয়া যায়নি। নিবন্ধন করুন।', 'error');
+      return;
+    }
+
+    const customer = customers[0];
+
+    if (!customer.is_active) {
+      overlay.classList.remove('show');
+      showMsg('msgPass', '❌ আপনার অ্যাকাউন্ট সক্রিয় নেই। SAR-এর সাথে যোগাযোগ করুন।', 'error');
+      return;
+    }
+
+    // ── পাসওয়ার্ড যাচাই ──
+    const storedHash = customer.password_hash;
+    const enteredHash = btoa(unescape(encodeURIComponent(password)));
+
+    // password_hash না থাকলে — OTP দিয়ে যেতে বলুন
+    if (!storedHash) {
+      overlay.classList.remove('show');
+      showMsg('msgPass', '⚠️ এই অ্যাকাউন্টে পাসওয়ার্ড সেট নেই। OTP দিয়ে লগইন করুন।', 'error');
+      return;
+    }
+
+    // পাসওয়ার্ড মেলানো
+    if (storedHash !== enteredHash) {
+      overlay.classList.remove('show');
+      showMsg('msgPass', '❌ পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।', 'error');
+      return;
+    }
+
+    // Save session
+    saveSession(customer);
+    overlay.classList.remove('show');
+    showMsg('msgPass', `✓ স্বাগতম ${customer.full_name}! ড্যাশবোর্ডে যাচ্ছে...`, 'success');
+
+    // Update last login
+    await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${customer.id}`, {
+      method: 'PATCH',
+      headers: { ...headers, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ updated_at: new Date().toISOString() })
+    });
+
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+
+  } catch (err) {
+    overlay.classList.remove('show');
+    showMsg('msgPass', '❌ লগইন ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+// ═══════════════════════════════
+// OTP FLOW
+// ═══════════════════════════════
+function sendOTP() {
+  const phone = document.getElementById('otp_phone').value.trim();
+  if (!phone || !/^01[3-9]\d{8}$/.test(phone)) {
+    showMsg('msgOtpPhone', '⚠️ সঠিক মোবাইল নম্বর দিন', 'error'); return;
+  }
+  otpPhoneNum = phone;
+  generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log('OTP (dev):', generatedOTP); // Remove in production
+  document.getElementById('otpSentTo').textContent = phone;
+  document.getElementById('otpPhasePhone').style.display = 'none';
+  document.getElementById('otpPhaseCode').style.display = 'block';
+  document.getElementById('otp0').focus();
+  startResendTimer();
+  showMsg('msgOtpPhone', '✓ OTP পাঠানো হয়েছে', 'success');
+}
+
+function otpNext(input, idx) {
+  if (input.value.length === 1 && idx < 5) {
+    document.getElementById('otp' + (idx + 1)).focus();
+  }
+  if (idx === 5 && input.value.length === 1) verifyOTP();
+}
+
+function getOTPValue() {
+  return [0, 1, 2, 3, 4, 5].map(i => document.getElementById('otp' + i).value).join('');
+}
+
+async function verifyOTP() {
+  const entered = getOTPValue();
+  if (entered.length !== 6) {
+    showMsg('msgOtpCode', '⚠️ ৬ সংখ্যার OTP দিন', 'error'); return;
+  }
+
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/customers?phone=eq.${otpPhoneNum}&select=*`,
+      { headers }
+    );
+    const customers = await res.json();
+
+    if (!customers || customers.length === 0) {
+      overlay.classList.remove('show');
+      showMsg('msgOtpCode', '❌ এই নম্বরে অ্যাকাউন্ট নেই। নিবন্ধন করুন।', 'error'); return;
+    }
+
+    const customer = customers[0];
+    saveSession(customer);
+    overlay.classList.remove('show');
+    showMsg('msgOtpCode', `✓ স্বাগতম ${customer.full_name}! ড্যাশবোর্ডে যাচ্ছে...`, 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1200);
+
+  } catch (err) {
+    overlay.classList.remove('show');
+    showMsg('msgOtpCode', '❌ যাচাই ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
+function startResendTimer() {
+  let t = 30;
+  const btn = document.getElementById('resendBtn');
+  const timer = document.getElementById('resendTimer');
+  btn.disabled = true;
+  resendInterval = setInterval(() => {
+    t--;
+    timer.textContent = t;
+    if (t <= 0) {
+      clearInterval(resendInterval);
+      btn.disabled = false;
+      btn.innerHTML = 'পুনরায় পাঠান';
+    }
+  }, 1000);
+}
+
+function resendOTP() {
+  generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log('New OTP (dev):', generatedOTP);
+  [0, 1, 2, 3, 4, 5].forEach(i => document.getElementById('otp' + i).value = '');
+  document.getElementById('otp0').focus();
+  startResendTimer();
+  showMsg('msgOtpCode', '✓ নতুন OTP পাঠানো হয়েছে', 'info');
+}
+
+function resetOTP() {
+  clearInterval(resendInterval);
+  document.getElementById('otpPhasePhone').style.display = 'block';
+  document.getElementById('otpPhaseCode').style.display = 'none';
+  [0, 1, 2, 3, 4, 5].forEach(i => document.getElementById('otp' + i).value = '');
+}
+
+// ═══════════════════════════════
+// SESSION SAVE
+// ═══════════════════════════════
+function saveSession(customer) {
+  // সব দরকারি তথ্য localStorage-এ সেভ করুন
+  localStorage.setItem('sar_customer', JSON.stringify(customer));
+  localStorage.setItem('sar_customer_id', customer.id);
+  localStorage.setItem('sar_member_id', customer.member_id || '');
+  localStorage.setItem('sar_customer_name', customer.full_name);
+  localStorage.setItem('sar_phone', customer.phone);
+  localStorage.setItem('sar_membership_tier', customer.membership_tier || 'Basic');
+  localStorage.setItem('sar_sub_paid', customer.monthly_sub_paid);
+  localStorage.setItem('sar_sub_expiry', customer.monthly_sub_expiry_date || '');
+  localStorage.setItem('sar_login_time', new Date().toISOString());
+}
+
+// Auto redirect — শুধু তখনই যদি সত্যিকার session থাকে
+const existingSession = localStorage.getItem('sar_customer');
+if (existingSession) {
+  try {
+    const parsed = JSON.parse(existingSession);
+    const loginTime = new Date(localStorage.getItem('sar_login_time') || 0);
+    const hoursSince = (new Date() - loginTime) / 3600000;
+    // শুধু ২৪ ঘণ্টার মধ্যে এবং valid id থাকলে redirect করুন
+    if (hoursSince < 24 && parsed.id) {
+      window.location.href = 'dashboard.html';
+    } else {
+      // Expired — সব মুছুন
+      localStorage.clear();
+    }
+  } catch(e) {
+    localStorage.clear();
+  }
+}
+
+// Enter key support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('panel-password').classList.contains('active')) loginWithPassword();
+  }
+});
+</script>
+</body>
+</html>

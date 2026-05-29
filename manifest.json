@@ -1,0 +1,111 @@
+{
+  "name": "SAR — She AI Restaurant",
+  "short_name": "SAR",
+  "description": "শি এআই রেস্তোরাঁ — বাংলাদেশের প্রথম নারী-নেতৃত্বাধীন AI থেরাপিউটিক ফুড প্ল্যাটফর্ম",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A0A0F",
+  "theme_color": "#E91E8C",
+  "orientation": "portrait-primary",
+  "lang": "bn",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "SAR হোমপেজ"
+    },
+    {
+      "src": "screenshots/dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "SAR ড্যাশবোর্ড"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "মেনু দেখুন",
+      "short_name": "মেনু",
+      "description": "SAR থেরাপিউটিক মেনু",
+      "url": "/menu.html",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "অর্ডার দিন",
+      "short_name": "অর্ডার",
+      "description": "নতুন অর্ডার করুন",
+      "url": "/order.html",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "অর্ডার ট্র্যাক",
+      "short_name": "ট্র্যাক",
+      "description": "অর্ডার ট্র্যাক করুন",
+      "url": "/track.html",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "ড্যাশবোর্ড",
+      "short_name": "ড্যাশ",
+      "description": "আপনার ড্যাশবোর্ড",
+      "url": "/dashboard.html",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["food", "health", "lifestyle"],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

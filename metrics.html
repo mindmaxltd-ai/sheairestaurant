@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>স্বাস্থ্য মেট্রিক্স — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;
+  --purple:#6B21A8;--purple2:#A855F7;
+  --yellow:#F59E0B;--yellow2:#FCD34D;
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;
+  --dark:#0A0A0F;--dark2:#12121A;
+  --glass:rgba(255,255,255,.047);
+  --border:rgba(255,255,255,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.10;animation:orbF 18s ease-in-out infinite}
+.o1{width:500px;height:500px;background:var(--pink);top:-160px;left:-160px}
+.o2{width:420px;height:420px;background:var(--purple);bottom:-120px;right:-120px;animation-delay:7s}
+.o3{width:280px;height:280px;background:var(--yellow);top:50%;left:48%;animation-delay:14s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(24px,-18px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.035)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.035)1px,transparent 1px);
+  background-size:64px 64px}
+
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* NAV */
+.top-nav{width:100%;max-width:920px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.75rem;padding:.65rem 1.4rem;
+  background:rgba(10,10,15,.65);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.55rem;text-decoration:none}
+.logo-icon{width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-info{font-size:.8rem;color:rgba(255,255,255,.42)}
+.nav-info span{color:var(--pink2);font-weight:600}
+
+/* CARD */
+.card{width:100%;max-width:920px;background:rgba(14,14,20,.85);
+  backdrop-filter:blur(28px);border:1px solid var(--border);
+  border-radius:26px;overflow:hidden;
+  box-shadow:0 0 90px rgba(233,30,140,.06)}
+
+/* HEADER */
+.card-hd{padding:2.2rem 2.2rem 0;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(107,33,168,.14);border:1px solid rgba(107,33,168,.26);
+  border-radius:50px;padding:.28rem .95rem;font-size:.72rem;
+  color:var(--purple2);letter-spacing:.07em;margin-bottom:1.1rem}
+.card-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--purple2),var(--pink),var(--yellow));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.card-sub{font-size:.85rem;color:rgba(255,255,255,.4);margin-bottom:1.6rem}
+
+/* SECTION PROGRESS BAR */
+.sec-prog{padding:0 2.2rem 1.6rem}
+.sec-tabs{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:1rem}
+.stab{padding:.38rem .9rem;border-radius:50px;border:1px solid rgba(255,255,255,.1);
+  background:transparent;color:rgba(255,255,255,.45);font-family:'Hind Siliguri',sans-serif;
+  font-size:.75rem;cursor:pointer;transition:all .3s}
+.stab.active{background:linear-gradient(135deg,var(--purple),var(--pink));border-color:transparent;color:#fff;box-shadow:0 0 14px rgba(107,33,168,.3)}
+.stab.done{background:rgba(5,150,105,.15);border-color:rgba(5,150,105,.3);color:var(--green2)}
+.overall-bar{height:5px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden;margin-bottom:.55rem}
+.overall-fill{height:100%;border-radius:5px;
+  background:linear-gradient(90deg,var(--green),var(--purple2),var(--pink));
+  transition:width .55s ease;box-shadow:0 0 10px rgba(5,150,105,.35)}
+.prog-info{display:flex;justify-content:space-between;font-size:.75rem}
+.prog-pct{color:var(--green2);font-family:'Space Mono',monospace;font-weight:700}
+.prog-lbl{color:rgba(255,255,255,.35)}
+
+/* FORM BODY */
+.fbody{padding:0 2.2rem 2.2rem}
+.sec-panel{display:none}
+.sec-panel.active{display:block;animation:pIn .35s ease both}
+@keyframes pIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+
+/* SECTION HEADER */
+.sec-hd{margin-bottom:1.6rem}
+.sec-icon{font-size:1.8rem;display:block;margin-bottom:.6rem}
+.sec-title{font-family:'Playfair Display',serif;font-size:1.28rem;font-weight:700;color:#fff;margin-bottom:.25rem}
+.sec-desc{font-size:.8rem;color:rgba(255,255,255,.4);line-height:1.6}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.85rem}
+.g1{display:grid;grid-template-columns:1fr;gap:.9rem}
+.sp2{grid-column:span 2}
+.sp3{grid-column:span 3}
+.sp4{grid-column:span 4}
+
+/* FIELDS */
+.fld{display:flex;flex-direction:column;gap:.32rem}
+.fld label{font-size:.77rem;color:rgba(255,255,255,.55);font-weight:500;display:flex;align-items:center;gap:.3rem}
+.unit{font-size:.67rem;color:rgba(255,255,255,.28);background:rgba(255,255,255,.06);border-radius:4px;padding:.1rem .35rem}
+.opt{color:rgba(255,255,255,.26);font-size:.67rem}
+
+input[type=text],input[type=number],input[type=date],select,textarea{
+  background:rgba(255,255,255,.044);border:1px solid rgba(255,255,255,.10);
+  border-radius:10px;padding:.65rem .88rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;
+  transition:all .3s;outline:none;width:100%;-webkit-appearance:none
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--purple2);background:rgba(107,33,168,.06);
+  box-shadow:0 0 0 3px rgba(107,33,168,.10)}
+input::placeholder{color:rgba(255,255,255,.2)}
+select option{background:var(--dark2);color:#fff}
+
+/* RANGE SLIDER */
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:5px;border-radius:5px;
+  background:rgba(255,255,255,.09);cursor:pointer;border:none;padding:0}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  cursor:pointer;box-shadow:0 0 8px rgba(233,30,140,.35)}
+.range-wrap{position:relative;padding-top:1.8rem}
+.range-val{position:absolute;top:0;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;
+  padding:.12rem .42rem;border-radius:7px;white-space:nowrap}
+.range-lbl{display:flex;justify-content:space-between;font-size:.68rem;color:rgba(255,255,255,.35);margin-top:.35rem}
+
+/* CHECKBOXES */
+.chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.chk-grid.three{grid-template-columns:1fr 1fr 1fr}
+.ci{display:flex;align-items:center;gap:.6rem;cursor:pointer;
+  background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);
+  border-radius:9px;padding:.55rem .85rem;transition:all .3s}
+.ci:hover{border-color:rgba(107,33,168,.3);background:rgba(107,33,168,.06)}
+.ci.sel{border-color:rgba(107,33,168,.38);background:rgba(107,33,168,.09)}
+.ci input{width:16px;height:16px;accent-color:var(--purple2);cursor:pointer;flex-shrink:0}
+.ci span{font-size:.8rem;color:rgba(255,255,255,.7)}
+
+/* DIVIDER */
+.divider{height:1px;background:rgba(255,255,255,.06);margin:1.3rem 0}
+.sub-lbl{font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--purple2);margin-bottom:.82rem}
+
+/* NOTE BOX */
+.note-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);
+  border-radius:12px;padding:1rem 1.1rem;margin-bottom:1.2rem;
+  font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.7}
+.note-box strong{color:var(--yellow2)}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:.85rem;margin-top:1.7rem}
+.btn-back{flex:1;padding:.85rem;border-radius:50px;
+  background:transparent;border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.52);font-family:'Hind Siliguri',sans-serif;
+  font-size:.9rem;font-weight:600;cursor:pointer;transition:all .3s}
+.btn-back:hover{border-color:rgba(255,255,255,.26);color:#fff}
+.btn-save{flex:2;padding:.85rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.9rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 20px rgba(107,33,168,.28);transition:all .3s}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(107,33,168,.45)}
+.btn-finish{width:100%;padding:.9rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.95rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 20px rgba(5,150,105,.28);transition:all .3s;margin-top:1rem}
+.btn-finish:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(5,150,105,.45)}
+
+/* MSG */
+.msg{display:none;padding:.65rem .9rem;border-radius:9px;font-size:.8rem;margin-top:.85rem}
+.msg.err{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);color:var(--red2)}
+.msg.ok{background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.2);color:var(--green2)}
+
+/* SUCCESS */
+.suc-panel{display:none;text-align:center;padding:2.5rem 1.5rem}
+.suc-icon{width:70px;height:70px;border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;
+  margin:0 auto 1.3rem;box-shadow:0 0 35px rgba(107,33,168,.38);
+  animation:scIn .4s ease both}
+@keyframes scIn{from{transform:scale(0)}to{transform:scale(1)}}
+.suc-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;
+  background:linear-gradient(135deg,var(--purple2),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.65rem}
+.suc-txt{font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:.65rem}
+.btn-gd{display:inline-block;margin:.4rem;text-decoration:none;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;padding:.82rem 2rem;border-radius:50px;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:700;
+  box-shadow:0 0 18px rgba(233,30,140,.25);transition:all .3s}
+.btn-gd:hover{transform:translateY(-2px)}
+
+/* LOADER */
+.loader{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.85);backdrop-filter:blur(10px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.85rem}
+.loader.show{display:flex}
+.spin{width:42px;height:42px;border-radius:50%;
+  border:3px solid rgba(107,33,168,.18);border-top-color:var(--purple2);
+  animation:sp .75s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-txt{font-size:.85rem;color:rgba(255,255,255,.45)}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  .g2,.g3,.g4{grid-template-columns:1fr 1fr}
+  .sp2,.sp3,.sp4{grid-column:span 2}
+  .g4{grid-template-columns:1fr 1fr}
+  .fbody,.card-hd,.sec-prog{padding-left:1.15rem;padding-right:1.15rem}
+}
+@media(max-width:480px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .sp2,.sp3,.sp4{grid-column:span 1}
+  .chk-grid,.chk-grid.three{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <div class="load-txt" id="loadTxt">তথ্য সংরক্ষণ করা হচ্ছে...</div>
+</div>
+
+<div class="page">
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <div class="nav-info">সদস্য: <span id="navName">লোড হচ্ছে...</span></div>
+  </nav>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="badge">📊 ধাপ ২ — স্বাস্থ্য মেট্রিক্স</div>
+      <h1 class="card-title">সম্পূর্ণ স্বাস্থ্য প্রোফাইল</h1>
+      <p class="card-sub">আপনার ২৫০টি মেট্রিক্স পূরণ করুন — AI আপনার জন্য বিশেষ মেনু ও বিশ্লেষণ তৈরি করবে। সব তথ্য ঐচ্ছিক তবে বেশি তথ্য = আরও ভালো বিশ্লেষণ।</p>
+    </div>
+
+    <!-- SECTION TABS + OVERALL PROGRESS -->
+    <div class="sec-prog">
+      <div class="sec-tabs" id="secTabs">
+        <button class="stab active" onclick="gotoSec(0,this)">ক. পরিমাপ</button>
+        <button class="stab" onclick="gotoSec(1,this)">খ. রক্ত পরীক্ষা</button>
+        <button class="stab" onclick="gotoSec(2,this)">গ. কিডনি/লিভার</button>
+        <button class="stab" onclick="gotoSec(3,this)">ঘ. হরমোন</button>
+        <button class="stab" onclick="gotoSec(4,this)">ঙ. নারী স্বাস্থ্য</button>
+        <button class="stab" onclick="gotoSec(5,this)">চ. রোগ ইতিহাস</button>
+        <button class="stab" onclick="gotoSec(6,this)">ছ. উপসর্গ</button>
+        <button class="stab" onclick="gotoSec(7,this)">জ. মানসিক</button>
+        <button class="stab" onclick="gotoSec(8,this)">ঝ. জীবনযাত্রা</button>
+        <button class="stab" onclick="gotoSec(9,this)">ঞ. খাদ্যাভ্যাস</button>
+        <button class="stab" onclick="gotoSec(10,this)">ট. স্বাস্থ্য লক্ষ্য</button>
+        <button class="stab" onclick="gotoSec(11,this)">ঠ. বিশেষ অ্যাক্সেস</button>
+      </div>
+      <div class="overall-bar"><div class="overall-fill" id="overallBar" style="width:8.33%"></div></div>
+      <div class="prog-info">
+        <span class="prog-pct" id="progPct">বিভাগ ১/১২</span>
+        <span class="prog-lbl" id="progLbl">বিভাগ ক: মৌলিক পরিমাপ</span>
+      </div>
+    </div>
+
+    <div class="fbody">
+
+      <!-- ═══════ SEC A: মৌলিক পরিমাপ ═══════ -->
+      <div class="sec-panel active" id="sec0">
+        <div class="sec-hd">
+          <span class="sec-icon">📏</span>
+          <div class="sec-title">বিভাগ ক — মৌলিক শারীরিক পরিমাপ</div>
+          <div class="sec-desc">আপনার শরীরের মাপ — BMI ও WHR স্বাস্থ্য মূল্যায়নের ভিত্তি।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>বয়স <span class="unit">বছর</span></label><input type="number" id="age_calculated" placeholder="স্বয়ংক্রিয়" min="5" max="120"></div>
+          <div class="fld"><label>কোমরের পরিধি <span class="unit">সেমি</span></label><input type="number" id="waist_cm" placeholder="যেমন: 80" step="0.1"></div>
+          <div class="fld"><label>নিতম্বের পরিধি <span class="unit">সেমি</span></label><input type="number" id="hip_cm" placeholder="যেমন: 95" step="0.1" oninput="calcWHR()"></div>
+          <div class="fld sp3" style="background:rgba(107,33,168,.08);border:1px solid rgba(107,33,168,.18);border-radius:10px;padding:.75rem;text-align:center">
+            <label style="justify-content:center">কোমর-নিতম্ব অনুপাত (WHR) — স্বয়ংক্রিয়</label>
+            <div id="whrVal" style="font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--purple2);margin-top:.3rem">—</div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn-save" onclick="nextSec(0)">পরবর্তী বিভাগ →</button></div>
+      </div>
+
+      <!-- ═══════ SEC B: রক্ত পরীক্ষা ═══════ -->
+      <div class="sec-panel" id="sec1">
+        <div class="sec-hd">
+          <span class="sec-icon">🩸</span>
+          <div class="sec-title">বিভাগ খ — রক্ত পরীক্ষা ও ভাইটাল সাইন</div>
+          <div class="sec-desc">সর্বশেষ রক্ত পরীক্ষার ফলাফল দিন। না থাকলে খালি রাখুন।</div>
+        </div>
+        <div class="sub-lbl">💓 ভাইটাল সাইন</div>
+        <div class="g3">
+          <div class="fld"><label>সিস্টোলিক রক্তচাপ <span class="unit">mmHg</span></label><input type="number" id="bp_systolic" placeholder="যেমন: 120"></div>
+          <div class="fld"><label>ডায়াস্টোলিক রক্তচাপ <span class="unit">mmHg</span></label><input type="number" id="bp_diastolic" placeholder="যেমন: 80"></div>
+          <div class="fld"><label>রক্তচাপের অবস্থা</label>
+            <select id="bp_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>স্বাভাবিক</option><option>উচ্চ</option><option>নিম্ন</option><option>অনিয়মিত</option>
+            </select>
+          </div>
+          <div class="fld"><label>বিশ্রামের হৃদস্পন্দন <span class="unit">bpm</span></label><input type="number" id="heart_rate_resting" placeholder="যেমন: 72"></div>
+          <div class="fld"><label>রক্তের অক্সিজেন <span class="unit">%</span></label><input type="number" id="blood_oxygen_percent" placeholder="যেমন: 98" step="0.1"></div>
+          <div class="fld"><label>শরীরের তাপমাত্রা <span class="unit">°C</span></label><input type="number" id="body_temperature" placeholder="যেমন: 36.8" step="0.1"></div>
+          <div class="fld"><label>শ্বাসের হার <span class="unit">প্রতি মিনিট</span></label><input type="number" id="respiratory_rate" placeholder="যেমন: 16"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🍬 রক্তের শর্করা</div>
+        <div class="g3">
+          <div class="fld"><label>ফাস্টিং গ্লুকোজ <span class="unit">mmol/L</span></label><input type="number" id="fasting_glucose" placeholder="যেমন: 5.5" step="0.1"></div>
+          <div class="fld"><label>খাওয়ার পর গ্লুকোজ <span class="unit">mmol/L</span></label><input type="number" id="postprandial_glucose" placeholder="যেমন: 7.8" step="0.1"></div>
+          <div class="fld"><label>HbA1c <span class="unit">%</span></label><input type="number" id="hba1c" placeholder="যেমন: 5.7" step="0.1"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🫀 কোলেস্টেরল প্যানেল</div>
+        <div class="g4">
+          <div class="fld"><label>মোট কোলেস্টেরল <span class="unit">mmol/L</span></label><input type="number" id="cholesterol_total" placeholder="5.0" step="0.1"></div>
+          <div class="fld"><label>LDL কোলেস্টেরল <span class="unit">mmol/L</span></label><input type="number" id="cholesterol_ldl" placeholder="3.0" step="0.1"></div>
+          <div class="fld"><label>HDL কোলেস্টেরল <span class="unit">mmol/L</span></label><input type="number" id="cholesterol_hdl" placeholder="1.2" step="0.1"></div>
+          <div class="fld"><label>ট্রাইগ্লিসারাইড <span class="unit">mmol/L</span></label><input type="number" id="triglycerides" placeholder="1.7" step="0.1"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🔴 রক্তের গঠন</div>
+        <div class="g4">
+          <div class="fld"><label>হিমোগ্লোবিন <span class="unit">g/dL</span></label><input type="number" id="hemoglobin" placeholder="12.5" step="0.1"></div>
+          <div class="fld"><label>হেমাটোক্রিট <span class="unit">%</span></label><input type="number" id="hematocrit" placeholder="38" step="0.1"></div>
+          <div class="fld"><label>সিরাম ফেরিটিন <span class="unit">ng/mL</span></label><input type="number" id="serum_ferritin" placeholder="30" step="0.1"></div>
+          <div class="fld"><label>সিরাম আয়রন <span class="unit">μg/dL</span></label><input type="number" id="serum_iron" placeholder="90" step="0.1"></div>
+          <div class="fld"><label>TIBC <span class="unit">μg/dL</span></label><input type="number" id="tibc" placeholder="350" step="0.1"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">💊 ভিটামিন ও মিনারেল</div>
+        <div class="g3">
+          <div class="fld"><label>ভিটামিন ডি <span class="unit">ng/mL</span></label><input type="number" id="vitamin_d" placeholder="30" step="0.1"></div>
+          <div class="fld"><label>ভিটামিন বি১২ <span class="unit">pg/mL</span></label><input type="number" id="vitamin_b12" placeholder="300" step="0.1"></div>
+          <div class="fld"><label>ফোলেট <span class="unit">ng/mL</span></label><input type="number" id="folate" placeholder="8" step="0.1"></div>
+          <div class="fld"><label>ক্যালসিয়াম <span class="unit">mg/dL</span></label><input type="number" id="calcium" placeholder="9.5" step="0.1"></div>
+          <div class="fld"><label>ম্যাগনেসিয়াম <span class="unit">mg/dL</span></label><input type="number" id="magnesium" placeholder="2.0" step="0.1"></div>
+          <div class="fld"><label>জিংক <span class="unit">μg/dL</span></label><input type="number" id="zinc" placeholder="80" step="0.1"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(1)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(1)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC C: কিডনি/লিভার ═══════ -->
+      <div class="sec-panel" id="sec2">
+        <div class="sec-hd">
+          <span class="sec-icon">🫁</span>
+          <div class="sec-title">বিভাগ গ — কিডনি ও লিভার ফাংশন</div>
+          <div class="sec-desc">লিভার এনজাইম ও কিডনি ফাংশন পরীক্ষার ফলাফল।</div>
+        </div>
+        <div class="sub-lbl">🫀 লিভার ফাংশন</div>
+        <div class="g4">
+          <div class="fld"><label>ALT/SGPT <span class="unit">U/L</span></label><input type="number" id="alt_sgpt" placeholder="30"></div>
+          <div class="fld"><label>AST/SGOT <span class="unit">U/L</span></label><input type="number" id="ast_sgot" placeholder="25"></div>
+          <div class="fld"><label>ALP <span class="unit">U/L</span></label><input type="number" id="alp" placeholder="80"></div>
+          <div class="fld"><label>GGT <span class="unit">U/L</span></label><input type="number" id="ggt" placeholder="30"></div>
+          <div class="fld"><label>বিলিরুবিন মোট <span class="unit">mg/dL</span></label><input type="number" id="bilirubin_total" placeholder="1.0" step="0.1"></div>
+          <div class="fld"><label>বিলিরুবিন সরাসরি <span class="unit">mg/dL</span></label><input type="number" id="bilirubin_direct" placeholder="0.3" step="0.1"></div>
+          <div class="fld"><label>মোট প্রোটিন <span class="unit">g/dL</span></label><input type="number" id="total_protein" placeholder="7.0" step="0.1"></div>
+          <div class="fld"><label>অ্যালবুমিন <span class="unit">g/dL</span></label><input type="number" id="albumin" placeholder="4.0" step="0.1"></div>
+          <div class="fld"><label>প্রোথ্রম্বিন টাইম <span class="unit">সেকেন্ড</span></label><input type="number" id="prothrombin_time" placeholder="12" step="0.1"></div>
+          <div class="fld"><label>ফাইব্রিনোজেন <span class="unit">mg/dL</span></label><input type="number" id="fibrinogen" placeholder="300"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🫘 কিডনি ফাংশন</div>
+        <div class="g4">
+          <div class="fld"><label>ক্রিয়েটিনিন <span class="unit">mg/dL</span></label><input type="number" id="creatinine" placeholder="0.9" step="0.01"></div>
+          <div class="fld"><label>ইউরিয়া <span class="unit">mg/dL</span></label><input type="number" id="urea" placeholder="25"></div>
+          <div class="fld"><label>ইউরিক এসিড <span class="unit">mg/dL</span></label><input type="number" id="uric_acid" placeholder="5.0" step="0.1"></div>
+          <div class="fld"><label>eGFR <span class="unit">mL/min</span></label><input type="number" id="egfr" placeholder="90"></div>
+          <div class="fld"><label>সোডিয়াম <span class="unit">mEq/L</span></label><input type="number" id="sodium" placeholder="140"></div>
+          <div class="fld"><label>পটাশিয়াম <span class="unit">mEq/L</span></label><input type="number" id="potassium" placeholder="4.0" step="0.1"></div>
+          <div class="fld"><label>ক্লোরাইড <span class="unit">mEq/L</span></label><input type="number" id="chloride" placeholder="100"></div>
+          <div class="fld"><label>বাইকার্বোনেট <span class="unit">mEq/L</span></label><input type="number" id="bicarbonate" placeholder="24"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🔥 প্রদাহ নির্দেশক</div>
+        <div class="g3">
+          <div class="fld"><label>CRP <span class="unit">mg/L</span></label><input type="number" id="crp" placeholder="1.0" step="0.1"></div>
+          <div class="fld"><label>ESR <span class="unit">mm/hour</span></label><input type="number" id="esr" placeholder="15"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(2)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(2)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC D: হরমোন ═══════ -->
+      <div class="sec-panel" id="sec3">
+        <div class="sec-hd">
+          <span class="sec-icon">⚗️</span>
+          <div class="sec-title">বিভাগ ঘ — থাইরয়েড ও হরমোন</div>
+          <div class="sec-desc">হরমোনের মাত্রা নারীর স্বাস্থ্যের কেন্দ্রীয় সূচক।</div>
+        </div>
+        <div class="sub-lbl">🦋 থাইরয়েড প্যানেল</div>
+        <div class="g3">
+          <div class="fld"><label>TSH <span class="unit">mIU/L</span></label><input type="number" id="tsh" placeholder="2.5" step="0.01"></div>
+          <div class="fld"><label>T3 মোট <span class="unit">nmol/L</span></label><input type="number" id="t3_total" placeholder="1.8" step="0.01"></div>
+          <div class="fld"><label>T4 মোট <span class="unit">nmol/L</span></label><input type="number" id="t4_total" placeholder="100" step="0.1"></div>
+          <div class="fld"><label>ফ্রি T3 <span class="unit">pmol/L</span></label><input type="number" id="free_t3" placeholder="5.0" step="0.1"></div>
+          <div class="fld"><label>ফ্রি T4 <span class="unit">pmol/L</span></label><input type="number" id="free_t4" placeholder="15" step="0.1"></div>
+          <div class="fld"><label>থাইরয়েডের অবস্থা</label>
+            <select id="thyroid_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>স্বাভাবিক</option><option>হাইপোথাইরয়েড</option>
+              <option>হাইপারথাইরয়েড</option><option>গয়টার</option><option>নডিউল</option>
+            </select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🌸 যৌন হরমোন</div>
+        <div class="g3">
+          <div class="fld"><label>ইস্ট্রোজেন <span class="unit">pg/mL</span></label><input type="number" id="estrogen" placeholder="100" step="0.1"></div>
+          <div class="fld"><label>প্রোজেস্টেরন <span class="unit">ng/mL</span></label><input type="number" id="progesterone" placeholder="5.0" step="0.01"></div>
+          <div class="fld"><label>LH <span class="unit">mIU/mL</span></label><input type="number" id="lh" placeholder="5.0" step="0.1"></div>
+          <div class="fld"><label>FSH <span class="unit">mIU/mL</span></label><input type="number" id="fsh" placeholder="6.0" step="0.1"></div>
+          <div class="fld"><label>টেস্টোস্টেরন <span class="unit">ng/dL</span></label><input type="number" id="testosterone" placeholder="30" step="0.1"></div>
+          <div class="fld"><label>প্রোল্যাকটিন <span class="unit">ng/mL</span></label><input type="number" id="prolactin" placeholder="15" step="0.1"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">💉 ইনসুলিন ও স্ট্রেস হরমোন</div>
+        <div class="g3">
+          <div class="fld"><label>ইনসুলিন <span class="unit">μIU/mL</span></label><input type="number" id="insulin_level" placeholder="10" step="0.1"></div>
+          <div class="fld"><label>HOMA-IR <span class="unit">সূচক</span></label><input type="number" id="homa_ir" placeholder="2.0" step="0.01"></div>
+          <div class="fld"><label>কর্টিসল (সকাল) <span class="unit">μg/dL</span></label><input type="number" id="cortisol_morning" placeholder="15" step="0.1"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(3)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(3)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC E: নারী স্বাস্থ্য ═══════ -->
+      <div class="sec-panel" id="sec4">
+        <div class="sec-hd">
+          <span class="sec-icon">🌺</span>
+          <div class="sec-title">বিভাগ ঙ — নারী স্বাস্থ্য বিশেষ মেট্রিক্স</div>
+          <div class="sec-desc">এই তথ্য সম্পূর্ণ গোপনীয়। সঠিক তথ্য AI-কে আপনার জন্য সর্বোত্তম মেনু তৈরি করতে সাহায্য করবে।</div>
+        </div>
+        <div class="sub-lbl">🔴 মাসিক চক্র</div>
+        <div class="g3">
+          <div class="fld"><label>মাসিক চক্রের অবস্থা</label>
+            <select id="menstrual_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>নিয়মিত</option><option>অনিয়মিত</option>
+              <option>বন্ধ হয়ে গেছে</option><option>পেরিমেনোপজ</option>
+              <option>মেনোপজ</option><option>পোস্টমেনোপজ</option>
+            </select>
+          </div>
+          <div class="fld"><label>শেষ মাসিকের তারিখ</label><input type="date" id="last_period_date"></div>
+          <div class="fld"><label>গড় চক্রের দৈর্ঘ্য <span class="unit">দিন</span></label><input type="number" id="cycle_length_days" placeholder="28" min="15" max="60"></div>
+          <div class="fld"><label>মাসিকের স্থায়িত্ব <span class="unit">দিন</span></label><input type="number" id="menstruation_duration_days" placeholder="5" min="1" max="15"></div>
+          <div class="fld"><label>রক্তপ্রবাহ</label>
+            <select id="flow_amount">
+              <option value="">নির্বাচন করুন</option>
+              <option>কম</option><option>স্বাভাবিক</option><option>বেশি</option><option>অতিরিক্ত</option>
+            </select>
+          </div>
+          <div class="fld"><label>মাসিকের ব্যথা</label>
+            <select id="menstrual_pain">
+              <option value="">নির্বাচন করুন</option>
+              <option>নেই</option><option>হালকা</option><option>মাঝারি</option>
+              <option>তীব্র</option><option>অসহনীয়</option>
+            </select>
+          </div>
+        </div>
+        <div class="fld" style="margin-top:.9rem">
+          <label>PMS উপসর্গ (একাধিক নির্বাচন)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="pms" value="মাথাব্যথা"><span>মাথাব্যথা</span></label>
+            <label class="ci"><input type="checkbox" name="pms" value="মেজাজ পরিবর্তন"><span>মেজাজ পরিবর্তন</span></label>
+            <label class="ci"><input type="checkbox" name="pms" value="পেট ফোলা"><span>পেট ফোলা</span></label>
+            <label class="ci"><input type="checkbox" name="pms" value="স্তন ব্যথা"><span>স্তন ব্যথা</span></label>
+            <label class="ci"><input type="checkbox" name="pms" value="ক্লান্তি"><span>ক্লান্তি</span></label>
+            <label class="ci"><input type="checkbox" name="pms" value="কোষ্ঠকাঠিন্য"><span>কোষ্ঠকাঠিন্য</span></label>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🤱 গর্ভাবস্থা ও মাতৃত্ব</div>
+        <div class="g3">
+          <div class="fld"><label>গর্ভাবস্থার অবস্থা</label>
+            <select id="pregnancy_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ — ১ম ত্রৈমাসিক</option>
+              <option>হ্যাঁ — ২য় ত্রৈমাসিক</option><option>হ্যাঁ — ৩য় ত্রৈমাসিক</option>
+            </select>
+          </div>
+          <div class="fld"><label>বুকের দুধ খাওয়াচ্ছেন</label>
+            <select id="breastfeeding">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ — একচেটিয়া</option><option>হ্যাঁ — আংশিক</option>
+            </select>
+          </div>
+          <div class="fld"><label>গর্ভধারণ সংখ্যা</label><input type="number" id="number_of_pregnancies" placeholder="০" min="0" max="20"></div>
+          <div class="fld"><label>জীবিত সন্তান সংখ্যা</label><input type="number" id="number_of_children" placeholder="০" min="0" max="20"></div>
+          <div class="fld"><label>গর্ভপাতের ইতিহাস</label>
+            <select id="miscarriage_history">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>১ বার</option><option>২ বার</option><option>৩ বার বা বেশি</option>
+            </select>
+          </div>
+          <div class="fld"><label>শেষ প্রসবের তারিখ</label><input type="date" id="last_delivery_date"></div>
+          <div class="fld"><label>সিজারিয়ান ইতিহাস</label>
+            <select id="cesarean_history">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>১ বার</option><option>২ বার</option><option>বেশি</option>
+            </select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🏥 স্ত্রীরোগ ইতিহাস</div>
+        <div class="g3">
+          <div class="fld"><label>PCOS</label>
+            <select id="pcos_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option>
+            </select>
+          </div>
+          <div class="fld"><label>এন্ডোমেট্রিওসিস</label>
+            <select id="endometriosis_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option>
+            </select>
+          </div>
+          <div class="fld"><label>জরায়ুর ফাইব্রয়েড</label>
+            <select id="uterine_fibroid">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option>
+            </select>
+          </div>
+          <div class="fld"><label>ডিম্বাশয়ের সিস্ট</label>
+            <select id="ovarian_cyst">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option>
+            </select>
+          </div>
+          <div class="fld"><label>জরায়ু স্ক্রিনিং</label>
+            <select id="cervical_screening">
+              <option value="">নির্বাচন করুন</option>
+              <option>করা হয়নি</option><option>স্বাভাবিক</option><option>অস্বাভাবিক</option>
+            </select>
+          </div>
+          <div class="fld"><label>স্তন পরীক্ষা</label>
+            <select id="breast_examination">
+              <option value="">নির্বাচন করুন</option>
+              <option>করা হয়নি</option><option>স্বাভাবিক</option><option>গোটা আছে</option><option>অস্বাভাবিক</option>
+            </select>
+          </div>
+          <div class="fld"><label>হরমোনাল জন্মনিয়ন্ত্রণ</label>
+            <select id="hormonal_contraception">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>পিল</option><option>ইঞ্জেকশন</option>
+              <option>IUD</option><option>ইমপ্লান্ট</option>
+            </select>
+          </div>
+          <div class="fld"><label>মেনোপজ বয়স (হলে)</label><input type="number" id="menopause_age" placeholder="যেমন: 50" min="30" max="70"></div>
+          <div class="fld"><label>HRT চলছে</label>
+            <select id="hrt_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ — ইস্ট্রোজেন</option>
+              <option>হ্যাঁ — কম্বিনেশন</option>
+            </select>
+          </div>
+          <div class="fld"><label>যোনি স্রাব সমস্যা</label>
+            <select id="vaginal_discharge">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>স্বাভাবিক</option>
+              <option>অস্বাভাবিক রঙ</option><option>দুর্গন্ধ</option><option>চুলকানি</option>
+            </select>
+          </div>
+          <div class="fld"><label>পেলভিক ব্যথা</label>
+            <select id="pelvic_pain">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>মাঝে মাঝে</option><option>নিয়মিত</option><option>তীব্র</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(4)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(4)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC F: রোগ ইতিহাস ═══════ -->
+      <div class="sec-panel" id="sec5">
+        <div class="sec-hd">
+          <span class="sec-icon">📋</span>
+          <div class="sec-title">বিভাগ চ — রোগের ইতিহাস</div>
+          <div class="sec-desc">বর্তমান ও অতীত রোগের তথ্য দিন।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>ডায়াবেটিস</label>
+            <select id="diabetes_type">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>টাইপ-১</option><option>টাইপ-২</option>
+              <option>গেস্টেশনাল</option><option>প্রি-ডায়াবেটিস</option>
+            </select>
+          </div>
+          <div class="fld"><label>উচ্চ রক্তচাপ</label>
+            <select id="hypertension_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>নিয়ন্ত্রণে আছে</option><option>নিয়ন্ত্রণে নেই</option>
+            </select>
+          </div>
+          <div class="fld"><label>হাঁপানি / শ্বাসকষ্ট</label>
+            <select id="asthma_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option>
+            </select>
+          </div>
+          <div class="fld"><label>COPD / ফুসফুসের রোগ</label>
+            <select id="copd_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option>
+            </select>
+          </div>
+          <div class="fld"><label>ফ্যাটি লিভার</label>
+            <select id="fatty_liver_grade">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>গ্রেড-১</option><option>গ্রেড-২</option>
+              <option>গ্রেড-৩</option><option>সিরোসিস</option>
+            </select>
+          </div>
+          <div class="fld"><label>হেপাটাইটিস</label>
+            <select id="hepatitis_type">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হেপ-বি</option><option>হেপ-সি</option>
+              <option>হেপ-এ</option><option>অটোইমিউন</option>
+            </select>
+          </div>
+          <div class="fld"><label>IBS / গ্যাস্ট্রিক</label>
+            <select id="ibs_type">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>IBS-কোষ্ঠকাঠিন্য</option>
+              <option>IBS-ডায়রিয়া</option><option>গ্যাস্ট্রাইটিস</option>
+              <option>GERD</option><option>পেপটিক আলসার</option>
+            </select>
+          </div>
+          <div class="fld"><label>কিডনির রোগ</label>
+            <select id="kidney_disease_stage">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>স্টেজ-১</option><option>স্টেজ-২</option>
+              <option>স্টেজ-৩</option><option>স্টেজ-৪</option><option>পাথর</option>
+            </select>
+          </div>
+          <div class="fld"><label>থাইরয়েড রোগ</label>
+            <select id="thyroid_disease">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হাইপোথাইরয়েড</option>
+              <option>হাইপারথাইরয়েড</option><option>গয়টার</option><option>ক্যান্সার</option>
+            </select>
+          </div>
+          <div class="fld"><label>ক্যান্সারের ইতিহাস</label>
+            <select id="cancer_history">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>স্তন</option><option>জরায়ু</option>
+              <option>ডিম্বাশয়</option><option>কোলন</option><option>রক্ত</option><option>অন্যান্য</option>
+            </select>
+          </div>
+          <div class="fld"><label>স্ট্রোকের ইতিহাস</label>
+            <select id="stroke_history">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>ইসকেমিক</option><option>হেমোরেজিক</option><option>TIA</option>
+            </select>
+          </div>
+          <div class="fld"><label>মাইগ্রেন</label>
+            <select id="migraine_frequency">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option>
+            </select>
+          </div>
+          <div class="fld"><label>মৃগীরোগ / খিঁচুনি</label>
+            <select id="epilepsy_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>নিয়ন্ত্রণে</option><option>নিয়ন্ত্রণে নেই</option>
+            </select>
+          </div>
+          <div class="fld"><label>অস্টিওপোরোসিস</label>
+            <select id="osteoporosis_status">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>অস্টিওপেনিয়া</option><option>অস্টিওপোরোসিস</option>
+            </select>
+          </div>
+          <div class="fld"><label>রক্তশূন্যতার ধরন</label>
+            <select id="anemia_type">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>আয়রন ডেফিশিয়েন্সি</option>
+              <option>B12 ঘাটতি</option><option>ফোলেট ঘাটতি</option>
+              <option>থ্যালাসেমিয়া</option>
+            </select>
+          </div>
+          <div class="fld"><label>যক্ষ্মার ইতিহাস</label>
+            <select id="tuberculosis_history">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>চিকিৎসা হয়েছে</option>
+              <option>চলমান</option><option>লেটেন্ট</option>
+            </select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">👨‍👩‍👧 পারিবারিক ইতিহাস</div>
+        <div class="g3">
+          <div class="fld"><label>পরিবারে ডায়াবেটিস</label>
+            <select id="family_diabetes">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>বাবা</option><option>মা</option>
+              <option>উভয়</option><option>ভাইবোন</option>
+            </select>
+          </div>
+          <div class="fld"><label>পরিবারে হৃদরোগ</label>
+            <select id="family_heart_disease">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ — বাবা</option>
+              <option>হ্যাঁ — মা</option><option>হ্যাঁ — উভয়</option>
+            </select>
+          </div>
+          <div class="fld"><label>পরিবারে ক্যান্সার</label>
+            <select id="family_cancer">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ — কোন ধরন</option>
+            </select>
+          </div>
+          <div class="fld"><label>পরিবারে উচ্চ রক্তচাপ</label>
+            <select id="family_hypertension">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ</option>
+            </select>
+          </div>
+          <div class="fld"><label>পরিবারে থাইরয়েড</label>
+            <select id="family_thyroid">
+              <option value="">নির্বাচন করুন</option>
+              <option>না</option><option>হ্যাঁ</option>
+            </select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">⚠️ অ্যালার্জি ও অপারেশন</div>
+        <div class="fld" style="margin-bottom:.9rem">
+          <label>অ্যালার্জির ধরন (একাধিক নির্বাচন)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="allergy_types" value="খাবার অ্যালার্জি"><span>খাবার অ্যালার্জি</span></label>
+            <label class="ci"><input type="checkbox" name="allergy_types" value="ওষুধ অ্যালার্জি"><span>ওষুধ অ্যালার্জি</span></label>
+            <label class="ci"><input type="checkbox" name="allergy_types" value="পরাগ অ্যালার্জি"><span>পরাগ অ্যালার্জি</span></label>
+            <label class="ci"><input type="checkbox" name="allergy_types" value="ধুলো অ্যালার্জি"><span>ধুলো অ্যালার্জি</span></label>
+            <label class="ci"><input type="checkbox" name="allergy_types" value="পশুর লোম"><span>পশুর লোম</span></label>
+            <label class="ci"><input type="checkbox" name="allergy_types" value="পোকার কামড়"><span>পোকার কামড়</span></label>
+          </div>
+        </div>
+        <div class="fld">
+          <label>হৃদরোগের ধরন (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="heart_disease" value="ইসকেমিক"><span>ইসকেমিক</span></label>
+            <label class="ci"><input type="checkbox" name="heart_disease" value="ভালভুলার"><span>ভালভুলার</span></label>
+            <label class="ci"><input type="checkbox" name="heart_disease" value="অ্যারিদমিয়া"><span>অ্যারিদমিয়া</span></label>
+          </div>
+        </div>
+        <div class="fld" style="margin-top:.9rem">
+          <label>অপারেশনের ইতিহাস</label>
+          <input type="text" id="surgery_history" placeholder="যেমন: অ্যাপেন্ডিক্স, গলব্লাডার (না থাকলে খালি)">
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(5)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(5)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC G: উপসর্গ ═══════ -->
+      <div class="sec-panel" id="sec6">
+        <div class="sec-hd">
+          <span class="sec-icon">🌡️</span>
+          <div class="sec-title">বিভাগ ছ — বর্তমান উপসর্গ</div>
+          <div class="sec-desc">এখন কী কী অনুভব করছেন — সৎভাবে বলুন।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>ক্লান্তি</label>
+            <select id="fatigue_level"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>ঘন ঘন প্রস্রাব</label>
+            <select id="frequent_urination"><option value="">নির্বাচন</option><option>না</option><option>রাতে</option><option>দিনে</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>অতিরিক্ত তৃষ্ণা</label>
+            <select id="excessive_thirst"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>ওজন পরিবর্তন</label>
+            <select id="weight_change"><option value="">নির্বাচন</option><option>স্থিতিশীল</option><option>বাড়ছে</option><option>কমছে</option><option>হঠাৎ পরিবর্তন</option></select>
+          </div>
+          <div class="fld"><label>ক্ষুধার পরিবর্তন</label>
+            <select id="appetite_change"><option value="">নির্বাচন</option><option>স্বাভাবিক</option><option>বেশি</option><option>কম</option><option>অনিয়মিত</option></select>
+          </div>
+          <div class="fld"><label>পেট ফোলা / গ্যাস</label>
+            <select id="bloating_gas"><option value="">নির্বাচন</option><option>না</option><option>খাওয়ার পরে</option><option>সর্বদা</option><option>রাতে বেশি</option></select>
+          </div>
+          <div class="fld"><label>বুক জ্বালা / অ্যাসিডিটি</label>
+            <select id="heartburn_acidity"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option></select>
+          </div>
+          <div class="fld"><label>বমি বমি ভাব</label>
+            <select id="nausea_vomiting"><option value="">নির্বাচন</option><option>না</option><option>সকালে</option><option>খাওয়ার পরে</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>ডায়রিয়া</label>
+            <select id="diarrhea_frequency"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option></select>
+          </div>
+          <div class="fld"><label>কোষ্ঠকাঠিন্য</label>
+            <select id="constipation_frequency"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>মাথাব্যথা</label>
+            <select id="headache_frequency"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option></select>
+          </div>
+          <div class="fld"><label>মাথা ঘোরা</label>
+            <select id="dizziness"><option value="">নির্বাচন</option><option>না</option><option>উঠলে</option><option>হাঁটলে</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>বুকে ব্যথা</label>
+            <select id="chest_pain"><option value="">নির্বাচন</option><option>না</option><option>পরিশ্রমে</option><option>বিশ্রামে</option><option>রাতে</option></select>
+          </div>
+          <div class="fld"><label>শ্বাসকষ্ট</label>
+            <select id="shortness_of_breath"><option value="">নির্বাচন</option><option>না</option><option>পরিশ্রমে</option><option>বিশ্রামে</option><option>শুলে</option></select>
+          </div>
+          <div class="fld"><label>হাত-পা ফোলা</label>
+            <select id="limb_swelling"><option value="">নির্বাচন</option><option>না</option><option>সন্ধ্যায়</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>হাত-পা ঝিনঝিন</label>
+            <select id="limb_tingling"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>পিঠে / কোমরে ব্যথা</label>
+            <select id="back_pain"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>চুল পড়া</label>
+            <select id="hair_loss"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>নখ ভঙ্গুর</label>
+            <select id="brittle_nails"><option value="">নির্বাচন</option><option>না</option><option>হ্যাঁ</option></select>
+          </div>
+          <div class="fld"><label>ত্বক শুষ্ক</label>
+            <select id="dry_skin"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>রাতে ঘাম</label>
+            <select id="night_sweats"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রতিরাত</option></select>
+          </div>
+          <div class="fld"><label>হঠাৎ গরম লাগা</label>
+            <select id="hot_flashes"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রতিদিন</option></select>
+          </div>
+          <div class="fld"><label>ঠান্ডা অসহিষ্ণুতা</label>
+            <select id="cold_intolerance"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>কাশির ধরন</label>
+            <select id="cough_type"><option value="">নির্বাচন</option><option>না</option><option>শুষ্ক</option><option>কফসহ</option><option>রক্তসহ</option><option>দীর্ঘমেয়াদি</option></select>
+          </div>
+          <div class="fld"><label>ঘন ঘন সংক্রমণ / জ্বর</label>
+            <select id="frequent_infections"><option value="">নির্বাচন</option><option>না</option><option>মাসে একবার</option><option>সপ্তাহে</option><option>প্রায়ই</option></select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(6)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(6)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC H: মানসিক ═══════ -->
+      <div class="sec-panel" id="sec7">
+        <div class="sec-hd">
+          <span class="sec-icon">💜</span>
+          <div class="sec-title">বিভাগ জ — মানসিক ও আবেগীয় স্বাস্থ্য</div>
+          <div class="sec-desc">সম্পূর্ণ গোপনীয়। সৎ উত্তর AI-কে আপনাকে আরও ভালোভাবে সাহায্য করতে দেবে।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>সামগ্রিক মেজাজ</label>
+            <select id="overall_mood"><option value="">নির্বাচন</option><option>খুব ভালো</option><option>ভালো</option><option>মাঝারি</option><option>খারাপ</option><option>খুব খারাপ</option></select>
+          </div>
+          <div class="fld"><label>উদ্বেগ / দুশ্চিন্তা</label>
+            <select id="anxiety_level"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option><option>প্যানিক অ্যাটাক</option></select>
+          </div>
+          <div class="fld"><label>বিষণ্নতা</label>
+            <select id="depression_frequency"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option></select>
+          </div>
+          <div class="fld"><label>ঘুমের সমস্যা</label>
+            <select id="sleep_problems"><option value="">নির্বাচন</option><option>না</option><option>ঘুমাতে পারি না</option><option>রাতে ঘুম ভাঙে</option><option>বেশি ঘুমাই</option></select>
+          </div>
+          <div class="fld"><label>মনোযোগ / স্মৃতির সমস্যা</label>
+            <select id="memory_concentration"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>রাগ / খিটখিটে মেজাজ</label>
+            <select id="anger_irritability"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রায়ই</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>আবেগীয় খাওয়া</label>
+            <select id="emotional_eating"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রায়ই</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>একাকীত্ব</label>
+            <select id="loneliness"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রায়ই</option><option>সর্বদা</option></select>
+          </div>
+          <div class="fld"><label>মানসিক স্বাস্থ্যের চিকিৎসা</label>
+            <select id="mental_health_treatment"><option value="">নির্বাচন</option><option>না</option><option>ওষুধ</option><option>কাউন্সেলিং</option><option>উভয়</option></select>
+          </div>
+          <div class="fld"><label>শরীরের ছবি নিয়ে উদ্বেগ</label>
+            <select id="body_image_concern"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>সামাজিক খাওয়ার পছন্দ</label>
+            <select id="social_dining_preference"><option value="">নির্বাচন</option><option>একা</option><option>ছোট দল</option><option>বড় দল</option><option>যেকোনো</option></select>
+          </div>
+          <div class="fld"><label>কাজের চাপ</label>
+            <select id="work_stress"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option><option>অসহনীয়</option></select>
+          </div>
+          <div class="fld"><label>পারিবারিক সম্পর্কের চাপ</label>
+            <select id="family_relationship_stress"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select>
+          </div>
+          <div class="fld"><label>আত্মবিশ্বাস</label>
+            <select id="self_confidence"><option value="">নির্বাচন</option><option>খুব বেশি</option><option>বেশি</option><option>মাঝারি</option><option>কম</option><option>খুব কম</option></select>
+          </div>
+        </div>
+        <div class="fld" style="margin-top:1rem">
+          <label>স্ট্রেস মাত্রা ১ থেকে ১০</label>
+          <div class="range-wrap">
+            <div class="range-val" id="stressLbl" style="left:44%">৫</div>
+            <input type="range" id="stress_level" min="1" max="10" value="5" oninput="upStress(this.value)">
+            <div class="range-lbl"><span>১ — শান্ত</span><span>৫ — মাঝারি</span><span>১০ — অতি চাপ</span></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(7)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(7)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC I: জীবনযাত্রা ═══════ -->
+      <div class="sec-panel" id="sec8">
+        <div class="sec-hd">
+          <span class="sec-icon">🌿</span>
+          <div class="sec-title">বিভাগ ঝ — জীবনযাত্রা ও অভ্যাস</div>
+          <div class="sec-desc">আপনার দৈনন্দিন জীবনযাপনের তথ্য।</div>
+        </div>
+        <div class="sub-lbl">😴 ঘুম</div>
+        <div class="g3">
+          <div class="fld"><label>প্রতিদিন ঘুম <span class="unit">ঘণ্টা</span></label><input type="number" id="sleep_hours_daily" placeholder="৭" min="1" max="24" step="0.5"></div>
+          <div class="fld"><label>ঘুমের মান</label><select id="sleep_quality"><option value="">নির্বাচন</option><option>খুব ভালো</option><option>ভালো</option><option>মাঝারি</option><option>খারাপ</option><option>খুব খারাপ</option></select></div>
+          <div class="fld"><label>ঘুমানোর সময়</label><select id="sleep_time"><option value="">নির্বাচন</option><option>রাত ৯টার আগে</option><option>৯-১১টা</option><option>১১টা-১টা</option><option>১টার পরে</option></select></div>
+          <div class="fld"><label>ওঠার সময়</label><select id="wake_time"><option value="">নির্বাচন</option><option>ভোর ৫টার আগে</option><option>৫-৭টা</option><option>৭-৯টা</option><option>৯টার পরে</option></select></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">🏃 কার্যকলাপ</div>
+        <div class="g3">
+          <div class="fld"><label>কার্যকলাপের স্তর</label><select id="activity_level"><option value="">নির্বাচন</option><option>নিষ্ক্রিয়</option><option>হালকা</option><option>মাঝারি</option><option>সক্রিয়</option><option>অ্যাথলেট</option></select></div>
+          <div class="fld"><label>সাপ্তাহিক ব্যায়ামের দিন</label><input type="number" id="exercise_days_per_week" placeholder="৩" min="0" max="7"></div>
+          <div class="fld"><label>বসে থাকার সময় <span class="unit">ঘণ্টা/দিন</span></label><input type="number" id="sitting_hours_daily" placeholder="৮" min="0" max="24"></div>
+          <div class="fld"><label>যাতায়াতের সময় <span class="unit">ঘণ্টা</span></label><input type="number" id="commute_time_hours" placeholder="১" step="0.5"></div>
+          <div class="fld"><label>স্ক্রিন টাইম <span class="unit">ঘণ্টা</span></label><input type="number" id="screen_time_hours" placeholder="৪" step="0.5"></div>
+          <div class="fld"><label>রোদে থাকার সময় <span class="unit">ঘণ্টা</span></label><input type="number" id="sun_exposure_hours" placeholder="১" step="0.5"></div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>ব্যায়ামের ধরন (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="exercise_types" value="হাঁটা"><span>🚶 হাঁটা</span></label>
+            <label class="ci"><input type="checkbox" name="exercise_types" value="দৌড়"><span>🏃 দৌড়</span></label>
+            <label class="ci"><input type="checkbox" name="exercise_types" value="সাঁতার"><span>🏊 সাঁতার</span></label>
+            <label class="ci"><input type="checkbox" name="exercise_types" value="যোগব্যায়াম"><span>🧘 যোগব্যায়াম</span></label>
+            <label class="ci"><input type="checkbox" name="exercise_types" value="জিম"><span>💪 জিম</span></label>
+            <label class="ci"><input type="checkbox" name="exercise_types" value="ঘরের কাজ"><span>🏠 ঘরের কাজ</span></label>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub-lbl">💼 পেশা ও অভ্যাস</div>
+        <div class="g3">
+          <div class="fld"><label>পেশার ধরন</label><select id="occupation_type"><option value="">নির্বাচন</option><option>ডেস্ক কাজ</option><option>মাঠ কাজ</option><option>শারীরিক পরিশ্রম</option><option>গৃহিণী</option><option>শিক্ষার্থী</option><option>ব্যবসা</option><option>অবসর</option></select></div>
+          <div class="fld"><label>ধূমপান</label><select id="smoking_status"><option value="">নির্বাচন</option><option>না</option><option>ছেড়ে দিয়েছি</option><option>মাঝে মাঝে</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>পান / জর্দা</label><select id="pan_jorda_use"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>মদ্যপান</label><select id="alcohol_use"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>নিয়মিত</option></select></div>
+          <div class="fld"><label>পানি পান <span class="unit">লিটার/দিন</span></label><input type="number" id="water_intake_liters" placeholder="২" step="0.25" min="0" max="10"></div>
+          <div class="fld"><label>চা/কফি</label><select id="tea_coffee_cups"><option value="">নির্বাচন</option><option>না</option><option>১ কাপ</option><option>২-৩ কাপ</option><option>৪ বা বেশি</option></select></div>
+          <div class="fld"><label>রান্না করার সময়</label><select id="cooking_time"><option value="">নির্বাচন</option><option>রান্না করি না</option><option>১ ঘণ্টা</option><option>২-৩ ঘণ্টা</option><option>৩+ ঘণ্টা</option></select></div>
+          <div class="fld"><label>বাইরে খাওয়ার হার</label><select id="eating_out_frequency"><option value="">নির্বাচন</option><option>কদাচিৎ</option><option>সপ্তাহে ১-২</option><option>৩-৪ বার</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>ফাস্টফুড</label><select id="fastfood_frequency"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সাপ্তাহিক</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>সামাজিক সমর্থন</label><select id="social_support"><option value="">নির্বাচন</option><option>শক্তিশালী</option><option>মাঝারি</option><option>দুর্বল</option><option>নেই</option></select></div>
+          <div class="fld"><label>আধ্যাত্মিক অনুশীলন</label><select id="spiritual_practice"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>নিয়মিত</option></select></div>
+          <div class="fld"><label>পরিবেশ দূষণ</label><select id="environmental_pollution"><option value="">নির্বাচন</option><option>কম</option><option>মাঝারি</option><option>বেশি</option><option>অতিরিক্ত</option></select></div>
+          <div class="fld"><label>বর্তমানে ওষুধ সেবন</label><select id="current_medications"><option value="">নির্বাচন</option><option>না</option><option>১-২টি</option><option>৩-৫টি</option><option>৫টির বেশি</option></select></div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>অবসর কার্যকলাপ (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="leisure" value="পড়া"><span>📚 পড়া</span></label>
+            <label class="ci"><input type="checkbox" name="leisure" value="সঙ্গীত"><span>🎵 সঙ্গীত</span></label>
+            <label class="ci"><input type="checkbox" name="leisure" value="বাগান"><span>🌱 বাগান</span></label>
+            <label class="ci"><input type="checkbox" name="leisure" value="রান্না"><span>🍳 রান্না</span></label>
+            <label class="ci"><input type="checkbox" name="leisure" value="ভ্রমণ"><span>✈️ ভ্রমণ</span></label>
+            <label class="ci"><input type="checkbox" name="leisure" value="টেলিভিশন"><span>📺 টেলিভিশন</span></label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(8)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(8)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC J: খাদ্যাভ্যাস ═══════ -->
+      <div class="sec-panel" id="sec9">
+        <div class="sec-hd">
+          <span class="sec-icon">🥗</span>
+          <div class="sec-title">বিভাগ ঞ — খাদ্যাভ্যাস ও পুষ্টি</div>
+          <div class="sec-desc">আপনার খাদ্যাভ্যাস SAR মেনুর মূল ভিত্তি।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>খাদ্যাভ্যাসের ধরন</label><select id="dietary_pattern"><option value="">নির্বাচন</option><option>সর্বভোজী</option><option>নিরামিষ</option><option>ভেগান</option><option>পেসকেটারিয়ান</option><option>হালাল-কেবল</option></select></div>
+          <div class="fld"><label>ধর্মীয় খাদ্য বিধিনিষেধ</label><select id="religious_food_restriction"><option value="">নির্বাচন</option><option>নেই</option><option>হালাল</option><option>হিন্দু নিরামিষ</option><option>অন্যান্য</option></select></div>
+          <div class="fld"><label>প্রতিদিন খাবারের সংখ্যা</label><select id="meals_per_day"><option value="">নির্বাচন</option><option>১</option><option>২</option><option>৩</option><option>৪</option><option>৫-৬</option></select></div>
+          <div class="fld"><label>সকালের নাস্তা</label><select id="breakfast_habit"><option value="">নির্বাচন</option><option>সর্বদা</option><option>মাঝে মাঝে</option><option>কখনো না</option></select></div>
+          <div class="fld"><label>রাতের খাবারের সময়</label><select id="dinner_time"><option value="">নির্বাচন</option><option>রাত ৭টার আগে</option><option>৭-৯টা</option><option>৯-১১টা</option><option>১১টার পরে</option></select></div>
+          <div class="fld"><label>মশলার সহনশীলতা</label><select id="spice_tolerance"><option value="">নির্বাচন</option><option>মসলাবিহীন</option><option>হালকা</option><option>মাঝারি</option><option>ঝাল</option><option>অতি ঝাল</option></select></div>
+          <div class="fld"><label>পোরশন সাইজ পছন্দ</label><select id="portion_size_preference"><option value="">নির্বাচন</option><option>ছোট</option><option>মাঝারি</option><option>বড়</option><option>অতিরিক্ত বড়</option></select></div>
+          <div class="fld"><label>চিনির সংবেদনশীলতা</label><select id="sugar_sensitivity"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select></div>
+          <div class="fld"><label>লবণের সংবেদনশীলতা</label><select id="salt_sensitivity"><option value="">নির্বাচন</option><option>না</option><option>হালকা</option><option>মাঝারি</option><option>তীব্র</option></select></div>
+          <div class="fld"><label>গ্লুটেন অসহিষ্ণুতা</label><select id="gluten_intolerance"><option value="">নির্বাচন</option><option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option></select></div>
+          <div class="fld"><label>ল্যাকটোজ অসহিষ্ণুতা</label><select id="lactose_intolerance"><option value="">নির্বাচন</option><option>না</option><option>সন্দেহজনক</option><option>নির্ণয় হয়েছে</option></select></div>
+          <div class="fld"><label>মাছ (সাপ্তাহিক)</label><select id="fish_intake_weekly"><option value="">নির্বাচন</option><option>খাই না</option><option>১-২ বার</option><option>৩-৪ বার</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>মাংস (সাপ্তাহিক)</label><select id="meat_intake_weekly"><option value="">নির্বাচন</option><option>খাই না</option><option>১-২ বার</option><option>৩-৪ বার</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>ডিম (সাপ্তাহিক)</label><select id="egg_intake_weekly"><option value="">নির্বাচন</option><option>খাই না</option><option>১-৩টি</option><option>৪-৬টি</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>শাকসবজি</label><select id="vegetable_intake"><option value="">নির্বাচন</option><option>কম</option><option>মাঝারি</option><option>বেশি</option><option>অনেক বেশি</option></select></div>
+          <div class="fld"><label>ফল খাওয়া</label><select id="fruit_intake"><option value="">নির্বাচন</option><option>কম</option><option>মাঝারি</option><option>বেশি</option><option>প্রতিদিন</option></select></div>
+          <div class="fld"><label>প্রোবায়োটিক (দই ইত্যাদি)</label><select id="probiotic_intake"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রতিদিন</option></select></div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>খাদ্য অ্যালার্জি (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="food_allergies" value="বাদাম"><span>🥜 বাদাম</span></label>
+            <label class="ci"><input type="checkbox" name="food_allergies" value="ডিম"><span>🥚 ডিম</span></label>
+            <label class="ci"><input type="checkbox" name="food_allergies" value="দুধ"><span>🥛 দুধ</span></label>
+            <label class="ci"><input type="checkbox" name="food_allergies" value="সামুদ্রিক মাছ"><span>🐟 সামুদ্রিক মাছ</span></label>
+            <label class="ci"><input type="checkbox" name="food_allergies" value="গম/গ্লুটেন"><span>🌾 গম/গ্লুটেন</span></label>
+            <label class="ci"><input type="checkbox" name="food_allergies" value="সয়া"><span>🫘 সয়া</span></label>
+          </div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>বাংলাদেশি খাবারের পছন্দ (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="bd_food" value="ভাত-ডাল"><span>🍚 ভাত-ডাল</span></label>
+            <label class="ci"><input type="checkbox" name="bd_food" value="ভর্তা"><span>🥘 ভর্তা</span></label>
+            <label class="ci"><input type="checkbox" name="bd_food" value="তরকারি"><span>🥗 তরকারি</span></label>
+            <label class="ci"><input type="checkbox" name="bd_food" value="ভাজি"><span>🥦 ভাজি</span></label>
+            <label class="ci"><input type="checkbox" name="bd_food" value="খিচুড়ি"><span>🍲 খিচুড়ি</span></label>
+            <label class="ci"><input type="checkbox" name="bd_food" value="বিরিয়ানি"><span>🍛 বিরিয়ানি</span></label>
+          </div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>পানীয় পছন্দ (একাধিক)</label>
+          <div class="chk-grid three">
+            <label class="ci"><input type="checkbox" name="beverages" value="পানি"><span>💧 পানি</span></label>
+            <label class="ci"><input type="checkbox" name="beverages" value="গ্রিন টি"><span>🍵 গ্রিন টি</span></label>
+            <label class="ci"><input type="checkbox" name="beverages" value="হার্বাল চা"><span>🌿 হার্বাল চা</span></label>
+            <label class="ci"><input type="checkbox" name="beverages" value="ফলের রস"><span>🍊 ফলের রস</span></label>
+            <label class="ci"><input type="checkbox" name="beverages" value="নারকেল পানি"><span>🥥 নারকেল পানি</span></label>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(9)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(9)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC K: স্বাস্থ্য লক্ষ্য ═══════ -->
+      <div class="sec-panel" id="sec10">
+        <div class="sec-hd">
+          <span class="sec-icon">🎯</span>
+          <div class="sec-title">বিভাগ ট — স্বাস্থ্য লক্ষ্য ও পছন্দ</div>
+          <div class="sec-desc">আপনার লক্ষ্য ও পছন্দ AI-কে আপনার জন্য সেরা পরিকল্পনা তৈরি করতে সাহায্য করবে।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>প্রাথমিক স্বাস্থ্য লক্ষ্য</label><select id="primary_health_goal"><option value="">নির্বাচন</option><option>ওজন কমানো</option><option>ওজন বাড়ানো</option><option>পেশি গঠন</option><option>হরমোন ভারসাম্য</option><option>শক্তি বৃদ্ধি</option><option>অন্ত্রের স্বাস্থ্য</option><option>সাধারণ সুস্থতা</option><option>রোগ ব্যবস্থাপনা</option><option>গর্ভাবস্থায় পুষ্টি</option></select></div>
+          <div class="fld"><label>দ্বিতীয় স্বাস্থ্য লক্ষ্য</label><select id="secondary_health_goal"><option value="">নির্বাচন</option><option>ওজন কমানো</option><option>হরমোন ভারসাম্য</option><option>শক্তি বৃদ্ধি</option><option>ঘুমের উন্নতি</option><option>চাপ কমানো</option><option>অন্যান্য</option></select></div>
+          <div class="fld"><label>লক্ষ্য ওজন <span class="unit">কেজি</span></label><input type="number" id="target_weight_kg" placeholder="৫৫" min="30" max="200" step="0.5"></div>
+          <div class="fld"><label>লক্ষ্যের সময়সীমা</label><select id="goal_timeline"><option value="">নির্বাচন</option><option>১ মাস</option><option>৩ মাস</option><option>৬ মাস</option><option>১ বছর</option><option>দীর্ঘমেয়াদি</option></select></div>
+          <div class="fld"><label>আগে ডায়েট করেছেন</label><select id="previous_diet_program"><option value="">নির্বাচন</option><option>না</option><option>হ্যাঁ — সফল</option><option>হ্যাঁ — আংশিক</option><option>হ্যাঁ — ব্যর্থ</option></select></div>
+          <div class="fld"><label>ডাইনিং পছন্দ</label><select id="dining_preference"><option value="">নির্বাচন</option><option>ডাইন-ইন</option><option>ডেলিভারি</option><option>টেকঅ্যাওয়ে</option><option>সব</option></select></div>
+          <div class="fld"><label>Foodpanda ব্যবহার</label><select id="foodpanda_use"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>প্রায়ই</option></select></div>
+          <div class="fld"><label>মেম্বারশিপ পছন্দ</label><select id="membership_tier_preference"><option value="">নির্বাচন</option><option>Basic</option><option>Silver</option><option>Gold</option><option>Platinum</option></select></div>
+          <div class="fld"><label>যোগাযোগের পছন্দ</label><select id="communication_pref_main"><option value="">নির্বাচন</option><option>WhatsApp</option><option>SMS</option><option>Email</option><option>সব</option></select></div>
+          <div class="fld"><label>ভাষার পছন্দ</label><select id="language_preference"><option value="bn">বাংলা</option><option value="en">English</option></select></div>
+          <div class="fld"><label>গবেষণায় তথ্য ব্যবহার</label><select id="data_research_consent"><option value="সম্মতি আছে">সম্মতি আছে</option><option value="নেই">নেই</option></select></div>
+          <div class="fld"><label>সাপ্তাহিক রিপোর্ট চান</label><select id="weekly_report_preference"><option value="হ্যাঁ">হ্যাঁ</option><option value="না">না</option></select></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="prevSec(10)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(10)">পরবর্তী বিভাগ →</button>
+        </div>
+      </div>
+
+      <!-- ═══════ SEC L: বিশেষ অ্যাক্সেস ═══════ -->
+      <div class="sec-panel" id="sec11">
+        <div class="sec-hd">
+          <span class="sec-icon">🔧</span>
+          <div class="sec-title">বিভাগ ঠ — ভয়েস ও বিশেষ অ্যাক্সেস</div>
+          <div class="sec-desc">আপনার প্রযুক্তিগত পছন্দ ও বিশেষ চাহিদা।</div>
+        </div>
+        <div class="g3">
+          <div class="fld"><label>ভয়েস রেজিস্ট্রেশন পছন্দ</label><select id="voice_registration_preference"><option value="">নির্বাচন</option><option>না</option><option>হ্যাঁ — বাংলায়</option><option>হ্যাঁ — ইংরেজিতে</option></select></div>
+          <div class="fld"><label>স্মার্টফোন দক্ষতা</label><select id="smartphone_proficiency"><option value="">নির্বাচন</option><option>দক্ষ</option><option>মাঝারি</option><option>কম</option><option>সাহায্য লাগে</option></select></div>
+          <div class="fld"><label>ইন্টারনেটের মান</label><select id="internet_connection_quality"><option value="">নির্বাচন</option><option>ভালো</option><option>মাঝারি</option><option>দুর্বল</option><option>নেই</option></select></div>
+          <div class="fld"><label>SAR অ্যাপ ইনস্টল করেছেন</label><select id="app_installed"><option value="">নির্বাচন</option><option>না</option><option>Android</option><option>iOS</option><option>উভয়</option></select></div>
+          <div class="fld"><label>ভয়েস অর্ডার পছন্দ</label><select id="voice_order_preference"><option value="">নির্বাচন</option><option>না</option><option>হ্যাঁ — বাংলায়</option><option>হ্যাঁ — ইংরেজিতে</option></select></div>
+          <div class="fld"><label>স্টাফ সহায়তায় অর্ডার</label><select id="staff_assisted_order"><option value="">নির্বাচন</option><option>না</option><option>প্রয়োজনে</option><option>সর্বদা</option></select></div>
+          <div class="fld"><label>কর্পোরেট ওয়েলনেস প্রোগ্রাম</label><select id="corporate_wellness_program"><option value="">নির্বাচন</option><option>না</option><option>হ্যাঁ</option></select></div>
+          <div class="fld"><label>মিল কিট ডেলিভারি</label><select id="meal_kit_delivery_preference"><option value="">নির্বাচন</option><option>না</option><option>সাপ্তাহিক</option><option>মাসিক</option></select></div>
+          <div class="fld"><label>পরিবারের সাবস্ক্রিপশন</label><select id="family_subscription_interest"><option value="">নির্বাচন</option><option>না</option><option>১ জন</option><option>২ জন</option><option>পুরো পরিবার</option></select></div>
+          <div class="fld"><label>বাড়িতে রান্না করতে আগ্রহ</label><select id="home_cooking_interest"><option value="">নির্বাচন</option><option>না</option><option>মাঝে মাঝে</option><option>সর্বদা</option></select></div>
+          <div class="fld"><label>স্বাস্থ্য তথ্য শেয়ার</label><select id="health_progress_sharing"><option value="">নির্বাচন</option><option>না</option><option>SAR টিমের সাথে</option><option>ডাক্তারের সাথে</option><option>উভয়</option></select></div>
+        </div>
+        <div class="fld" style="margin-top:.85rem">
+          <label>শারীরিক প্রতিবন্ধকতা (একাধিক)</label>
+          <div class="chk-grid">
+            <label class="ci"><input type="checkbox" name="disability" value="দৃষ্টি সমস্যা"><span>👁️ দৃষ্টি সমস্যা</span></label>
+            <label class="ci"><input type="checkbox" name="disability" value="শ্রবণ সমস্যা"><span>👂 শ্রবণ সমস্যা</span></label>
+            <label class="ci"><input type="checkbox" name="disability" value="গতিশীলতার সমস্যা"><span>♿ গতিশীলতার সমস্যা</span></label>
+            <label class="ci"><input type="checkbox" name="disability" value="নেই"><span>✅ কোনো প্রতিবন্ধকতা নেই</span></label>
+          </div>
+        </div>
+
+        <div class="msg" id="msgFinal"></div>
+
+        <button class="btn-finish" onclick="saveAllMetrics()">
+          ✦ সম্পূর্ণ স্বাস্থ্য প্রোফাইল সেভ করুন
+        </button>
+        <div class="btn-row" style="margin-top:.85rem">
+          <button class="btn-back" onclick="prevSec(11)">← পিছনে</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="suc-panel" id="sucPanel">
+        <div class="suc-icon">✓</div>
+        <div class="suc-title">মেট্রিক্স সেভ হয়েছে!</div>
+        <p class="suc-txt">আপনার সম্পূর্ণ স্বাস্থ্য প্রোফাইল Supabase-এ সংরক্ষিত হয়েছে। AI এখন আপনার জন্য বিশ্লেষণ তৈরি করবে।</p>
+        <p class="suc-txt">পরের ধাপ: মাসিক সাবস্ক্রিপশন (৳ ৫০০) নিন এবং আজকের ব্যক্তিগতকৃত মেনু ও AI বিশ্লেষণ পান।</p>
+        <div>
+          <a href="payment.html" class="btn-gd">সাবস্ক্রিপশন নিন →</a>
+          <a href="dashboard.html" class="btn-gd" style="background:linear-gradient(135deg,var(--purple),var(--purple2))">ড্যাশবোর্ড →</a>
+        </div>
+      </div>
+
+    </div><!-- /fbody -->
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<script>
+const SUPA_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U'; // ← আপনার নতুন anon key
+
+const H = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+// Get customer ID from URL or localStorage
+const urlParams = new URLSearchParams(window.location.search);
+const CID = urlParams.get('cid') || localStorage.getItem('sar_cid');
+const CNAME = localStorage.getItem('sar_name') || 'গ্রাহক';
+
+// Set nav name
+document.getElementById('navName').textContent = CNAME;
+
+// Redirect if no customer ID
+if (!CID) {
+  alert('প্রথমে নিবন্ধন করুন।');
+  window.location.href = 'register.html';
+}
+
+// ── Section navigation ──
+let curSec = 0;
+const secNames = [
+  'বিভাগ ক: মৌলিক পরিমাপ','বিভাগ খ: রক্ত পরীক্ষা',
+  'বিভাগ গ: কিডনি/লিভার','বিভাগ ঘ: হরমোন',
+  'বিভাগ ঙ: নারী স্বাস্থ্য','বিভাগ চ: রোগ ইতিহাস',
+  'বিভাগ ছ: উপসর্গ','বিভাগ জ: মানসিক স্বাস্থ্য',
+  'বিভাগ ঝ: জীবনযাত্রা','বিভাগ ঞ: খাদ্যাভ্যাস',
+  'বিভাগ ট: স্বাস্থ্য লক্ষ্য','বিভাগ ঠ: বিশেষ অ্যাক্সেস'
+];
+
+function gotoSec(idx, btn) {
+  document.getElementById('sec' + curSec).classList.remove('active');
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+  curSec = idx;
+  document.getElementById('sec' + curSec).classList.add('active');
+  btn.classList.add('active');
+  updateOverall(idx);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextSec(idx) {
+  document.getElementById('sec' + idx).classList.remove('active');
+  const tabs = document.querySelectorAll('.stab');
+  tabs[idx].classList.remove('active');
+  tabs[idx].classList.add('done');
+  curSec = idx + 1;
+  if (curSec < 12) {
+    document.getElementById('sec' + curSec).classList.add('active');
+    tabs[curSec].classList.add('active');
+    updateOverall(curSec);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevSec(idx) {
+  document.getElementById('sec' + idx).classList.remove('active');
+  curSec = idx - 1;
+  document.getElementById('sec' + curSec).classList.add('active');
+  document.querySelectorAll('.stab').forEach((t, i) => {
+    t.classList.remove('active');
+    if (i === curSec) t.classList.add('active');
+  });
+  updateOverall(curSec);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateOverall(idx) {
+  const pct = ((idx + 1) / 12 * 100).toFixed(0);
+  document.getElementById('overallBar').style.width = pct + '%';
+  document.getElementById('progPct').textContent = `বিভাগ ${idx + 1}/১২`;
+  document.getElementById('progLbl').textContent = secNames[idx];
+}
+
+// ── WHR ──
+function calcWHR() {
+  const w = parseFloat(document.getElementById('waist_cm').value) || 0;
+  const h = parseFloat(document.getElementById('hip_cm').value) || 1;
+  if (w > 0 && h > 0) {
+    const r = (w / h).toFixed(3);
+    const el = document.getElementById('whrVal');
+    el.textContent = r;
+    el.style.color = r > 0.85 ? '#F87171' : '#34D399';
+  }
+}
+
+// ── Stress slider ──
+function upStress(v) {
+  const lbl = document.getElementById('stressLbl');
+  lbl.style.left = `calc(${(v - 1) / 9 * 100}% + ${8 - ((v - 1) / 9) * 16}px)`;
+  lbl.textContent = v;
+  const colors = ['', '#34D399', '#34D399', '#34D399', '#A3E635', '#FCD34D', '#FCD34D', '#FB923C', '#FB923C', '#F87171', '#EF4444'];
+  lbl.parentElement.style.background = `linear-gradient(to right, ${colors[v] || '#E91E8C'}, transparent)`;
+}
+
+// ── Helpers ──
+function g(id) { const e = document.getElementById(id); return e ? e.value?.trim() || null : null; }
+function gn(id) { const v = g(id); return v ? parseFloat(v) : null; }
+function chk(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value); }
+
+// ── COLLECT ALL 250 METRICS ──
+function collectAll() {
+  return {
+    customer_id: CID,
+    // A
+    age_calculated: gn('age_calculated'),
+    waist_cm: gn('waist_cm'),
+    hip_cm: gn('hip_cm'),
+    waist_hip_ratio: gn('waist_cm') && gn('hip_cm') ? parseFloat((gn('waist_cm') / gn('hip_cm')).toFixed(3)) : null,
+    // B
+    bp_systolic: gn('bp_systolic'),
+    bp_diastolic: gn('bp_diastolic'),
+    bp_status: g('bp_status'),
+    heart_rate_resting: gn('heart_rate_resting'),
+    blood_oxygen_percent: gn('blood_oxygen_percent'),
+    body_temperature: gn('body_temperature'),
+    respiratory_rate: gn('respiratory_rate'),
+    fasting_glucose: gn('fasting_glucose'),
+    postprandial_glucose: gn('postprandial_glucose'),
+    hba1c: gn('hba1c'),
+    cholesterol_total: gn('cholesterol_total'),
+    cholesterol_ldl: gn('cholesterol_ldl'),
+    cholesterol_hdl: gn('cholesterol_hdl'),
+    triglycerides: gn('triglycerides'),
+    hemoglobin: gn('hemoglobin'),
+    hematocrit: gn('hematocrit'),
+    serum_ferritin: gn('serum_ferritin'),
+    serum_iron: gn('serum_iron'),
+    tibc: gn('tibc'),
+    vitamin_d: gn('vitamin_d'),
+    vitamin_b12: gn('vitamin_b12'),
+    folate: gn('folate'),
+    calcium: gn('calcium'),
+    magnesium: gn('magnesium'),
+    zinc: gn('zinc'),
+    // C
+    alt_sgpt: gn('alt_sgpt'), ast_sgot: gn('ast_sgot'), alp: gn('alp'), ggt: gn('ggt'),
+    bilirubin_total: gn('bilirubin_total'), bilirubin_direct: gn('bilirubin_direct'),
+    total_protein: gn('total_protein'), albumin: gn('albumin'),
+    prothrombin_time: gn('prothrombin_time'), fibrinogen: gn('fibrinogen'),
+    creatinine: gn('creatinine'), urea: gn('urea'), uric_acid: gn('uric_acid'),
+    egfr: gn('egfr'), sodium: gn('sodium'), potassium: gn('potassium'),
+    chloride: gn('chloride'), bicarbonate: gn('bicarbonate'),
+    crp: gn('crp'), esr: gn('esr'),
+    // D
+    tsh: gn('tsh'), t3_total: gn('t3_total'), t4_total: gn('t4_total'),
+    free_t3: gn('free_t3'), free_t4: gn('free_t4'),
+    thyroid_status: g('thyroid_status'),
+    estrogen: gn('estrogen'), progesterone: gn('progesterone'),
+    lh: gn('lh'), fsh: gn('fsh'), testosterone: gn('testosterone'),
+    prolactin: gn('prolactin'), insulin_level: gn('insulin_level'),
+    homa_ir: gn('homa_ir'), cortisol_morning: gn('cortisol_morning'),
+    // E
+    menstrual_status: g('menstrual_status'),
+    last_period_date: g('last_period_date'),
+    cycle_length_days: gn('cycle_length_days'),
+    menstruation_duration_days: gn('menstruation_duration_days'),
+    flow_amount: g('flow_amount'), menstrual_pain: g('menstrual_pain'),
+    pms_symptoms: chk('pms'),
+    pregnancy_status: g('pregnancy_status'), breastfeeding: g('breastfeeding'),
+    number_of_pregnancies: gn('number_of_pregnancies'),
+    number_of_children: gn('number_of_children'),
+    miscarriage_history: g('miscarriage_history'),
+    last_delivery_date: g('last_delivery_date'),
+    cesarean_history: g('cesarean_history'),
+    pcos_status: g('pcos_status'), endometriosis_status: g('endometriosis_status'),
+    uterine_fibroid: g('uterine_fibroid'), ovarian_cyst: g('ovarian_cyst'),
+    cervical_screening: g('cervical_screening'), breast_examination: g('breast_examination'),
+    hormonal_contraception: g('hormonal_contraception'),
+    menopause_age: gn('menopause_age'), hrt_status: g('hrt_status'),
+    vaginal_discharge: g('vaginal_discharge'), pelvic_pain: g('pelvic_pain'),
+    // F
+    diabetes_type: g('diabetes_type'), hypertension_status: g('hypertension_status'),
+    heart_disease: chk('heart_disease'),
+    asthma_status: g('asthma_status'), copd_status: g('copd_status'),
+    fatty_liver_grade: g('fatty_liver_grade'), hepatitis_type: g('hepatitis_type'),
+    ibs_type: g('ibs_type'), kidney_disease_stage: g('kidney_disease_stage'),
+    thyroid_disease: g('thyroid_disease'),
+    cancer_history: g('cancer_history'), stroke_history: g('stroke_history'),
+    migraine_frequency: g('migraine_frequency'), epilepsy_status: g('epilepsy_status'),
+    osteoporosis_status: g('osteoporosis_status'), anemia_type: g('anemia_type'),
+    tuberculosis_history: g('tuberculosis_history'),
+    family_diabetes: g('family_diabetes'), family_heart_disease: g('family_heart_disease'),
+    family_cancer: g('family_cancer'), family_hypertension: g('family_hypertension'),
+    family_thyroid: g('family_thyroid'),
+    allergy_types: chk('allergy_types'),
+    surgery_history: g('surgery_history'),
+    // G
+    fatigue_level: g('fatigue_level'), frequent_urination: g('frequent_urination'),
+    excessive_thirst: g('excessive_thirst'), weight_change: g('weight_change'),
+    appetite_change: g('appetite_change'), bloating_gas: g('bloating_gas'),
+    heartburn_acidity: g('heartburn_acidity'), nausea_vomiting: g('nausea_vomiting'),
+    diarrhea_frequency: g('diarrhea_frequency'), constipation_frequency: g('constipation_frequency'),
+    headache_frequency: g('headache_frequency'), dizziness: g('dizziness'),
+    chest_pain: g('chest_pain'), shortness_of_breath: g('shortness_of_breath'),
+    limb_swelling: g('limb_swelling'), limb_tingling: g('limb_tingling'),
+    back_pain: g('back_pain'), hair_loss: g('hair_loss'),
+    brittle_nails: g('brittle_nails'), dry_skin: g('dry_skin'),
+    night_sweats: g('night_sweats'), hot_flashes: g('hot_flashes'),
+    cold_intolerance: g('cold_intolerance'), cough_type: g('cough_type'),
+    frequent_infections: g('frequent_infections'),
+    // H
+    overall_mood: g('overall_mood'), anxiety_level: g('anxiety_level'),
+    depression_frequency: g('depression_frequency'), sleep_problems: g('sleep_problems'),
+    memory_concentration: g('memory_concentration'), anger_irritability: g('anger_irritability'),
+    emotional_eating: g('emotional_eating'), loneliness: g('loneliness'),
+    stress_level: parseInt(document.getElementById('stress_level')?.value) || 5,
+    mental_health_treatment: g('mental_health_treatment'),
+    body_image_concern: g('body_image_concern'),
+    social_dining_preference: g('social_dining_preference'),
+    work_stress: g('work_stress'), family_relationship_stress: g('family_relationship_stress'),
+    self_confidence: g('self_confidence'),
+    // I
+    sleep_hours_daily: gn('sleep_hours_daily'), sleep_quality: g('sleep_quality'),
+    sleep_time: g('sleep_time'), wake_time: g('wake_time'),
+    activity_level: g('activity_level'),
+    exercise_types: chk('exercise_types'),
+    exercise_days_per_week: gn('exercise_days_per_week'),
+    sitting_hours_daily: gn('sitting_hours_daily'),
+    smoking_status: g('smoking_status'), pan_jorda_use: g('pan_jorda_use'),
+    alcohol_use: g('alcohol_use'), water_intake_liters: gn('water_intake_liters'),
+    tea_coffee_cups: g('tea_coffee_cups'), occupation_type: g('occupation_type'),
+    commute_time_hours: gn('commute_time_hours'), screen_time_hours: gn('screen_time_hours'),
+    sun_exposure_hours: gn('sun_exposure_hours'), cooking_time: g('cooking_time'),
+    eating_out_frequency: g('eating_out_frequency'), fastfood_frequency: g('fastfood_frequency'),
+    social_support: g('social_support'), spiritual_practice: g('spiritual_practice'),
+    leisure_activities: chk('leisure'),
+    environmental_pollution: g('environmental_pollution'),
+    current_medications: g('current_medications'),
+    // J
+    dietary_pattern: g('dietary_pattern'),
+    religious_food_restriction: g('religious_food_restriction'),
+    meals_per_day: gn('meals_per_day'), breakfast_habit: g('breakfast_habit'),
+    dinner_time: g('dinner_time'), gluten_intolerance: g('gluten_intolerance'),
+    lactose_intolerance: g('lactose_intolerance'),
+    food_allergies: chk('food_allergies'),
+    spice_tolerance: g('spice_tolerance'),
+    portion_size_preference: g('portion_size_preference'),
+    sugar_sensitivity: g('sugar_sensitivity'), salt_sensitivity: g('salt_sensitivity'),
+    preferred_beverages: chk('beverages'),
+    bangladeshi_food_preference: chk('bd_food'),
+    fish_intake_weekly: g('fish_intake_weekly'), meat_intake_weekly: g('meat_intake_weekly'),
+    egg_intake_weekly: g('egg_intake_weekly'), vegetable_intake: g('vegetable_intake'),
+    fruit_intake: g('fruit_intake'), probiotic_intake: g('probiotic_intake'),
+    // K
+    primary_health_goal: g('primary_health_goal'),
+    secondary_health_goal: g('secondary_health_goal'),
+    target_weight_kg: gn('target_weight_kg'), goal_timeline: g('goal_timeline'),
+    previous_diet_program: g('previous_diet_program'),
+    dining_preference: g('dining_preference'), foodpanda_use: g('foodpanda_use'),
+    membership_tier_preference: g('membership_tier_preference'),
+    language_preference: g('language_preference'),
+    data_research_consent: g('data_research_consent'),
+    weekly_report_preference: g('weekly_report_preference'),
+    // L
+    voice_registration_preference: g('voice_registration_preference'),
+    physical_disability: chk('disability'),
+    smartphone_proficiency: g('smartphone_proficiency'),
+    internet_connection_quality: g('internet_connection_quality'),
+    app_installed: g('app_installed'),
+    voice_order_preference: g('voice_order_preference'),
+    staff_assisted_order: g('staff_assisted_order'),
+    referral_code_used: localStorage.getItem('sar_ref') || null,
+    corporate_wellness_program: g('corporate_wellness_program'),
+    meal_kit_delivery_preference: g('meal_kit_delivery_preference'),
+    family_subscription_interest: g('family_subscription_interest'),
+    home_cooking_interest: g('home_cooking_interest'),
+    health_progress_sharing: g('health_progress_sharing'),
+  };
+}
+
+// ── SAVE ──
+async function saveAllMetrics() {
+  const loader = document.getElementById('loader');
+  const lt = document.getElementById('loadTxt');
+  loader.classList.add('show');
+  lt.textContent = 'সমস্ত মেট্রিক্স সেভ করা হচ্ছে...';
+
+  try {
+    const data = collectAll();
+
+    // Check if metrics already exist for this customer
+    const chkRes = await fetch(
+      `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=id`,
+      { headers: H }
+    );
+    const existing = await chkRes.json();
+
+    let res;
+    if (existing && existing.length > 0) {
+      // UPDATE existing record
+      res = await fetch(
+        `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}`,
+        { method: 'PATCH', headers: { ...H, 'Prefer': 'return=minimal' }, body: JSON.stringify(data) }
+      );
+    } else {
+      // INSERT new record
+      res = await fetch(
+        `${SUPA_URL}/rest/v1/customer_metrics`,
+        { method: 'POST', headers: H, body: JSON.stringify(data) }
+      );
+    }
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'মেট্রিক্স সেভ করতে সমস্যা হয়েছে');
+    }
+
+    lt.textContent = 'AI বিশ্লেষণ অনুরোধ পাঠানো হচ্ছে...';
+
+    // Log notification for admin to run analysis
+    await fetch(`${SUPA_URL}/rest/v1/notifications_log`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        customer_id: CID,
+        notification_type: 'whatsapp',
+        trigger_event: 'registration',
+        message_preview: `${CNAME}-এর স্বাস্থ্য মেট্রিক্স আপডেট হয়েছে। AI বিশ্লেষণের জন্য অ্যাডমিন প্যানেলে যান।`,
+        status: 'pending'
+      })
+    });
+
+    loader.classList.remove('show');
+
+    // Show success
+    document.getElementById('sec11').classList.remove('active');
+    document.getElementById('sucPanel').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    loader.classList.remove('show');
+    const msgEl = document.getElementById('msgFinal');
+    msgEl.className = 'msg err';
+    msgEl.textContent = '❌ সমস্যা: ' + err.message;
+    msgEl.style.display = 'block';
+    console.error(err);
+  }
+}
+
+// Init
+upStress(5);
+updateOverall(0);
+</script>
+</body>
+</html>

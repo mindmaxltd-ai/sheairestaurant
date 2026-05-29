@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>কিচেন — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0D0D1A;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050510;color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.07;animation:orbF 18s ease-in-out infinite}
+.o1{width:700px;height:700px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:9s}
+.o3{width:400px;height:400px;background:var(--green);top:35%;left:40%;animation-delay:18s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-size:80px 80px}
+
+.app{position:relative;z-index:10;min-height:100vh}
+
+/* TOP BAR */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 1.5rem;
+  background:rgba(5,5,20,.85);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+.bar-logo{display:flex;align-items:center;gap:.75rem}
+.bar-logo-icon{width:40px;height:40px;border-radius:12px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem}
+.bar-logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.bar-center{display:flex;gap:1rem;align-items:center}
+.bar-time{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:.1em}
+.bar-date{font-size:.8rem;color:rgba(255,255,255,.4)}
+.bar-right{display:flex;gap:.75rem;align-items:center}
+.bar-stat{display:flex;flex-direction:column;align-items:center;
+  background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:.4rem .75rem}
+.bar-stat-num{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700}
+.bar-stat-label{font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:.08em;text-transform:uppercase}
+.bar-stat.alert .bar-stat-num{color:var(--red2)}
+.bar-stat.warn .bar-stat-num{color:var(--yellow2)}
+.bar-stat.ok .bar-stat-num{color:var(--green2)}
+.refresh-btn{padding:.45rem 1rem;border-radius:50px;font-size:.78rem;font-weight:600;
+  background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;
+  border:none;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:.4rem}
+.refresh-btn:hover{opacity:.9;transform:translateY(-1px)}
+
+/* FILTER TABS */
+.filter-bar{padding:.75rem 1.5rem;display:flex;gap:.5rem;flex-wrap:wrap;
+  background:rgba(5,5,20,.6);border-bottom:1px solid var(--border)}
+.filter-tab{padding:.4rem 1rem;border-radius:50px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:all .25s;border:1px solid var(--border);
+  background:var(--glass);color:rgba(255,255,255,.5)}
+.filter-tab.active{color:#fff}
+.filter-tab.all.active{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border-color:rgba(255,255,255,.2)}
+.filter-tab.dm.active{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:var(--yellow2)}
+.filter-tab.ob.active{background:rgba(107,33,168,.15);border-color:rgba(107,33,168,.3);color:var(--purple2)}
+.filter-tab.fl.active{background:rgba(5,150,105,.15);border-color:rgba(5,150,105,.3);color:var(--green2)}
+.filter-tab.ib.active{background:rgba(233,30,140,.15);border-color:rgba(233,30,140,.3);color:var(--pink2)}
+.filter-tab.pr.active{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red2)}
+.filter-tab.urgent.active{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4);color:var(--red2);animation:urgentPulse 1.5s ease infinite}
+@keyframes urgentPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+/* COLUMNS */
+.columns-wrap{padding:1rem 1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;min-height:calc(100vh - 140px)}
+@media(max-width:900px){.columns-wrap{grid-template-columns:1fr}}
+
+/* COLUMN */
+.col-header{display:flex;align-items:center;justify-content:space-between;
+  padding:.6rem 1rem;border-radius:12px 12px 0 0;margin-bottom:0;
+  border:1px solid var(--border);border-bottom:none}
+.col-header.queued{background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05))}
+.col-header.cooking{background:linear-gradient(135deg,rgba(233,30,140,.15),rgba(107,33,168,.1))}
+.col-header.done{background:linear-gradient(135deg,rgba(5,150,105,.15),rgba(5,150,105,.05))}
+.col-title{font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.col-count{font-family:'Space Mono',monospace;font-size:.8rem;
+  background:rgba(255,255,255,.1);border-radius:50px;padding:.1rem .5rem}
+.col-body{background:rgba(10,10,20,.5);border:1px solid var(--border);border-top:none;
+  border-radius:0 0 12px 12px;min-height:400px;display:flex;flex-direction:column;gap:.75rem;padding:.75rem}
+
+/* ORDER CARD */
+.order-card{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:14px;padding:1rem;transition:all .3s;cursor:pointer;
+  animation:cardIn .4s ease both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.order-card:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
+.order-card.urgent{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05);
+  animation:urgentCard 2s ease infinite}
+@keyframes urgentCard{0%,100%{border-color:rgba(239,68,68,.4)}50%{border-color:rgba(239,68,68,.7)}}
+.order-card.vip{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.6rem}
+.order-num{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--yellow2);font-weight:700}
+.card-badges{display:flex;gap:.3rem;flex-wrap:wrap}
+.badge{padding:.12rem .45rem;border-radius:50px;font-size:.68rem;font-weight:700}
+.badge-type{background:rgba(107,33,168,.2);color:var(--purple2);border:1px solid rgba(107,33,168,.3)}
+.badge-urgent{background:rgba(239,68,68,.2);color:var(--red2);border:1px solid rgba(239,68,68,.3)}
+.badge-vip{background:rgba(245,158,11,.2);color:var(--yellow2);border:1px solid rgba(245,158,11,.3)}
+.badge-dm{background:rgba(245,158,11,.15);color:var(--yellow2);border:1px solid rgba(245,158,11,.25)}
+.badge-ob{background:rgba(107,33,168,.15);color:var(--purple2);border:1px solid rgba(107,33,168,.25)}
+.badge-fl{background:rgba(5,150,105,.15);color:var(--green2);border:1px solid rgba(5,150,105,.25)}
+.badge-ib{background:rgba(233,30,140,.15);color:var(--pink2);border:1px solid rgba(233,30,140,.25)}
+.badge-pr{background:rgba(239,68,68,.15);color:var(--red2);border:1px solid rgba(239,68,68,.25)}
+.card-items{margin-bottom:.6rem}
+.card-item{display:flex;align-items:center;gap:.5rem;padding:.25rem 0;
+  border-bottom:1px solid rgba(255,255,255,.04);font-size:.82rem;color:rgba(255,255,255,.7)}
+.card-item:last-child{border-bottom:none}
+.item-qty-badge{width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.card-footer{display:flex;justify-content:space-between;align-items:center}
+.timer{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;display:flex;align-items:center;gap:.35rem}
+.timer.green{color:var(--green2)}
+.timer.yellow{color:var(--yellow2)}
+.timer.red{color:var(--red2);animation:timerPulse .8s ease infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.4}}
+.payment-ok{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--green2)}
+.payment-pending{display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:var(--yellow2)}
+
+/* CARD ACTION BUTTONS */
+.card-actions{display:flex;gap:.4rem;margin-top:.6rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.05)}
+.card-btn{flex:1;padding:.4rem;border-radius:8px;font-size:.75rem;font-weight:600;
+  cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:.3rem}
+.card-btn.start{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-color:transparent}
+.card-btn.start:hover{opacity:.9}
+.card-btn.done{background:linear-gradient(135deg,var(--green),#10b981);color:#fff;border-color:transparent}
+.card-btn.done:hover{opacity:.9}
+.card-btn.detail{background:var(--glass);color:rgba(255,255,255,.7)}
+.card-btn.detail:hover{background:var(--glass2);color:#fff}
+
+/* RECIPE MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);
+  backdrop-filter:blur(8px);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.active{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:rgba(15,15,30,.95);border:1px solid var(--border2);border-radius:24px;
+  max-width:700px;width:100%;max-height:90vh;overflow-y:auto;
+  animation:modalIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{padding:1.5rem 2rem 1rem;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;
+  background:linear-gradient(135deg,var(--pink2),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);
+  border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:rgba(255,255,255,.5);transition:all .2s;flex-shrink:0;margin-top:.15rem}
+.modal-close:hover{background:rgba(255,255,255,.1);color:#fff}
+.modal-body{padding:1.5rem 2rem}
+.recipe-step{background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.recipe-step-num{display:inline-flex;width:24px;height:24px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  align-items:center;justify-content:center;font-size:.72rem;font-weight:700;margin-right:.5rem;flex-shrink:0}
+.recipe-step-text{font-size:.85rem;color:rgba(255,255,255,.75);line-height:1.6}
+.ing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem;margin-top:.75rem}
+.ing-chip{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;
+  padding:.35rem .6rem;font-size:.78rem;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:.35rem}
+.ing-chip::before{content:'•';color:var(--pink);font-size:.9rem}
+
+/* SOUND TOGGLE */
+.sound-toggle{width:34px;height:34px;border-radius:50%;background:var(--glass);
+  border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;transition:all .2s}
+.sound-toggle:hover{background:var(--glass2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;
+  background:linear-gradient(135deg,var(--green),#10b981);color:#fff;
+  padding:.65rem 1.25rem;border-radius:50px;font-size:.82rem;font-weight:600;
+  z-index:9999;transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:1100px){.columns-wrap{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.columns-wrap{grid-template-columns:1fr}.bar-center{display:none}}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="bar-logo">
+      <div class="bar-logo-icon">🌸</div>
+      <div>
+        <div class="bar-logo-text">SAR Kitchen</div>
+        <div style="font-size:.65rem;color:rgba(255,255,255,.35)">Kitchen Display System</div>
+      </div>
+    </div>
+    <div class="bar-center">
+      <div>
+        <div class="bar-time" id="clock">০০:০০:০০</div>
+        <div class="bar-date" id="dateDisplay"></div>
+      </div>
+    </div>
+    <div class="bar-right">
+      <div class="bar-stat alert"><div class="bar-stat-num" id="urgentCount">2</div><div class="bar-stat-label">জরুরি</div></div>
+      <div class="bar-stat warn"><div class="bar-stat-num" id="cookingCount">4</div><div class="bar-stat-label">রান্না</div></div>
+      <div class="bar-stat ok"><div class="bar-stat-num" id="doneCount">7</div><div class="bar-stat-label">সম্পন্ন</div></div>
+      <button class="sound-toggle" id="soundToggle" title="Sound On/Off" onclick="toggleSound()">🔔</button>
+      <button class="refresh-btn" onclick="loadOrders()">↻ রিফ্রেশ</button>
+      <a href="admin.html" style="text-decoration:none;padding:.45rem 1rem;border-radius:50px;font-size:.78rem;font-weight:600;background:var(--glass);color:rgba(255,255,255,.6);border:1px solid var(--border)">অ্যাডমিন →</a>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-tab all active" onclick="filterOrders('all',this)">সব অর্ডার</button>
+    <button class="filter-tab dm" onclick="filterOrders('DM',this)">🩸 ডায়াবেটিস</button>
+    <button class="filter-tab ob" onclick="filterOrders('OB',this)">⚖️ স্থূলতা</button>
+    <button class="filter-tab fl" onclick="filterOrders('FL',this)">🫀 ফ্যাটি লিভার</button>
+    <button class="filter-tab ib" onclick="filterOrders('IB',this)">🫁 IBS/গ্যাস্ট্রিক</button>
+    <button class="filter-tab pr" onclick="filterOrders('PR',this)">🤰 গর্ভাবস্থা</button>
+    <button class="filter-tab urgent" onclick="filterOrders('urgent',this)">🚨 জরুরি</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:rgba(255,255,255,.4)">
+      <span id="autoRefreshLabel">⏱️ ৩০ সেকেন্ডে রিফ্রেশ</span>
+    </div>
+  </div>
+
+  <!-- COLUMNS -->
+  <div class="columns-wrap">
+    <!-- QUEUED -->
+    <div>
+      <div class="col-header queued">
+        <div class="col-title">⏳ অপেক্ষায় <span class="col-count" id="queuedCount" style="color:var(--yellow2)">0</span></div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.4)">Queue</div>
+      </div>
+      <div class="col-body" id="queuedCol"></div>
+    </div>
+
+    <!-- COOKING -->
+    <div>
+      <div class="col-header cooking">
+        <div class="col-title">🍳 রান্না হচ্ছে <span class="col-count" id="cookingColCount" style="color:var(--pink2)">0</span></div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.4)">In Progress</div>
+      </div>
+      <div class="col-body" id="cookingCol"></div>
+    </div>
+
+    <!-- DONE / READY -->
+    <div>
+      <div class="col-header done">
+        <div class="col-title">✅ প্রস্তুত <span class="col-count" id="doneColCount" style="color:var(--green2)">0</span></div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.4)">Ready</div>
+      </div>
+      <div class="col-body" id="doneCol"></div>
+    </div>
+  </div>
+
+</div><!-- .app -->
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="recipeModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">রেসিপি বিবরণ</div>
+        <div id="modalOrderNum" style="font-family:'Space Mono',monospace;font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.25rem"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+let soundEnabled = true;
+let currentFilter = 'all';
+let allOrders = [];
+
+// CLOCK
+function updateClock() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('clock').textContent =
+    toBN(pad(now.getHours())) + ':' + toBN(pad(now.getMinutes())) + ':' + toBN(pad(now.getSeconds()));
+  const days = ['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
+  const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+  document.getElementById('dateDisplay').textContent =
+    days[now.getDay()] + ', ' + toBN(now.getDate()) + ' ' + months[now.getMonth()] + ' ' + toBN(now.getFullYear());
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function toBN(n) { return String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]); }
+
+// SAMPLE DATA (loaded if Supabase has none)
+const sampleOrders = [
+  { id:'ord1', order_number:'ORD-20260528-1001', order_type:'dine_in', status:'pending',
+    items_json:[{name:'DM-11 Quinoa Plate',code:'DM',qty:1,upgrade:true},{name:'Seed Topping',code:'DM',qty:1,upgrade:false}],
+    table_number:'T-04', payment_status:'paid', created_at: new Date(Date.now()-8*60000).toISOString(),
+    priority:'urgent', disease:'DM' },
+  { id:'ord2', order_number:'ORD-20260528-1002', order_type:'delivery', status:'pending',
+    items_json:[{name:'PR-86 Foetal Nourish Plate',code:'PR',qty:1,upgrade:true}],
+    table_number:null, payment_status:'paid', created_at: new Date(Date.now()-5*60000).toISOString(),
+    priority:'normal', disease:'PR' },
+  { id:'ord3', order_number:'ORD-20260528-1003', order_type:'dine_in', status:'preparing',
+    items_json:[{name:'OB-23 Rainbow Bowl',code:'OB',qty:2,upgrade:false}],
+    table_number:'T-07', payment_status:'paid', created_at: new Date(Date.now()-12*60000).toISOString(),
+    priority:'vip', disease:'OB' },
+  { id:'ord4', order_number:'ORD-20260528-1004', order_type:'takeaway', status:'preparing',
+    items_json:[{name:'FL-44 Liver-Cleanse Plate',code:'FL',qty:1,upgrade:false}],
+    table_number:null, payment_status:'pending', created_at: new Date(Date.now()-18*60000).toISOString(),
+    priority:'normal', disease:'FL' },
+  { id:'ord5', order_number:'ORD-20260528-1005', order_type:'dine_in', status:'ready',
+    items_json:[{name:'IB-64 Gut-Soothe Bowl',code:'IB',qty:1,upgrade:false}],
+    table_number:'T-02', payment_status:'paid', created_at: new Date(Date.now()-22*60000).toISOString(),
+    priority:'normal', disease:'IB' },
+  { id:'ord6', order_number:'ORD-20260528-1006', order_type:'dine_in', status:'ready',
+    items_json:[{name:'DM-3 Cauliflower Stir Bowl',code:'DM',qty:1,upgrade:true}],
+    table_number:'T-01', payment_status:'paid', created_at: new Date(Date.now()-30*60000).toISOString(),
+    priority:'normal', disease:'DM' },
+];
+
+const recipeData = {
+  'DM': {
+    ingredients: ['কুইনোয়া', 'পালং শাক', 'মরিঙ্গা', 'করলা গুঁড়া', 'মেথি গুঁড়া', 'দারুচিনি গুঁড়া', 'নারকেল দুধ', 'হলুদ', 'আদা', 'রসুন'],
+    steps: ['কুইনোয়া ২০ মিনিট ভিজিয়ে রাখুন', 'করলা গুঁড়া, মেথি গুঁড়া ও দারুচিনি গুঁড়া মিশিয়ে নিন', 'নারকেল দুধে কুইনোয়া রান্না করুন', 'পালং শাক ও মরিঙ্গা হালকা ভাপ দিন', 'সব মিলিয়ে পরিবেশন করুন', 'সিড ক্রাঞ্চ টপিং ও চাটনি ১ যোগ করুন'],
+    time: '20 মিনিট', temp: '৭০°C'
+  },
+  'PR': {
+    ingredients: ['কুইনোয়া', 'ছোলার ডাল', 'মরিঙ্গা পাতা', 'পালং শাক', 'নারকেল দুধ', 'ডিম (সম্পূর্ণ সেদ্ধ)', 'আদা গুঁড়া', 'রেড রাসবেরি লিফ গুঁড়া', 'শতমূলী গুঁড়া', 'আমলকী'],
+    steps: ['⚠️ ডিম অবশ্যই ৭০°C বা তার বেশিতে রান্না করুন', 'কুইনোয়া আলাদা রান্না করুন', 'ছোলার ডাল নারকেল দুধে রান্না করুন', 'মরিঙ্গা পাতা ও পালং শাক আলাদা ভাপ দিন', '৩টি ঔষধি গুঁড়া মিশিয়ে দিন', 'ডিম সম্পূর্ণ সেদ্ধ করুন — কোনো কাঁচা অংশ থাকবে না'],
+    time: '25 মিনিট', temp: '৭০°C+ (ডিম)'
+  },
+  'OB': {
+    ingredients: ['বাঁধাকপি', 'গাজর', 'বিটরুট', 'ছোলা', 'কুইনোয়া', 'লেবু', 'জিরা', 'ধনেপাতা', 'গার্সিনিয়া গুঁড়া', 'গ্রিন কফি গুঁড়া'],
+    steps: ['সব সবজি তাজা ধুয়ে কুচি করুন', 'ছোলা সেদ্ধ করুন', 'কুইনোয়া রান্না করুন', 'লেবু-জিরার ড্রেসিং তৈরি করুন', '৩টি ঔষধি গুঁড়া মিশিয়ে দিন', 'বড় বাটিতে সব মিলিয়ে পরিবেশন করুন'],
+    time: '15 মিনিট', temp: 'কাঁচা + সেদ্ধ'
+  },
+  'FL': {
+    ingredients: ['হলুদ কুইনোয়া', 'সেদ্ধ বিটরুট-গাজর', 'তেল-মুক্ত ভাজা ছোলা', 'ধনেপাতা সালাদ', 'পোচড ডিম', 'মিল্ক থিস্টল গুঁড়া', 'ড্যান্ডেলিয়ন গুঁড়া', 'ভূমি আমলা গুঁড়া'],
+    steps: ['কুইনোয়া হলুদ দিয়ে রান্না করুন', 'বিটরুট ও গাজর সেদ্ধ করুন', 'ছোলা তেল ছাড়া বেক করুন', '৩টি লিভার-রক্ষাকারী গুঁড়া মিশিয়ে দিন', 'পোচড ডিম ডিটক্স শাকের উপর রাখুন', 'চাটনি ৪ দিয়ে পরিবেশন করুন'],
+    time: '22 মিনিট', temp: '৭০°C+ (ডিম)'
+  },
+  'IB': {
+    ingredients: ['GF ওটস', 'নারকেল দুধ', 'কলা', 'এলাচ', 'দারুচিনি', 'স্লিপারি এলম গুঁড়া', 'মৌরি বীজ গুঁড়া', 'জিরা গুঁড়া'],
+    steps: ['ওটস নারকেল দুধে ১৫ মিনিট ভিজিয়ে রাখুন', 'মাঝারি আঁচে রান্না করুন, নাড়তে থাকুন', '৩টি পেট-শান্তকারী গুঁড়া মেশান', 'কলা ও এলাচ যোগ করুন', 'সেদ্ধ আপেল ও আদা দিয়ে পরিবেশন করুন', 'চাটনি ১ পাশে রাখুন'],
+    time: '12 মিনিট', temp: 'গরম, জ্বাল কম'
+  }
+};
+
+// LOAD ORDERS
+async function loadOrders() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/orders?status=in.(pending,confirmed,preparing,ready)&order=created_at.asc&select=*`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    const data = await res.json();
+    allOrders = (data && data.length) ? data.map(processOrder) : sampleOrders;
+  } catch {
+    allOrders = sampleOrders;
+  }
+  renderOrders();
+  updateCounters();
+}
+
+function processOrder(o) {
+  if (typeof o.items_json === 'string') o.items_json = JSON.parse(o.items_json);
+  const items = Array.isArray(o.items_json) ? o.items_json : [];
+  const disease = items.length && items[0].code ? items[0].code : 'DM';
+  return { ...o, disease, priority: o.priority || 'normal' };
+}
+
+function getElapsed(created) {
+  return Math.floor((Date.now() - new Date(created).getTime()) / 60000);
+}
+
+function timerClass(mins, status) {
+  if (status === 'ready') return 'green';
+  if (mins > 25) return 'red';
+  if (mins > 15) return 'yellow';
+  return 'green';
+}
+
+function catBadge(code) {
+  const map = { DM:'dm ডায়াবেটিস', OB:'ob স্থূলতা', FL:'fl ফ্যাটি লিভার', IB:'ib IBS', PR:'pr গর্ভাবস্থা' };
+  const [cls, label] = (map[code] || 'dm DM').split(' ');
+  return `<span class="badge badge-${cls}">${label}</span>`;
+}
+
+function buildCard(o) {
+  const mins = getElapsed(o.created_at);
+  const tClass = timerClass(mins, o.status);
+  const isUrgent = o.priority === 'urgent' || mins > 20;
+  const isVip = o.priority === 'vip';
+  const items = Array.isArray(o.items_json) ? o.items_json : [];
+
+  const payBadge = o.payment_status === 'paid'
+    ? `<span class="payment-ok">✓ পেমেন্ট</span>`
+    : `<span class="payment-pending">⚠️ পেমেন্ট বাকি</span>`;
+
+  const actionBtns = o.status === 'pending'
+    ? `<button class="card-btn start" onclick="updateStatus('${o.id}','preparing')">▶ শুরু করুন</button>`
+    : o.status === 'preparing'
+    ? `<button class="card-btn done" onclick="updateStatus('${o.id}','ready')">✓ প্রস্তুত</button>`
+    : `<button class="card-btn done" onclick="updateStatus('${o.id}','delivered')">🏁 ডেলিভার</button>`;
+
+  return `
+    <div class="order-card ${isUrgent?'urgent':''} ${isVip&&!isUrgent?'vip':''}" data-disease="${o.disease}" data-urgent="${isUrgent}" data-id="${o.id}">
+      <div class="card-top">
+        <div class="order-num">${o.order_number}</div>
+        <div class="card-badges">
+          ${catBadge(o.disease)}
+          ${isUrgent?'<span class="badge badge-urgent">🚨 জরুরি</span>':''}
+          ${isVip&&!isUrgent?'<span class="badge badge-vip">⭐ VIP</span>':''}
+          <span class="badge badge-type">${o.order_type === 'dine_in' ? '🪑 ডাইন-ইন' : o.order_type === 'delivery' ? '🛵 ডেলিভারি' : '📦 টেকঅ্যাওয়ে'}</span>
+        </div>
+      </div>
+      ${o.table_number ? `<div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.4rem">টেবিল: ${o.table_number}</div>` : ''}
+      <div class="card-items">
+        ${items.map(it => `
+          <div class="card-item">
+            <span class="item-qty-badge">${it.qty || 1}</span>
+            ${it.name || 'অর্ডার আইটেম'}
+            ${it.upgrade ? '<span style="font-size:.68rem;color:var(--pink2);margin-left:auto">+আপগ্রেড</span>' : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="card-footer">
+        <div class="timer ${tClass}">⏱ ${mins} মিনিট</div>
+        ${payBadge}
+      </div>
+      <div class="card-actions">
+        ${actionBtns}
+        <button class="card-btn detail" onclick="showRecipe('${o.id}','${o.disease}','${o.order_number}')">📋 রেসিপি</button>
+      </div>
+    </div>`;
+}
+
+function renderOrders() {
+  const qCol = document.getElementById('queuedCol');
+  const cCol = document.getElementById('cookingCol');
+  const dCol = document.getElementById('doneCol');
+  qCol.innerHTML = ''; cCol.innerHTML = ''; dCol.innerHTML = '';
+
+  let filtered = allOrders;
+  if (currentFilter !== 'all' && currentFilter !== 'urgent') {
+    filtered = allOrders.filter(o => o.disease === currentFilter);
+  } else if (currentFilter === 'urgent') {
+    filtered = allOrders.filter(o => o.priority === 'urgent' || getElapsed(o.created_at) > 20);
+  }
+
+  let qc = 0, cc = 0, dc = 0;
+  filtered.forEach(o => {
+    const html = buildCard(o);
+    if (o.status === 'pending' || o.status === 'confirmed') { qCol.innerHTML += html; qc++; }
+    else if (o.status === 'preparing') { cCol.innerHTML += html; cc++; }
+    else if (o.status === 'ready') { dCol.innerHTML += html; dc++; }
+  });
+
+  document.getElementById('queuedCount').textContent = toBN(qc);
+  document.getElementById('cookingColCount').textContent = toBN(cc);
+  document.getElementById('doneColCount').textContent = toBN(dc);
+
+  if (!qc) qCol.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.2);font-size:.85rem">কোনো অর্ডার নেই</div>';
+  if (!cc) cCol.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.2);font-size:.85rem">কোনো অর্ডার নেই</div>';
+  if (!dc) dCol.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.2);font-size:.85rem">কোনো অর্ডার নেই</div>';
+}
+
+function updateCounters() {
+  const urgent = allOrders.filter(o => o.priority === 'urgent' || getElapsed(o.created_at) > 20).length;
+  const cooking = allOrders.filter(o => o.status === 'preparing').length;
+  const done = allOrders.filter(o => o.status === 'ready').length;
+  document.getElementById('urgentCount').textContent = toBN(urgent);
+  document.getElementById('cookingCount').textContent = toBN(cooking);
+  document.getElementById('doneCount').textContent = toBN(done);
+}
+
+// UPDATE STATUS
+async function updateStatus(id, newStatus) {
+  const order = allOrders.find(o => o.id === id);
+  if (!order) return;
+
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ status: newStatus, updated_at: new Date().toISOString() })
+    });
+  } catch {}
+
+  order.status = newStatus;
+  renderOrders();
+  updateCounters();
+
+  const msgs = { preparing: '🍳 রান্না শুরু!', ready: '✅ প্রস্তুত — পরিবেশন করুন!', delivered: '🏁 ডেলিভার সম্পন্ন!' };
+  showToast(msgs[newStatus] || 'আপডেট হয়েছে');
+  if (soundEnabled) playBeep(newStatus === 'ready' ? 'ready' : 'update');
+}
+
+// FILTER
+function filterOrders(type, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = type;
+  renderOrders();
+}
+
+// RECIPE MODAL
+function showRecipe(id, disease, orderNum) {
+  const r = recipeData[disease] || recipeData['DM'];
+  document.getElementById('modalTitle').textContent = disease + ' — রান্নার নির্দেশনা';
+  document.getElementById('modalOrderNum').textContent = orderNum;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+      <span style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:.3rem .7rem;font-size:.78rem;color:var(--yellow2)">⏱ ${r.time}</span>
+      <span style="background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.2);border-radius:8px;padding:.3rem .7rem;font-size:.78rem;color:var(--pink2)">🌡 তাপমাত্রা: ${r.temp}</span>
+    </div>
+    <div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;margin-bottom:.5rem">উপাদান</div>
+    <div class="ing-grid">${r.ingredients.map(i => `<div class="ing-chip">${i}</div>`).join('')}</div>
+    <div style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;margin:1rem 0 .5rem">রান্নার ধাপ</div>
+    ${r.steps.map((s,i) => `
+      <div class="recipe-step">
+        <span class="recipe-step-num">${i+1}</span>
+        <span class="recipe-step-text">${s}</span>
+      </div>`).join('')}
+    <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:.85rem;margin-top:.75rem;font-size:.8rem;color:rgba(255,255,255,.6)">
+      ⚠️ SAR মানের নিয়ম: তেল সম্পূর্ণ নিষিদ্ধ। শুধু ঘি ব্যবহার করুন। চিনি ও গ্লুটেন নিষিদ্ধ। ৩টি রোগ-নির্দিষ্ট গুঁড়া অবশ্যই মিশাতে হবে।
+    </div>
+  `;
+  document.getElementById('recipeModal').classList.add('active');
+}
+function closeModal() { document.getElementById('recipeModal').classList.remove('active'); }
+
+// SOUND
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔔' : '🔕';
+  showToast(soundEnabled ? '🔔 সাউন্ড চালু' : '🔕 সাউন্ড বন্ধ');
+}
+
+function playBeep(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = type === 'ready' ? 880 : 660;
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(); osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+}
+
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// AUTO REFRESH
+setInterval(() => { loadOrders(); }, 30000);
+
+// Timer update every minute
+setInterval(() => { renderOrders(); updateCounters(); }, 60000);
+
+// INIT
+loadOrders();
+</script>
+</body>
+</html>

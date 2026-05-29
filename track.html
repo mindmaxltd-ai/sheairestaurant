@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>অর্ডার ট্র্যাকিং — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 20s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:8s}
+.o3{width:350px;height:350px;background:var(--yellow);top:40%;left:40%;animation-delay:15s}
+@keyframes orbF{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-15px) scale(1.04)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-size:72px 72px}
+
+/* RAINBOW TOP BAR */
+.rainbow-bar{height:3px;background:linear-gradient(90deg,#E91E8C,#F59E0B,#059669,#6B21A8,#E91E8C);background-size:200% 100%;animation:rainbowShift 4s linear infinite;position:fixed;top:0;left:0;right:0;z-index:999}
+@keyframes rainbowShift{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* HEADER */
+.header{position:fixed;top:3px;left:0;right:0;z-index:100;
+  background:rgba(10,10,20,.85);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);padding:.85rem 2rem;
+  display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:1rem}
+.back-btn{display:flex;align-items:center;gap:.5rem;
+  color:rgba(255,255,255,.5);text-decoration:none;font-size:.85rem;
+  padding:.4rem .8rem;border-radius:8px;border:1px solid var(--border);
+  background:var(--glass);transition:all .25s}
+.back-btn:hover{color:#fff;border-color:var(--border2)}
+.header-brand{font-family:'Playfair Display',serif;font-size:1.1rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-right{display:flex;align-items:center;gap:1rem}
+.live-badge{display:flex;align-items:center;gap:.45rem;
+  background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);
+  padding:.3rem .75rem;border-radius:50px;font-size:.75rem;color:var(--green2);
+  font-family:'Space Mono',monospace}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green2);animation:livePulse 1.5s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,0)}}
+
+/* MAIN LAYOUT */
+.main{position:relative;z-index:10;padding-top:5.5rem;padding-bottom:3rem;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem}
+
+/* ORDER SEARCH */
+.search-section{text-align:center;padding:2rem 0 1.5rem}
+.search-title{font-family:'Playfair Display',serif;font-size:2rem;
+  background:linear-gradient(135deg,var(--pink),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:.4rem}
+.search-sub{color:rgba(255,255,255,.4);font-size:.9rem;margin-bottom:1.5rem}
+.search-box{display:flex;gap:.75rem;max-width:480px;margin:0 auto}
+.search-input{flex:1;background:var(--glass2);border:1px solid var(--border2);
+  border-radius:12px;padding:.75rem 1.1rem;color:#fff;font-size:.9rem;
+  font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color .25s}
+.search-input:focus{border-color:var(--pink)}
+.search-input::placeholder{color:rgba(255,255,255,.3)}
+.search-btn{background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;border-radius:12px;padding:.75rem 1.4rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:600;
+  cursor:pointer;transition:opacity .25s;white-space:nowrap}
+.search-btn:hover{opacity:.85}
+
+/* ORDER CARD */
+.order-card{background:rgba(15,15,26,.8);backdrop-filter:blur(20px);
+  border:1px solid var(--border2);border-radius:20px;padding:1.75rem;
+  margin-bottom:1.5rem;position:relative;overflow:hidden}
+.order-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--pink),var(--purple))}
+.order-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem}
+.order-num{font-family:'Space Mono',monospace;font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:.25rem}
+.order-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:#fff}
+.status-pill{display:flex;align-items:center;gap:.5rem;padding:.4rem 1rem;
+  border-radius:50px;font-size:.78rem;font-weight:600;font-family:'Space Mono',monospace}
+.status-pill.preparing{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--yellow2)}
+.status-pill.delivered{background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2)}
+.status-pill.pending{background:rgba(233,30,140,.15);border:1px solid rgba(233,30,140,.3);color:var(--pink2)}
+.status-pill.out_for_delivery{background:rgba(107,33,168,.15);border:1px solid rgba(168,85,247,.3);color:var(--purple2)}
+
+/* TRACKING STEPS */
+.track-steps{margin:1.5rem 0}
+.track-label{font-size:.78rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem}
+.steps-grid{display:flex;align-items:flex-start;gap:0;position:relative;overflow-x:auto;padding-bottom:.5rem}
+.step-item{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.step-connector{position:absolute;top:18px;left:50%;right:-50%;height:2px;z-index:0}
+.step-item:not(:last-child)::after{content:'';position:absolute;top:18px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step-item.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green),var(--green2))}
+.step-item.active:not(:last-child)::after{background:linear-gradient(90deg,var(--yellow),var(--border))}
+.step-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;position:relative;z-index:2;border:2px solid var(--border);background:var(--dark2);
+  margin-bottom:.5rem;transition:all .3s}
+.step-item.done .step-icon{background:linear-gradient(135deg,var(--green),var(--green2));border-color:var(--green2);
+  box-shadow:0 0 14px rgba(5,150,105,.4)}
+.step-item.active .step-icon{background:linear-gradient(135deg,var(--yellow),var(--pink));border-color:var(--yellow2);
+  box-shadow:0 0 14px rgba(245,158,11,.4);animation:stepPulse 2s ease-in-out infinite}
+@keyframes stepPulse{0%,100%{box-shadow:0 0 14px rgba(245,158,11,.4)}50%{box-shadow:0 0 24px rgba(245,158,11,.7)}}
+.step-title{font-size:.7rem;font-weight:600;text-align:center;color:rgba(255,255,255,.4);margin-bottom:.15rem}
+.step-item.done .step-title{color:var(--green2)}
+.step-item.active .step-title{color:var(--yellow2)}
+.step-time{font-family:'Space Mono',monospace;font-size:.6rem;color:rgba(255,255,255,.25);text-align:center}
+.step-item.done .step-time{color:rgba(52,211,153,.6)}
+
+/* ETA BANNER */
+.eta-banner{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(233,30,140,.08));
+  border:1px solid rgba(245,158,11,.2);border-radius:14px;padding:1rem 1.25rem;
+  display:flex;align-items:center;justify-content:space-between;margin:1.25rem 0;flex-wrap:wrap;gap:.75rem}
+.eta-left{display:flex;align-items:center;gap:.75rem}
+.eta-icon{font-size:1.6rem}
+.eta-text{font-size:.8rem;color:rgba(255,255,255,.5)}
+.eta-time{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--yellow2)}
+.eta-right{font-size:.78rem;color:rgba(255,255,255,.4)}
+
+/* MAP AREA */
+.map-section{background:var(--glass);border:1px solid var(--border);border-radius:16px;
+  overflow:hidden;margin:1.25rem 0;position:relative;height:260px}
+.map-inner{width:100%;height:100%}
+.map-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.75rem;background:rgba(15,15,26,.6)}
+.map-placeholder-icon{font-size:2.5rem;opacity:.5}
+.map-placeholder-text{font-size:.85rem;color:rgba(255,255,255,.3);text-align:center}
+.map-overlay-badge{position:absolute;top:.75rem;right:.75rem;
+  background:rgba(10,10,20,.85);backdrop-filter:blur(12px);
+  border:1px solid var(--border2);border-radius:10px;padding:.4rem .8rem;
+  font-family:'Space Mono',monospace;font-size:.72rem;color:var(--pink2)}
+
+/* ORDER ITEMS */
+.items-section{margin:1.25rem 0}
+.items-title{font-size:.78rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem}
+.item-row{display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem .9rem;background:var(--glass);border-radius:10px;
+  border:1px solid var(--border);margin-bottom:.5rem;gap:1rem}
+.item-cat{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:.85rem;flex-shrink:0}
+.item-cat.dm{background:rgba(233,30,140,.15)}
+.item-cat.ob{background:rgba(245,158,11,.15)}
+.item-cat.fl{background:rgba(5,150,105,.15)}
+.item-cat.ib{background:rgba(107,33,168,.15)}
+.item-cat.pr{background:rgba(255,107,181,.15)}
+.item-info{flex:1}
+.item-name{font-size:.85rem;color:#fff;font-weight:500}
+.item-meta{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.1rem}
+.item-price{font-family:'Space Mono',monospace;font-size:.85rem;color:var(--yellow2);white-space:nowrap}
+.items-total{display:flex;justify-content:flex-end;padding:.6rem .9rem;
+  font-family:'Space Mono',monospace;font-size:.9rem;color:var(--pink2);font-weight:700}
+
+/* RIDER CARD */
+.rider-card{display:flex;align-items:center;gap:1rem;
+  background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-top:1.25rem}
+.rider-avatar{width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.rider-info{flex:1}
+.rider-name{font-weight:600;font-size:.9rem}
+.rider-role{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.1rem}
+.rider-contact{display:flex;gap:.5rem}
+.rider-btn{padding:.35rem .75rem;border-radius:8px;font-size:.75rem;cursor:pointer;
+  border:1px solid;font-family:'Hind Siliguri',sans-serif;font-weight:600;transition:all .25s}
+.rider-btn.call{background:rgba(5,150,105,.15);border-color:rgba(52,211,153,.3);color:var(--green2)}
+.rider-btn.msg{background:rgba(233,30,140,.15);border-color:rgba(233,30,140,.3);color:var(--pink2)}
+.rider-btn:hover{filter:brightness(1.2)}
+
+/* HELP SECTION */
+.help-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+.help-card{background:var(--glass);border:1px solid var(--border);border-radius:14px;
+  padding:1rem 1.25rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;
+  transition:all .25s;text-decoration:none}
+.help-card:hover{border-color:var(--border2);background:var(--glass2)}
+.help-icon{font-size:1.4rem;flex-shrink:0}
+.help-text{font-size:.83rem;color:rgba(255,255,255,.6)}
+.help-text b{color:#fff;display:block;font-size:.88rem;margin-bottom:.1rem}
+
+/* NO ORDER STATE */
+.no-order{text-align:center;padding:4rem 2rem}
+.no-order-icon{font-size:4rem;margin-bottom:1rem;opacity:.4}
+.no-order-text{font-size:1rem;color:rgba(255,255,255,.4)}
+
+/* RECENT ORDERS */
+.recent-section{margin-top:2rem}
+.recent-title{font-size:.78rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;
+  border-bottom:1px solid var(--border)}
+.recent-row{display:flex;align-items:center;gap:.75rem;padding:.65rem .9rem;
+  background:var(--glass);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:.5rem;cursor:pointer;transition:all .25s}
+.recent-row:hover{border-color:var(--border2);background:var(--glass2)}
+.recent-num{font-family:'Space Mono',monospace;font-size:.72rem;color:var(--pink2)}
+.recent-info{flex:1}
+.recent-name{font-size:.83rem;color:#fff}
+.recent-date{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.1rem}
+.recent-status{padding:.25rem .65rem;border-radius:50px;font-size:.68rem;font-weight:600}
+.recent-status.delivered{background:rgba(5,150,105,.15);color:var(--green2)}
+.recent-status.cancelled{background:rgba(220,38,38,.15);color:#F87171}
+
+/* NOTIFICATION TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:rgba(15,15,26,.95);backdrop-filter:blur(20px);
+  border:1px solid var(--green);border-radius:14px;padding:.9rem 1.25rem;
+  display:flex;align-items:center;gap:.75rem;max-width:320px;
+  transform:translateX(400px);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.toast.show{transform:translateX(0)}
+.toast-icon{font-size:1.2rem}
+.toast-text{font-size:.82rem;color:rgba(255,255,255,.8)}
+.toast-text b{color:var(--green2);display:block}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;z-index:500;
+  background:rgba(10,10,15,.85);backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.spinner{width:48px;height:48px;border:3px solid var(--border2);
+  border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:.85rem;color:rgba(255,255,255,.5)}
+.hidden{display:none!important}
+
+@media(max-width:640px){
+  .help-row{grid-template-columns:1fr}
+  .steps-grid{gap:0}
+  .step-icon{width:30px;height:30px;font-size:.8rem}
+  .header{padding:.7rem 1rem}
+  .container{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="rainbow-bar"></div>
+
+<!-- LOADING -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">অর্ডার খোঁজা হচ্ছে...</div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <a href="dashboard.html" class="back-btn">← ড্যাশবোর্ড</a>
+    <span class="header-brand">SAR ট্র্যাকিং</span>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      লাইভ আপডেট
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="container">
+    <!-- SEARCH -->
+    <div class="search-section">
+      <h1 class="search-title">🚴‍♀️ অর্ডার ট্র্যাক করুন</h1>
+      <p class="search-sub">আপনার অর্ডার নম্বর দিয়ে রিয়েল-টাইম স্ট্যাটাস দেখুন</p>
+      <div class="search-box">
+        <input type="text" class="search-input" id="orderSearchInput"
+          placeholder="অর্ডার নম্বর লিখুন (যেমন ORD-20250101-1234)"
+          value="">
+        <button class="search-btn" onclick="searchOrder()">খুঁজুন 🔍</button>
+      </div>
+    </div>
+
+    <!-- TRACKING CONTENT (hidden until search or auto-load) -->
+    <div id="trackingContent" class="hidden">
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <div class="order-num" id="displayOrderNum">ORD-XXXXXXXXXX</div>
+            <div class="order-name" id="displayOrderName">লোড হচ্ছে...</div>
+          </div>
+          <div class="status-pill preparing" id="statusPill">
+            <span>⏳</span> <span id="statusText">প্রস্তুত হচ্ছে</span>
+          </div>
+        </div>
+
+        <!-- TRACKING STEPS -->
+        <div class="track-steps">
+          <div class="track-label">ডেলিভারি অগ্রগতি</div>
+          <div class="steps-grid" id="stepsGrid">
+            <!-- Dynamically rendered -->
+          </div>
+        </div>
+
+        <!-- ETA BANNER -->
+        <div class="eta-banner" id="etaBanner">
+          <div class="eta-left">
+            <div class="eta-icon">⏱️</div>
+            <div>
+              <div class="eta-text">আনুমানিক সময়</div>
+              <div class="eta-time" id="etaTime">— মিনিট</div>
+            </div>
+          </div>
+          <div class="eta-right" id="etaAddress">ঠিকানা লোড হচ্ছে...</div>
+        </div>
+
+        <!-- MAP PLACEHOLDER -->
+        <div class="map-section" id="mapSection">
+          <div id="mapContainer" style="width:100%;height:100%"></div>
+          <div class="map-placeholder" id="mapPlaceholder">
+            <div class="map-placeholder-icon">🗺️</div>
+            <div class="map-placeholder-text">ডেলিভারি ম্যাপ<br><small>ডেলিভারি শুরু হলে লাইভ লোকেশন দেখাবে</small></div>
+          </div>
+          <div class="map-overlay-badge">📍 লাইভ লোকেশন</div>
+        </div>
+
+        <!-- ORDER ITEMS -->
+        <div class="items-section">
+          <div class="items-title">অর্ডার আইটেম</div>
+          <div id="orderItemsList">
+            <!-- Dynamically rendered -->
+          </div>
+          <div class="items-total" id="orderTotal"></div>
+        </div>
+
+        <!-- RIDER INFO -->
+        <div class="rider-card" id="riderCard" style="display:none">
+          <div class="rider-avatar">🚴‍♀️</div>
+          <div class="rider-info">
+            <div class="rider-name" id="riderName">ডেলিভারি স্টাফ</div>
+            <div class="rider-role">SAR ডেলিভারি পার্টনার</div>
+          </div>
+          <div class="rider-contact">
+            <button class="rider-btn call" id="riderCallBtn">📞 কল</button>
+            <button class="rider-btn msg">💬 মেসেজ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HELP ROW -->
+      <div class="help-row">
+        <a href="order.html" class="help-card">
+          <span class="help-icon">📋</span>
+          <div class="help-text">
+            <b>অর্ডার ইতিহাস</b>
+            সব অর্ডারের তালিকা দেখুন
+          </div>
+        </a>
+        <a href="javascript:void(0)" class="help-card" onclick="cancelOrder()">
+          <span class="help-icon">❌</span>
+          <div class="help-text">
+            <b>অর্ডার বাতিল</b>
+            প্রস্তুতি শুরুর আগে বাতিল করা যাবে
+          </div>
+        </a>
+        <a href="receipt.html" class="help-card" id="receiptLink">
+          <span class="help-icon">🧾</span>
+          <div class="help-text">
+            <b>রিসিট দেখুন</b>
+            পুষ্টিমান ও পরামর্শ সহ
+          </div>
+        </a>
+        <a href="javascript:void(0)" class="help-card" onclick="showSupport()">
+          <span class="help-icon">🆘</span>
+          <div class="help-text">
+            <b>সাহায্য দরকার?</b>
+            SAR সাপোর্টে যোগাযোগ করুন
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- NO ORDER STATE -->
+    <div id="noOrderState" class="no-order hidden">
+      <div class="no-order-icon">📦</div>
+      <div class="no-order-text">এই অর্ডার নম্বরে কোনো অর্ডার পাওয়া যায়নি।<br>অনুগ্রহ করে সঠিক নম্বর দিন।</div>
+    </div>
+
+    <!-- RECENT ORDERS -->
+    <div class="recent-section" id="recentSection">
+      <div class="recent-title">সাম্প্রতিক অর্ডার</div>
+      <div id="recentOrdersList">
+        <div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">
+          লোড হচ্ছে...
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <div class="toast-text"><b id="toastTitle">আপডেট</b><span id="toastMsg"></span></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+const STEPS_CONFIG = [
+  { key:'pending',           icon:'📝', title:'অর্ডার প্রাপ্ত',      desc:'অপেক্ষায়' },
+  { key:'confirmed',         icon:'✅', title:'নিশ্চিত',              desc:'নিশ্চিত হয়েছে' },
+  { key:'preparing',         icon:'👩‍🍳', title:'রান্না চলছে',          desc:'কিচেনে' },
+  { key:'ready',             icon:'🍱', title:'প্রস্তুত',              desc:'প্যাক হচ্ছে' },
+  { key:'out_for_delivery',  icon:'🚴‍♀️', title:'পথে আছে',             desc:'ডেলিভারিতে' },
+  { key:'delivered',         icon:'🏠', title:'পৌঁছে গেছে',           desc:'সম্পন্ন' },
+];
+
+const STATUS_ORDER = ['pending','confirmed','preparing','ready','out_for_delivery','delivered'];
+
+let currentOrderId = null;
+let refreshTimer = null;
+
+async function sbFetch(path){
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'}
+  });
+  return r.json();
+}
+
+async function searchOrder(){
+  const val = document.getElementById('orderSearchInput').value.trim();
+  if(!val) return;
+  showLoading(true);
+  try{
+    const data = await sbFetch(`orders?order_number=eq.${encodeURIComponent(val)}&select=*`);
+    if(data && data.length > 0){
+      renderOrder(data[0]);
+    } else {
+      document.getElementById('trackingContent').classList.add('hidden');
+      document.getElementById('noOrderState').classList.remove('hidden');
+    }
+  } catch(e){
+    // Demo mode
+    renderDemoOrder(val);
+  }
+  showLoading(false);
+}
+
+function renderOrder(order){
+  currentOrderId = order.id;
+  document.getElementById('noOrderState').classList.add('hidden');
+  document.getElementById('trackingContent').classList.remove('hidden');
+
+  document.getElementById('displayOrderNum').textContent = order.order_number || '—';
+  document.getElementById('displayOrderName').textContent = `অর্ডার — ${order.order_type === 'delivery' ? 'ডেলিভারি' : 'ডাইন-ইন'}`;
+  document.getElementById('etaAddress').textContent = order.delivery_address || 'ডেলিভারি ঠিকানা';
+
+  const eta = order.estimated_time_minutes;
+  document.getElementById('etaTime').textContent = eta ? `${eta} মিনিট` : '৩০-৪৫ মিনিট';
+
+  updateStatusUI(order.status || 'pending');
+  renderSteps(order.status || 'pending', order.created_at);
+
+  if(order.items_json){
+    renderItems(order.items_json, order.total_amount);
+  }
+
+  const receiptLink = document.getElementById('receiptLink');
+  receiptLink.href = `receipt.html?order_id=${order.id}`;
+
+  // Rider info for delivery
+  if(order.order_type === 'delivery' && order.status === 'out_for_delivery'){
+    document.getElementById('riderCard').style.display = 'flex';
+  }
+
+  // Setup auto-refresh
+  clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => refreshOrder(order.id), 30000);
+}
+
+async function refreshOrder(id){
+  try{
+    const data = await sbFetch(`orders?id=eq.${id}&select=*`);
+    if(data && data[0]){
+      const prev = document.getElementById('statusText').textContent;
+      updateStatusUI(data[0].status);
+      renderSteps(data[0].status, data[0].created_at);
+      const newStatus = getStatusBn(data[0].status);
+      if(prev !== newStatus) showToast('স্ট্যাটাস আপডেট', `অর্ডার এখন: ${newStatus}`);
+    }
+  } catch(e){}
+}
+
+function renderSteps(currentStatus, createdAt){
+  const grid = document.getElementById('stepsGrid');
+  const idx = STATUS_ORDER.indexOf(currentStatus);
+  const created = createdAt ? new Date(createdAt) : new Date();
+
+  grid.innerHTML = STEPS_CONFIG.map((step, i) => {
+    let cls = 'step-item';
+    let timeStr = '';
+    if(i < idx){ cls += ' done'; timeStr = formatStepTime(created, i*8); }
+    else if(i === idx){ cls += ' active'; timeStr = 'এখন'; }
+    return `<div class="${cls}">
+      <div class="step-icon">${step.icon}</div>
+      <div class="step-title">${step.title}</div>
+      <div class="step-time">${timeStr}</div>
+    </div>`;
+  }).join('');
+}
+
+function formatStepTime(base, addMins){
+  const d = new Date(base.getTime() + addMins * 60000);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function updateStatusUI(status){
+  const pill = document.getElementById('statusPill');
+  const text = document.getElementById('statusText');
+  pill.className = `status-pill ${status}`;
+  text.textContent = getStatusBn(status);
+  const icons = {pending:'📝',confirmed:'✅',preparing:'👩‍🍳',ready:'🍱',out_for_delivery:'🚴‍♀️',delivered:'🎉',cancelled:'❌'};
+  pill.querySelector('span').textContent = icons[status] || '⏳';
+}
+
+function getStatusBn(s){
+  const m = {pending:'অপেক্ষায়',confirmed:'নিশ্চিত',preparing:'রান্না চলছে',
+    ready:'প্রস্তুত',out_for_delivery:'পথে আছে',delivered:'পৌঁছে গেছে',cancelled:'বাতিল'};
+  return m[s] || s;
+}
+
+function renderItems(items, total){
+  const list = document.getElementById('orderItemsList');
+  const catIcons = {DM:'🩺',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤰'};
+  const catCls = {DM:'dm',OB:'ob',FL:'fl',IB:'ib',PR:'pr'};
+
+  if(typeof items === 'string') try{ items = JSON.parse(items); } catch(e){ items = []; }
+
+  if(!Array.isArray(items) || items.length === 0){
+    list.innerHTML = '<div style="color:rgba(255,255,255,.3);font-size:.82rem;padding:.5rem">আইটেম পাওয়া যায়নি</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(it => {
+    const cat = it.disease_category || 'DM';
+    return `<div class="item-row">
+      <div class="item-cat ${catCls[cat]||'dm'}">${catIcons[cat]||'🍽️'}</div>
+      <div class="item-info">
+        <div class="item-name">${it.menu_name_bn || it.name || 'আইটেম'}</div>
+        <div class="item-meta">${it.meal_type ? mealBn(it.meal_type) : ''} × ${it.quantity||1}</div>
+      </div>
+      <div class="item-price">৳${((it.unit_price||0) * (it.quantity||1)).toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('orderTotal').textContent = `মোট: ৳${(total||0).toLocaleString()}`;
+}
+
+function mealBn(m){ return {breakfast:'সকালের নাস্তা',lunch:'দুপুরের খাবার',dinner:'রাতের খাবার'}[m] || m; }
+
+function renderDemoOrder(num){
+  document.getElementById('noOrderState').classList.add('hidden');
+  document.getElementById('trackingContent').classList.remove('hidden');
+  document.getElementById('displayOrderNum').textContent = num || 'ORD-DEMO-0001';
+  document.getElementById('displayOrderName').textContent = 'ডেমো অর্ডার — ডেলিভারি';
+  document.getElementById('etaTime').textContent = '৩৫ মিনিট';
+  document.getElementById('etaAddress').textContent = 'ধানমন্ডি, ঢাকা';
+  updateStatusUI('preparing');
+  renderSteps('preparing', new Date());
+  const demo = [{menu_name_bn:'গোল্ডেন কুইনোয়া কনজি',meal_type:'breakfast',unit_price:200,quantity:1,disease_category:'DM'},
+    {menu_name_bn:'ঘি-পোচড চিকেন ডিনার বাটি',meal_type:'dinner',unit_price:350,quantity:1,disease_category:'DM'}];
+  renderItems(demo, 550);
+}
+
+async function loadRecentOrders(){
+  const cust = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  if(!cust.id){ document.getElementById('recentOrdersList').innerHTML =
+    '<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">লগইন করুন সাম্প্রতিক অর্ডার দেখতে</div>'; return; }
+  try{
+    const data = await sbFetch(`orders?customer_id=eq.${cust.id}&order=created_at.desc&limit=5&select=*`);
+    if(!data || data.length === 0){
+      document.getElementById('recentOrdersList').innerHTML =
+        '<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">কোনো অর্ডার নেই</div>';
+      return;
+    }
+    const statusCls = {delivered:'delivered',cancelled:'cancelled'};
+    document.getElementById('recentOrdersList').innerHTML = data.map(o => `
+      <div class="recent-row" onclick="loadOrderById('${o.id}','${o.order_number}')">
+        <span class="recent-num">${o.order_number||'—'}</span>
+        <div class="recent-info">
+          <div class="recent-name">${o.order_type==='delivery'?'ডেলিভারি':'ডাইন-ইন'} অর্ডার</div>
+          <div class="recent-date">${formatDate(o.created_at)}</div>
+        </div>
+        <span class="recent-status ${statusCls[o.status]||''}">${getStatusBn(o.status)}</span>
+      </div>`).join('');
+  } catch(e){
+    document.getElementById('recentOrdersList').innerHTML =
+      '<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">লোড করতে সমস্যা হয়েছে</div>';
+  }
+}
+
+async function loadOrderById(id, num){
+  document.getElementById('orderSearchInput').value = num;
+  showLoading(true);
+  try{
+    const data = await sbFetch(`orders?id=eq.${id}&select=*`);
+    if(data && data[0]) renderOrder(data[0]);
+  } catch(e){ renderDemoOrder(num); }
+  showLoading(false);
+  document.querySelector('.search-section').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelOrder(){
+  if(!currentOrderId){ showToast('মনোযোগ দিন','আগে একটি অর্ডার লোড করুন'); return; }
+  if(confirm('আপনি কি এই অর্ডারটি বাতিল করতে চান?\nশুধুমাত্র "অপেক্ষায়" বা "নিশ্চিত" স্ট্যাটাসে বাতিল করা যাবে।')){
+    showToast('অনুরোধ পাঠানো হয়েছে','বাতিলের অনুরোধ SAR টিমকে জানানো হয়েছে।');
+  }
+}
+
+function showSupport(){
+  const msg = encodeURIComponent('SAR-এ আমার অর্ডারে সমস্যা হচ্ছে। অর্ডার নম্বর: ' + (document.getElementById('displayOrderNum').textContent));
+  window.open(`https://wa.me/8801346098892?text=${msg}`, '_blank');
+}
+
+function showToast(title, msg){
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+function showLoading(v){ document.getElementById('loadingOverlay').classList.toggle('hidden', !v); }
+
+function formatDate(d){
+  if(!d) return '—';
+  const dt = new Date(d);
+  return `${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()} ${dt.getHours()}:${String(dt.getMinutes()).padStart(2,'0')}`;
+}
+
+// Auto-load from URL param
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('order_id');
+const orderNum = urlParams.get('order_number');
+
+window.addEventListener('load', () => {
+  if(orderNum){
+    document.getElementById('orderSearchInput').value = orderNum;
+    searchOrder();
+  } else if(orderId){
+    loadOrderById(orderId, '');
+  }
+  loadRecentOrders();
+
+  // Try Google Maps if available
+  if(typeof google !== 'undefined') initMap();
+});
+
+function initMap(){
+  const mapEl = document.getElementById('mapContainer');
+  document.getElementById('mapPlaceholder').style.display = 'none';
+  const dhaka = { lat: 23.8103, lng: 90.4125 };
+  const map = new google.maps.Map(mapEl, { center: dhaka, zoom: 14,
+    styles: [
+      {elementType:'geometry',stylers:[{color:'#0a0a1a'}]},
+      {elementType:'labels.text.fill',stylers:[{color:'#ffffff'}]},
+      {featureType:'road',elementType:'geometry',stylers:[{color:'#1a1a2e'}]},
+      {featureType:'water',elementType:'geometry',stylers:[{color:'#0d1117'}]}
+    ]
+  });
+  new google.maps.Marker({ position: dhaka, map, title:'SAR Restaurant',
+    icon:{ url:'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><circle cx="16" cy="16" r="12" fill="%23E91E8C" stroke="%23fff" stroke-width="2"/><text x="16" y="20" text-anchor="middle" fill="white" font-size="12">🏠</text></svg>',
+    scaledSize: new google.maps.Size(32,32)}
+  });
+}
+
+// Search on Enter
+document.getElementById('orderSearchInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') searchOrder();
+});
+</script>
+
+<!-- Google Maps (optional - loads if API key added) -->
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=initMap" async defer></script> -->
+
+</body>
+</html>

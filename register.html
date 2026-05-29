@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>নিবন্ধন — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;
+  --purple:#6B21A8;--purple2:#A855F7;
+  --yellow:#F59E0B;--yellow2:#FCD34D;
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;
+  --dark:#0A0A0F;--dark2:#12121A;--dark3:#16162A;
+  --glass:rgba(255,255,255,.05);
+  --border:rgba(255,255,255,.11);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── BG ── */
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.11;animation:orbF 16s ease-in-out infinite}
+.o1{width:560px;height:560px;background:var(--pink);top:-180px;left:-180px}
+.o2{width:440px;height:440px;background:var(--purple);bottom:-120px;right:-120px;animation-delay:6s}
+.o3{width:320px;height:320px;background:var(--yellow);top:45%;left:45%;animation-delay:12s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(28px,-22px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.04)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.04)1px,transparent 1px);
+  background-size:64px 64px}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* ── NAV ── */
+.top-nav{width:100%;max-width:860px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:2rem;padding:.7rem 1.5rem;
+  background:rgba(10,10,15,.65);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1rem;box-shadow:0 0 15px rgba(233,30,140,.4)}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-link{font-size:.85rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .3s}
+.nav-link span{color:var(--pink2)}
+.nav-link:hover{color:#fff}
+
+/* ── CARD ── */
+.card{width:100%;max-width:860px;background:rgba(14,14,20,.85);
+  backdrop-filter:blur(30px);border:1px solid var(--border);
+  border-radius:28px;overflow:hidden;
+  box-shadow:0 0 100px rgba(233,30,140,.07)}
+
+/* ── CARD HEADER ── */
+.card-hd{padding:2.5rem 2.5rem 0;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:.45rem;
+  background:rgba(233,30,140,.11);border:1px solid rgba(233,30,140,.24);
+  border-radius:50px;padding:.3rem 1rem;font-size:.74rem;
+  color:var(--pink2);letter-spacing:.07em;margin-bottom:1.2rem}
+.bdot{width:5px;height:5px;background:var(--pink);border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.card-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.8));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.35rem}
+.card-sub{font-size:.88rem;color:rgba(255,255,255,.42);margin-bottom:1.75rem}
+
+/* ── PROGRESS ── */
+.prog-wrap{padding:0 2.5rem 1.75rem}
+.step-dots{display:flex;justify-content:space-between;margin-bottom:.7rem}
+.sdot{display:flex;flex-direction:column;align-items:center;gap:.28rem;
+  font-size:.68rem;color:rgba(255,255,255,.32);transition:color .4s;flex:1;cursor:default}
+.sdot.active{color:var(--pink2)}
+.sdot.done{color:var(--green2)}
+.sdot-circle{width:26px;height:26px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-family:'Space Mono',monospace;font-weight:700;
+  transition:all .4s;background:var(--dark2)}
+.sdot.active .sdot-circle{border-color:var(--pink);background:rgba(233,30,140,.18);color:var(--pink2);box-shadow:0 0 10px rgba(233,30,140,.28)}
+.sdot.done .sdot-circle{border-color:var(--green);background:rgba(5,150,105,.18);color:var(--green2)}
+.pbar-bg{height:4px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.pbar{height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--pink),var(--purple2),var(--yellow));
+  transition:width .55s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 10px rgba(233,30,140,.38)}
+.step-info-row{display:flex;justify-content:space-between;margin-top:.55rem}
+.step-nm{font-size:.78rem;color:var(--pink2);font-weight:600}
+.step-ct{font-family:'Space Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.28)}
+
+/* ── FORM BODY ── */
+.fbody{padding:0 2.5rem 2.5rem}
+.panel{display:none}
+.panel.active{display:block;animation:pIn .38s ease both}
+@keyframes pIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── STEP HEADER ── */
+.step-hd{margin-bottom:1.75rem}
+.step-icon{font-size:1.9rem;display:block;margin-bottom:.65rem}
+.step-title{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:#fff;margin-bottom:.28rem}
+.step-desc{font-size:.83rem;color:rgba(255,255,255,.42);line-height:1.6}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.g1{display:grid;grid-template-columns:1fr;gap:1rem}
+.sp2{grid-column:span 2}
+.sp3{grid-column:span 3}
+
+/* ── FIELD ── */
+.fld{display:flex;flex-direction:column;gap:.36rem}
+.fld label{font-size:.8rem;color:rgba(255,255,255,.58);font-weight:500;display:flex;align-items:center;gap:.35rem}
+.req{color:var(--pink);font-size:.68rem}
+.opt{color:rgba(255,255,255,.28);font-size:.68rem}
+
+input,select,textarea{
+  background:rgba(255,255,255,.047);border:1px solid rgba(255,255,255,.11);
+  border-radius:11px;padding:.72rem .95rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;
+  transition:all .3s;outline:none;width:100%;-webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--pink);background:rgba(233,30,140,.065);
+  box-shadow:0 0 0 3px rgba(233,30,140,.11)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.22)}
+select option{background:var(--dark2);color:#fff}
+textarea{resize:vertical;min-height:76px}
+
+/* ── VOICE ROW ── */
+.vrow{display:flex;gap:.7rem;align-items:center}
+.vrow input,.vrow textarea{flex:1}
+.vbtn{width:42px;height:42px;flex-shrink:0;border-radius:11px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  border:none;color:#fff;font-size:.95rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .3s}
+.vbtn:hover{transform:scale(1.1);box-shadow:0 0 14px rgba(233,30,140,.4)}
+.vbtn.listening{animation:vp .7s ease infinite;background:linear-gradient(135deg,var(--red),var(--pink))}
+@keyframes vp{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.5)}50%{box-shadow:0 0 0 8px rgba(220,38,38,0)}}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:rgba(255,255,255,.065);margin:1.4rem 0}
+.sec-lbl{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--pink2);margin-bottom:.9rem}
+
+/* ── BMI BOX ── */
+.bmi-box{background:linear-gradient(135deg,rgba(233,30,140,.09),rgba(107,33,168,.09));
+  border:1px solid rgba(233,30,140,.18);border-radius:11px;
+  padding:.7rem .95rem;text-align:center}
+.bmi-val{font-family:'Space Mono',monospace;font-size:1.45rem;font-weight:700}
+.bmi-cat{font-size:.72rem;color:rgba(255,255,255,.48);margin-top:.18rem}
+
+/* ── PAYMENT BOX ── */
+.pay-box{background:linear-gradient(135deg,rgba(5,150,105,.09),rgba(245,158,11,.05));
+  border:1px solid rgba(5,150,105,.18);border-radius:18px;padding:1.4rem;margin-top:1.4rem}
+.pay-title{font-size:.88rem;font-weight:700;color:var(--green2);margin-bottom:.9rem;display:flex;align-items:center;gap:.45rem}
+.pay-amt-box{background:rgba(255,255,255,.044);border:1px solid var(--border);
+  border-radius:11px;padding:.9rem;text-align:center;margin-bottom:.9rem}
+.pay-orig{font-size:.78rem;color:rgba(255,255,255,.38);text-decoration:line-through}
+.pay-disc{font-family:'Space Mono',monospace;font-size:1.9rem;font-weight:700;
+  background:linear-gradient(135deg,var(--green2),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pay-badge{display:inline-block;background:rgba(5,150,105,.18);color:var(--green2);
+  border-radius:50px;padding:.18rem .7rem;font-size:.72rem;font-weight:700;margin-top:.28rem}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:.9rem}
+.pm{background:rgba(255,255,255,.044);border:1.5px solid rgba(255,255,255,.09);
+  border-radius:10px;padding:.65rem .45rem;text-align:center;cursor:pointer;transition:all .3s}
+.pm:hover,.pm.sel{border-color:var(--pink);background:rgba(233,30,140,.09)}
+.pm-icon{font-size:1.15rem;display:block;margin-bottom:.26rem}
+.pm-name{font-size:.68rem;color:rgba(255,255,255,.58);font-weight:600}
+
+/* ── CONSENT ── */
+.consent-box{background:linear-gradient(135deg,rgba(220,38,38,.07),rgba(107,33,168,.07));
+  border:1px solid rgba(220,38,38,.18);border-radius:16px;padding:1.4rem;margin-bottom:1.4rem}
+.consent-ttl{font-size:.87rem;font-weight:700;color:var(--red2);margin-bottom:.7rem;display:flex;align-items:center;gap:.45rem}
+.consent-txt{font-size:.78rem;color:rgba(255,255,255,.58);line-height:1.7;margin-bottom:.9rem}
+.ccheck{display:flex;align-items:flex-start;gap:.7rem;cursor:pointer}
+.ccheck input{width:17px;height:17px;accent-color:var(--pink);cursor:pointer;flex-shrink:0;margin-top:.1rem}
+.ccheck span{font-size:.8rem;color:rgba(255,255,255,.68);line-height:1.5}
+
+/* ── SUMMARY ── */
+.sum-box{background:var(--glass);border:1px solid var(--border);
+  border-radius:16px;padding:1.4rem;margin-bottom:1.4rem}
+.sum-ttl{font-size:.83rem;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:.9rem;display:flex;align-items:center;gap:.45rem}
+.sum-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.44rem 0;border-bottom:1px solid rgba(255,255,255,.046)}
+.sum-row:last-child{border:none}
+.sum-k{font-size:.8rem;color:rgba(255,255,255,.42)}
+.sum-v{font-size:.8rem;color:#fff;font-weight:500;text-align:right;max-width:58%}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:.9rem;margin-top:1.75rem}
+.btn-back{flex:1;padding:.88rem;border-radius:50px;
+  background:transparent;border:1px solid rgba(255,255,255,.13);
+  color:rgba(255,255,255,.55);font-family:'Hind Siliguri',sans-serif;
+  font-size:.93rem;font-weight:600;cursor:pointer;transition:all .3s}
+.btn-back:hover{border-color:rgba(255,255,255,.28);color:#fff}
+.btn-next{flex:2;padding:.88rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.93rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 22px rgba(233,30,140,.28);transition:all .3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(233,30,140,.48)}
+.btn-pay{width:100%;padding:.95rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.97rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 22px rgba(5,150,105,.28);transition:all .3s;margin-top:.9rem}
+.btn-pay:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(5,150,105,.48)}
+
+/* ── MSG ── */
+.msg{display:none;padding:.7rem .95rem;border-radius:10px;font-size:.83rem;margin-top:.9rem}
+.msg.err{background:rgba(220,38,38,.09);border:1px solid rgba(220,38,38,.22);color:var(--red2)}
+.msg.ok{background:rgba(5,150,105,.09);border:1px solid rgba(5,150,105,.22);color:var(--green2)}
+
+/* ── SUCCESS ── */
+.success-panel{display:none;text-align:center;padding:3rem 2rem}
+.suc-icon{width:76px;height:76px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  display:flex;align-items:center;justify-content:center;font-size:1.9rem;
+  margin:0 auto 1.4rem;box-shadow:0 0 38px rgba(5,150,105,.38);
+  animation:scIn .45s ease both}
+@keyframes scIn{from{transform:scale(0)}to{transform:scale(1)}}
+.suc-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;
+  background:linear-gradient(135deg,var(--green2),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.7rem}
+.suc-txt{font-size:.88rem;color:rgba(255,255,255,.52);line-height:1.7;margin-bottom:.7rem}
+.mid-box{display:inline-block;
+  background:linear-gradient(135deg,rgba(233,30,140,.13),rgba(107,33,168,.13));
+  border:1px solid rgba(233,30,140,.28);border-radius:12px;
+  padding:.7rem 2rem;margin:.9rem 0;
+  font-family:'Space Mono',monospace;font-size:1.15rem;font-weight:700;
+  color:var(--pink2);letter-spacing:.09em}
+.btn-dash{display:inline-block;margin-top:1.4rem;text-decoration:none;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;padding:.88rem 2.4rem;border-radius:50px;
+  font-family:'Hind Siliguri',sans-serif;font-size:.93rem;font-weight:700;
+  box-shadow:0 0 22px rgba(233,30,140,.28);transition:all .3s}
+.btn-dash:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(233,30,140,.48)}
+.btn-metrics{display:inline-block;margin-top:.75rem;text-decoration:none;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:#fff;padding:.78rem 2rem;border-radius:50px;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:700;
+  box-shadow:0 0 18px rgba(107,33,168,.28);transition:all .3s;margin-left:.75rem}
+.btn-metrics:hover{transform:translateY(-2px)}
+
+/* ── LOADING ── */
+.loader{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.85);backdrop-filter:blur(10px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
+.loader.show{display:flex}
+.spin{width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
+  animation:sp .75s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-txt{font-size:.88rem;color:rgba(255,255,255,.48)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:620px){
+  .g2,.g3{grid-template-columns:1fr}
+  .sp2,.sp3{grid-column:span 1}
+  .pay-methods{grid-template-columns:1fr 1fr}
+  .fbody,.card-hd,.prog-wrap{padding-left:1.2rem;padding-right:1.2rem}
+  .step-dots{gap:.2rem}
+  .sdot .sdot-circle{width:22px;height:22px;font-size:.62rem}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="loader" id="loader">
+  <div class="spin"></div>
+  <div class="load-txt" id="loadTxt">প্রক্রিয়া করা হচ্ছে...</div>
+</div>
+
+<div class="page">
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <a href="login.html" class="nav-link">ইতিমধ্যে সদস্য? <span>লগইন →</span></a>
+  </nav>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="badge"><span class="bdot"></span>ধাপ ১ — মূল নিবন্ধন</div>
+      <h1 class="card-title">SAR পরিবারে স্বাগতম</h1>
+      <p class="card-sub">আপনার মৌলিক তথ্য দিন — তারপর স্বাস্থ্য মেট্রিক্স পূরণ করুন</p>
+    </div>
+
+    <!-- PROGRESS: 3 steps -->
+    <div class="prog-wrap">
+      <div class="step-dots" id="stepDots">
+        <div class="sdot active" data-s="1"><div class="sdot-circle">১</div><span>পরিচয়</span></div>
+        <div class="sdot" data-s="2"><div class="sdot-circle">২</div><span>নিশ্চিত</span></div>
+        <div class="sdot" data-s="3"><div class="sdot-circle">৩</div><span>পেমেন্ট</span></div>
+      </div>
+      <div class="pbar-bg"><div class="pbar" id="pbar" style="width:33.33%"></div></div>
+      <div class="step-info-row">
+        <span class="step-nm" id="stepNm">ধাপ ১: মৌলিক পরিচয়</span>
+        <span class="step-ct" id="stepCt">১ / ৩</span>
+      </div>
+    </div>
+
+    <div class="fbody">
+
+      <!-- ═══ STEP 1: IDENTITY ═══ -->
+      <div class="panel active" id="p1">
+        <div class="step-hd">
+          <span class="step-icon">👤</span>
+          <div class="step-title">মৌলিক পরিচয় তথ্য</div>
+          <div class="step-desc">নিবন্ধনের জন্য প্রয়োজনীয় মূল তথ্য। ⭐ চিহ্নিত ঘরগুলো আবশ্যিক।</div>
+        </div>
+
+        <div class="sec-lbl">👤 ব্যক্তিগত তথ্য</div>
+        <div class="g2">
+          <div class="fld sp2">
+            <label>পূর্ণ নাম <span class="req">⭐</span></label>
+            <div class="vrow">
+              <input type="text" id="full_name" placeholder="আপনার পূর্ণ নাম বাংলায়" required>
+              <button class="vbtn" type="button" onclick="voice('full_name')" title="ভয়েস">🎙️</button>
+            </div>
+          </div>
+          <div class="fld">
+            <label>মোবাইল নম্বর <span class="req">⭐</span></label>
+            <input type="tel" id="phone" placeholder="01XXXXXXXXX" maxlength="11" required>
+          </div>
+          <div class="fld">
+            <label>ইমেইল <span class="opt">(ঐচ্ছিক)</span></label>
+            <input type="email" id="email" placeholder="email@example.com">
+          </div>
+          <div class="fld">
+            <label>জন্ম তারিখ <span class="req">⭐</span></label>
+            <input type="date" id="date_of_birth" required>
+          </div>
+          <div class="fld">
+            <label>রক্তের গ্রুপ <span class="opt">(ঐচ্ছিক)</span></label>
+            <select id="blood_group">
+              <option value="">নির্বাচন করুন</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>জাতীয় পরিচয়পত্র নম্বর <span class="opt">(ঐচ্ছিক)</span></label>
+            <input type="text" id="nid_number" placeholder="১৩ বা ১৭ সংখ্যার NID">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-lbl">📍 ঠিকানা</div>
+        <div class="g2">
+          <div class="fld">
+            <label>বিভাগ <span class="req">⭐</span></label>
+            <select id="division" required>
+              <option value="">নির্বাচন করুন</option>
+              <option>ঢাকা</option><option>চট্টগ্রাম</option><option>রাজশাহী</option>
+              <option>খুলনা</option><option>বরিশাল</option><option>সিলেট</option>
+              <option>রংপুর</option><option>ময়মনসিংহ</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>জেলা <span class="req">⭐</span></label>
+            <input type="text" id="district" placeholder="আপনার জেলার নাম" required>
+          </div>
+          <div class="fld">
+            <label>উপজেলা <span class="opt">(ঐচ্ছিক)</span></label>
+            <input type="text" id="upazila" placeholder="উপজেলা / থানা">
+          </div>
+          <div class="fld">
+            <label>পছন্দের ভাষা</label>
+            <select id="preferred_language">
+              <option value="bn">বাংলা</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="fld sp2">
+            <label>বিস্তারিত ঠিকানা</label>
+            <div class="vrow">
+              <textarea id="address" placeholder="বাড়ি নং, রোড, এলাকা..." rows="2"></textarea>
+              <button class="vbtn" type="button" onclick="voice('address')" title="ভয়েস">🎙️</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-lbl">📏 শারীরিক পরিমাপ (BMI গণনার জন্য)</div>
+        <div class="g3">
+          <div class="fld">
+            <label>উচ্চতা (সেমি) <span class="req">⭐</span></label>
+            <input type="number" id="height_cm" placeholder="যেমন: 160" min="100" max="250" oninput="calcBMI()" required>
+          </div>
+          <div class="fld">
+            <label>ওজন (কেজি) <span class="req">⭐</span></label>
+            <input type="number" id="weight_kg" placeholder="যেমন: 60" min="20" max="300" step="0.1" oninput="calcBMI()" required>
+          </div>
+          <div class="fld">
+            <label>BMI (স্বয়ংক্রিয়)</label>
+            <div class="bmi-box">
+              <div class="bmi-val" id="bmiVal">—</div>
+              <div class="bmi-cat" id="bmiCat">উচ্চতা ও ওজন দিন</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-lbl">🆘 জরুরি যোগাযোগ</div>
+        <div class="g2">
+          <div class="fld">
+            <label>জরুরি যোগাযোগের নাম</label>
+            <input type="text" id="emergency_contact_name" placeholder="পরিবারের সদস্যের নাম">
+          </div>
+          <div class="fld">
+            <label>জরুরি যোগাযোগের নম্বর</label>
+            <input type="tel" id="emergency_contact_phone" placeholder="01XXXXXXXXX">
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-lbl">🔐 পাসওয়ার্ড তৈরি করুন <span class="req">⭐</span></div>
+        <div class="g2">
+          <div class="fld">
+            <label>পাসওয়ার্ড <span class="req">*</span></label>
+            <div style="display:flex;align-items:center;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.12);border-radius:11px;overflow:hidden">
+              <input type="password" id="reg_password" placeholder="কমপক্ষে ৬ সংখ্যা বা অক্ষর" style="flex:1;background:none;border:none;padding:.72rem 1rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.92rem;outline:none">
+              <button type="button" onclick="toggleRegPwd('reg_password',this)" style="background:none;border:none;padding:0 .9rem;cursor:pointer;font-size:.9rem;color:rgba(255,255,255,.4)">👁️</button>
+            </div>
+          </div>
+          <div class="fld">
+            <label>পাসওয়ার্ড নিশ্চিত করুন <span class="req">*</span></label>
+            <div style="display:flex;align-items:center;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.12);border-radius:11px;overflow:hidden">
+              <input type="password" id="reg_password_confirm" placeholder="একই পাসওয়ার্ড আবার লিখুন" style="flex:1;background:none;border:none;padding:.72rem 1rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.92rem;outline:none">
+              <button type="button" onclick="toggleRegPwd('reg_password_confirm',this)" style="background:none;border:none;padding:0 .9rem;cursor:pointer;font-size:.9rem;color:rgba(255,255,255,.4)">👁️</button>
+            </div>
+          </div>
+        </div>
+        <div id="pwd_msg" style="font-size:.8rem;color:#F87171;margin-top:-.3rem;margin-bottom:.5rem;display:none"></div>
+
+        <div class="divider"></div>
+        <div class="sec-lbl">🔗 রেফারেল ও অন্যান্য</div>
+        <div class="g2">
+          <div class="fld">
+            <label>রেফারেল কোড <span class="opt">(ঐচ্ছিক)</span></label>
+            <input type="text" id="referred_by" placeholder="REF-XXXXXX">
+          </div>
+          <div class="fld">
+            <label>SAR সম্পর্কে জেনেছেন কোথায়</label>
+            <select id="how_heard">
+              <option value="">নির্বাচন করুন</option>
+              <option>Facebook</option><option>WhatsApp</option>
+              <option>বন্ধু/পরিচিত</option><option>ডাক্তার</option>
+              <option>Google</option><option>MindMax</option><option>অন্যান্য</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>SAR বিভাগ পছন্দ <span class="req">⭐</span></label>
+            <select id="sar_category" required>
+              <option value="">নির্বাচন করুন</option>
+              <option value="DM">ডায়াবেটিস মেনু (DM)</option>
+              <option value="OB">স্থূলতা মেনু (OB)</option>
+              <option value="FL">ফ্যাটি লিভার মেনু (FL)</option>
+              <option value="IB">IBS/গ্যাস্ট্রিক মেনু (IB)</option>
+              <option value="PR">গর্ভাবস্থা মেনু (PR)</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>পেমেন্ট পদ্ধতি পছন্দ</label>
+            <select id="payment_pref">
+              <option value="">নির্বাচন করুন</option>
+              <option>bKash</option><option>Nagad</option><option>Rocket</option>
+              <option>Visa/Mastercard</option><option>ক্যাশ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="msg" id="m1"></div>
+        <div class="btn-row">
+          <button class="btn-next" onclick="go(1)">পরবর্তী → পর্যালোচনা</button>
+        </div>
+      </div><!-- /p1 -->
+
+      <!-- ═══ STEP 2: REVIEW ═══ -->
+      <div class="panel" id="p2">
+        <div class="step-hd">
+          <span class="step-icon">📋</span>
+          <div class="step-title">তথ্য পর্যালোচনা করুন</div>
+          <div class="step-desc">আপনার দেওয়া তথ্য সঠিক কিনা যাচাই করুন।</div>
+        </div>
+        <div class="sum-box">
+          <div class="sum-ttl">📝 আপনার তথ্যের সারসংক্ষেপ</div>
+          <div class="sum-row"><span class="sum-k">পূর্ণ নাম</span><span class="sum-v" id="s_name">—</span></div>
+          <div class="sum-row"><span class="sum-k">মোবাইল</span><span class="sum-v" id="s_phone">—</span></div>
+          <div class="sum-row"><span class="sum-k">ইমেইল</span><span class="sum-v" id="s_email">—</span></div>
+          <div class="sum-row"><span class="sum-k">জন্ম তারিখ</span><span class="sum-v" id="s_dob">—</span></div>
+          <div class="sum-row"><span class="sum-k">বিভাগ / জেলা</span><span class="sum-v" id="s_loc">—</span></div>
+          <div class="sum-row"><span class="sum-k">উচ্চতা / ওজন</span><span class="sum-v" id="s_hw">—</span></div>
+          <div class="sum-row"><span class="sum-k">BMI</span><span class="sum-v" id="s_bmi">—</span></div>
+          <div class="sum-row"><span class="sum-k">SAR বিভাগ</span><span class="sum-v" id="s_cat">—</span></div>
+        </div>
+
+        <div class="consent-box">
+          <div class="consent-ttl">⚕️ শর্তাবলী ও সম্মতি</div>
+          <div class="consent-txt">
+            SAR — She AI Restaurant কোনো চিকিৎসা প্রতিষ্ঠান নয়। এখানে প্রদত্ত সব তথ্য শুধুমাত্র সচেতনতা ও অনুপ্রেরণার জন্য। যেকোনো স্বাস্থ্য সমস্যায় অবশ্যই নিবন্ধিত চিকিৎসকের পরামর্শ নিন। আপনার সব তথ্য সম্পূর্ণ নিরাপদ ও গোপনীয়।
+          </div>
+          <label class="ccheck">
+            <input type="checkbox" id="consent" required>
+            <span>আমি শর্তাবলী পড়েছি এবং সম্মত। আমার তথ্য SAR AI সিস্টেমে ব্যবহারের অনুমতি দিচ্ছি।</span>
+          </label>
+        </div>
+
+        <div class="msg" id="m2"></div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="back(2)">← পিছনে</button>
+          <button class="btn-next" onclick="go(2)">পেমেন্টে যান →</button>
+        </div>
+      </div><!-- /p2 -->
+
+      <!-- ═══ STEP 3: PAYMENT ═══ -->
+      <div class="panel" id="p3">
+        <div class="step-hd">
+          <span class="step-icon">💳</span>
+          <div class="step-title">নিবন্ধন ফি পরিশোধ</div>
+          <div class="step-desc">পেমেন্ট সম্পন্ন হলে আপনার অ্যাকাউন্ট সক্রিয় হবে।</div>
+        </div>
+
+        <div class="pay-box">
+          <div class="pay-title">💰 নিবন্ধন ফি</div>
+          <div class="pay-amt-box">
+            <div class="pay-orig">সাধারণ মূল্য: ৳ ২,০০০</div>
+            <div class="pay-disc">৳ ১,০০০</div>
+            <div class="pay-badge">✦ ৫০% ছাড় — প্রথম ১ লাখ গ্রাহক</div>
+          </div>
+          <div class="sec-lbl" style="margin-bottom:.65rem">পেমেন্ট পদ্ধতি নির্বাচন করুন</div>
+          <div class="pay-methods">
+            <div class="pm sel" onclick="selPay(this,'bkash')"><span class="pm-icon">📱</span><span class="pm-name">bKash</span></div>
+            <div class="pm" onclick="selPay(this,'nagad')"><span class="pm-icon">💚</span><span class="pm-name">Nagad</span></div>
+            <div class="pm" onclick="selPay(this,'rocket')"><span class="pm-icon">🚀</span><span class="pm-name">Rocket</span></div>
+            <div class="pm" onclick="selPay(this,'visa')"><span class="pm-icon">💳</span><span class="pm-name">Visa/Card</span></div>
+            <div class="pm" onclick="selPay(this,'mastercard')"><span class="pm-icon">🔴</span><span class="pm-name">Mastercard</span></div>
+            <div class="pm" onclick="selPay(this,'cash')"><span class="pm-icon">💵</span><span class="pm-name">ক্যাশ</span></div>
+          </div>
+          <button class="btn-pay" onclick="submitReg()">
+            ✦ নিবন্ধন সম্পন্ন করুন — ৳ ১,০০০
+          </button>
+          <p style="text-align:center;font-size:.72rem;color:rgba(255,255,255,.28);margin-top:.65rem">
+            ShurjoPay নিরাপদ পেমেন্ট গেটওয়ে
+          </p>
+        </div>
+
+        <div class="msg" id="m3"></div>
+        <div class="btn-row" style="margin-top:1rem">
+          <button class="btn-back" onclick="back(3)">← পিছনে</button>
+        </div>
+      </div><!-- /p3 -->
+
+      <!-- SUCCESS -->
+      <div class="success-panel" id="sucPanel">
+        <div class="suc-icon">✓</div>
+        <div class="suc-title">নিবন্ধন সম্পন্ন!</div>
+        <p class="suc-txt">আপনার SAR অ্যাকাউন্ট তৈরি হয়েছে। WhatsApp ও ইমেইলে নিশ্চিতকরণ পাঠানো হয়েছে।</p>
+        <p class="suc-txt">আপনার সদস্য আইডি:</p>
+        <div class="mid-box" id="midBox">SAR-2026-XXXXXX</div>
+        <p class="suc-txt" style="margin-top:.5rem;font-size:.82rem">
+          এখন <strong style="color:var(--purple2)">স্বাস্থ্য মেট্রিক্স</strong> পূরণ করুন — AI আপনার জন্য ব্যক্তিগতকৃত মেনু তৈরি করবে।<br>
+          তারপর মাসিক সাবস্ক্রিপশন (৳ ৫০০) নিয়ে সম্পূর্ণ সুবিধা পান।
+        </p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.4rem">
+          <a href="metrics.html" class="btn-dash" id="metricsLink">স্বাস্থ্য মেট্রিক্স পূরণ করুন →</a>
+          <a href="dashboard.html" class="btn-metrics">ড্যাশবোর্ডে যান</a>
+        </div>
+      </div>
+
+    </div><!-- /fbody -->
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<script>
+const SUPA_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+const H = {
+  'apikey': SUPA_KEY,
+  'Authorization': 'Bearer ' + SUPA_KEY,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+let step = 1;
+let selPayMethod = 'bkash';
+
+const stepNames = ['','ধাপ ১: মৌলিক পরিচয়','ধাপ ২: পর্যালোচনা','ধাপ ৩: পেমেন্ট'];
+
+function updateProg(s) {
+  document.getElementById('pbar').style.width = (s/3*100)+'%';
+  document.getElementById('stepNm').textContent = stepNames[s];
+  document.getElementById('stepCt').textContent = s+' / ৩';
+  document.querySelectorAll('.sdot').forEach((d,i)=>{
+    const n=i+1;d.classList.remove('active','done');
+    if(n<s){d.classList.add('done');d.querySelector('.sdot-circle').textContent='✓'}
+    else if(n===s){d.classList.add('active')}
+    else{d.querySelector('.sdot-circle').textContent=n}
+  });
+}
+
+function showMsg(id,txt,type){
+  const el=document.getElementById(id);
+  el.className='msg '+(type==='error'?'err':'ok');
+  el.textContent=txt;el.style.display='block';
+  if(type!=='ok')setTimeout(()=>el.style.display='none',4500);
+}
+
+function g(id){const e=document.getElementById(id);return e?e.value?.trim()||null:null}
+function toggleRegPwd(id,btn){const el=document.getElementById(id);if(el.type==='password'){el.type='text';btn.textContent='🙈';}else{el.type='password';btn.textContent='👁️';}}
+function gn(id){const v=g(id);return v?parseFloat(v):null}
+
+/* ── VALIDATION ── */
+function validateStep1(){
+  const checks = [
+    {id:'full_name',msg:'পূর্ণ নাম দিন'},
+    {id:'phone',msg:'মোবাইল নম্বর দিন'},
+    {id:'date_of_birth',msg:'জন্ম তারিখ দিন'},
+    {id:'division',msg:'বিভাগ নির্বাচন করুন'},
+    {id:'district',msg:'জেলা দিন'},
+    {id:'height_cm',msg:'উচ্চতা দিন'},
+    {id:'weight_kg',msg:'ওজন দিন'},
+    {id:'sar_category',msg:'SAR বিভাগ নির্বাচন করুন'},
+  ];
+  for(const c of checks){
+    if(!g(c.id)){showMsg('m1','⚠️ '+c.msg,'error');document.getElementById(c.id)?.focus();return false}
+  }
+  const ph = g('phone');
+  if(!/^01[3-9]\d{8}$/.test(ph)){showMsg('m1','⚠️ সঠিক মোবাইল নম্বর দিন (11 সংখ্যা)','error');return false}
+  // Password validation
+  const pwd = document.getElementById('reg_password').value;
+  const pwdC = document.getElementById('reg_password_confirm').value;
+  const pwdMsg = document.getElementById('pwd_msg');
+  if(!pwd || pwd.length < 6){
+    pwdMsg.textContent='⚠️ পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে';
+    pwdMsg.style.display='block';
+    document.getElementById('reg_password').focus();
+    return false;
+  }
+  if(pwd !== pwdC){
+    pwdMsg.textContent='⚠️ পাসওয়ার্ড দুটি মিলছে না';
+    pwdMsg.style.display='block';
+    document.getElementById('reg_password_confirm').focus();
+    return false;
+  }
+  pwdMsg.style.display='none';
+  return true;
+}
+
+/* ── NAVIGATION ── */
+function go(s){
+  if(s===1){if(!validateStep1())return;fillSummary()}
+  if(s===2){if(!document.getElementById('consent').checked){showMsg('m2','⚠️ শর্তাবলীতে সম্মতি দিন','error');return}}
+  document.getElementById('p'+s).classList.remove('active');
+  step=s+1;
+  document.getElementById('p'+step).classList.add('active');
+  updateProg(step);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function back(s){
+  document.getElementById('p'+s).classList.remove('active');
+  step=s-1;
+  document.getElementById('p'+step).classList.add('active');
+  updateProg(step);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── BMI ── */
+function calcBMI(){
+  const h=gn('height_cm'),w=gn('weight_kg');
+  if(h>0&&w>0){
+    const b=(w/((h/100)**2)).toFixed(1);
+    const el=document.getElementById('bmiVal');
+    const cl=document.getElementById('bmiCat');
+    el.textContent=b;
+    let cat,col;
+    if(b<18.5){cat='কম ওজন';col='#60A5FA'}
+    else if(b<25){cat='স্বাভাবিক ✓';col='#34D399'}
+    else if(b<30){cat='অতিরিক্ত ওজন';col='#FCD34D'}
+    else{cat='স্থূলতা';col='#F87171'}
+    el.style.color=col;cl.textContent=cat;
+  }
+}
+
+/* ── SUMMARY ── */
+function fillSummary(){
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'—'};
+  set('s_name',g('full_name'));
+  set('s_phone',g('phone'));
+  set('s_email',g('email')||'দেওয়া হয়নি');
+  set('s_dob',g('date_of_birth'));
+  set('s_loc',(g('division')||'')+'  /  '+(g('district')||''));
+  set('s_hw',(g('height_cm')||'—')+'সেমি  /  '+(g('weight_kg')||'—')+'কেজি');
+  set('s_bmi',document.getElementById('bmiVal').textContent);
+  set('s_cat',g('sar_category'));
+}
+
+/* ── PAY METHOD ── */
+function selPay(el,m){
+  document.querySelectorAll('.pm').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');selPayMethod=m;
+}
+
+/* ── VOICE ── */
+let recog=null;
+function voice(fid){
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    alert('ভয়েস ইনপুট আপনার ব্রাউজারে সমর্থিত নয়।');return;
+  }
+  const btn=event.target;
+  if(recog){recog.stop();return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog=new SR();recog.lang='bn-BD';recog.continuous=false;recog.interimResults=false;
+  btn.classList.add('listening');recog.start();
+  recog.onresult=e=>{document.getElementById(fid).value=e.results[0][0].transcript;recog=null;btn.classList.remove('listening')};
+  recog.onerror=()=>{recog=null;btn.classList.remove('listening')};
+  recog.onend=()=>{recog=null;btn.classList.remove('listening')};
+}
+
+/* ── SUBMIT ── */
+async function submitReg(){
+  const loader=document.getElementById('loader');
+  const lTxt=document.getElementById('loadTxt');
+  loader.classList.add('show');
+  lTxt.textContent='অ্যাকাউন্ট তৈরি হচ্ছে...';
+
+  try{
+    // 1. Save to customers table
+    const custData={
+      full_name:g('full_name'),
+      phone:g('phone'),
+      email:g('email'),
+      date_of_birth:g('date_of_birth'),
+      blood_group:g('blood_group'),
+      height_cm:gn('height_cm'),
+      weight_kg:gn('weight_kg'),
+      bmi:parseFloat(document.getElementById('bmiVal').textContent)||null,
+      nid_number:g('nid_number'),
+      address:g('address'),
+      division:g('division'),
+      district:g('district'),
+      upazila:g('upazila'),
+      preferred_language:g('preferred_language')||'bn',
+      referred_by:g('referred_by'),
+      emergency_contact_name:g('emergency_contact_name'),
+      emergency_contact_phone:g('emergency_contact_phone'),
+      registration_fee_paid:false,
+      monthly_sub_paid:false,
+      membership_tier:'Basic',
+      is_active:true,
+      password_hash: btoa(unescape(encodeURIComponent(document.getElementById('reg_password').value)))
+    };
+
+    const res=await fetch(`${SUPA_URL}/rest/v1/customers`,{
+      method:'POST',headers:H,body:JSON.stringify(custData)
+    });
+    if(!res.ok){const e=await res.json();throw new Error(e.message||'সেভ করতে সমস্যা হয়েছে')}
+    const arr=await res.json();
+    const cust=arr[0];
+
+    lTxt.textContent='পেমেন্ট রেকর্ড করা হচ্ছে...';
+
+    // 2. Save payment record
+    await fetch(`${SUPA_URL}/rest/v1/payments`,{
+      method:'POST',headers:H,
+      body:JSON.stringify({
+        customer_id:cust.id,
+        payment_type:'registration',
+        amount:2000,
+        discount_applied:1000,
+        discount_reason:'প্রথম ১ লাখ গ্রাহক ৫০% ছাড়',
+        final_amount:1000,
+        payment_method:selPayMethod,
+        status:'pending'
+      })
+    });
+
+    // 3. Notification log
+    await fetch(`${SUPA_URL}/rest/v1/notifications_log`,{
+      method:'POST',headers:H,
+      body:JSON.stringify({
+        customer_id:cust.id,
+        notification_type:'whatsapp',
+        trigger_event:'registration',
+        message_preview:`স্বাগতম ${cust.full_name}! SAR ID: ${cust.member_id}`,
+        status:'pending'
+      })
+    });
+
+    // 4. Store session
+    localStorage.setItem('sar_cid',cust.id);
+    localStorage.setItem('sar_mid',cust.member_id||'');
+    localStorage.setItem('sar_name',cust.full_name);
+    localStorage.setItem('sar_phone',cust.phone);
+    localStorage.setItem('sar_cat',g('sar_category'));
+
+    loader.classList.remove('show');
+
+    // Show success
+    document.getElementById('p3').classList.remove('active');
+    const sp=document.getElementById('sucPanel');
+    sp.style.display='block';
+    document.getElementById('midBox').textContent=cust.member_id||'SAR-2026-XXXXXX';
+
+    // Set metrics link with customer id
+    document.getElementById('metricsLink').href=`metrics.html?cid=${cust.id}`;
+
+  }catch(err){
+    loader.classList.remove('show');
+    showMsg('m3','❌ সমস্যা: '+err.message,'error');
+    console.error(err);
+  }
+}
+
+updateProg(1);
+</script>
+</body>
+</html>

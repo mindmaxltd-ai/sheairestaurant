@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>অর্ডার — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 18s ease-in-out infinite}
+.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:7s}
+.o3{width:350px;height:350px;background:var(--green);top:40%;left:42%;animation-delay:14s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-18px)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
+  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-size:72px 72px}
+
+.page{position:relative;z-index:10;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 5rem}
+
+/* NAV */
+.top-nav{width:100%;max-width:1000px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.75rem;padding:.65rem 1.4rem;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--pink),var(--purple2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-link{font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .3s}
+.nav-link:hover{color:var(--pink2)}
+
+/* STEPS */
+.steps-wrap{width:100%;max-width:1000px;margin-bottom:2rem}
+.steps-row{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:.65rem}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1}
+.step-circle{width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;
+  border:2px solid rgba(255,255,255,.15);background:var(--dark2);
+  color:rgba(255,255,255,.35);transition:all .4s;position:relative;z-index:1}
+.step-item.active .step-circle{border-color:var(--pink);background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 0 16px rgba(233,30,140,.4)}
+.step-item.done .step-circle{border-color:var(--green);background:rgba(5,150,105,.2);color:var(--green2)}
+.step-label{font-size:.72rem;color:rgba(255,255,255,.32);transition:color .3s;white-space:nowrap}
+.step-item.active .step-label{color:var(--pink2)}
+.step-item.done .step-label{color:var(--green2)}
+.step-line{flex:1;height:2px;background:rgba(255,255,255,.08);margin:0 -1px;
+  position:relative;top:-12px;z-index:0}
+.step-line.done{background:linear-gradient(90deg,var(--green),var(--green2))}
+
+/* PANELS */
+.order-panel{width:100%;max-width:1000px}
+.panel{display:none}
+.panel.active{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* PANEL HEADER */
+.panel-hd{margin-bottom:1.5rem}
+.panel-badge{display:inline-flex;align-items:center;gap:.4rem;
+  border-radius:50px;padding:.28rem .9rem;font-size:.72rem;
+  letter-spacing:.07em;margin-bottom:.65rem}
+.pb-cart{background:var(--pink3);border:1px solid rgba(233,30,140,.25);color:var(--pink2)}
+.pb-delivery{background:var(--purple3);border:1px solid rgba(107,33,168,.25);color:var(--purple2)}
+.pb-payment{background:var(--green3);border:1px solid rgba(5,150,105,.25);color:var(--green2)}
+.pb-confirm{background:var(--yellow3);border:1px solid rgba(245,158,11,.25);color:var(--yellow2)}
+.panel-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.78));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.panel-sub{font-size:.84rem;color:rgba(255,255,255,.4)}
+
+/* LAYOUT GRID */
+.order-grid{display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start}
+.order-main{}
+.order-aside{position:sticky;top:1.5rem}
+
+/* CARD */
+.ocard{background:rgba(14,14,20,.85);backdrop-filter:blur(16px);
+  border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:1.25rem}
+.ocard-hd{padding:1rem 1.3rem .8rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.ocard-title{font-size:.88rem;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:.45rem}
+.ocard-action{font-size:.75rem;color:var(--pink2);text-decoration:none;
+  background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:color .3s}
+.ocard-action:hover{color:var(--pink)}
+.ocard-body{padding:1.1rem 1.3rem}
+
+/* CART ITEMS */
+.cart-list{display:flex;flex-direction:column;gap:.75rem}
+.ci{display:flex;align-items:flex-start;gap:.85rem;
+  padding:.85rem;border-radius:14px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  transition:border-color .3s}
+.ci:hover{border-color:var(--border2)}
+.ci-emoji{font-size:1.5rem;flex-shrink:0}
+.ci-body{flex:1}
+.ci-name{font-size:.88rem;font-weight:600;color:#fff;margin-bottom:.2rem;line-height:1.3}
+.ci-meta{font-size:.74rem;color:rgba(255,255,255,.42);display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem}
+.ci-meta span{display:flex;align-items:center;gap:.25rem}
+.nutr-chips{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.5rem}
+.nc{font-size:.67rem;padding:.14rem .5rem;border-radius:50px;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)}
+.ci-qty-row{display:flex;align-items:center;gap:.75rem}
+.qty-btn{width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .3s;line-height:1}
+.qty-btn:hover{background:rgba(233,30,140,.2);border-color:var(--pink)}
+.qty-val{font-family:'Space Mono',monospace;font-size:.85rem;min-width:22px;text-align:center}
+.ci-note{flex:1;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);
+  border-radius:8px;padding:.4rem .7rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.76rem;outline:none;resize:none}
+.ci-note:focus{border-color:var(--pink)}
+.ci-note::placeholder{color:rgba(255,255,255,.22)}
+.ci-price{font-family:'Space Mono',monospace;font-size:.92rem;font-weight:700;
+  color:var(--yellow2);flex-shrink:0}
+.ci-del{background:none;border:none;color:rgba(255,255,255,.25);
+  font-size:.85rem;cursor:pointer;transition:color .3s;flex-shrink:0;padding:.2rem}
+.ci-del:hover{color:var(--red2)}
+.upgrade-row{display:flex;align-items:center;gap:.5rem;margin-top:.45rem;cursor:pointer}
+.upgrade-cb{width:14px;height:14px;accent-color:var(--pink);cursor:pointer}
+.upgrade-txt{font-size:.73rem;color:rgba(255,255,255,.5)}
+.upgrade-badge{font-size:.7rem;font-weight:700;color:var(--green2);
+  background:rgba(5,150,105,.15);border-radius:50px;padding:.1rem .45rem}
+
+/* EMPTY CART */
+.empty-cart{text-align:center;padding:2.5rem;color:rgba(255,255,255,.28)}
+.empty-cart-icon{font-size:2.5rem;display:block;margin-bottom:.75rem}
+.empty-cart a{color:var(--pink2);text-decoration:none;font-size:.85rem;
+  border:1px solid rgba(233,30,140,.3);border-radius:50px;padding:.45rem 1.1rem;
+  display:inline-block;margin-top:.5rem;transition:all .3s}
+.empty-cart a:hover{background:var(--pink3)}
+
+/* DELIVERY OPTIONS */
+.order-type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.1rem}
+.otype{border-radius:14px;padding:1rem .75rem;text-align:center;
+  background:rgba(255,255,255,.04);border:2px solid var(--border);
+  cursor:pointer;transition:all .3s}
+.otype:hover{border-color:rgba(233,30,140,.3);background:var(--pink3)}
+.otype.selected{border-color:var(--pink);background:var(--pink3);
+  box-shadow:0 0 16px rgba(233,30,140,.15)}
+.otype-icon{font-size:1.5rem;display:block;margin-bottom:.45rem}
+.otype-name{font-size:.82rem;font-weight:700;color:#fff;margin-bottom:.18rem}
+.otype-desc{font-size:.7rem;color:rgba(255,255,255,.4)}
+
+/* FORM FIELDS */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem}
+.frow.one{grid-template-columns:1fr}
+.fld{display:flex;flex-direction:column;gap:.32rem}
+.fld label{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:500}
+input[type=text],input[type=tel],input[type=number],select,textarea{
+  background:rgba(255,255,255,.047);border:1px solid var(--border);
+  border-radius:10px;padding:.68rem .95rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.86rem;
+  outline:none;transition:all .3s;width:100%;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--pink);background:rgba(233,30,140,.065);
+  box-shadow:0 0 0 3px rgba(233,30,140,.1)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.22)}
+select option{background:var(--dark2);color:#fff}
+textarea{resize:vertical;min-height:72px}
+
+/* PAYMENT METHODS */
+.pm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.65rem;margin-bottom:.9rem}
+.pm{border-radius:12px;padding:.75rem .5rem;text-align:center;
+  background:rgba(255,255,255,.044);border:1.5px solid var(--border);
+  cursor:pointer;transition:all .3s}
+.pm:hover{border-color:rgba(233,30,140,.3);background:var(--pink3)}
+.pm.selected{border-color:var(--pink);background:var(--pink3);
+  box-shadow:0 0 12px rgba(233,30,140,.18)}
+.pm-icon{font-size:1.2rem;display:block;margin-bottom:.28rem}
+.pm-name{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.65)}
+
+/* ORDER SUMMARY ASIDE */
+.sum-card{background:linear-gradient(135deg,rgba(107,33,168,.09),rgba(233,30,140,.06));
+  border:1px solid rgba(107,33,168,.2);border-radius:18px;padding:1.3rem}
+.sum-title{font-size:.85rem;font-weight:700;color:rgba(255,255,255,.6);
+  margin-bottom:1rem;display:flex;align-items:center;gap:.4rem}
+.sum-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.48rem 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:.82rem}
+.sum-row:last-child{border:none;padding-bottom:0}
+.sk{color:rgba(255,255,255,.44)}
+.sv{color:#fff;font-weight:600}
+.sv.disc{color:var(--green2)}
+.sv.total{font-family:'Space Mono',monospace;font-size:1.15rem;
+  background:linear-gradient(135deg,var(--yellow2),var(--green2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.divider{height:1px;background:rgba(255,255,255,.07);margin:.4rem 0}
+
+/* BUTTONS */
+.btn-primary{
+  width:100%;padding:.92rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.94rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 22px rgba(233,30,140,.28);transition:all .3s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(233,30,140,.48)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{
+  width:100%;padding:.82rem;border-radius:50px;
+  background:transparent;border:1px solid var(--border2);
+  color:rgba(255,255,255,.6);font-family:'Hind Siliguri',sans-serif;
+  font-size:.88rem;font-weight:600;cursor:pointer;transition:all .3s;margin-top:.65rem;
+}
+.btn-secondary:hover{border-color:rgba(255,255,255,.3);color:#fff}
+.btn-pay{
+  width:100%;padding:.92rem;border-radius:50px;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.94rem;font-weight:700;cursor:pointer;
+  box-shadow:0 0 22px rgba(5,150,105,.28);transition:all .3s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+.btn-pay:hover{transform:translateY(-2px);box-shadow:0 0 38px rgba(5,150,105,.5)}
+.btn-pay:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* DISCLAIMER */
+.disclaimer{
+  background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.14);
+  border-radius:11px;padding:.7rem .9rem;margin-top:.85rem;
+  font-size:.73rem;color:rgba(255,255,255,.42);line-height:1.65}
+.disclaimer strong{color:var(--red2)}
+
+/* SUCCESS PANEL */
+.success-wrap{text-align:center;padding:3rem 1.5rem;max-width:580px;margin:0 auto}
+.suc-ring{
+  width:88px;height:88px;border-radius:50%;margin:0 auto 1.4rem;
+  background:linear-gradient(135deg,var(--green),var(--yellow));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;box-shadow:0 0 44px rgba(5,150,105,.4);
+  animation:scIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes scIn{from{transform:scale(0)}to{transform:scale(1)}}
+.suc-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--green2),var(--yellow2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.65rem}
+.suc-txt{font-size:.88rem;color:rgba(255,255,255,.52);line-height:1.7;margin-bottom:1rem}
+.order-id-box{
+  display:inline-block;
+  background:linear-gradient(135deg,rgba(107,33,168,.15),rgba(233,30,140,.12));
+  border:1px solid rgba(107,33,168,.3);border-radius:14px;
+  padding:.75rem 2rem;margin:.75rem 0;
+  font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;
+  color:var(--purple2);letter-spacing:.08em}
+.suc-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem}
+.suc-btn{
+  padding:.75rem 1.75rem;border-radius:50px;font-family:'Hind Siliguri',sans-serif;
+  font-size:.88rem;font-weight:700;cursor:pointer;transition:all .3s;
+  text-decoration:none;display:inline-block;
+}
+.suc-btn.primary{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border:none;box-shadow:0 0 16px rgba(233,30,140,.25)}
+.suc-btn.secondary{background:var(--glass2);border:1px solid var(--border2);color:#fff}
+.suc-btn:hover{transform:translateY(-2px)}
+
+/* TRACKING PREVIEW */
+.track-preview{
+  background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(245,158,11,.06));
+  border:1px solid rgba(5,150,105,.2);border-radius:16px;
+  padding:1.2rem 1.4rem;margin-top:1.2rem;
+}
+.track-steps{display:flex;justify-content:space-between;position:relative;margin-bottom:.5rem}
+.track-steps::before{content:'';position:absolute;top:14px;left:5%;right:5%;
+  height:2px;background:rgba(255,255,255,.08)}
+.ts{display:flex;flex-direction:column;align-items:center;gap:.35rem;flex:1}
+.ts-dot{width:28px;height:28px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.14);background:var(--dark2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;transition:all .4s;position:relative;z-index:1}
+.ts-dot.done{border-color:var(--green);background:rgba(5,150,105,.2);color:var(--green2)}
+.ts-dot.active{border-color:var(--yellow);background:rgba(245,158,11,.2);color:var(--yellow2);
+  animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+.ts-label{font-size:.66rem;color:rgba(255,255,255,.35);text-align:center;white-space:nowrap}
+.ts.done .ts-label{color:var(--green2)}
+.ts.active .ts-label{color:var(--yellow2)}
+
+/* MSG */
+.msg{display:none;padding:.7rem .95rem;border-radius:10px;font-size:.82rem;margin-top:.9rem}
+.msg.err{background:rgba(220,38,38,.09);border:1px solid rgba(220,38,38,.2);color:var(--red2)}
+.msg.ok{background:rgba(5,150,105,.09);border:1px solid rgba(5,150,105,.2);color:var(--green2)}
+
+/* LOADER */
+.loader{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(10,10,15,.88);backdrop-filter:blur(12px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
+.loader.show{display:flex}
+.spin{width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
+  animation:sp .75s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.load-txt{font-size:.88rem;color:rgba(255,255,255,.45)}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
+  background:rgba(20,20,30,.95);backdrop-filter:blur(16px);
+  border:1px solid var(--border2);border-radius:14px;
+  padding:.85rem 1.2rem;font-size:.84rem;color:#fff;
+  display:flex;align-items:center;gap:.65rem;
+  transform:translateY(80px);opacity:0;
+  transition:all .38s cubic-bezier(.4,0,.2,1);max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* RESPONSIVE */
+@media(max-width:820px){
+  .order-grid{grid-template-columns:1fr}
+  .order-aside{position:static}
+  .pm-grid{grid-template-columns:repeat(3,1fr)}
+  .order-type-grid{grid-template-columns:1fr 1fr 1fr}
+}
+@media(max-width:480px){
+  .frow{grid-template-columns:1fr}
+  .pm-grid{grid-template-columns:1fr 1fr}
+  .order-type-grid{grid-template-columns:1fr}
+  .steps-row{gap:0}
+  .step-circle{width:32px;height:32px;font-size:.7rem}
+  .step-label{font-size:.62rem}
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="loader" id="loader"><div class="spin"></div><div class="load-txt" id="loadTxt">প্রক্রিয়া করা হচ্ছে...</div></div>
+<div class="toast" id="toast"><span id="toastMsg">✓</span></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <div class="nav-right">
+      <a href="menu.html" class="nav-link">← মেনুতে ফিরুন</a>
+      <a href="dashboard.html" class="nav-link">ড্যাশবোর্ড</a>
+    </div>
+  </nav>
+
+  <!-- STEPS -->
+  <div class="steps-wrap">
+    <div class="steps-row" id="stepsRow">
+      <div class="step-item active" id="st1">
+        <div class="step-circle">১</div>
+        <span class="step-label">কার্ট</span>
+      </div>
+      <div class="step-line" id="sl1"></div>
+      <div class="step-item" id="st2">
+        <div class="step-circle">২</div>
+        <span class="step-label">ডেলিভারি</span>
+      </div>
+      <div class="step-line" id="sl2"></div>
+      <div class="step-item" id="st3">
+        <div class="step-circle">৩</div>
+        <span class="step-label">পেমেন্ট</span>
+      </div>
+      <div class="step-line" id="sl3"></div>
+      <div class="step-item" id="st4">
+        <div class="step-circle">৪</div>
+        <span class="step-label">নিশ্চিত</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-panel">
+
+    <!-- ══ STEP 1: CART REVIEW ══ -->
+    <div class="panel active" id="p1">
+      <div class="panel-hd">
+        <div class="panel-badge pb-cart">🛒 ধাপ ১</div>
+        <h1 class="panel-title">আপনার কার্ট পর্যালোচনা</h1>
+        <p class="panel-sub">আইটেম পরিমাণ পরিবর্তন করুন বা বিশেষ নির্দেশনা দিন</p>
+      </div>
+      <div class="order-grid">
+        <div class="order-main">
+          <div class="ocard">
+            <div class="ocard-hd">
+              <span class="ocard-title">🥗 নির্বাচিত আইটেম</span>
+              <a href="menu.html" class="ocard-action">মেনু পরিবর্তন করুন →</a>
+            </div>
+            <div class="ocard-body">
+              <div class="cart-list" id="cartList">
+                <div class="empty-cart">
+                  <span class="empty-cart-icon">🛒</span>
+                  কার্ট খালি।
+                  <br><a href="menu.html">মেনু থেকে আইটেম যোগ করুন →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VOICE ORDER -->
+          <div class="ocard">
+            <div class="ocard-hd">
+              <span class="ocard-title">🎙️ ভয়েস অর্ডার</span>
+            </div>
+            <div class="ocard-body">
+              <p style="font-size:.8rem;color:rgba(255,255,255,.45);margin-bottom:.9rem">
+                ফোনে বলুন কী খেতে চান — SAR স্টাফ আপনার হয়ে অর্ডার করবেন।
+              </p>
+              <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+                <button class="btn-primary" style="flex:1;min-width:160px"
+                  onclick="startVoiceOrder()">
+                  🎙️ ভয়েসে বলুন
+                </button>
+                <a href="tel:01XXXXXXXXX" class="btn-secondary"
+                  style="flex:1;min-width:160px;text-align:center;display:flex;align-items:center;justify-content:center;text-decoration:none">
+                  📞 ফোনে অর্ডার করুন
+                </a>
+              </div>
+              <div id="voiceResult" style="display:none;margin-top:.75rem;
+                background:rgba(107,33,168,.1);border:1px solid rgba(107,33,168,.2);
+                border-radius:10px;padding:.75rem;font-size:.82rem;color:var(--purple2)">
+              </div>
+            </div>
+          </div>
+
+          <div class="msg" id="m1"></div>
+          <button class="btn-primary" onclick="goToDelivery()" id="nextBtn1">
+            পরবর্তী — ডেলিভারি তথ্য →
+          </button>
+        </div>
+
+        <!-- ASIDE -->
+        <div class="order-aside">
+          <div class="sum-card" id="sumCard1">
+            <div class="sum-title">🧾 অর্ডার সারসংক্ষেপ</div>
+            <div id="sumItems1"></div>
+            <div class="divider"></div>
+            <div class="sum-row"><span class="sk">সাবটোটাল</span><span class="sv" id="subTotal">৳ ০</span></div>
+            <div class="sum-row" id="deliveryRow" style="display:none">
+              <span class="sk">ডেলিভারি চার্জ</span><span class="sv" id="deliveryFee">৳ ৫০</span>
+            </div>
+            <div class="sum-row"><span class="sk">ভ্যাট (৫%)</span><span class="sv" id="vatAmt">৳ ০</span></div>
+            <div class="divider"></div>
+            <div class="sum-row">
+              <span class="sk" style="font-weight:700;color:#fff">মোট</span>
+              <span class="sv total" id="grandTotal">৳ ০</span>
+            </div>
+            <div class="disclaimer">
+              <strong>⚕️</strong> SAR ডাক্তার নয়। এই খাবার থেরাপিউটিক সচেতনতার জন্য।
+              স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 2: DELIVERY ══ -->
+    <div class="panel" id="p2">
+      <div class="panel-hd">
+        <div class="panel-badge pb-delivery">📍 ধাপ ২</div>
+        <h1 class="panel-title">ডেলিভারি তথ্য</h1>
+        <p class="panel-sub">অর্ডারের ধরন এবং ডেলিভারি বা টেবিল তথ্য দিন</p>
+      </div>
+      <div class="order-grid">
+        <div class="order-main">
+
+          <!-- ORDER TYPE -->
+          <div class="ocard">
+            <div class="ocard-hd"><span class="ocard-title">🏷️ অর্ডারের ধরন</span></div>
+            <div class="ocard-body">
+              <div class="order-type-grid">
+                <div class="otype selected" id="ot-dine" onclick="selectOrderType('dine_in',this)">
+                  <span class="otype-icon">🪑</span>
+                  <div class="otype-name">ডাইন-ইন</div>
+                  <div class="otype-desc">রেস্তোরাঁয় বসে খাবেন</div>
+                </div>
+                <div class="otype" id="ot-delivery" onclick="selectOrderType('delivery',this)">
+                  <span class="otype-icon">🛵</span>
+                  <div class="otype-name">ডেলিভারি</div>
+                  <div class="otype-desc">বাড়িতে পাঠানো হবে</div>
+                </div>
+                <div class="otype" id="ot-takeaway" onclick="selectOrderType('takeaway',this)">
+                  <span class="otype-icon">🥡</span>
+                  <div class="otype-name">টেকঅ্যাওয়ে</div>
+                  <div class="otype-desc">নিজে নিয়ে যাবেন</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DINE IN FIELDS -->
+          <div class="ocard" id="dineInFields">
+            <div class="ocard-hd"><span class="ocard-title">🪑 টেবিল তথ্য</span></div>
+            <div class="ocard-body">
+              <div class="frow">
+                <div class="fld">
+                  <label>টেবিল নম্বর</label>
+                  <input type="text" id="tableNumber" placeholder="যেমন: T-05">
+                </div>
+                <div class="fld">
+                  <label>আসন সংখ্যা</label>
+                  <select id="seatCount">
+                    <option value="1">১ জন</option>
+                    <option value="2">২ জন</option>
+                    <option value="3">৩ জন</option>
+                    <option value="4">৪ জন</option>
+                    <option value="5+">৫+ জন</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DELIVERY FIELDS -->
+          <div class="ocard" id="deliveryFields" style="display:none">
+            <div class="ocard-hd"><span class="ocard-title">📍 ডেলিভারি ঠিকানা</span></div>
+            <div class="ocard-body">
+              <div class="frow one">
+                <div class="fld">
+                  <label>সম্পূর্ণ ঠিকানা <span style="color:var(--pink);font-size:.67rem">*</span></label>
+                  <textarea id="deliveryAddress" rows="2"
+                    placeholder="বাড়ি নং, রোড, এলাকা, থানা, জেলা..."></textarea>
+                </div>
+              </div>
+              <div class="frow">
+                <div class="fld">
+                  <label>ফোন নম্বর <span style="color:var(--pink);font-size:.67rem">*</span></label>
+                  <input type="tel" id="deliveryPhone" placeholder="01XXXXXXXXX">
+                </div>
+                <div class="fld">
+                  <label>ডেলিভারি নির্দেশনা</label>
+                  <input type="text" id="deliveryNote" placeholder="যেমন: ৩য় তলা, লাল গেট">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SPECIAL INSTRUCTIONS -->
+          <div class="ocard">
+            <div class="ocard-hd"><span class="ocard-title">📝 বিশেষ নির্দেশনা</span></div>
+            <div class="ocard-body">
+              <div class="frow one">
+                <div class="fld">
+                  <label>অর্ডারের জন্য বিশেষ কথা <span style="color:rgba(255,255,255,.28);font-size:.67rem">(ঐচ্ছিক)</span></label>
+                  <textarea id="specialInstructions" rows="2"
+                    placeholder="যেমন: মশলা কম দিন, অতিরিক্ত লেবু চাই, অ্যালার্জি বিষয়ক তথ্য..."></textarea>
+                </div>
+              </div>
+
+              <!-- CONDITION POWDERS -->
+              <div style="margin-top:.9rem">
+                <div style="font-size:.78rem;color:rgba(255,255,255,.55);font-weight:600;margin-bottom:.65rem">
+                  💊 ঐচ্ছিক কন্ডিশন পাউডার যোগ করুন (ফ্রি)
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;
+                    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                    border-radius:9px;padding:.55rem .85rem;font-size:.78rem;color:rgba(255,255,255,.65)">
+                    <input type="checkbox" name="condPow" value="সর্দি-কাশি" style="accent-color:var(--pink)">
+                    🌿 তুলসী + মুলেঠি (সর্দি-কাশি)
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;
+                    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                    border-radius:9px;padding:.55rem .85rem;font-size:.78rem;color:rgba(255,255,255,.65)">
+                    <input type="checkbox" name="condPow" value="জ্বর" style="accent-color:var(--pink)">
+                    🌡️ গিলয় + নিম (জ্বর)
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;
+                    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                    border-radius:9px;padding:.55rem .85rem;font-size:.78rem;color:rgba(255,255,255,.65)">
+                    <input type="checkbox" name="condPow" value="পেট খারাপ" style="accent-color:var(--pink)">
+                    🫙 পেপারমিন্ট + আজওয়াইন (পেট খারাপ)
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;
+                    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                    border-radius:9px;padding:.55rem .85rem;font-size:.78rem;color:rgba(255,255,255,.65)">
+                    <input type="checkbox" name="condPow" value="স্ট্রেস" style="accent-color:var(--pink)">
+                    🧠 অশ্বগন্ধা + ব্রাহ্মী (স্ট্রেস)
+                  </label>
+                  <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;
+                    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+                    border-radius:9px;padding:.55rem .85rem;font-size:.78rem;color:rgba(255,255,255,.65)">
+                    <input type="checkbox" name="condPow" value="মাসিক" style="accent-color:var(--pink)">
+                    🌸 ডং কোয়াই + শতমূলী (মাসিক)
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="msg" id="m2"></div>
+          <button class="btn-primary" onclick="goToPayment()">
+            পরবর্তী — পেমেন্ট →
+          </button>
+          <button class="btn-secondary" onclick="goTo(1)">← কার্টে ফিরুন</button>
+        </div>
+
+        <!-- ASIDE -->
+        <div class="order-aside" id="sumAside2">
+          <div class="sum-card">
+            <div class="sum-title">🧾 অর্ডার সারসংক্ষেপ</div>
+            <div id="sumItems2"></div>
+            <div class="divider"></div>
+            <div class="sum-row"><span class="sk">সাবটোটাল</span><span class="sv" id="sub2">৳ ০</span></div>
+            <div class="sum-row" id="delRow2" style="display:none">
+              <span class="sk">ডেলিভারি</span><span class="sv" id="del2">৳ ৫০</span>
+            </div>
+            <div class="sum-row"><span class="sk">ভ্যাট (৫%)</span><span class="sv" id="vat2">৳ ০</span></div>
+            <div class="divider"></div>
+            <div class="sum-row">
+              <span class="sk" style="font-weight:700;color:#fff">মোট</span>
+              <span class="sv total" id="grand2">৳ ০</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: PAYMENT ══ -->
+    <div class="panel" id="p3">
+      <div class="panel-hd">
+        <div class="panel-badge pb-payment">💳 ধাপ ৩</div>
+        <h1 class="panel-title">পেমেন্ট</h1>
+        <p class="panel-sub">ShurjoPay-এর মাধ্যমে নিরাপদ পেমেন্ট করুন</p>
+      </div>
+      <div class="order-grid">
+        <div class="order-main">
+
+          <div class="ocard">
+            <div class="ocard-hd"><span class="ocard-title">💳 পেমেন্ট পদ্ধতি</span></div>
+            <div class="ocard-body">
+              <div class="pm-grid">
+                <div class="pm selected" onclick="selPM(this,'bkash')">
+                  <span class="pm-icon">📱</span><span class="pm-name">bKash</span>
+                </div>
+                <div class="pm" onclick="selPM(this,'nagad')">
+                  <span class="pm-icon">💚</span><span class="pm-name">Nagad</span>
+                </div>
+                <div class="pm" onclick="selPM(this,'rocket')">
+                  <span class="pm-icon">🚀</span><span class="pm-name">Rocket</span>
+                </div>
+                <div class="pm" onclick="selPM(this,'visa')">
+                  <span class="pm-icon">💳</span><span class="pm-name">Visa/Card</span>
+                </div>
+                <div class="pm" onclick="selPM(this,'mastercard')">
+                  <span class="pm-icon">🔴</span><span class="pm-name">Mastercard</span>
+                </div>
+                <div class="pm" onclick="selPM(this,'cash')">
+                  <span class="pm-icon">💵</span><span class="pm-name">ক্যাশ অন ডেলিভারি</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ORDER REVIEW BOX -->
+          <div class="ocard">
+            <div class="ocard-hd"><span class="ocard-title">📋 চূড়ান্ত পর্যালোচনা</span></div>
+            <div class="ocard-body" id="finalReview">
+            </div>
+          </div>
+
+          <div class="disclaimer">
+            <strong>⚕️ গুরুত্বপূর্ণ বিজ্ঞপ্তি:</strong> SAR — She AI Restaurant কোনো চিকিৎসা প্রতিষ্ঠান নয়।
+            আমরা ডাক্তার নই। পেমেন্ট রিসিটে পুষ্টিমান, ঔষধি পরামর্শ ও ডিসক্লেইমার পাবেন।
+            যেকোনো স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
+            <strong>নিজে নিজে ওষুধ সেবন করবেন না।</strong>
+          </div>
+
+          <div class="msg" id="m3"></div>
+          <button class="btn-pay" onclick="processOrder()" id="payOrderBtn">
+            🔒 পেমেন্ট করুন ও অর্ডার নিশ্চিত করুন —
+            <span id="payAmtBtn">৳ ০</span>
+          </button>
+          <button class="btn-secondary" onclick="goTo(2)">← ডেলিভারি তথ্যে ফিরুন</button>
+        </div>
+
+        <!-- ASIDE -->
+        <div class="order-aside">
+          <div class="sum-card">
+            <div class="sum-title">🧾 চূড়ান্ত হিসাব</div>
+            <div id="sumItems3"></div>
+            <div class="divider"></div>
+            <div class="sum-row"><span class="sk">সাবটোটাল</span><span class="sv" id="sub3">৳ ০</span></div>
+            <div class="sum-row" id="delRow3" style="display:none">
+              <span class="sk">ডেলিভারি</span><span class="sv" id="del3">৳ ৫০</span>
+            </div>
+            <div class="sum-row"><span class="sk">ভ্যাট (৫%)</span><span class="sv" id="vat3">৳ ০</span></div>
+            <div class="divider"></div>
+            <div class="sum-row">
+              <span class="sk" style="font-weight:700;color:#fff">মোট পরিশোধযোগ্য</span>
+              <span class="sv total" id="grand3">৳ ০</span>
+            </div>
+            <div style="margin-top:.9rem;font-size:.72rem;color:rgba(255,255,255,.28);text-align:center">
+              🔐 ShurjoPay SSL এনক্রিপ্টেড
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 4: SUCCESS ══ -->
+    <div class="panel" id="p4">
+      <div class="ocard">
+        <div class="ocard-body">
+          <div class="success-wrap">
+            <div class="suc-ring">✓</div>
+            <div class="suc-title">অর্ডার নিশ্চিত হয়েছে!</div>
+            <p class="suc-txt" id="sucTxt">
+              আপনার অর্ডার সফলভাবে নেওয়া হয়েছে। রান্নাঘর প্রস্তুত করছে।
+              WhatsApp ও ইমেইলে নিশ্চিতকরণ পাঠানো হয়েছে।
+            </p>
+            <div class="order-id-box" id="orderIdDisplay">ORD-—</div>
+
+            <!-- TRACKING PREVIEW -->
+            <div class="track-preview">
+              <div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:.85rem;text-align:center">
+                অর্ডারের অবস্থা — লাইভ আপডেট
+              </div>
+              <div class="track-steps">
+                <div class="ts done" id="ts1">
+                  <div class="ts-dot">✓</div>
+                  <span class="ts-label">নিশ্চিত</span>
+                </div>
+                <div class="ts active" id="ts2">
+                  <div class="ts-dot">🍳</div>
+                  <span class="ts-label">রান্না হচ্ছে</span>
+                </div>
+                <div class="ts" id="ts3">
+                  <div class="ts-dot">✓</div>
+                  <span class="ts-label">প্রস্তুত</span>
+                </div>
+                <div class="ts" id="ts4">
+                  <div class="ts-dot">🛵</div>
+                  <span class="ts-label">ডেলিভারি</span>
+                </div>
+                <div class="ts" id="ts5">
+                  <div class="ts-dot">🏠</div>
+                  <span class="ts-label">পৌঁছেছে</span>
+                </div>
+              </div>
+              <div style="text-align:center;margin-top:.75rem">
+                <div style="font-size:.8rem;color:var(--yellow2);font-weight:600">
+                  ⏱️ আনুমানিক সময়: <span id="etaDisplay">২৫-৩০ মিনিট</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="suc-actions">
+              <a href="track.html" class="suc-btn primary" id="trackLink">📍 ট্র্যাক করুন</a>
+              <a href="receipt.html" class="suc-btn secondary" id="receiptLink">🧾 রিসিট দেখুন</a>
+              <a href="menu.html" class="suc-btn secondary">🥗 আবার অর্ডার করুন</a>
+              <a href="dashboard.html" class="suc-btn secondary">🏠 ড্যাশবোর্ড</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /order-panel -->
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H    = {'apikey':KEY,'Authorization':'Bearer '+KEY,
+  'Content-Type':'application/json','Prefer':'return=representation'};
+
+const CID   = localStorage.getItem('sar_cid');
+const CNAME = localStorage.getItem('sar_name') || 'গ্রাহক';
+
+if (!CID) { window.location.href = 'login.html'; }
+
+// State
+let cart        = JSON.parse(localStorage.getItem('sar_cart') || '[]');
+let orderType   = 'dine_in';
+let payMethod   = 'bkash';
+let createdOrderId = null;
+let currentStep = 1;
+
+const CAT_EMOJI = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱'};
+const MEAL_LBL  = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  if (!cart.length) {
+    // If came from dashboard with empty cart, show empty state
+  }
+  renderCartStep();
+  updateAllSummaries();
+});
+
+// ═══════════════════════════════════════
+// STEP NAVIGATION
+// ═══════════════════════════════════════
+function goTo(step) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('p' + step).classList.add('active');
+  currentStep = step;
+  updateStepUI(step);
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function updateStepUI(step) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('st' + i);
+    const ln = document.getElementById('sl' + i);
+    el.classList.remove('active','done');
+    if (i < step)  { el.classList.add('done');   el.querySelector('.step-circle').textContent = '✓'; }
+    else if (i === step) { el.classList.add('active'); el.querySelector('.step-circle').textContent = i; }
+    else           { el.querySelector('.step-circle').textContent = i; }
+    if (ln) { ln.classList.toggle('done', i < step); }
+  }
+}
+
+function goToDelivery() {
+  if (!cart.length) { showMsg('m1','কার্ট খালি। মেনু থেকে আইটেম যোগ করুন।','err'); return; }
+  updateAllSummaries();
+  buildFinalReview();
+  goTo(2);
+}
+
+function goToPayment() {
+  if (orderType === 'delivery') {
+    const addr = document.getElementById('deliveryAddress').value.trim();
+    const ph   = document.getElementById('deliveryPhone').value.trim();
+    if (!addr) { showMsg('m2','ডেলিভারি ঠিকানা দিন।','err'); return; }
+    if (!ph || !/^01[3-9]\d{8}$/.test(ph)) { showMsg('m2','সঠিক ফোন নম্বর দিন।','err'); return; }
+  }
+  buildFinalReview();
+  updateAllSummaries();
+  goTo(3);
+}
+
+// ═══════════════════════════════════════
+// RENDER CART
+// ═══════════════════════════════════════
+function renderCartStep() {
+  const list = document.getElementById('cartList');
+  if (!cart.length) {
+    list.innerHTML = `<div class="empty-cart">
+      <span class="empty-cart-icon">🛒</span>কার্ট খালি।
+      <br><a href="menu.html">মেনু থেকে আইটেম যোগ করুন →</a></div>`;
+    document.getElementById('nextBtn1').disabled = true;
+    return;
+  }
+  document.getElementById('nextBtn1').disabled = false;
+  list.innerHTML = cart.map((item, idx) => `
+    <div class="ci" id="ci-${idx}">
+      <span class="ci-emoji">${CAT_EMOJI[item.cat] || '🍽️'}</span>
+      <div class="ci-body">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-meta">
+          <span>${MEAL_LBL[item.meal] || item.meal}</span>
+          <span style="color:var(--yellow2)">৳ ${item.price}</span>
+          ${item.cat?`<span style="font-size:.67rem;padding:.1rem .4rem;border-radius:50px;
+            background:rgba(233,30,140,.12);color:var(--pink2)">${item.cat}</span>`:''}
+        </div>
+        <div class="nutr-chips">
+          ${item.kcal?`<span class="nc">🔥 ${item.kcal} kcal</span>`:''}
+          ${item.protein?`<span class="nc">💪 ${item.protein}</span>`:''}
+          ${item.has_egg?`<span class="nc" style="color:var(--yellow2)">🥚 ডিম</span>`:''}
+          ${item.has_chicken?`<span class="nc" style="color:var(--green2)">🐓 চিকেন ঘি</span>`:''}
+        </div>
+        <div class="ci-qty-row">
+          <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+          <textarea class="ci-note" rows="1"
+            placeholder="বিশেষ নির্দেশনা..."
+            onchange="updateNote(${idx},this.value)">${item.note||''}</textarea>
+          <button class="ci-del" onclick="removeItem(${idx})">🗑️</button>
+        </div>
+        ${(item.has_egg||item.has_chicken)?`
+        <label class="upgrade-row">
+          <input type="checkbox" class="upgrade-cb"
+            ${item.upgrade?'checked':''}
+            onchange="toggleUpgrade(${idx},this.checked)">
+          <span class="upgrade-txt">চিকেন/ডিম আপগ্রেড</span>
+          <span class="upgrade-badge">+ ৳ ৫০</span>
+        </label>`:''}
+      </div>
+      <span class="ci-price">৳ ${(item.price * item.qty).toLocaleString('bn-BD')}</span>
+    </div>`).join('');
+  updateAllSummaries();
+}
+
+// ═══════════════════════════════════════
+// CART MUTATIONS
+// ═══════════════════════════════════════
+function changeQty(idx, d) {
+  cart[idx].qty = Math.max(0, (cart[idx].qty || 1) + d);
+  if (cart[idx].qty === 0) cart.splice(idx, 1);
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  renderCartStep();
+}
+function removeItem(idx) {
+  cart.splice(idx, 1);
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  renderCartStep();
+}
+function updateNote(idx, val) {
+  cart[idx].note = val;
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+}
+function toggleUpgrade(idx, checked) {
+  if (!cart[idx].basePrice) cart[idx].basePrice = cart[idx].price;
+  cart[idx].upgrade = checked;
+  cart[idx].price = cart[idx].basePrice + (checked ? 50 : 0);
+  localStorage.setItem('sar_cart', JSON.stringify(cart));
+  renderCartStep();
+}
+
+// ═══════════════════════════════════════
+// ORDER TYPE
+// ═══════════════════════════════════════
+function selectOrderType(type, el) {
+  orderType = type;
+  document.querySelectorAll('.otype').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('dineInFields').style.display   = type === 'dine_in'  ? 'block' : 'none';
+  document.getElementById('deliveryFields').style.display = type === 'delivery' ? 'block' : 'none';
+  // Show/hide delivery fee
+  const showDel = type === 'delivery';
+  ['deliveryRow','delRow2','delRow3'].forEach(id => {
+    const el2 = document.getElementById(id);
+    if (el2) el2.style.display = showDel ? 'flex' : 'none';
+  });
+  updateAllSummaries();
+}
+
+// ═══════════════════════════════════════
+// SUMMARIES
+// ═══════════════════════════════════════
+function calcTotals() {
+  const sub  = cart.reduce((s, i) => s + (i.price * (i.qty||1)), 0);
+  const del  = orderType === 'delivery' ? 50 : 0;
+  const vat  = Math.round((sub + del) * 0.05);
+  const grand = sub + del + vat;
+  return {sub, del, vat, grand};
+}
+
+function buildItemsHTML(items) {
+  return items.map(i =>
+    `<div class="sum-row">
+      <span class="sk">${CAT_EMOJI[i.cat]||'🍽️'} ${i.name.substring(0,22)}${i.name.length>22?'…':''} ×${i.qty||1}</span>
+      <span class="sv">৳ ${(i.price*(i.qty||1)).toLocaleString('bn-BD')}</span>
+    </div>`
+  ).join('');
+}
+
+function updateAllSummaries() {
+  const {sub, del, vat, grand} = calcTotals();
+  const itemsHTML = buildItemsHTML(cart);
+  const showDel   = orderType === 'delivery';
+
+  // Step 1
+  document.getElementById('sumItems1').innerHTML = itemsHTML;
+  document.getElementById('subTotal').textContent = '৳ ' + sub.toLocaleString('bn-BD');
+  document.getElementById('vatAmt').textContent   = '৳ ' + vat;
+  document.getElementById('grandTotal').textContent = '৳ ' + grand.toLocaleString('bn-BD');
+  if (document.getElementById('deliveryRow'))
+    document.getElementById('deliveryRow').style.display = showDel ? 'flex' : 'none';
+
+  // Step 2
+  document.getElementById('sumItems2').innerHTML = itemsHTML;
+  document.getElementById('sub2').textContent    = '৳ ' + sub.toLocaleString('bn-BD');
+  document.getElementById('vat2').textContent    = '৳ ' + vat;
+  document.getElementById('grand2').textContent  = '৳ ' + grand.toLocaleString('bn-BD');
+  document.getElementById('delRow2').style.display = showDel?'flex':'none';
+  if (showDel) document.getElementById('del2').textContent = '৳ ' + del;
+
+  // Step 3
+  document.getElementById('sumItems3').innerHTML = itemsHTML;
+  document.getElementById('sub3').textContent    = '৳ ' + sub.toLocaleString('bn-BD');
+  document.getElementById('vat3').textContent    = '৳ ' + vat;
+  document.getElementById('grand3').textContent  = '৳ ' + grand.toLocaleString('bn-BD');
+  document.getElementById('delRow3').style.display = showDel?'flex':'none';
+  if (showDel) document.getElementById('del3').textContent = '৳ ' + del;
+
+  document.getElementById('payAmtBtn').textContent = '৳ ' + grand.toLocaleString('bn-BD');
+}
+
+// ═══════════════════════════════════════
+// FINAL REVIEW BOX
+// ═══════════════════════════════════════
+function buildFinalReview() {
+  const condPows = [...document.querySelectorAll('input[name="condPow"]:checked')].map(e=>e.value);
+  const {grand} = calcTotals();
+  const typeLabel = {dine_in:'ডাইন-ইন 🪑',delivery:'ডেলিভারি 🛵',takeaway:'টেকঅ্যাওয়ে 🥡'}[orderType];
+  const addr = document.getElementById('deliveryAddress')?.value || '';
+  const tbl  = document.getElementById('tableNumber')?.value || '—';
+  const note = document.getElementById('specialInstructions')?.value || '';
+
+  document.getElementById('finalReview').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:.6rem">
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="color:rgba(255,255,255,.44)">অর্ডারের ধরন</span>
+        <span style="color:#fff;font-weight:600">${typeLabel}</span>
+      </div>
+      ${orderType==='dine_in'?`
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="color:rgba(255,255,255,.44)">টেবিল নম্বর</span>
+        <span style="color:#fff;font-weight:600">${tbl}</span>
+      </div>`:''}
+      ${orderType==='delivery'?`
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="color:rgba(255,255,255,.44)">ডেলিভারি ঠিকানা</span>
+        <span style="color:#fff;font-weight:600;text-align:right;max-width:55%">${addr.substring(0,50)}</span>
+      </div>`:''}
+      ${note?`
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="color:rgba(255,255,255,.44)">বিশেষ নির্দেশনা</span>
+        <span style="color:rgba(255,255,255,.7);text-align:right;max-width:55%">${note.substring(0,60)}</span>
+      </div>`:''}
+      ${condPows.length?`
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <span style="color:rgba(255,255,255,.44)">কন্ডিশন পাউডার</span>
+        <span style="color:var(--yellow2);font-weight:600;text-align:right;max-width:55%">${condPows.join(', ')}</span>
+      </div>`:''}
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;padding:.45rem 0">
+        <span style="color:rgba(255,255,255,.44)">আইটেম সংখ্যা</span>
+        <span style="color:#fff;font-weight:600">${cart.length}টি আইটেম</span>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════
+// PAYMENT METHOD
+// ═══════════════════════════════════════
+function selPM(el, method) {
+  document.querySelectorAll('.pm').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  payMethod = method;
+}
+
+// ═══════════════════════════════════════
+// PROCESS ORDER — SUPABASE
+// ═══════════════════════════════════════
+async function processOrder() {
+  const btn = document.getElementById('payOrderBtn');
+  btn.disabled = true;
+  showLoader('অর্ডার প্রক্রিয়া করা হচ্ছে...');
+
+  const {sub, del, vat, grand} = calcTotals();
+  const txnId  = 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  const orderNum = 'ORD-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000+Math.random()*9000);
+  const condPows = [...document.querySelectorAll('input[name="condPow"]:checked')].map(e=>e.value);
+  const note   = document.getElementById('specialInstructions')?.value || '';
+  const addr   = orderType==='delivery' ? document.getElementById('deliveryAddress')?.value : null;
+  const tbl    = orderType==='dine_in'  ? document.getElementById('tableNumber')?.value : null;
+  const eta    = orderType==='delivery' ? 45 : orderType==='dine_in' ? 25 : 20;
+
+  // Build items_json
+  const itemsJson = cart.map(i => ({
+    id: i.id, name_bn: i.name, cat: i.cat, meal: i.meal,
+    qty: i.qty||1, unit_price: i.price,
+    upgrade: !!i.upgrade, note: i.note||'',
+    kcal: i.kcal, protein: i.protein,
+    has_egg: i.has_egg, has_chicken: i.has_chicken
+  }));
+
+  const fullInstructions = [
+    note,
+    condPows.length ? 'কন্ডিশন পাউডার: ' + condPows.join(', ') : ''
+  ].filter(Boolean).join(' | ');
+
+  try {
+    // 1. Create order
+    showLoader('অর্ডার তৈরি হচ্ছে...');
+    const oRes = await fetch(`${SUPA}/rest/v1/orders`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        order_number: orderNum,
+        customer_id: CID,
+        order_type: orderType,
+        status: 'confirmed',
+        items_json: itemsJson,
+        subtotal: sub,
+        tax: vat,
+        delivery_fee: del,
+        total_amount: grand,
+        payment_method: payMethod,
+        payment_status: payMethod === 'cash' ? 'pending' : 'paid',
+        payment_transaction_id: txnId,
+        special_instructions: fullInstructions || null,
+        table_number: tbl || null,
+        delivery_address: addr || null,
+        estimated_time_minutes: eta,
+        is_voice_order: false,
+      })
+    });
+    if (!oRes.ok) { const e=await oRes.json(); throw new Error(e.message); }
+    const oArr = await oRes.json();
+    const order = oArr[0];
+    createdOrderId = order.id;
+
+    // 2. Create order_items rows
+    showLoader('আইটেম সংরক্ষণ হচ্ছে...');
+    const oiData = cart.map(i => ({
+      order_id: order.id,
+      menu_item_id: i.id || null,
+      menu_name_bn: i.name,
+      quantity: i.qty || 1,
+      unit_price: i.price,
+      upgrade_selected: !!i.upgrade,
+      special_note: i.note || null,
+      nutrition_json: {kcal:i.kcal, protein:i.protein, has_egg:i.has_egg, has_chicken:i.has_chicken}
+    }));
+    await fetch(`${SUPA}/rest/v1/order_items`, {
+      method: 'POST', headers: H, body: JSON.stringify(oiData)
+    });
+
+    // 3. Payment record
+    showLoader('পেমেন্ট রেকর্ড সংরক্ষণ হচ্ছে...');
+    await fetch(`${SUPA}/rest/v1/payments`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        customer_id: CID,
+        order_id: order.id,
+        payment_type: 'order',
+        amount: grand,
+        discount_applied: 0,
+        final_amount: grand,
+        payment_method: payMethod,
+        transaction_id: txnId,
+        status: payMethod === 'cash' ? 'pending' : 'success',
+        surjopay_response_json: {
+          gateway: 'ShurjoPay', txn: txnId, amount: grand,
+          method: payMethod, time: new Date().toISOString()
+        }
+      })
+    });
+
+    // 4. Kitchen display entry
+    showLoader('রান্নাঘরে পাঠানো হচ্ছে...');
+    await fetch(`${SUPA}/rest/v1/kitchen_display`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        order_id: order.id, station: 'hot',
+        status: 'queued', priority_level: 'normal'
+      })
+    });
+
+    // 5. Notification log
+    await fetch(`${SUPA}/rest/v1/notifications_log`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        customer_id: CID,
+        notification_type: 'whatsapp',
+        trigger_event: 'order',
+        message_preview: `${CNAME} আপা — অর্ডার ${orderNum} নিশ্চিত! মোট: ৳${grand}. আনুমানিক সময়: ${eta} মিনিট।`,
+        status: 'pending'
+      })
+    });
+
+    // 6. Receipt entry
+    const totalNutr = cart.reduce((acc, i) => ({
+      kcal: (acc.kcal||0) + (parseInt(i.kcal)||0) * (i.qty||1),
+      protein: acc.protein + (parseFloat(i.protein)||0) * (i.qty||1)
+    }), {kcal:0, protein:0});
+    await fetch(`${SUPA}/rest/v1/receipts`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        order_id: order.id,
+        customer_id: CID,
+        customer_name: CNAME,
+        items_detail_json: itemsJson,
+        nutrition_summary_json: totalNutr,
+        total_calories: totalNutr.kcal,
+        total_protein: totalNutr.protein,
+        health_benefits_bn: 'SAR থেরাপিউটিক মেনু — গ্লুটেন-মুক্ত, পরিশোধিত তেল-মুক্ত, চিনি-মুক্ত।',
+        disease_powders_used: cart.map(i=>i.powders||'').filter(Boolean).join('; ') || null,
+      })
+    });
+
+    // 7. Clear cart
+    localStorage.removeItem('sar_cart');
+    localStorage.setItem('sar_last_order_id', order.id);
+    localStorage.setItem('sar_last_order_num', orderNum);
+    cart = [];
+
+    hideLoader();
+    btn.disabled = false;
+
+    // Show success
+    document.getElementById('orderIdDisplay').textContent = orderNum;
+    document.getElementById('etaDisplay').textContent = `${eta}-${eta+10} মিনিট`;
+    document.getElementById('trackLink').href   = `track.html?oid=${order.id}`;
+    document.getElementById('receiptLink').href = `receipt.html?oid=${order.id}`;
+    document.getElementById('sucTxt').textContent =
+      `আপনার অর্ডার ${orderNum} সফলভাবে নেওয়া হয়েছে।
+       ${orderType==='delivery'?'আনুমানিক '+eta+' মিনিটের মধ্যে ডেলিভারি হবে।':'রান্নাঘর প্রস্তুত করছে।'}
+       WhatsApp ও ইমেইলে নিশ্চিতকরণ পাঠানো হয়েছে।`;
+
+    // Start mock tracking update
+    goTo(4);
+    startTrackingSimulation();
+
+  } catch (e) {
+    hideLoader();
+    btn.disabled = false;
+    showMsg('m3', '❌ অর্ডার সমস্যা: ' + e.message, 'err');
+    console.error(e);
+  }
+}
+
+// ═══════════════════════════════════════
+// TRACKING SIMULATION
+// ═══════════════════════════════════════
+function startTrackingSimulation() {
+  const stages = [
+    {id:'ts1',icon:'✓',done:true},
+    {id:'ts2',icon:'🍳',active:true},
+    {id:'ts3',icon:'✓'},
+    {id:'ts4',icon:'🛵'},
+    {id:'ts5',icon:'🏠'},
+  ];
+  let idx = 2;
+  const interval = setInterval(() => {
+    if (idx >= stages.length) { clearInterval(interval); return; }
+    const prev = stages[idx-1];
+    const curr = stages[idx];
+    const prevEl = document.getElementById(prev.id);
+    if (prevEl) {
+      prevEl.classList.remove('active'); prevEl.classList.add('done');
+      prevEl.querySelector('.ts-dot').textContent = '✓';
+      prevEl.querySelector('.ts-label').style.color = '';
+    }
+    const currEl = document.getElementById(curr.id);
+    if (currEl) {
+      currEl.classList.add('active');
+      currEl.querySelector('.ts-dot').textContent = curr.icon || idx+1;
+    }
+    idx++;
+    // Real-time Supabase update if order exists
+    if (createdOrderId && idx === 3) updateOrderStatus('preparing');
+    if (createdOrderId && idx === 4) updateOrderStatus('ready');
+  }, orderType === 'delivery' ? 20000 : 15000);
+}
+
+async function updateOrderStatus(status) {
+  try {
+    await fetch(`${SUPA}/rest/v1/orders?id=eq.${createdOrderId}`, {
+      method: 'PATCH',
+      headers: {...H, 'Prefer': 'return=minimal'},
+      body: JSON.stringify({status, updated_at: new Date().toISOString()})
+    });
+    await fetch(`${SUPA}/rest/v1/kitchen_display?order_id=eq.${createdOrderId}`, {
+      method: 'PATCH',
+      headers: {...H, 'Prefer': 'return=minimal'},
+      body: JSON.stringify({
+        status: status === 'preparing' ? 'started' : 'done',
+        started_at: status === 'preparing' ? new Date().toISOString() : null,
+        completed_at: status === 'ready' ? new Date().toISOString() : null
+      })
+    });
+  } catch(e) { console.error(e); }
+}
+
+// ═══════════════════════════════════════
+// VOICE ORDER
+// ═══════════════════════════════════════
+function startVoiceOrder() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    toast('দুঃখিত, আপনার ব্রাউজার ভয়েস সমর্থন করে না।'); return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const rec = new SR();
+  rec.lang = 'bn-BD'; rec.continuous = false; rec.interimResults = false;
+  rec.start();
+  toast('🎙️ বলুন... (শুনছি)');
+  rec.onresult = e => {
+    const txt = e.results[0][0].transcript;
+    const res = document.getElementById('voiceResult');
+    res.style.display = 'block';
+    res.innerHTML = `<strong>আপনি বললেন:</strong> "${txt}"<br>
+      <span style="color:rgba(255,255,255,.5);font-size:.75rem">
+      এই অর্ডারটি SAR স্টাফ প্রক্রিয়া করবেন। অথবা মেনু থেকে নিজে নির্বাচন করুন।</span>`;
+    // Save voice order
+    fetch(`${SUPA}/rest/v1/voice_orders`, {
+      method: 'POST', headers: H,
+      body: JSON.stringify({
+        customer_id: CID, transcription_text: txt,
+        language: 'bn', recording_url: null
+      })
+    }).catch(console.error);
+    toast('✓ ভয়েস অর্ডার রেকর্ড করা হয়েছে।');
+  };
+  rec.onerror = () => toast('ভয়েস শোনা যায়নি। আবার চেষ্টা করুন।');
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function showMsg(id, txt, type) {
+  const el = document.getElementById(id);
+  el.className = 'msg ' + type;
+  el.textContent = txt;
+  el.style.display = 'block';
+  if (type !== 'ok') setTimeout(() => el.style.display = 'none', 5000);
+}
+function showLoader(t) { document.getElementById('loadTxt').textContent = t; document.getElementById('loader').classList.add('show'); }
+function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
