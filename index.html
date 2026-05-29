@@ -4,445 +4,485 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>SAR সার — She AI Restaurant | World's First AI+EI+Blockchain Women's Healing Restaurant</title>
-<meta name="description" content="SAR — Bangladesh's first AI+EI+Blockchain therapeutic restaurant exclusively for women. Food is Medicine.">
+<meta name="description" content="SAR — পৃথিবীর প্রথম AI+EI+Blockchain থেরাপিউটিক রেস্তোরাঁ — শুধুমাত্র নারীদের জন্য।">
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Hind+Siliguri:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700;900&family=Hind+Siliguri:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#F5C842;--gold2:#FFE082;--gold3:rgba(245,200,66,.12);
-  --green:#2ECC71;--green2:#A8E6CF;--green3:rgba(46,204,113,.12);
-  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
-  --yellow:#F59E0B;--yellow2:#FCD34D;
-  --silver:#C0C0C0;--silver2:#E8E8E8;--silver3:rgba(192,192,192,.15);
-  --dark:#060608;--dark2:#0A0A10;--dark3:#111118;
-  --glass:rgba(255,255,255,.04);--glass2:rgba(255,255,255,.08);
-  --border:rgba(245,200,66,.15);--border2:rgba(245,200,66,.25);
+  --gold:#F5C518;--gold2:#FFE566;--gold3:#FFF3B0;--goldr:rgba(245,197,24,.15);
+  --green:#00D084;--green2:#A8FFD8;--greenr:rgba(0,208,132,.12);
+  --pink:#FF1493;--pink2:#FF69B4;--pinkr:rgba(255,20,147,.12);
+  --purple:#8B00FF;--purple2:#BF5FFF;
+  --cyan:#00F5FF;--cyanr:rgba(0,245,255,.1);
+  --dark:#03030A;--dark2:#06060F;--dark3:#0A0A18;--dark4:#0E0E22;
+  --glass:rgba(255,255,255,.03);--glass2:rgba(255,255,255,.07);--glass3:rgba(255,255,255,.12);
+  --border:rgba(245,197,24,.12);--border2:rgba(245,197,24,.25);--border3:rgba(245,197,24,.4);
+  --silver:rgba(192,192,192,.2);--silver2:rgba(220,220,220,.3);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;overflow-x:hidden;cursor:default}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;overflow-x:hidden}
+::selection{background:var(--gold);color:#000}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold),var(--pink));border-radius:99px}
 
-/* ══ SCROLLBAR ══ */
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-track{background:var(--dark)}
-::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold),var(--pink));border-radius:50px}
+/* ══ PARTICLE CANVAS ══ */
+#particleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
 
-/* ══ BACKGROUNDS ══ */
-.bg-fixed{position:fixed;inset:0;z-index:0;pointer-events:none}
-.bg-mesh{position:absolute;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(245,200,66,.07) 0%,transparent 60%),
-  radial-gradient(ellipse 60% 80% at 80% 80%,rgba(46,204,113,.07) 0%,transparent 60%),
-  radial-gradient(ellipse 50% 50% at 50% 50%,rgba(233,30,140,.05) 0%,transparent 70%)}
-.bg-grid{position:absolute;inset:0;
-  background-image:linear-gradient(rgba(245,200,66,.025)1px,transparent 1px),
-  linear-gradient(90deg,rgba(245,200,66,.025)1px,transparent 1px);
-  background-size:60px 60px}
-.bg-noise{position:absolute;inset:0;opacity:.025;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* ══ ANIMATED BG ══ */
+.bg-layer{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(120px);animation:orbDrift 25s ease-in-out infinite}
+.o1{width:700px;height:700px;background:radial-gradient(var(--gold),transparent 70%);opacity:.06;top:-200px;left:-200px}
+.o2{width:600px;height:600px;background:radial-gradient(var(--pink),transparent 70%);opacity:.07;bottom:-100px;right:-100px;animation-delay:-8s}
+.o3{width:450px;height:450px;background:radial-gradient(var(--green),transparent 70%);opacity:.06;top:30%;left:30%;animation-delay:-15s}
+.o4{width:300px;height:300px;background:radial-gradient(var(--purple),transparent 70%);opacity:.08;top:60%;right:20%;animation-delay:-5s}
+@keyframes orbDrift{0%,100%{transform:translate(0,0)}25%{transform:translate(30px,-30px)}50%{transform:translate(-20px,20px)}75%{transform:translate(15px,10px)}}
+.grid-overlay{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(245,197,24,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(245,197,24,.02) 1px,transparent 1px);
+  background-size:80px 80px}
 
-/* ══ RAINBOW BAR ══ */
-.rainbow-bar{height:3px;background:linear-gradient(90deg,var(--gold),var(--green),var(--pink),var(--yellow),var(--gold));background-size:200%;animation:rainbow 4s linear infinite;position:fixed;top:0;left:0;right:0;z-index:1000}
-@keyframes rainbow{0%{background-position:0%}100%{background-position:200%}}
+/* ══ RAINBOW ══ */
+.rainbow{height:2px;background:linear-gradient(90deg,var(--gold),var(--green),var(--pink),var(--cyan),var(--purple),var(--gold));background-size:300%;animation:rgbShift 3s linear infinite;position:fixed;top:0;left:0;right:0;z-index:1000}
+@keyframes rgbShift{0%{background-position:0%}100%{background-position:300%}}
 
-/* ══ NAV ══ */
-nav{position:fixed;top:3px;left:0;right:0;z-index:100;background:rgba(6,6,8,.88);backdrop-filter:blur(28px);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:.75rem;text-decoration:none}
-.nav-logo-icon{width:42px;height:42px;border-radius:12px;
+/* ══ NAVBAR ══ */
+nav{position:fixed;top:2px;left:0;right:0;z-index:200;background:rgba(3,3,10,.82);backdrop-filter:blur(32px) saturate(180%);border-bottom:1px solid rgba(245,197,24,.08);padding:.7rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo-wrap{display:flex;align-items:center;gap:.75rem;text-decoration:none;flex-shrink:0}
+.logo-gem{width:40px;height:40px;border-radius:12px;position:relative;display:flex;align-items:center;justify-content:center;
   background:linear-gradient(135deg,var(--gold),var(--pink));
-  display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;font-family:'Cinzel',serif;color:#000;
-  box-shadow:0 0 20px rgba(245,200,66,.35)}
-.nav-logo-text{font-family:'Cinzel',serif;font-size:1rem;
-  background:linear-gradient(90deg,var(--gold),var(--gold2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
-.nav-logo-sub{font-size:.62rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;display:block}
-.nav-right{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.nav-btn{display:inline-flex;align-items:center;gap:.4rem;
-  background:linear-gradient(135deg,rgba(192,192,192,.15),rgba(192,192,192,.08));
-  border:1px solid rgba(192,192,192,.3);border-radius:10px;
-  padding:.42rem 1rem;font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;
-  color:var(--gold);text-decoration:none;cursor:pointer;transition:all .25s;white-space:nowrap}
-.nav-btn:hover{background:linear-gradient(135deg,rgba(245,200,66,.2),rgba(245,200,66,.08));border-color:var(--gold);box-shadow:0 0 14px rgba(245,200,66,.2);transform:translateY(-1px)}
-.nav-btn.primary{background:linear-gradient(135deg,var(--gold),var(--yellow));border-color:var(--gold);color:#000;font-weight:700}
-.nav-btn.primary:hover{box-shadow:0 0 20px rgba(245,200,66,.5)}
+  box-shadow:0 0 0 1px rgba(245,197,24,.4),0 0 24px rgba(245,197,24,.3),0 0 48px rgba(255,20,147,.15);
+  animation:gemPulse 3s ease-in-out infinite}
+@keyframes gemPulse{0%,100%{box-shadow:0 0 0 1px rgba(245,197,24,.4),0 0 24px rgba(245,197,24,.3)}50%{box-shadow:0 0 0 2px rgba(245,197,24,.6),0 0 40px rgba(245,197,24,.5),0 0 60px rgba(255,20,147,.2)}}
+.logo-gem span{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;color:#000}
+.logo-text-wrap .t1{font-family:'Cinzel',serif;font-size:.95rem;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.logo-text-wrap .t2{font-size:.58rem;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;letter-spacing:.1em;display:block}
+
+/* Smart nav buttons — role-based */
+.nav-links{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap}
+.nb{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .85rem;border-radius:9px;font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;text-decoration:none;cursor:pointer;transition:all .22s;white-space:nowrap;border:1px solid}
+/* Silver/gold style */
+.nb-sg{background:linear-gradient(135deg,rgba(200,200,200,.1),rgba(180,180,180,.05));border-color:rgba(200,200,200,.25);color:var(--gold)}
+.nb-sg:hover{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.4);box-shadow:0 0 14px rgba(245,197,24,.15);transform:translateY(-1px)}
+.nb-gold{background:linear-gradient(135deg,var(--gold),#E8B800);border-color:var(--gold);color:#000;font-weight:800}
+.nb-gold:hover{box-shadow:0 0 20px rgba(245,197,24,.5);transform:translateY(-1px)}
+.nb-staff{background:rgba(0,208,132,.08);border-color:rgba(0,208,132,.25);color:var(--green2)}
+.nb-staff:hover{background:rgba(0,208,132,.15);border-color:rgba(0,208,132,.4)}
+/* Hidden until role set */
+.role-customer .staff-only{display:none!important}
+.role-staff .customer-only,.role-admin .customer-only{display:none!important}
+.role-public .staff-only,.role-public .admin-only{display:none!important}
 
 /* ══ HERO ══ */
-.hero{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem 4rem;text-align:center;overflow:hidden}
-.hero-bg-img{position:absolute;inset:0;z-index:0;
-  background:radial-gradient(ellipse 120% 80% at 50% 50%,rgba(245,200,66,.06) 0%,transparent 60%);
-  pointer-events:none}
+.hero{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7rem 2rem 4rem;text-align:center;overflow:hidden}
 
-/* Floating orbs */
-.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;animation:orbFloat 18s ease-in-out infinite;pointer-events:none}
-.orb1{width:500px;height:500px;background:var(--gold);top:-150px;left:-150px}
-.orb2{width:400px;height:400px;background:var(--green);bottom:-100px;right:-100px;animation-delay:6s}
-.orb3{width:300px;height:300px;background:var(--pink);top:40%;right:10%;animation-delay:12s}
-@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-20px) scale(1.05)}66%{transform:translate(-15px,15px) scale(.97)}}
+/* MAIN SAR TITLE — animated, bilingual, blinking */
+.sar-main-title{margin-bottom:1rem;position:relative}
+.sar-line1{display:block;font-family:'Cinzel Decorative',serif;font-size:clamp(3.5rem,10vw,9rem);font-weight:900;line-height:.9;
+  background:linear-gradient(135deg,#F5C518 0%,#FFE566 25%,#FF69B4 50%,#F5C518 75%,#00D084 100%);
+  background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:titleGradient 4s linear infinite,titleBlink 6s ease-in-out infinite}
+@keyframes titleGradient{0%{background-position:0%}100%{background-position:300%}}
+@keyframes titleBlink{0%,100%{filter:drop-shadow(0 0 20px rgba(245,197,24,.5)) drop-shadow(0 0 60px rgba(245,197,24,.2))}50%{filter:drop-shadow(0 0 40px rgba(245,197,24,.9)) drop-shadow(0 0 80px rgba(255,105,180,.4)) drop-shadow(0 0 120px rgba(245,197,24,.3))}}
+.sar-line2-bn{display:block;font-family:'Playfair Display',serif;font-size:clamp(1rem,3vw,2.2rem);font-style:italic;font-weight:700;
+  background:linear-gradient(90deg,var(--pink),var(--gold2),var(--green));
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:titleGradient 5s linear infinite reverse,bnBlink 4s ease-in-out infinite;
+  margin-top:.4rem;letter-spacing:.05em}
+@keyframes bnBlink{0%,100%{opacity:1;text-shadow:0 0 20px rgba(255,105,180,.3)}50%{opacity:.85;text-shadow:0 0 40px rgba(255,105,180,.7),0 0 80px rgba(245,197,24,.3)}}
+.sar-line3{display:block;font-family:'Cinzel',serif;font-size:clamp(.65rem,1.5vw,1rem);letter-spacing:.35em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-top:.6rem;animation:subtitleFlicker 8s ease-in-out infinite}
+@keyframes subtitleFlicker{0%,100%{opacity:.45}48%{opacity:.45}50%{opacity:.9}52%{opacity:.45}70%{opacity:.8}72%{opacity:.45}}
 
-.hero-eyebrow{display:inline-flex;align-items:center;gap:.6rem;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:50px;padding:.4rem 1.2rem;font-family:'Space Mono',monospace;font-size:.72rem;color:var(--gold);letter-spacing:.12em;margin-bottom:1.75rem;animation:fadeUp .8s ease both}
-.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(245,200,66,.4)}50%{opacity:.7;box-shadow:0 0 0 6px rgba(245,200,66,0)}}
+/* TAGLINE animated */
+.hero-tagline-wrap{margin:1.25rem 0;overflow:hidden}
+.hero-tagline-en{font-family:'Cormorant Garamond',serif;font-size:clamp(.9rem,2vw,1.3rem);font-style:italic;color:rgba(255,255,255,.55);animation:fadeUp .9s .4s both}
+.hero-tagline-bn{font-family:'Hind Siliguri',sans-serif;font-size:clamp(.82rem,1.8vw,1.1rem);color:rgba(255,255,255,.4);margin-top:.3rem;animation:fadeUp .9s .55s both}
+.hero-tagline-en strong,.hero-tagline-bn strong{color:var(--gold2)}
 
-.hero-title{font-family:'Cinzel',serif;font-size:clamp(2.8rem,8vw,7rem);font-weight:900;line-height:1;margin-bottom:.5rem;animation:fadeUp .9s .1s ease both}
-.hero-title .sar{background:linear-gradient(135deg,var(--gold),var(--yellow2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block;filter:drop-shadow(0 0 30px rgba(245,200,66,.4))}
-.hero-title .she{background:linear-gradient(135deg,var(--pink),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:clamp(1.2rem,3vw,2.2rem);display:block;font-style:italic;letter-spacing:.2em;margin-top:.3rem}
+/* BADGES */
+.badge-row{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;margin:.85rem 0;animation:fadeUp .9s .65s both}
+.hbadge{padding:.3rem .9rem;border-radius:50px;font-size:.7rem;font-weight:700;letter-spacing:.05em;border:1px solid;animation:badgePop 3s ease-in-out infinite}
+.hb-g{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.3);color:var(--gold2)}
+.hb-p{background:rgba(255,20,147,.1);border-color:rgba(255,20,147,.3);color:var(--pink2)}
+.hb-c{background:rgba(0,208,132,.1);border-color:rgba(0,208,132,.3);color:var(--green2)}
+@keyframes badgePop{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.hbadge:nth-child(2){animation-delay:.2s}
+.hbadge:nth-child(3){animation-delay:.4s}
+.hbadge:nth-child(4){animation-delay:.6s}
+.hbadge:nth-child(5){animation-delay:.8s}
+.hbadge:nth-child(6){animation-delay:1s}
 
-.hero-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,2.5vw,1.5rem);font-style:italic;color:rgba(255,255,255,.6);margin:.75rem 0;animation:fadeUp .9s .2s ease both}
-.hero-tagline span{color:var(--gold2)}
+/* CTA BUTTONS */
+.cta-row{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin:1.5rem 0;animation:fadeUp .9s .75s both}
+.cta-a{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 2.2rem;border-radius:14px;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;text-decoration:none;transition:all .3s;position:relative;overflow:hidden;border:none;cursor:pointer}
+.cta-primary{background:linear-gradient(135deg,var(--gold),#E8B800,var(--gold));background-size:200%;color:#000;animation:ctaShimmer 3s linear infinite}
+@keyframes ctaShimmer{0%{background-position:0%}100%{background-position:200%}}
+.cta-primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 40px rgba(245,197,24,.5)}
+.cta-pink{background:linear-gradient(135deg,var(--pink),#CC0078);color:#fff}
+.cta-pink:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(255,20,147,.4)}
+.cta-outline{background:transparent;border:1px solid rgba(245,197,24,.3)!important;color:var(--gold2);border-radius:14px}
+.cta-outline:hover{background:rgba(245,197,24,.08);border-color:rgba(245,197,24,.5)!important;transform:translateY(-2px)}
 
-.hero-badges{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin:1.25rem 0;animation:fadeUp .9s .3s ease both}
-.h-badge{padding:.3rem .85rem;border-radius:50px;font-size:.72rem;font-weight:700;font-family:'Space Mono',monospace;letter-spacing:.05em}
-.hb-gold{background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.3);color:var(--gold2)}
-.hb-green{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);color:var(--green2)}
-.hb-pink{background:rgba(233,30,140,.12);border:1px solid rgba(233,30,140,.3);color:var(--pink2)}
-
-.hero-desc{max-width:680px;margin:0 auto 2.25rem;font-size:clamp(.88rem,1.5vw,1.05rem);color:rgba(255,255,255,.55);line-height:1.8;animation:fadeUp .9s .35s ease both}
-
-.hero-cta{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;animation:fadeUp .9s .45s ease both}
-.cta-btn{display:inline-flex;align-items:center;gap:.55rem;padding:.85rem 2rem;border-radius:14px;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;text-decoration:none;cursor:pointer;border:none;transition:all .3s}
-.cta-primary{background:linear-gradient(135deg,var(--gold),var(--yellow));color:#000;box-shadow:0 4px 24px rgba(245,200,66,.3)}
-.cta-primary:hover{transform:translateY(-3px);box-shadow:0 8px 36px rgba(245,200,66,.5)}
-.cta-secondary{background:var(--glass2);border:1px solid var(--border2);color:var(--gold2)}
-.cta-secondary:hover{background:rgba(245,200,66,.1);transform:translateY(-2px)}
-
-/* Stats ticker */
-.hero-stats{display:flex;gap:2.5rem;justify-content:center;margin-top:3rem;flex-wrap:wrap;animation:fadeUp .9s .55s ease both}
+/* STATS */
+.hero-stats{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:2.5rem;animation:fadeUp .9s .9s both}
 .h-stat{text-align:center}
-.h-stat-num{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--yellow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.h-stat-label{font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase;margin-top:.1rem}
+.h-stat-num{font-family:'Cinzel',serif;font-size:2.4rem;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 12px rgba(245,197,24,.4));line-height:1}
+.h-stat-label{font-size:.65rem;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-top:.2rem}
 
-/* Ticker tape */
-.ticker-wrap{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(245,200,66,.03);padding:.6rem 0;position:relative;z-index:10}
-.ticker{display:flex;white-space:nowrap;animation:ticker 30s linear infinite}
-.ticker-item{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--gold);letter-spacing:.1em;padding:0 2rem}
-.ticker-sep{color:var(--pink);padding:0 .5rem}
+/* SCROLL INDICATOR */
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;animation:scrollBob 2.5s ease-in-out infinite}
+.scroll-hint-line{width:1px;height:48px;background:linear-gradient(var(--gold),transparent)}
+.scroll-hint-text{font-size:.62rem;letter-spacing:.2em;color:rgba(255,255,255,.25);font-family:'Space Mono',monospace}
+@keyframes scrollBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 
-@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+/* ══ TICKER ══ */
+.ticker-belt{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:linear-gradient(90deg,rgba(245,197,24,.03),rgba(255,20,147,.03));padding:.55rem 0;position:relative;z-index:10}
+.ticker-belt::before,.ticker-belt::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:2;pointer-events:none}
+.ticker-belt::before{left:0;background:linear-gradient(90deg,var(--dark),transparent)}
+.ticker-belt::after{right:0;background:linear-gradient(-90deg,var(--dark),transparent)}
+.ticker-inner{display:flex;white-space:nowrap;animation:tickerMove 35s linear infinite}
+.ti{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--gold);letter-spacing:.12em;padding:0 1.5rem}
+.ts{color:var(--pink);padding:0 .25rem}
 
-/* ══ SECTION COMMON ══ */
-section{position:relative;z-index:10;padding:5rem 2rem}
-.section-inner{max-width:1100px;margin:0 auto}
-.section-eyebrow{font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;display:flex;align-items:center;gap:.6rem}
-.section-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold)}
-.section-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,3.2rem);font-weight:700;line-height:1.2;margin-bottom:1rem}
-.section-title .gold{background:linear-gradient(135deg,var(--gold),var(--yellow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.section-title .green{background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.section-title .pink{background:linear-gradient(135deg,var(--pink),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.section-sub{font-size:1rem;color:rgba(255,255,255,.45);line-height:1.8;max-width:680px;margin-bottom:2.5rem}
+/* ══ SECTION BASE ══ */
+section{position:relative;z-index:10;padding:5.5rem 2rem}
+.si{max-width:1120px;margin:0 auto}
+.s-eye{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem;display:flex;align-items:center;gap:.6rem}
+.s-eye::before{content:'';width:28px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.s-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4.5vw,3.4rem);font-weight:900;line-height:1.15;margin-bottom:.9rem}
+.s-title .gd{background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s-title .gp{background:linear-gradient(135deg,var(--pink),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s-title .gg{background:linear-gradient(135deg,var(--green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s-sub{font-size:.98rem;color:rgba(255,255,255,.42);line-height:1.8;max-width:660px;margin-bottom:2.5rem}
 
-/* Silver gold button */
-.sg-btn{display:inline-flex;align-items:center;gap:.55rem;
-  background:linear-gradient(135deg,rgba(192,192,192,.2),rgba(192,192,192,.08));
-  border:1px solid rgba(192,192,192,.35);border-radius:12px;
-  padding:.65rem 1.6rem;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:700;
-  color:var(--gold);text-decoration:none;cursor:pointer;transition:all .3s;white-space:nowrap}
-.sg-btn:hover{background:rgba(245,200,66,.12);border-color:var(--gold);box-shadow:0 0 20px rgba(245,200,66,.2);transform:translateY(-2px)}
+/* SILVER GOLD BUTTON */
+.sg-btn{display:inline-flex;align-items:center;gap:.55rem;padding:.65rem 1.65rem;border-radius:12px;
+  background:linear-gradient(135deg,rgba(200,200,200,.1),rgba(180,180,180,.05));
+  border:1px solid rgba(200,200,200,.28);color:var(--gold);font-family:'Hind Siliguri',sans-serif;
+  font-size:.88rem;font-weight:700;text-decoration:none;cursor:pointer;transition:all .3s}
+.sg-btn:hover{background:rgba(245,197,24,.08);border-color:rgba(245,197,24,.4);box-shadow:0 0 20px rgba(245,197,24,.15);transform:translateY(-2px)}
+
+/* DIVIDER */
+.sec-div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);max-width:700px;margin:0 auto}
 
 /* ══ WHAT IS SAR ══ */
-#what-is-sar{background:linear-gradient(180deg,var(--dark) 0%,var(--dark2) 100%)}
-.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
-.what-visual{position:relative}
-.what-card-big{background:rgba(245,200,66,.06);border:1px solid var(--border2);border-radius:24px;padding:2.5rem;position:relative;overflow:hidden}
-.what-card-big::before{content:'SAR';position:absolute;right:-1rem;top:-2rem;font-family:'Cinzel',serif;font-size:8rem;font-weight:900;color:rgba(245,200,66,.04);pointer-events:none;line-height:1}
-.what-arabic{font-family:'Cinzel',serif;font-size:5rem;background:linear-gradient(135deg,var(--gold),var(--yellow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem;filter:drop-shadow(0 0 20px rgba(245,200,66,.3))}
-.what-meaning{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:rgba(255,255,255,.55);margin-bottom:1.25rem}
-.what-pillars{display:flex;flex-direction:column;gap:.75rem}
-.what-pillar{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem;background:var(--glass);border-radius:12px;border:1px solid var(--border)}
-.wp-icon{font-size:1.3rem;flex-shrink:0;margin-top:.1rem}
-.wp-title{font-weight:700;font-size:.88rem;color:var(--gold2);margin-bottom:.15rem}
-.wp-desc{font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.5}
-.what-quote{margin-top:2rem;padding:1.25rem 1.5rem;background:rgba(245,200,66,.06);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05rem;color:rgba(255,255,255,.65);line-height:1.7}
-.what-quote cite{display:block;font-style:normal;font-size:.75rem;color:var(--gold);margin-top:.5rem;font-family:'Space Mono',monospace;letter-spacing:.05em}
+#what{background:linear-gradient(180deg,var(--dark),var(--dark2))}
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center}
+.what-visual .wcard{background:linear-gradient(135deg,rgba(245,197,24,.06),rgba(255,20,147,.04));border:1px solid var(--border2);border-radius:28px;padding:2.5rem;position:relative;overflow:hidden}
+.what-visual .wcard::after{content:'SAR';position:absolute;right:-1.5rem;top:-2rem;font-family:'Cinzel Decorative',serif;font-size:7rem;font-weight:900;color:rgba(245,197,24,.03);line-height:1;pointer-events:none}
+.sar-arabic{font-family:'Cinzel Decorative',serif;font-size:5.5rem;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(245,197,24,.5));animation:arabicGlow 4s ease-in-out infinite;line-height:1}
+@keyframes arabicGlow{0%,100%{filter:drop-shadow(0 0 20px rgba(245,197,24,.4))}50%{filter:drop-shadow(0 0 50px rgba(245,197,24,.8)) drop-shadow(0 0 80px rgba(255,20,147,.3))}}
+.sar-meaning{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-style:italic;color:rgba(255,255,255,.45);margin:.4rem 0 1.25rem}
+.pillars{display:flex;flex-direction:column;gap:.7rem}
+.pillar{display:flex;gap:.75rem;align-items:flex-start;padding:.8rem;background:var(--glass);border:1px solid var(--border);border-radius:14px;transition:all .3s}
+.pillar:hover{border-color:var(--border2);background:var(--glass2);transform:translateX(4px)}
+.pi{font-size:1.25rem;flex-shrink:0;margin-top:.1rem}
+.pt{font-weight:700;font-size:.86rem;color:var(--gold2);margin-bottom:.15rem}
+.pd{font-size:.76rem;color:rgba(255,255,255,.4);line-height:1.55}
+.what-quote{margin-top:2rem;padding:1.1rem 1.4rem;background:rgba(245,197,24,.05);border-left:3px solid var(--gold);border-radius:0 14px 14px 0;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:rgba(255,255,255,.6);line-height:1.75}
+.what-quote cite{display:block;font-style:normal;font-size:.7rem;color:var(--gold);margin-top:.5rem;font-family:'Space Mono',monospace;letter-spacing:.06em}
 
 /* ══ WHY SAR ══ */
-#why-sar{background:var(--dark2)}
-.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.why-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:1.5rem;transition:all .3s;position:relative;overflow:hidden}
-.why-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
-.why-card:nth-child(3n+1)::before{background:linear-gradient(90deg,var(--gold),var(--yellow))}
-.why-card:nth-child(3n+2)::before{background:linear-gradient(90deg,var(--green),var(--green2))}
-.why-card:nth-child(3n)::before{background:linear-gradient(90deg,var(--pink),var(--pink2))}
-.why-card:hover{transform:translateY(-6px);border-color:var(--border2);background:var(--glass2)}
-.why-card:hover::before{opacity:1}
-.why-icon{font-size:2rem;margin-bottom:.85rem}
-.why-num{font-family:'Cinzel',serif;font-size:.65rem;color:rgba(255,255,255,.2);letter-spacing:.15em;margin-bottom:.3rem}
-.why-title{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold2);margin-bottom:.6rem;font-weight:700}
-.why-desc{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.65}
+#why{background:var(--dark2)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.wcard2{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:1.6rem;transition:all .35s;position:relative;overflow:hidden;cursor:default}
+.wcard2::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(245,197,24,.04));opacity:0;transition:opacity .3s}
+.wcard2:hover::before{opacity:1}
+.wcard2:hover{transform:translateY(-8px);border-color:var(--border2);box-shadow:0 24px 60px rgba(0,0,0,.4),0 0 40px rgba(245,197,24,.06)}
+.wcard2-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.wcard2-icon{font-size:1.8rem}
+.wcard2-num{font-family:'Cinzel',serif;font-size:.62rem;color:rgba(255,255,255,.15);letter-spacing:.2em}
+.wcard2-title{font-family:'Cinzel',serif;font-size:.95rem;color:var(--gold2);margin-bottom:.55rem;font-weight:700}
+.wcard2-desc{font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.7}
+.wcard2-bar{position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
+.wcard2:hover .wcard2-bar{opacity:1}
+.wcard2:nth-child(3n+1) .wcard2-bar{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.wcard2:nth-child(3n+2) .wcard2-bar{background:linear-gradient(90deg,var(--green),var(--green2))}
+.wcard2:nth-child(3n)   .wcard2-bar{background:linear-gradient(90deg,var(--pink),var(--pink2))}
+
+/* ══ MENU SCROLL ══ */
+#menus{background:var(--dark);overflow:hidden}
+.menu-runway{overflow:hidden;position:relative;margin:0 -2rem}
+.menu-runway::before,.menu-runway::after{content:'';position:absolute;top:0;bottom:0;width:100px;z-index:5;pointer-events:none}
+.menu-runway::before{left:0;background:linear-gradient(90deg,var(--dark),transparent)}
+.menu-runway::after{right:0;background:linear-gradient(-90deg,var(--dark),transparent)}
+.menu-belt{display:flex;gap:1.2rem;animation:beltMove 45s linear infinite;width:max-content;padding:1rem 2rem}
+.menu-belt:hover{animation-play-state:paused}
+@keyframes beltMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.mcard{width:255px;flex-shrink:0;background:rgba(245,197,24,.03);border:1px solid var(--border);border-radius:22px;overflow:hidden;transition:all .35s;cursor:pointer}
+.mcard:hover{transform:translateY(-10px) scale(1.03);border-color:var(--border2);box-shadow:0 24px 50px rgba(0,0,0,.5),0 0 30px rgba(245,197,24,.1)}
+.mcard-img{height:155px;display:flex;align-items:center;justify-content:center;font-size:3.8rem;position:relative}
+.mcard-img.dm{background:linear-gradient(135deg,rgba(255,20,147,.18),rgba(139,0,255,.15))}
+.mcard-img.ob{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(255,20,147,.15))}
+.mcard-img.fl{background:linear-gradient(135deg,rgba(0,208,132,.18),rgba(0,245,255,.12))}
+.mcard-img.ib{background:linear-gradient(135deg,rgba(139,0,255,.18),rgba(0,245,255,.12))}
+.mcard-img.pr{background:linear-gradient(135deg,rgba(255,105,180,.18),rgba(245,197,24,.15))}
+.mcard-cat{position:absolute;top:.6rem;right:.6rem;padding:.18rem .5rem;border-radius:50px;font-size:.6rem;font-weight:800;font-family:'Space Mono',monospace}
+.mcard-cat.dm{background:rgba(255,20,147,.2);color:#FF69B4}
+.mcard-cat.ob{background:rgba(245,158,11,.2);color:#FCD34D}
+.mcard-cat.fl{background:rgba(0,208,132,.2);color:#A8FFD8}
+.mcard-cat.ib{background:rgba(139,0,255,.2);color:#BF5FFF}
+.mcard-cat.pr{background:rgba(255,105,180,.2);color:#FFB3D1}
+.mcard-body{padding:.95rem 1.1rem}
+.mcard-bn{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.18rem}
+.mcard-en{font-size:.68rem;color:rgba(255,255,255,.3);margin-bottom:.45rem}
+.mcard-tags{display:flex;gap:.3rem;flex-wrap:wrap}
+.mcard-tag{font-size:.58rem;padding:.12rem .4rem;border-radius:50px;background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.13);color:var(--gold)}
+.mcard-price{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--gold);font-weight:700;margin-top:.5rem}
+
+/* ══ HOW IT WORKS ══ */
+#how{background:var(--dark2)}
+.steps7{display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;margin-top:2.5rem;position:relative}
+.steps7::before{content:'';position:absolute;top:36px;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--green),var(--pink),transparent);z-index:0;
+  animation:pathGlow 3s ease-in-out infinite}
+@keyframes pathGlow{0%,100%{opacity:.4}50%{opacity:1}}
+.step{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
+.step-ring{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:.7rem;transition:all .35s;border:2px solid transparent;position:relative}
+.step:hover .step-ring{transform:scale(1.15) translateY(-6px)}
+.step:nth-child(1) .step-ring{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.3)}
+.step:nth-child(2) .step-ring{background:rgba(0,208,132,.1);border-color:rgba(0,208,132,.3)}
+.step:nth-child(3) .step-ring{background:rgba(255,20,147,.1);border-color:rgba(255,20,147,.3)}
+.step:nth-child(4) .step-ring{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.3)}
+.step:nth-child(5) .step-ring{background:rgba(139,0,255,.1);border-color:rgba(139,0,255,.3)}
+.step:nth-child(6) .step-ring{background:rgba(0,208,132,.1);border-color:rgba(0,208,132,.3)}
+.step:nth-child(7) .step-ring{background:rgba(245,197,24,.15);border-color:var(--gold);box-shadow:0 0 24px rgba(245,197,24,.25);animation:stepGlow 2s ease-in-out infinite}
+@keyframes stepGlow{0%,100%{box-shadow:0 0 20px rgba(245,197,24,.2)}50%{box-shadow:0 0 40px rgba(245,197,24,.5)}}
+.step-n{position:absolute;top:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:var(--gold);color:#000;font-size:.55rem;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace}
+.step-t{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:.15rem}
+.step-d{font-size:.58rem;color:rgba(255,255,255,.3);line-height:1.5}
 
 /* ══ IMPACT ══ */
 #impact{background:var(--dark)}
-.impact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:3rem}
-.impact-card{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:1.75rem;text-align:center;transition:all .3s}
-.impact-card:hover{transform:translateY(-4px);border-color:var(--border2)}
-.impact-icon{font-size:2.2rem;margin-bottom:.75rem}
-.impact-num{font-family:'Cinzel',serif;font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--yellow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
-.impact-label{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.3rem;letter-spacing:.05em}
-.impact-timeline{display:grid;grid-template-columns:1fr;gap:.85rem;margin-top:2rem}
-.impact-row{display:flex;align-items:center;gap:1.5rem;padding:1rem 1.25rem;background:var(--glass);border:1px solid var(--border);border-radius:14px}
-.impact-year{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);font-weight:700;width:60px;flex-shrink:0}
-.impact-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:50px;overflow:hidden}
-.impact-bar{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--gold),var(--green))}
-.impact-val{font-family:'Space Mono',monospace;font-size:.8rem;color:rgba(255,255,255,.5);width:100px;text-align:right;flex-shrink:0}
+.impact4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:2.5rem}
+.icard{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:1.6rem;text-align:center;transition:all .3s}
+.icard:hover{transform:translateY(-5px);border-color:var(--border2);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.icard-icon{font-size:2rem;margin-bottom:.65rem}
+.icard-num{font-family:'Cinzel',serif;font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.icard-label{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.3rem;letter-spacing:.04em}
+.timeline{display:flex;flex-direction:column;gap:.8rem}
+.trow{display:flex;align-items:center;gap:1.25rem;padding:.85rem 1.1rem;background:var(--glass);border:1px solid var(--border);border-radius:14px;transition:all .3s}
+.trow:hover{border-color:var(--border2);background:var(--glass2)}
+.ty{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);font-weight:700;width:58px;flex-shrink:0}
+.tbw{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden}
+.tb{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.tv{font-family:'Space Mono',monospace;font-size:.76rem;color:rgba(255,255,255,.45);width:90px;text-align:right;flex-shrink:0}
 
-/* ══ MENU SLIDESHOW ══ */
-#menu-section{background:var(--dark2);overflow:hidden}
-.menu-scroll-wrap{overflow:hidden;margin:0 -2rem;padding:0 2rem;position:relative}
-.menu-scroll-wrap::before,.menu-scroll-wrap::after{content:'';position:absolute;top:0;bottom:0;width:80px;z-index:5;pointer-events:none}
-.menu-scroll-wrap::before{left:0;background:linear-gradient(90deg,var(--dark2),transparent)}
-.menu-scroll-wrap::after{right:0;background:linear-gradient(-90deg,var(--dark2),transparent)}
-.menu-track{display:flex;gap:1.25rem;animation:menuSlide 40s linear infinite;width:max-content}
-.menu-track:hover{animation-play-state:paused}
-@keyframes menuSlide{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.menu-card{width:260px;flex-shrink:0;background:rgba(245,200,66,.04);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:all .3s;cursor:pointer}
-.menu-card:hover{transform:translateY(-8px) scale(1.02);border-color:var(--border2);box-shadow:0 20px 40px rgba(245,200,66,.1)}
-.menu-card-img{height:160px;display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative}
-.menu-card-img.dm{background:linear-gradient(135deg,rgba(233,30,140,.2),rgba(107,33,168,.2))}
-.menu-card-img.ob{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(233,30,140,.2))}
-.menu-card-img.fl{background:linear-gradient(135deg,rgba(5,150,105,.2),rgba(46,204,113,.2))}
-.menu-card-img.ib{background:linear-gradient(135deg,rgba(107,33,168,.2),rgba(45,212,191,.2))}
-.menu-card-img.pr{background:linear-gradient(135deg,rgba(255,107,181,.2),rgba(245,200,66,.2))}
-.mc-cat{position:absolute;top:.6rem;right:.6rem;padding:.2rem .55rem;border-radius:50px;font-size:.62rem;font-weight:700;font-family:'Space Mono',monospace}
-.mc-cat.dm{background:rgba(233,30,140,.2);color:var(--pink2)}
-.mc-cat.ob{background:rgba(245,158,11,.2);color:var(--yellow2)}
-.mc-cat.fl{background:rgba(46,204,113,.2);color:var(--green2)}
-.mc-cat.ib{background:rgba(107,33,168,.2);color:#C4B5FD}
-.mc-cat.pr{background:rgba(255,107,181,.2);color:var(--pink2)}
-.menu-card-body{padding:1rem 1.1rem}
-.mc-name-bn{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.2rem}
-.mc-name-en{font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:.5rem}
-.mc-tags{display:flex;gap:.35rem;flex-wrap:wrap}
-.mc-tag{font-size:.6rem;padding:.15rem .45rem;border-radius:50px;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.15);color:var(--gold)}
-.mc-price{font-family:'Space Mono',monospace;font-size:.85rem;color:var(--gold);font-weight:700;margin-top:.5rem}
+/* ══ GORGEOUS FOOTER ══ */
+footer{position:relative;z-index:10;background:var(--dark4);overflow:hidden}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--pink),var(--green),transparent)}
+.footer-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:400px;background:radial-gradient(ellipse,rgba(245,197,24,.04),transparent 70%);pointer-events:none}
+.footer-inner{max-width:1120px;margin:0 auto;padding:4rem 2rem 0;position:relative}
 
-/* ══ HOW SAR WORKS ══ */
-#how-it-works{background:var(--dark)}
-.steps-flow{display:grid;grid-template-columns:repeat(7,1fr);gap:.6rem;margin-top:2.5rem;position:relative}
-.steps-flow::before{content:'';position:absolute;top:40px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),var(--green),var(--pink),transparent);z-index:0}
-.step-item{display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1}
-.step-circle{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:.75rem;transition:all .3s;border:2px solid transparent}
-.step-item:nth-child(1) .step-circle{background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(245,200,66,.05));border-color:rgba(245,200,66,.3)}
-.step-item:nth-child(2) .step-circle{background:linear-gradient(135deg,rgba(46,204,113,.15),rgba(46,204,113,.05));border-color:rgba(46,204,113,.3)}
-.step-item:nth-child(3) .step-circle{background:linear-gradient(135deg,rgba(233,30,140,.15),rgba(233,30,140,.05));border-color:rgba(233,30,140,.3)}
-.step-item:nth-child(4) .step-circle{background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(46,204,113,.05));border-color:rgba(245,200,66,.3)}
-.step-item:nth-child(5) .step-circle{background:linear-gradient(135deg,rgba(107,33,168,.15),rgba(107,33,168,.05));border-color:rgba(107,33,168,.3)}
-.step-item:nth-child(6) .step-circle{background:linear-gradient(135deg,rgba(46,204,113,.15),rgba(245,200,66,.05));border-color:rgba(46,204,113,.3)}
-.step-item:nth-child(7) .step-circle{background:linear-gradient(135deg,rgba(245,200,66,.2),rgba(245,200,66,.1));border-color:var(--gold);box-shadow:0 0 20px rgba(245,200,66,.2)}
-.step-item:hover .step-circle{transform:scale(1.1) translateY(-4px);box-shadow:0 8px 24px rgba(245,200,66,.2)}
-.step-title{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:.2rem}
-.step-desc{font-size:.62rem;color:rgba(255,255,255,.35);line-height:1.5}
-.step-num{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#000;font-size:.6rem;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace}
+/* Live stats bar at top of footer */
+.footer-live{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;padding:1.5rem 0;margin-bottom:2.5rem;border-bottom:1px solid var(--border)}
+.fl-stat{text-align:center;position:relative}
+.fl-num{font-family:'Cinzel',serif;font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.fl-label{font-size:.65rem;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;letter-spacing:.1em;margin-top:.1rem}
+.fl-dot{position:absolute;top:-4px;right:-8px;width:8px;height:8px;border-radius:50%;background:var(--green);animation:liveFlash 1.5s ease-in-out infinite;box-shadow:0 0 6px var(--green)}
+@keyframes liveFlash{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-/* ══ TECH PILLS ══ */
-.tech-strip{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin:3rem 0 2rem}
-.tech-pill{display:flex;align-items:center;gap:.65rem;padding:.75rem 1.5rem;border-radius:50px;background:var(--glass);border:1px solid var(--border);font-size:.85rem;transition:all .3s}
-.tech-pill:hover{border-color:var(--border2);background:var(--glass2);transform:translateY(-2px)}
-.tech-pill-icon{font-size:1.2rem}
-.tech-pill-text{font-weight:600;color:var(--gold2)}
+.footer-cols{display:grid;grid-template-columns:2.2fr 1fr 1fr 1.2fr;gap:2.5rem;margin-bottom:3rem}
 
-/* ══ ARTICLES (Why SAR blog) ══ */
-#articles-section{background:var(--dark2)}
-.articles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2rem}
-.article-card{background:var(--glass);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:all .3s;cursor:pointer;text-decoration:none;display:block}
-.article-card:hover{transform:translateY(-5px);border-color:var(--border2);box-shadow:0 16px 40px rgba(245,200,66,.08)}
-.article-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,rgba(245,200,66,.1),rgba(46,204,113,.08))}
-.article-body{padding:1.1rem}
-.article-tag{font-size:.62rem;color:var(--gold);font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
-.article-title{font-size:.9rem;font-weight:700;color:#fff;line-height:1.45;margin-bottom:.4rem}
-.article-date{font-size:.7rem;color:rgba(255,255,255,.3)}
-.articles-cta{text-align:center;margin-top:2rem}
+.footer-brand-logo{display:flex;align-items:center;gap:.85rem;margin-bottom:1rem}
+.fbrand-gem{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,var(--gold),var(--pink));display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:1.4rem;font-weight:900;color:#000;box-shadow:0 0 30px rgba(245,197,24,.3);flex-shrink:0}
+.fbrand-name{font-family:'Cinzel Decorative',serif;font-size:1.25rem;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;display:block}
+.fbrand-sub{font-size:.62rem;color:rgba(255,255,255,.25);font-family:'Space Mono',monospace;letter-spacing:.08em;display:block;margin-top:.15rem}
+.fbrand-desc{font-size:.78rem;color:rgba(255,255,255,.35);line-height:1.75;margin-bottom:1.25rem}
+.fbrand-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.88rem;color:var(--gold2);opacity:.7;border-left:2px solid var(--gold);padding-left:.85rem;margin-bottom:1.25rem;line-height:1.6}
 
-/* ══ FOOTER ══ */
-footer{position:relative;z-index:10;background:var(--dark3);border-top:1px solid var(--border);padding:4rem 2rem 1.5rem}
-.footer-inner{max-width:1100px;margin:0 auto}
-.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3rem;padding-bottom:2.5rem;border-bottom:1px solid var(--border)}
-.footer-brand .logo-wrap{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
-.footer-brand-title{font-family:'Cinzel',serif;font-size:1.3rem;background:linear-gradient(90deg,var(--gold),var(--yellow2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900}
-.footer-brand-tag{font-size:.75rem;color:rgba(255,255,255,.35);line-height:1.6;margin-bottom:1rem}
-.footer-social{display:flex;gap:.6rem;flex-wrap:wrap}
-.social-btn{width:34px;height:34px;border-radius:9px;background:var(--glass2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:all .25s;text-decoration:none}
-.social-btn:hover{border-color:var(--gold);background:rgba(245,200,66,.1);transform:translateY(-2px)}
-.footer-col-title{font-family:'Cinzel',serif;font-size:.85rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem;font-weight:700}
-.footer-links{display:flex;flex-direction:column;gap:.5rem}
-.footer-link{font-size:.82rem;color:rgba(255,255,255,.45);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
-.footer-link:hover{color:var(--gold)}
-.footer-contact-item{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.6rem;font-size:.82rem;color:rgba(255,255,255,.45)}
-.footer-contact-item a{color:rgba(255,255,255,.45);text-decoration:none;transition:color .2s}
-.footer-contact-item a:hover{color:var(--gold)}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
-.footer-copy{font-size:.75rem;color:rgba(255,255,255,.25);font-family:'Space Mono',monospace}
-.footer-copy span{color:var(--gold)}
-.footer-badges{display:flex;gap:.5rem;flex-wrap:wrap}
-.f-badge{font-size:.62rem;padding:.2rem .55rem;border-radius:50px;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.15);color:var(--gold);font-family:'Space Mono',monospace}
-.footer-mindmax{display:flex;align-items:center;gap:.5rem;font-size:.72rem;color:rgba(255,255,255,.25)}
-.footer-mindmax a{color:var(--gold);text-decoration:none;font-weight:700}
-.footer-mindmax a:hover{text-decoration:underline}
+/* Social buttons — gorgeous */
+.socials{display:flex;gap:.55rem;flex-wrap:wrap}
+.s-btn{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.95rem;text-decoration:none;transition:all .3s;border:1px solid;position:relative;overflow:hidden}
+.s-btn::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
+.s-btn:hover::before{opacity:1}
+.s-btn:hover{transform:translateY(-3px);border-color:transparent}
+.s-fb{background:rgba(24,119,242,.1);border-color:rgba(24,119,242,.2)}
+.s-fb::before{background:linear-gradient(135deg,rgba(24,119,242,.3),rgba(24,119,242,.1))}
+.s-fb:hover{box-shadow:0 8px 24px rgba(24,119,242,.3)}
+.s-fb2{background:rgba(255,20,147,.1);border-color:rgba(255,20,147,.2)}
+.s-fb2::before{background:linear-gradient(135deg,rgba(255,20,147,.3),rgba(255,20,147,.1))}
+.s-fb2:hover{box-shadow:0 8px 24px rgba(255,20,147,.3)}
+.s-yt{background:rgba(255,0,0,.1);border-color:rgba(255,0,0,.2)}
+.s-yt::before{background:linear-gradient(135deg,rgba(255,0,0,.3),rgba(255,0,0,.1))}
+.s-yt:hover{box-shadow:0 8px 24px rgba(255,0,0,.3)}
+.s-wa{background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.2)}
+.s-wa::before{background:linear-gradient(135deg,rgba(37,211,102,.3),rgba(37,211,102,.1))}
+.s-wa:hover{box-shadow:0 8px 24px rgba(37,211,102,.3)}
+.s-em{background:rgba(245,197,24,.1);border-color:rgba(245,197,24,.2)}
+.s-em::before{background:linear-gradient(135deg,rgba(245,197,24,.3),rgba(245,197,24,.1))}
+.s-em:hover{box-shadow:0 8px 24px rgba(245,197,24,.3)}
+.s-web{background:rgba(0,245,255,.08);border-color:rgba(0,245,255,.15)}
+.s-web::before{background:linear-gradient(135deg,rgba(0,245,255,.2),transparent)}
+.s-web:hover{box-shadow:0 8px 24px rgba(0,245,255,.2)}
 
-/* ══ SECTION DIVIDER ══ */
-.sec-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 auto;max-width:600px}
+/* Footer column */
+.fc-title{font-family:'Cinzel',serif;font-size:.8rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1.1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.fc-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.fc-links{display:flex;flex-direction:column;gap:.48rem}
+.fc-link{font-size:.8rem;color:rgba(255,255,255,.4);text-decoration:none;transition:all .2s;display:flex;align-items:center;gap:.4rem;padding:.2rem 0}
+.fc-link:hover{color:var(--gold);transform:translateX(4px)}
+.fc-link:hover::before{content:'';display:inline-block;width:8px;height:1px;background:var(--gold)}
 
-/* ══ ANIMATIONS on scroll ══ */
-.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
+/* Contact items */
+.fc-contact{display:flex;flex-direction:column;gap:.6rem}
+.fcc{display:flex;align-items:flex-start;gap:.55rem;font-size:.78rem;color:rgba(255,255,255,.4);line-height:1.5}
+.fcc a{color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s}
+.fcc a:hover{color:var(--gold)}
+.fcc-icon{flex-shrink:0;color:var(--gold);margin-top:.1rem}
 
-@media(max-width:900px){
-  .what-grid,.footer-top{grid-template-columns:1fr}
+/* Ecosystem */
+.eco-chips{display:flex;flex-direction:column;gap:.45rem;margin-top:.85rem}
+.eco-chip{display:flex;align-items:center;gap:.5rem;padding:.45rem .75rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;font-size:.75rem;color:rgba(255,255,255,.45);text-decoration:none;transition:all .25s}
+.eco-chip:hover{background:var(--glass2);border-color:var(--border2);color:var(--gold);transform:translateX(3px)}
+.eco-chip-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* Footer bottom */
+.footer-bottom{border-top:1px solid var(--border);padding:1.4rem 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:.7rem;color:rgba(255,255,255,.2);font-family:'Space Mono',monospace}
+.footer-copy b{color:var(--gold)}
+.footer-badges-row{display:flex;gap:.4rem;flex-wrap:wrap}
+.fb{font-size:.6rem;padding:.18rem .5rem;border-radius:50px;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.12);color:var(--gold);font-family:'Space Mono',monospace;letter-spacing:.04em}
+
+/* ══ UTILITY ══ */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ LIVE CLOCK ══ */
+.live-time{display:flex;align-items:center;gap:.4rem;font-family:'Space Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.25)}
+.lt-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:liveFlash 1.5s ease-in-out infinite}
+
+@media(max-width:960px){
+  .what-grid,.footer-cols{grid-template-columns:1fr}
   .why-grid{grid-template-columns:1fr 1fr}
-  .impact-grid{grid-template-columns:repeat(2,1fr)}
-  .steps-flow{grid-template-columns:repeat(4,1fr);gap:.5rem}
-  .steps-flow::before{display:none}
-  .articles-grid{grid-template-columns:1fr}
+  .impact4{grid-template-columns:repeat(2,1fr)}
+  .steps7{grid-template-columns:repeat(4,1fr)}
+  .steps7::before{display:none}
 }
 @media(max-width:600px){
-  nav{padding:.65rem 1rem}
-  .nav-right{gap:.4rem}
-  .nav-btn{padding:.35rem .7rem;font-size:.72rem}
+  nav{padding:.6rem 1rem}
+  .nb{padding:.32rem .65rem;font-size:.7rem}
   .why-grid{grid-template-columns:1fr}
-  .impact-grid{grid-template-columns:repeat(2,1fr)}
-  .steps-flow{grid-template-columns:repeat(3,1fr)}
-  section{padding:3.5rem 1.25rem}
+  .steps7{grid-template-columns:repeat(3,1fr)}
+  section{padding:3.5rem 1.2rem}
+  .footer-inner{padding:2.5rem 1.2rem 0}
+  .footer-live{gap:1.5rem}
 }
 </style>
 </head>
-<body>
+<body class="role-public" id="body">
 
-<div class="bg-fixed">
-  <div class="bg-mesh"></div>
-  <div class="bg-grid"></div>
-  <div class="bg-noise"></div>
+<!-- PARTICLE CANVAS -->
+<canvas id="particleCanvas"></canvas>
+
+<div class="bg-layer">
+  <div class="bg-orb o1"></div><div class="bg-orb o2"></div>
+  <div class="bg-orb o3"></div><div class="bg-orb o4"></div>
 </div>
-<div class="rainbow-bar"></div>
+<div class="grid-overlay"></div>
+<div class="rainbow"></div>
 
 <!-- ══ NAVIGATION ══ -->
-<nav>
-  <a href="index.html" class="nav-logo">
-    <div class="nav-logo-icon">S</div>
-    <div>
-      <div class="nav-logo-text">SAR সার</div>
-      <span class="nav-logo-sub">She AI Restaurant</span>
+<nav id="mainNav">
+  <a href="index.html" class="logo-wrap">
+    <div class="logo-gem"><span>S</span></div>
+    <div class="logo-text-wrap">
+      <span class="t1">SAR সার</span>
+      <span class="t2">She AI Restaurant</span>
     </div>
   </a>
-  <div class="nav-right">
-    <a href="register.html" target="_blank" class="nav-btn">📝 নিবন্ধন</a>
-    <a href="login.html" target="_blank" class="nav-btn">🔐 লগইন</a>
-    <a href="dashboard.html" target="_blank" class="nav-btn">📊 ড্যাশবোর্ড</a>
-    <a href="payment.html" target="_blank" class="nav-btn">💳 পেমেন্ট</a>
-    <a href="kitchen.html" target="_blank" class="nav-btn">👩‍🍳 কিচেন</a>
-    <a href="admin.html" target="_blank" class="nav-btn primary">⚙️ অ্যাডমিন</a>
+  <div class="nav-links">
+    <a href="register.html" target="_blank" class="nb nb-sg public-visible">📝 নিবন্ধন</a>
+    <a href="login.html" target="_blank" class="nb nb-sg public-visible">🔐 লগইন</a>
+    <!-- Customer only -->
+    <a href="dashboard.html" target="_blank" class="nb nb-sg customer-only" id="dashBtn" style="display:none">📊 ড্যাশবোর্ড</a>
+    <a href="payment.html" target="_blank" class="nb nb-sg customer-only" id="payBtn2" style="display:none">💳 পেমেন্ট</a>
+    <!-- Staff + Admin -->
+    <a href="dashboard.html" target="_blank" class="nb nb-staff staff-only" id="staffDashBtn" style="display:none">📊 ড্যাশবোর্ড</a>
+    <a href="kitchen.html" target="_blank" class="nb nb-staff staff-only" id="kitchenBtn" style="display:none">👩‍🍳 কিচেন</a>
+    <!-- Admin only -->
+    <a href="admin.html" target="_blank" class="nb nb-gold admin-only" id="adminBtn" style="display:none">⚙️ অ্যাডমিন</a>
+    <!-- Always visible -->
+    <a href="menu.html" target="_blank" class="nb nb-sg">🍱 মেনু</a>
+    <div class="live-time"><span class="lt-dot"></span><span id="liveClock">--:--:--</span></div>
   </div>
 </nav>
 
 <!-- ══ HERO ══ -->
 <section class="hero">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
-  <div class="hero-bg-img"></div>
-
-  <div class="hero-eyebrow">
-    <span class="hero-eyebrow-dot"></span>
-    WORLD PIONEER 2026 · BANGLADESH FIRST · DHAKA
+  <div class="sar-main-title">
+    <span class="sar-line1">SAR সার</span>
+    <span class="sar-line2-bn">শি এআই রেস্তোরাঁ · She AI Restaurant</span>
+    <span class="sar-line3">AI · EI · Blockchain · Women Only · World Pioneer 2026</span>
   </div>
 
-  <h1 class="hero-title">
-    <span class="sar">SAR সার</span>
-    <span class="she">She AI Restaurant</span>
-  </h1>
-
-  <p class="hero-tagline">
-    <span>AI + EI + Blockchain</span> — পৃথিবীর প্রথম<br>
-    নারী-নেতৃত্বাধীন থেরাপিউটিক হিলিং রেস্তোরাঁ
-  </p>
-
-  <div class="hero-badges">
-    <span class="h-badge hb-gold">🌾 Oil Free</span>
-    <span class="h-badge hb-gold">🌾 Gluten Free</span>
-    <span class="h-badge hb-green">🌿 100% Organic</span>
-    <span class="h-badge hb-green">🔗 Blockchain Verified</span>
-    <span class="h-badge hb-pink">👩 Women Only</span>
-    <span class="h-badge hb-pink">🤖 AI Personalized</span>
+  <div class="hero-tagline-wrap">
+    <p class="hero-tagline-en"><strong>"Food is Medicine.</strong> Medicine is Food. <strong>Empathy is the Recipe."</strong></p>
+    <p class="hero-tagline-bn">পৃথিবীর প্রথম <strong>নারী-নেতৃত্বাধীন AI+EI+Blockchain থেরাপিউটিক হিলিং রেস্তোরাঁ</strong> — বাংলাদেশ</p>
   </div>
 
-  <p class="hero-desc">
-    <em>"Food is Medicine. Medicine is Food. Empathy is the Recipe."</em><br>
-    বাংলাদেশের প্রথম AI + Emotional Intelligence + Blockchain চালিত রেস্তোরাঁ — শুধুমাত্র নারীদের জন্য, নারীদের দ্বারা পরিচালিত, নারীদের নেতৃত্বে। ১০৫টি থেরাপিউটিক রেসিপি। শূন্য ক্ষতিকর উপাদান।
-  </p>
+  <div class="badge-row">
+    <span class="hbadge hb-g">🌾 Oil Free</span>
+    <span class="hbadge hb-g">🌾 Gluten Free</span>
+    <span class="hbadge hb-c">🌿 100% Organic</span>
+    <span class="hbadge hb-c">🔗 Blockchain Verified</span>
+    <span class="hbadge hb-p">👩 Women Only</span>
+    <span class="hbadge hb-p">🤖 AI Personalized</span>
+  </div>
 
-  <div class="hero-cta">
-    <a href="register.html" target="_blank" class="cta-btn cta-primary">🌸 এখনই নিবন্ধন করুন</a>
-    <a href="#what-is-sar" class="cta-btn cta-secondary">SAR কী? জানুন →</a>
-    <a href="menu.html" target="_blank" class="cta-btn cta-secondary">🍱 মেনু দেখুন</a>
+  <div class="cta-row">
+    <a href="register.html" target="_blank" class="cta-a cta-primary">🌸 এখনই নিবন্ধন করুন</a>
+    <a href="#why" class="cta-a cta-pink">কেন SAR? জানুন →</a>
+    <a href="menu.html" target="_blank" class="cta-a cta-outline">🍱 মেনু দেখুন</a>
   </div>
 
   <div class="hero-stats">
-    <div class="h-stat"><div class="h-stat-num">১০৫</div><div class="h-stat-label">Healing Recipes</div></div>
-    <div class="h-stat"><div class="h-stat-num">৫</div><div class="h-stat-label">Disease Categories</div></div>
-    <div class="h-stat"><div class="h-stat-num">২৫০</div><div class="h-stat-label">Health Metrics</div></div>
-    <div class="h-stat"><div class="h-stat-num">১ম</div><div class="h-stat-label">World Pioneer</div></div>
-    <div class="h-stat"><div class="h-stat-num">০</div><div class="h-stat-label">Harmful Ingredients</div></div>
+    <div class="h-stat"><div class="h-stat-num" data-target="105">০</div><div class="h-stat-label">Healing Recipes</div></div>
+    <div class="h-stat"><div class="h-stat-num" data-target="5">০</div><div class="h-stat-label">Disease Categories</div></div>
+    <div class="h-stat"><div class="h-stat-num" data-target="250">০</div><div class="h-stat-label">Health Metrics</div></div>
+    <div class="h-stat"><div class="h-stat-num" data-target="99">০</div><div class="h-stat-label">SAR Ingredients</div></div>
+    <div class="h-stat"><div class="h-stat-num" data-target="0">✓</div><div class="h-stat-label">Harmful Elements</div></div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-hint-line"></div>
+    <div class="scroll-hint-text">SCROLL</div>
   </div>
 </section>
 
 <!-- ══ TICKER ══ -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span class="ticker-item">SAR সার</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">FOOD IS MEDICINE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">MEDICINE IS FOOD</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">OIL FREE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">GLUTEN FREE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">100% ORGANIC</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">AI + EI + BLOCKCHAIN</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WOMEN LED</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WOMEN RUN</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">FOR WOMEN ONLY</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">BANGLADESH FIRST</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WORLD PIONEER</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">DHAKA BANGLADESH</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">MINDMAX SHE ENTERPRISES</span><span class="ticker-sep">✦</span>
-    <!-- duplicate for seamless loop -->
-    <span class="ticker-item">SAR সার</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">FOOD IS MEDICINE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">MEDICINE IS FOOD</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">OIL FREE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">GLUTEN FREE</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">100% ORGANIC</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">AI + EI + BLOCKCHAIN</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WOMEN LED</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WOMEN RUN</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">FOR WOMEN ONLY</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">BANGLADESH FIRST</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">WORLD PIONEER</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">DHAKA BANGLADESH</span><span class="ticker-sep">✦</span>
-    <span class="ticker-item">MINDMAX SHE ENTERPRISES</span><span class="ticker-sep">✦</span>
-  </div>
+<div class="ticker-belt">
+  <div class="ticker-inner" id="tickerInner"></div>
 </div>
 
 <!-- ══ WHAT IS SAR ══ -->
-<section id="what-is-sar">
-  <div class="section-inner">
+<section id="what">
+  <div class="si">
     <div class="what-grid">
       <div>
-        <p class="section-eyebrow">What Is SAR?</p>
-        <h2 class="section-title reveal">সার — প্রকৃতির<br><span class="gold">মূল নির্যাস</span></h2>
-        <p class="section-sub reveal">বাংলায় <strong style="color:var(--gold)">সার</strong> মানে মাটির সেই অমূল্য উপাদান যা প্রতিটি বীজকে পূর্ণ জীবনে রূপান্তরিত করে। SAR হলো সেই খাবার যা প্রতিটি নারীকে ভেতর থেকে সারিয়ে তোলে।</p>
+        <p class="s-eye reveal">What Is SAR?</p>
+        <h2 class="s-title reveal">সার — জীবনের<br><span class="gd">মূল নির্যাস</span></h2>
+        <p class="s-sub reveal">বাংলায় <strong style="color:var(--gold2)">সার</strong> মানে মাটির সেই মূল্যবান উপাদান যা প্রতিটি বীজকে পরিপূর্ণ জীবনে রূপান্তরিত করে। SAR হলো সেই খাবার — যা প্রতিটি নারীকে ভেতর থেকে সুস্থ করে তোলে।</p>
         <div class="what-quote reveal">
           "Without proper food, medicine is of little use; with proper food, medicine is of little need."
-          <cite>— Charaka Samhita · Inspired by Divya's Kitchen NYC</cite>
+          <cite>— Charaka Samhita · Inspired by Divya's Kitchen NYC · Sakara Life NY · Six Senses Vana India</cite>
         </div>
         <div style="margin-top:1.75rem;display:flex;gap:.75rem;flex-wrap:wrap">
-          <a href="#why-sar" class="sg-btn">কেন SAR? →</a>
-          <a href="menu.html" target="_blank" class="sg-btn">মেনু দেখুন →</a>
+          <a href="#why" class="sg-btn reveal">কেন SAR? →</a>
+          <a href="menu.html" target="_blank" class="sg-btn reveal">মেনু দেখুন →</a>
         </div>
       </div>
       <div class="what-visual reveal">
-        <div class="what-card-big">
-          <div class="what-arabic">সার</div>
-          <div class="what-meaning">The Essential Nourishment of Life</div>
-          <div class="what-pillars">
-            <div class="what-pillar"><span class="wp-icon">🤖</span><div><div class="wp-title">AI-Personalized Healing</div><div class="wp-desc">আপনার বয়স, হরমোন চক্র ও স্বাস্থ্য লক্ষ্য অনুযায়ী প্রতিটি খাবার AI কর্তৃক পরিকল্পিত</div></div></div>
-            <div class="what-pillar"><span class="wp-icon">🧠</span><div><div class="wp-title">EI-Guided Service</div><div class="wp-desc">Emotional Intelligence প্রশিক্ষিত সম্পূর্ণ নারী দল — শরীর ও মন উভয়কে নিরাময়</div></div></div>
-            <div class="what-pillar"><span class="wp-icon">🔗</span><div><div class="wp-title">Blockchain Verified</div><div class="wp-desc">প্রতিটি উপাদানের খামার থেকে প্লেট পর্যন্ত সম্পূর্ণ ব্লকচেইন ট্রেসেবিলিটি</div></div></div>
-            <div class="what-pillar"><span class="wp-icon">👩</span><div><div class="wp-title">Women Led · Women Run</div><div class="wp-desc">রান্নাঘর থেকে বোর্ডরুম — প্রতিটি ভূমিকায় নারী, নারীর জন্য, নারীর দ্বারা</div></div></div>
+        <div class="wcard">
+          <div class="sar-arabic">সার</div>
+          <div class="sar-meaning">The Essential Nourishment of Life</div>
+          <div class="pillars">
+            <div class="pillar"><span class="pi">🤖</span><div><div class="pt">AI-Personalized Healing</div><div class="pd">আপনার বয়স, হরমোন চক্র ও ২৫০টি মেট্রিক্স বিশ্লেষণ করে AI প্রতিদিনের মেনু তৈরি করে।</div></div></div>
+            <div class="pillar"><span class="pi">🧠</span><div><div class="pt">EI-Guided Service</div><div class="pd">Emotional Intelligence প্রশিক্ষিত সম্পূর্ণ নারী দল — শরীর ও মন উভয়কে নিরাময়।</div></div></div>
+            <div class="pillar"><span class="pi">🔗</span><div><div class="pt">Blockchain Verified</div><div class="pd">খামার থেকে প্লেট পর্যন্ত প্রতিটি উপাদানের সম্পূর্ণ ব্লকচেইন ট্রেসেবিলিটি।</div></div></div>
+            <div class="pillar"><span class="pi">👩</span><div><div class="pt">Women Led · Women Run</div><div class="pd">রান্নাঘর থেকে বোর্ডরুম — প্রতিটি ভূমিকায় নারী, নারীর জন্য, নারীর দ্বারা।</div></div></div>
           </div>
         </div>
       </div>
@@ -450,96 +490,68 @@ footer{position:relative;z-index:10;background:var(--dark3);border-top:1px solid
   </div>
 </section>
 
-<div class="sec-divider"></div>
+<div class="sec-div"></div>
 
 <!-- ══ WHY SAR ══ -->
-<section id="why-sar">
-  <div class="section-inner">
-    <p class="section-eyebrow">Why SAR?</p>
-    <h2 class="section-title reveal">কেন SAR <span class="gold">বেছে নেবেন?</span></h2>
-    <p class="section-sub reveal">বাংলাদেশের ৪ কোটিরও বেশি নারী দীর্ঘস্থায়ী রোগে ভুগছেন। SAR সেই নারীদের জন্য — যারা খাবারকেই ওষুধ হিসেবে বেছে নিতে চান।</p>
+<section id="why">
+  <div class="si">
+    <p class="s-eye reveal">Why SAR?</p>
+    <h2 class="s-title reveal">কেন SAR <span class="gd">বেছে নেবেন?</span></h2>
+    <p class="s-sub reveal">বাংলাদেশের ৪ কোটিরও বেশি নারী দীর্ঘস্থায়ী রোগে ভুগছেন। SAR — যারা খাবারকেই ওষুধ হিসেবে বেছে নিতে চান তাদের জন্য।</p>
     <div class="why-grid reveal">
-      <div class="why-card"><div class="why-icon">🌾</div><div class="why-num">০১</div><div class="why-title">Oil, Gluten, Rice, Bread FREE</div><div class="why-desc">চারটি সবচেয়ে ক্ষতিকর প্রদাহজনক খাদ্য উপাদান সম্পূর্ণরূপে বাদ দেওয়া হয়েছে — নারীর স্বাস্থ্যের জন্য।</div></div>
-      <div class="why-card"><div class="why-icon">🧬</div><div class="why-num">০২</div><div class="why-title">AI-Personalized প্রতিটি খাবার</div><div class="why-desc">আপনার ২৫০টি স্বাস্থ্য মেট্রিক্স বিশ্লেষণ করে AI প্রতিদিন আপনার জন্য সেরা খাবার নির্বাচন করে।</div></div>
-      <div class="why-card"><div class="why-icon">💊</div><div class="why-num">০৩</div><div class="why-title">Food as Medicine — সর্বদা</div><div class="why-desc">ডায়াবেটিস, স্থূলতা, ফ্যাটি লিভার, IBS, গর্ভাবস্থা — প্রতিটি রেসিপি ক্লিনিক্যালি তৈরি।</div></div>
-      <div class="why-card"><div class="why-icon">🔗</div><div class="why-num">০৪</div><div class="why-title">Blockchain প্রমাণিত জৈব</div><div class="why-desc">প্রতিটি উপাদান স্থায়ীভাবে ব্লকচেইনে রেকর্ড — খামার থেকে প্লেট পর্যন্ত সম্পূর্ণ স্বচ্ছতা।</div></div>
-      <div class="why-card"><div class="why-icon">👩‍⚕️</div><div class="why-num">০৫</div><div class="why-title">নারী-নেতৃত্ব, নারী-পরিচালিত</div><div class="why-desc">SAR-এ প্রতিটি পদে নারী — মালিকানা, ব্যবস্থাপনা, রান্না, ডেলিভারি সব নারী দ্বারা।</div></div>
-      <div class="why-card"><div class="why-icon">🧠</div><div class="why-num">০৬</div><div class="why-title">Emotional Intelligence সেবা</div><div class="why-desc">EI-প্রশিক্ষিত দল শুধু খাবার নয় — মানসিক সুস্থতাও নিশ্চিত করে প্রতিটি সেবায়।</div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">🌾</div><div class="wcard2-num">01</div></div><div class="wcard2-title">Oil, Gluten, Rice FREE</div><div class="wcard2-desc">চারটি সবচেয়ে ক্ষতিকর প্রদাহজনক উপাদান — সম্পূর্ণ বাদ দেওয়া হয়েছে।</div><div class="wcard2-bar"></div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">🧬</div><div class="wcard2-num">02</div></div><div class="wcard2-title">AI-Personalized খাবার</div><div class="wcard2-desc">২৫০টি মেট্রিক্স বিশ্লেষণ করে AI প্রতিদিন আপনার জন্য সেরা মেনু নির্বাচন করে।</div><div class="wcard2-bar"></div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">💊</div><div class="wcard2-num">03</div></div><div class="wcard2-title">Food as Medicine</div><div class="wcard2-desc">ডায়াবেটিস, স্থূলতা, ফ্যাটি লিভার, IBS, গর্ভাবস্থা — প্রতিটি রেসিপি ক্লিনিক্যালি তৈরি।</div><div class="wcard2-bar"></div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">🔗</div><div class="wcard2-num">04</div></div><div class="wcard2-title">Blockchain প্রমাণিত জৈব</div><div class="wcard2-desc">প্রতিটি উপাদান স্থায়ীভাবে ব্লকচেইনে রেকর্ড — খামার থেকে আপনার প্লেট।</div><div class="wcard2-bar"></div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">👩‍⚕️</div><div class="wcard2-num">05</div></div><div class="wcard2-title">নারী-নেতৃত্ব</div><div class="wcard2-desc">SAR-এ প্রতিটি পদে নারী — মালিকানা, ব্যবস্থাপনা, রান্না, ডেলিভারি।</div><div class="wcard2-bar"></div></div>
+      <div class="wcard2"><div class="wcard2-top"><div class="wcard2-icon">🧠</div><div class="wcard2-num">06</div></div><div class="wcard2-title">Emotional Intelligence</div><div class="wcard2-desc">EI-প্রশিক্ষিত দল শুধু খাবার নয় — মানসিক সুস্থতাও নিশ্চিত করে।</div><div class="wcard2-bar"></div></div>
     </div>
     <div style="text-align:center;margin-top:2rem">
-      <a href="why-sar.html" target="_blank" class="sg-btn">📰 SAR সম্পর্কে আরও পড়ুন →</a>
+      <a href="why-sar.html" target="_blank" class="sg-btn reveal">📰 SAR সম্পর্কে আরও পড়ুন →</a>
     </div>
   </div>
 </section>
 
-<div class="sec-divider"></div>
+<div class="sec-div"></div>
 
 <!-- ══ MENU SLIDESHOW ══ -->
-<section id="menu-section">
-  <div class="section-inner">
-    <p class="section-eyebrow">Therapeutic Menu</p>
-    <h2 class="section-title reveal">১০৫টি <span class="gold">হিলিং রেসিপি</span></h2>
-    <p class="section-sub reveal">পাঁচটি রোগ বিভাগ থেকে নির্বাচিত — প্রতিটি খাবার একটি ওষুধ, প্রতিটি উপাদান একটি নিরাময়।</p>
-    <div class="tech-strip reveal">
-      <div class="tech-pill"><span class="tech-pill-icon">🩺</span><span class="tech-pill-text">ডায়াবেটিস</span></div>
-      <div class="tech-pill"><span class="tech-pill-icon">⚖️</span><span class="tech-pill-text">স্থূলতা</span></div>
-      <div class="tech-pill"><span class="tech-pill-icon">🫀</span><span class="tech-pill-text">ফ্যাটি লিভার</span></div>
-      <div class="tech-pill"><span class="tech-pill-icon">🌿</span><span class="tech-pill-text">IBS / গ্যাস্ট্রিক</span></div>
-      <div class="tech-pill"><span class="tech-pill-icon">🤰</span><span class="tech-pill-text">গর্ভাবস্থা</span></div>
+<section id="menus">
+  <div class="si">
+    <p class="s-eye reveal">Therapeutic Menu</p>
+    <h2 class="s-title reveal">১০৫টি <span class="gd">হিলিং রেসিপি</span></h2>
+    <p class="s-sub reveal">পাঁচটি রোগ বিভাগ থেকে নির্বাচিত — প্রতিটি খাবার একটি ওষুধ, প্রতিটি উপাদান একটি নিরাময়।</p>
+    <div style="display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem" class="reveal">
+      <span style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:50px;background:rgba(255,20,147,.08);border:1px solid rgba(255,20,147,.2);font-size:.8rem;color:#FF69B4">🩺 ডায়াবেটিস</span>
+      <span style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:50px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);font-size:.8rem;color:#FCD34D">⚖️ স্থূলতা</span>
+      <span style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:50px;background:rgba(0,208,132,.08);border:1px solid rgba(0,208,132,.2);font-size:.8rem;color:#A8FFD8">🫀 ফ্যাটি লিভার</span>
+      <span style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:50px;background:rgba(139,0,255,.08);border:1px solid rgba(139,0,255,.2);font-size:.8rem;color:#BF5FFF">🌿 IBS/গ্যাস্ট্রিক</span>
+      <span style="display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:50px;background:rgba(255,105,180,.08);border:1px solid rgba(255,105,180,.2);font-size:.8rem;color:#FFB3D1">🤰 গর্ভাবস্থা</span>
     </div>
   </div>
-  <div class="menu-scroll-wrap">
-    <div class="menu-track" id="menuTrack"></div>
+  <div class="menu-runway">
+    <div class="menu-belt" id="menuBelt"></div>
   </div>
-  <div class="section-inner" style="text-align:center;margin-top:2.5rem">
+  <div class="si" style="text-align:center;margin-top:2.5rem">
     <a href="menu.html" target="_blank" class="sg-btn">🍱 সম্পূর্ণ মেনু দেখুন →</a>
   </div>
 </section>
 
-<div class="sec-divider"></div>
+<div class="sec-div"></div>
 
-<!-- ══ HOW SAR WORKS ══ -->
-<section id="how-it-works">
-  <div class="section-inner">
-    <p class="section-eyebrow">How SAR Works</p>
-    <h2 class="section-title reveal">SAR কীভাবে <span class="gold">কাজ করে?</span></h2>
-    <p class="section-sub reveal">একজন নারীর নিরাময় যাত্রা — কর্মক্ষেত্র থেকে SAR রেস্তোরাঁ পর্যন্ত, অসুস্থতা থেকে সুস্বাস্থ্য পর্যন্ত।</p>
-    <div class="steps-flow reveal">
-      <div class="step-item">
-        <div class="step-circle">👩‍💼<span class="step-num">১</span></div>
-        <div class="step-title">কর্মব্যস্ত নারী</div>
-        <div class="step-desc">রোগ নিয়ে ব্যস্ত জীবন</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">📱<span class="step-num">২</span></div>
-        <div class="step-title">SAR সাইট ভিজিট</div>
-        <div class="step-desc">অনলাইনে নিবন্ধন</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">🤖<span class="step-num">৩</span></div>
-        <div class="step-title">AI বিশ্লেষণ</div>
-        <div class="step-desc">২৫০ মেট্রিক্স স্ক্যান</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">🍱<span class="step-num">৪</span></div>
-        <div class="step-title">মেনু নির্বাচন</div>
-        <div class="step-desc">AI সুপারিশকৃত খাবার</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">🚴‍♀️<span class="step-num">৫</span></div>
-        <div class="step-title">অর্ডার ও ডেলিভারি</div>
-        <div class="step-desc">দরজায় থেরাপিউটিক খাবার</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">💊<span class="step-num">৬</span></div>
-        <div class="step-title">ওষুধ ছেড়ে দিন</div>
-        <div class="step-desc">খাবারই হোক ওষুধ</div>
-      </div>
-      <div class="step-item">
-        <div class="step-circle">🌟<span class="step-num">৭</span></div>
-        <div class="step-title">সুস্থ ও প্রাণবন্ত</div>
-        <div class="step-desc">নতুন জীবনের শুরু</div>
-      </div>
+<!-- ══ HOW IT WORKS ══ -->
+<section id="how">
+  <div class="si">
+    <p class="s-eye reveal">How SAR Works</p>
+    <h2 class="s-title reveal">SAR কীভাবে <span class="gd">কাজ করে?</span></h2>
+    <p class="s-sub reveal">একজন নারীর নিরাময় যাত্রা — কর্মক্ষেত্র থেকে SAR রেস্তোরাঁ পর্যন্ত।</p>
+    <div class="steps7 reveal">
+      <div class="step"><div class="step-ring">👩‍💼<span class="step-n">১</span></div><div class="step-t">কর্মব্যস্ত নারী</div><div class="step-d">রোগ নিয়ে ব্যস্ত জীবন</div></div>
+      <div class="step"><div class="step-ring">📱<span class="step-n">২</span></div><div class="step-t">SAR-এ নিবন্ধন</div><div class="step-d">অনলাইনে সহজ প্রক্রিয়া</div></div>
+      <div class="step"><div class="step-ring">🤖<span class="step-n">৩</span></div><div class="step-t">AI বিশ্লেষণ</div><div class="step-d">২৫০ মেট্রিক্স স্ক্যান</div></div>
+      <div class="step"><div class="step-ring">🍱<span class="step-n">৪</span></div><div class="step-t">মেনু নির্বাচন</div><div class="step-d">AI সুপারিশকৃত</div></div>
+      <div class="step"><div class="step-ring">🚴‍♀️<span class="step-n">৫</span></div><div class="step-t">ডেলিভারি</div><div class="step-d">দরজায় থেরাপিউটিক</div></div>
+      <div class="step"><div class="step-ring">💊<span class="step-n">৬</span></div><div class="step-t">ওষুধ ছেড়ে দিন</div><div class="step-d">খাবারই ওষুধ</div></div>
+      <div class="step"><div class="step-ring">🌟<span class="step-n">৭</span></div><div class="step-t">সুস্থ ও প্রাণবন্ত</div><div class="step-d">নতুন জীবন</div></div>
     </div>
     <div style="text-align:center;margin-top:2.5rem">
       <a href="register.html" target="_blank" class="sg-btn">🌸 আজই যাত্রা শুরু করুন →</a>
@@ -547,186 +559,312 @@ footer{position:relative;z-index:10;background:var(--dark3);border-top:1px solid
   </div>
 </section>
 
-<div class="sec-divider"></div>
+<div class="sec-div"></div>
 
 <!-- ══ IMPACT ══ -->
 <section id="impact">
-  <div class="section-inner">
-    <p class="section-eyebrow">Impact of SAR</p>
-    <h2 class="section-title reveal">SAR-এর <span class="gold">প্রভাব ও লক্ষ্য</span></h2>
-    <p class="section-sub reveal">২০৩০ সালের মধ্যে ১০ লাখ বাংলাদেশি নারীর স্বাস্থ্য রূপান্তরের লক্ষ্যে SAR কাজ করছে।</p>
-    <div class="impact-grid reveal">
-      <div class="impact-card"><div class="impact-icon">👩‍⚕️</div><div class="impact-num">১০ লাখ</div><div class="impact-label">নারী ২০৩০ সালের মধ্যে</div></div>
-      <div class="impact-card"><div class="impact-icon">🍱</div><div class="impact-num">১০৫</div><div class="impact-label">থেরাপিউটিক রেসিপি</div></div>
-      <div class="impact-card"><div class="impact-icon">💊</div><div class="impact-num">০</div><div class="impact-label">ক্ষতিকর উপাদান</div></div>
-      <div class="impact-card"><div class="impact-icon">🌍</div><div class="impact-num">১ম</div><div class="impact-label">পৃথিবীতে World Pioneer</div></div>
+  <div class="si">
+    <p class="s-eye reveal">Impact of SAR</p>
+    <h2 class="s-title reveal">SAR-এর <span class="gd">প্রভাব ও লক্ষ্য</span></h2>
+    <p class="s-sub reveal">২০৩০ সালের মধ্যে ১০ লাখ বাংলাদেশি নারীর স্বাস্থ্য রূপান্তর।</p>
+    <div class="impact4 reveal">
+      <div class="icard"><div class="icard-icon">👩‍⚕️</div><div class="icard-num">১০ লাখ</div><div class="icard-label">নারী ২০৩০</div></div>
+      <div class="icard"><div class="icard-icon">🍱</div><div class="icard-num">১০৫</div><div class="icard-label">থেরাপিউটিক রেসিপি</div></div>
+      <div class="icard"><div class="icard-icon">💊</div><div class="icard-num">০</div><div class="icard-label">ক্ষতিকর উপাদান</div></div>
+      <div class="icard"><div class="icard-icon">🌍</div><div class="icard-num">১ম</div><div class="icard-label">World Pioneer</div></div>
     </div>
-    <div class="impact-timeline reveal">
-      <div class="impact-row"><span class="impact-year">২০২৬</span><div class="impact-bar-wrap"><div class="impact-bar" style="width:8%"></div></div><span class="impact-val">১,০০০ নারী</span></div>
-      <div class="impact-row"><span class="impact-year">২০২৭</span><div class="impact-bar-wrap"><div class="impact-bar" style="width:20%"></div></div><span class="impact-val">৫০,০০০ নারী</span></div>
-      <div class="impact-row"><span class="impact-year">২০২৮</span><div class="impact-bar-wrap"><div class="impact-bar" style="width:40%"></div></div><span class="impact-val">২ লাখ নারী</span></div>
-      <div class="impact-row"><span class="impact-year">২০২৯</span><div class="impact-bar-wrap"><div class="impact-bar" style="width:65%"></div></div><span class="impact-val">৫ লাখ নারী</span></div>
-      <div class="impact-row"><span class="impact-year">২০৩০</span><div class="impact-bar-wrap"><div class="impact-bar" style="width:100%"></div></div><span class="impact-val">১০ লাখ নারী</span></div>
+    <div class="timeline reveal">
+      <div class="trow"><span class="ty">২০২৬</span><div class="tbw"><div class="tb" style="width:0" data-w="8"></div></div><span class="tv">১,০০০ নারী</span></div>
+      <div class="trow"><span class="ty">২০২৭</span><div class="tbw"><div class="tb" style="width:0" data-w="20"></div></div><span class="tv">৫০,০০০ নারী</span></div>
+      <div class="trow"><span class="ty">২০২৮</span><div class="tbw"><div class="tb" style="width:0" data-w="40"></div></div><span class="tv">২ লাখ নারী</span></div>
+      <div class="trow"><span class="ty">২০২৯</span><div class="tbw"><div class="tb" style="width:0" data-w="65"></div></div><span class="tv">৫ লাখ নারী</span></div>
+      <div class="trow"><span class="ty">২০৩০</span><div class="tbw"><div class="tb" style="width:0" data-w="100"></div></div><span class="tv">১০ লাখ নারী</span></div>
     </div>
   </div>
 </section>
 
 <!-- ══ FOOTER ══ -->
 <footer>
+  <div class="footer-glow"></div>
   <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="logo-wrap">
-          <div class="nav-logo-icon" style="width:48px;height:48px;font-size:1.4rem">S</div>
+
+    <!-- Live stats -->
+    <div class="footer-live">
+      <div class="fl-stat">
+        <div class="fl-num">১০৫<div class="fl-dot"></div></div>
+        <div class="fl-label">Active Recipes</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-num" id="liveMembers">১,২৪৭</div>
+        <div class="fl-label">Members Served</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-num">৯৯</div>
+        <div class="fl-label">SAR Ingredients</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-num">২৪/৭</div>
+        <div class="fl-label">AI Online</div>
+      </div>
+      <div class="fl-stat">
+        <div class="fl-num" id="footerClock" style="font-size:1rem">--:--</div>
+        <div class="fl-label">Dhaka Time</div>
+      </div>
+    </div>
+
+    <div class="footer-cols">
+      <!-- Brand -->
+      <div>
+        <div class="footer-brand-logo">
+          <div class="fbrand-gem">S</div>
           <div>
-            <div class="footer-brand-title">SAR সার</div>
-            <div style="font-size:.65rem;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace">She AI Restaurant</div>
+            <span class="fbrand-name">SAR সার</span>
+            <span class="fbrand-sub">She AI Restaurant · MindMax Enterprises</span>
           </div>
         </div>
-        <p class="footer-brand-tag">পৃথিবীর প্রথম AI + EI + Blockchain সংযুক্ত থেরাপিউটিক রেস্তোরাঁ — শুধুমাত্র নারীদের জন্য। <em>"Food is Medicine. Medicine is Food. Empathy is the Recipe."</em></p>
-        <div class="footer-social">
-          <a class="social-btn" href="https://facebook.com/mindmaxbd" target="_blank" title="Facebook">📘</a>
-          <a class="social-btn" href="https://wa.me/8801346098892" target="_blank" title="WhatsApp">💬</a>
-          <a class="social-btn" href="mailto:mindmaxltd@gmail.com" title="Email">📧</a>
-          <a class="social-btn" href="https://youtube.com/@mindmaxbd" target="_blank" title="YouTube">📺</a>
-          <a class="social-btn" href="https://mindmaxbd.xyz" target="_blank" title="MindMax">🌐</a>
+        <p class="fbrand-desc">পৃথিবীর প্রথম AI + EI + Blockchain সংযুক্ত থেরাপিউটিক রেস্তোরাঁ — শুধুমাত্র নারীদের জন্য, নারীদের দ্বারা পরিচালিত, নারীদের নেতৃত্বে।</p>
+        <p class="fbrand-quote">"Food is Medicine. Medicine is Food. Empathy is the Recipe."</p>
+        <div class="socials">
+          <a class="s-btn s-fb" href="https://www.facebook.com/profile.php?id=61576437045217" target="_blank" title="SAR Facebook">📘</a>
+          <a class="s-btn s-fb2" href="https://www.facebook.com/profile.php?id=61590191923285" target="_blank" title="MindMax Facebook">📗</a>
+          <a class="s-btn s-yt" href="https://www.youtube.com/@user-oz6ro8gz4e" target="_blank" title="MindMax YouTube">▶️</a>
+          <a class="s-btn s-wa" href="https://wa.me/8801346098892" target="_blank" title="WhatsApp">💬</a>
+          <a class="s-btn s-em" href="mailto:mindmaxltd@gmail.com" title="Email">📧</a>
+          <a class="s-btn s-web" href="https://mindmaxbd.xyz" target="_blank" title="MindMax Web">🌐</a>
         </div>
       </div>
 
+      <!-- Quick Links -->
       <div>
-        <div class="footer-col-title">Quick Links</div>
-        <div class="footer-links">
-          <a href="#what-is-sar" class="footer-link">→ SAR কী?</a>
-          <a href="#why-sar" class="footer-link">→ কেন SAR?</a>
-          <a href="#impact" class="footer-link">→ SAR-এর প্রভাব</a>
-          <a href="#how-it-works" class="footer-link">→ SAR কীভাবে কাজ করে?</a>
-          <a href="menu.html" target="_blank" class="footer-link">→ থেরাপিউটিক মেনু</a>
-          <a href="why-sar.html" target="_blank" class="footer-link">→ আর্টিকেল ও আপডেট</a>
+        <div class="fc-title">Quick Links</div>
+        <div class="fc-links">
+          <a href="#what" class="fc-link">SAR কী?</a>
+          <a href="#why" class="fc-link">কেন SAR?</a>
+          <a href="#menus" class="fc-link">থেরাপিউটিক মেনু</a>
+          <a href="#how" class="fc-link">SAR কীভাবে কাজ করে</a>
+          <a href="#impact" class="fc-link">SAR-এর প্রভাব</a>
+          <a href="why-sar.html" target="_blank" class="fc-link">আর্টিকেল ও আপডেট</a>
+          <a href="register.html" target="_blank" class="fc-link">নিবন্ধন করুন</a>
+          <a href="login.html" target="_blank" class="fc-link">লগইন করুন</a>
         </div>
       </div>
 
+      <!-- Services -->
       <div>
-        <div class="footer-col-title">সেবা</div>
-        <div class="footer-links">
-          <a href="register.html" target="_blank" class="footer-link">→ নিবন্ধন</a>
-          <a href="login.html" target="_blank" class="footer-link">→ লগইন</a>
-          <a href="dashboard.html" target="_blank" class="footer-link">→ ড্যাশবোর্ড</a>
-          <a href="metrics.html" target="_blank" class="footer-link">→ স্বাস্থ্য মেট্রিক্স</a>
-          <a href="order.html" target="_blank" class="footer-link">→ অর্ডার করুন</a>
-          <a href="track.html" target="_blank" class="footer-link">→ অর্ডার ট্র্যাক</a>
-          <a href="payment.html" target="_blank" class="footer-link">→ পেমেন্ট</a>
+        <div class="fc-title">সেবাসমূহ</div>
+        <div class="fc-links">
+          <a href="dashboard.html" target="_blank" class="fc-link">ড্যাশবোর্ড</a>
+          <a href="metrics.html" target="_blank" class="fc-link">স্বাস্থ্য মেট্রিক্স</a>
+          <a href="order.html" target="_blank" class="fc-link">অর্ডার করুন</a>
+          <a href="track.html" target="_blank" class="fc-link">অর্ডার ট্র্যাক</a>
+          <a href="payment.html" target="_blank" class="fc-link">পেমেন্ট</a>
+          <a href="receipt.html" target="_blank" class="fc-link">রিসিট দেখুন</a>
+          <a href="profile.html" target="_blank" class="fc-link">আমার প্রোফাইল</a>
         </div>
       </div>
 
+      <!-- Contact + Ecosystem -->
       <div>
-        <div class="footer-col-title">যোগাযোগ</div>
-        <div class="footer-contact-item">📍 ধানমন্ডি, ঢাকা, বাংলাদেশ</div>
-        <div class="footer-contact-item">📞 <a href="tel:+8801346098892">01346098892</a></div>
-        <div class="footer-contact-item">📧 <a href="mailto:mindmaxltd@gmail.com">mindmaxltd@gmail.com</a></div>
-        <div class="footer-contact-item">🌐 <a href="https://mindmaxbd.xyz" target="_blank">mindmaxbd.xyz</a></div>
-        <div style="margin-top:1rem">
-          <div class="footer-col-title" style="margin-bottom:.5rem">MindMax Ecosystem</div>
-          <div class="footer-links" style="font-size:.75rem">
-            <a href="https://mindmaxbd.xyz/she-ai-restaurant-2/" target="_blank" class="footer-link">→ SAR Official</a>
-            <a href="https://mindmaxbd.xyz/kabiraj/" target="_blank" class="footer-link">→ She Kabiraj</a>
-            <a href="https://mindmaxbd.xyz/kotha/" target="_blank" class="footer-link">→ KOTHA</a>
-            <a href="https://mindmaxbd.xyz" target="_blank" class="footer-link">→ MindMax Group</a>
-          </div>
+        <div class="fc-title">যোগাযোগ</div>
+        <div class="fc-contact" style="margin-bottom:1.25rem">
+          <div class="fcc"><span class="fcc-icon">📍</span><span>ধানমন্ডি, ঢাকা, বাংলাদেশ</span></div>
+          <div class="fcc"><span class="fcc-icon">📞</span><a href="tel:+8801346098892">01346098892</a></div>
+          <div class="fcc"><span class="fcc-icon">📧</span><a href="mailto:mindmaxltd@gmail.com">mindmaxltd@gmail.com</a></div>
+          <div class="fcc"><span class="fcc-icon">🌐</span><a href="https://mindmaxbd.xyz" target="_blank">mindmaxbd.xyz</a></div>
+        </div>
+        <div class="fc-title">MindMax Ecosystem</div>
+        <div class="eco-chips">
+          <a href="https://mindmaxbd.xyz/she-ai-restaurant-2/" target="_blank" class="eco-chip"><span class="eco-chip-dot" style="background:#F5C518"></span>SAR Official Site</a>
+          <a href="https://mindmaxbd.xyz/sundar/" target="_blank" class="eco-chip"><span class="eco-chip-dot" style="background:#00D084"></span>SUNDAR — Bank Supervisor</a>
+          <a href="https://mindmaxbd.xyz/kotha/" target="_blank" class="eco-chip"><span class="eco-chip-dot" style="background:#FF69B4"></span>KOTHA — পেডিয়াট্রিক AI</a>
+          <a href="https://mindmaxbd.xyz" target="_blank" class="eco-chip"><span class="eco-chip-dot" style="background:#00F5FF"></span>MindMax Group</a>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <div class="footer-copy">© ২০২৬ <span>SAR — She AI Restaurant</span> · <span>MindMax She Enterprises</span> · সর্বস্বত্ব সংরক্ষিত</div>
-      <div class="footer-badges">
-        <span class="f-badge">AI Powered</span>
-        <span class="f-badge">EI Guided</span>
-        <span class="f-badge">Blockchain Verified</span>
-        <span class="f-badge">Women Only</span>
-        <span class="f-badge">World Pioneer 2026</span>
+      <div class="footer-copy">© ২০২৬ <b>SAR — She AI Restaurant</b> · <b>MindMax She Enterprises</b> · সর্বস্বত্ব সংরক্ষিত</div>
+      <div class="footer-badges-row">
+        <span class="fb">AI Powered</span><span class="fb">EI Guided</span>
+        <span class="fb">Blockchain Verified</span><span class="fb">Women Only</span>
+        <span class="fb">World Pioneer 2026</span>
       </div>
-      <div class="footer-mindmax">Powered by <a href="https://mindmaxbd.xyz" target="_blank">MindMax Group</a></div>
+      <div style="font-size:.68rem;color:rgba(255,255,255,.18);font-family:'Space Mono',monospace">
+        Powered by <a href="https://mindmaxbd.xyz" target="_blank" style="color:var(--gold);text-decoration:none">MindMax Group</a>
+      </div>
     </div>
-  </div>
+  </div><!-- footer-inner -->
 </footer>
 
 <script>
-// ══ MENU CARDS DATA ══
-const MENUS = [
-  {emoji:'🌾',cat:'dm',catLabel:'DM',name:'গোল্ডেন কুইনোয়া কনজি',en:'Golden Quinoa Congee',tags:['Anti-inflammatory','PCOS'],price:'৳২০০'},
-  {emoji:'🥗',cat:'dm',catLabel:'DM',name:'মেথি কুইনোয়া বাটি',en:'Fenugreek Quinoa Bowl',tags:['Blood Sugar','Diabetes'],price:'৳৩০০'},
-  {emoji:'🍲',cat:'dm',catLabel:'DM',name:'ঘি-পোচড চিকেন',en:'Ghee-Poached Chicken',tags:['Protein','Healing'],price:'৳৩৫০'},
-  {emoji:'⚖️',cat:'ob',catLabel:'OB',name:'প্রোটিন সিড পরিজ',en:'Protein Seed Porridge',tags:['Weight Loss','Metabolism'],price:'৳২০০'},
-  {emoji:'🥦',cat:'ob',catLabel:'OB',name:'রেইনবো ডিটক্স বাটি',en:'Rainbow Detox Bowl',tags:['Fat Burn','Cleanse'],price:'৳৩০০'},
-  {emoji:'🌿',cat:'ob',catLabel:'OB',name:'মেটাবলিক সবুজ স্যুপ',en:'Metabolic Green Soup',tags:['Thyroid','Lean'],price:'৳২৮০'},
-  {emoji:'🫀',cat:'fl',catLabel:'FL',name:'লিভার ডেটক্স বাটি',en:'Liver Detox Bowl',tags:['Liver','Detox'],price:'৳২৫০'},
-  {emoji:'🍵',cat:'fl',catLabel:'FL',name:'হলুদ গোল্ডেন ব্রোথ',en:'Turmeric Golden Broth',tags:['ALT','Cleanse'],price:'৳২২০'},
-  {emoji:'🌱',cat:'fl',catLabel:'FL',name:'ভৃঙ্গরাজ হিলিং বাটি',en:'Bhringraj Healing Bowl',tags:['Fatty Liver','Heal'],price:'৳৩২০'},
-  {emoji:'🌿',cat:'ib',catLabel:'IB',name:'গাট-সুথ মর্নিং বাটি',en:'Gut-Sooth Morning Bowl',tags:['IBS','Gut Health'],price:'৳২০০'},
-  {emoji:'🫙',cat:'ib',catLabel:'IB',name:'প্রোবায়োটিক লাসি বাটি',en:'Probiotic Lassi Bowl',tags:['Microbiome','Digest'],price:'৳২৫০'},
-  {emoji:'🥣',cat:'ib',catLabel:'IB',name:'ফার্মেন্টেড কিচরি',en:'Fermented Kitchari',tags:['Gastric','Soothe'],price:'৳২৮০'},
-  {emoji:'🤰',cat:'pr',catLabel:'PR',name:'নারিশিং মামা বাটি',en:'Nourishing Mama Bowl',tags:['Pregnancy','Iron'],price:'৳২৫০'},
-  {emoji:'🌸',cat:'pr',catLabel:'PR',name:'ফলিক অ্যাসিড গ্রিন',en:'Folate Green Bowl',tags:['Folic Acid','Growth'],price:'৳২৮০'},
-  {emoji:'🍯',cat:'pr',catLabel:'PR',name:'মাতৃ-শক্তি ডেজার্ট',en:'Maternal Strength Dessert',tags:['Calcium','Energy'],price:'৳২২০'},
+// ══ MENU CARD DATA ══
+const MENUS=[
+  {e:'🌾',c:'dm',cl:'DM',b:'গোল্ডেন কুইনোয়া কনজি',n:'Golden Quinoa Congee',t:['Anti-inflammatory','PCOS'],p:'৳২০০'},
+  {e:'🥗',c:'dm',cl:'DM',b:'মেথি কুইনোয়া বাটি',n:'Fenugreek Quinoa Bowl',t:['Blood Sugar','Diabetes'],p:'৳৩০০'},
+  {e:'🍲',c:'dm',cl:'DM',b:'ঘি-পোচড চিকেন',n:'Ghee-Poached Chicken',t:['Protein','Healing'],p:'৳৩৫০'},
+  {e:'⚖️',c:'ob',cl:'OB',b:'প্রোটিন সিড পরিজ',n:'Protein Seed Porridge',t:['Weight Loss','Metabolism'],p:'৳২০০'},
+  {e:'🥦',c:'ob',cl:'OB',b:'রেইনবো ডিটক্স বাটি',n:'Rainbow Detox Bowl',t:['Fat Burn','Cleanse'],p:'৳৩০০'},
+  {e:'🌿',c:'ob',cl:'OB',b:'মেটাবলিক সবুজ স্যুপ',n:'Metabolic Green Soup',t:['Thyroid','Lean'],p:'৳২৮০'},
+  {e:'🫀',c:'fl',cl:'FL',b:'লিভার ডেটক্স বাটি',n:'Liver Detox Bowl',t:['Liver','Detox'],p:'৳২৫০'},
+  {e:'🍵',c:'fl',cl:'FL',b:'হলুদ গোল্ডেন ব্রোথ',n:'Turmeric Golden Broth',t:['ALT','Cleanse'],p:'৳২২০'},
+  {e:'🌱',c:'fl',cl:'FL',b:'ভৃঙ্গরাজ হিলিং বাটি',n:'Bhringraj Healing Bowl',t:['Fatty Liver','Heal'],p:'৳৩২০'},
+  {e:'🌿',c:'ib',cl:'IB',b:'গাট-সুথ মর্নিং বাটি',n:'Gut-Sooth Morning Bowl',t:['IBS','Gut Health'],p:'৳২০০'},
+  {e:'🫙',c:'ib',cl:'IB',b:'প্রোবায়োটিক লাসি',n:'Probiotic Lassi Bowl',t:['Microbiome','Digest'],p:'৳২৫০'},
+  {e:'🥣',c:'ib',cl:'IB',b:'ফার্মেন্টেড কিচরি',n:'Fermented Kitchari',t:['Gastric','Soothe'],p:'৳২৮০'},
+  {e:'🤰',c:'pr',cl:'PR',b:'নারিশিং মামা বাটি',n:'Nourishing Mama Bowl',t:['Pregnancy','Iron'],p:'৳২৫০'},
+  {e:'🌸',c:'pr',cl:'PR',b:'ফলিক অ্যাসিড গ্রিন',n:'Folate Green Bowl',t:['Folic Acid','Growth'],p:'৳২৮০'},
+  {e:'🍯',c:'pr',cl:'PR',b:'মাতৃ-শক্তি ডেজার্ট',n:'Maternal Strength Dessert',t:['Calcium','Energy'],p:'৳২২০'},
 ];
 
 function buildMenuCards(){
-  const track = document.getElementById('menuTrack');
-  // Duplicate for seamless loop
-  const doubled = [...MENUS, ...MENUS];
-  track.innerHTML = doubled.map(m => `
-    <div class="menu-card" onclick="window.open('menu.html','_blank')">
-      <div class="menu-card-img ${m.cat}">
-        ${m.emoji}
-        <span class="mc-cat ${m.cat}">${m.catLabel}</span>
-      </div>
-      <div class="menu-card-body">
-        <div class="mc-name-bn">${m.name}</div>
-        <div class="mc-name-en">${m.en}</div>
-        <div class="mc-tags">${m.tags.map(t=>`<span class="mc-tag">${t}</span>`).join('')}</div>
-        <div class="mc-price">${m.price}</div>
+  const belt = document.getElementById('menuBelt');
+  const doubled = [...MENUS,...MENUS];
+  belt.innerHTML = doubled.map(m=>`
+    <div class="mcard" onclick="window.open('menu.html','_blank')">
+      <div class="mcard-img ${m.c}">${m.e}<span class="mcard-cat ${m.c}">${m.cl}</span></div>
+      <div class="mcard-body">
+        <div class="mcard-bn">${m.b}</div>
+        <div class="mcard-en">${m.n}</div>
+        <div class="mcard-tags">${m.t.map(t=>`<span class="mcard-tag">${t}</span>`).join('')}</div>
+        <div class="mcard-price">${m.p}</div>
       </div>
     </div>`).join('');
 }
 
+// ══ TICKER BUILD ══
+function buildTicker(){
+  const items=['SAR সার','FOOD IS MEDICINE','খাবারই ওষুধ','OIL FREE','GLUTEN FREE','100% ORGANIC','AI + EI + BLOCKCHAIN','WOMEN LED','WOMEN RUN','নারীর জন্য নারীর হাতে','BANGLADESH FIRST','WORLD PIONEER 2026','DHAKA BANGLADESH','MINDMAX SHE ENTERPRISES','FOOD IS LOVE','HEAL FROM WITHIN'];
+  const inner = document.getElementById('tickerInner');
+  const doubled=[...items,...items];
+  inner.innerHTML=doubled.map(t=>`<span class="ti">${t}</span><span class="ts">✦</span>`).join('');
+}
+
+// ══ PARTICLE SYSTEM ══
+function initParticles(){
+  const c=document.getElementById('particleCanvas');
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  const particles=[];
+  const N=60;
+  for(let i=0;i<N;i++){
+    particles.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5+.5,
+      vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,
+      color:['rgba(245,197,24,','rgba(255,20,147,','rgba(0,208,132,'][Math.floor(Math.random()*3)]});
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    // Lines
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(245,197,24,${.06*(1-dist/120)})`;ctx.lineWidth=.5;ctx.stroke();
+        }
+      }
+    }
+    // Dots
+    particles.forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+'0.5)';ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>c.width)p.vx*=-1;
+      if(p.y<0||p.y>c.height)p.vy*=-1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',()=>{c.width=window.innerWidth;c.height=window.innerHeight;});
+}
+
 // ══ SCROLL REVEAL ══
 function initReveal(){
-  const els = document.querySelectorAll('.reveal');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }});
-  },{threshold:0.12});
-  els.forEach(el => obs.observe(el));
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('vis');
+        // Animate timeline bars
+        e.target.querySelectorAll('.tb[data-w]').forEach(bar=>{
+          setTimeout(()=>{bar.style.width=bar.dataset.w+'%';},200);
+        });
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.1});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 }
 
 // ══ COUNTER ANIMATION ══
 function animateCounters(){
-  document.querySelectorAll('.h-stat-num').forEach(el => {
-    const text = el.textContent;
-    const num = parseFloat(text.replace(/[^\d.]/g,''));
-    if(isNaN(num)||num===0) return;
-    let start=0;
-    const dur=1800;
+  document.querySelectorAll('.h-stat-num[data-target]').forEach(el=>{
+    const target=parseInt(el.dataset.target);
+    if(isNaN(target)){return;}
+    let start=0,dur=1800;
     const step=()=>{
       start+=dur/60;
-      const progress=Math.min(start/dur,1);
-      const eased=1-Math.pow(1-progress,3);
-      el.textContent=text.replace(/[\d.]+/,Math.round(num*eased));
-      if(progress<1) requestAnimationFrame(step);
+      const p=Math.min(1,start/dur);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*eased);
+      if(p<1)requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   });
 }
 
+// ══ LIVE CLOCK ══
+function startClock(){
+  function upd(){
+    const now=new Date();
+    const t=now.toLocaleTimeString('en-BD',{timeZone:'Asia/Dhaka',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const ts=now.toLocaleTimeString('en-BD',{timeZone:'Asia/Dhaka',hour:'2-digit',minute:'2-digit'});
+    const lc=document.getElementById('liveClock');
+    const fc=document.getElementById('footerClock');
+    if(lc)lc.textContent=t;
+    if(fc)fc.textContent=ts;
+  }
+  upd();setInterval(upd,1000);
+}
+
+// ══ LIVE MEMBER COUNTER ══
+function animateMembers(){
+  const el=document.getElementById('liveMembers');
+  if(!el)return;
+  let base=1247;
+  setInterval(()=>{
+    base+=Math.floor(Math.random()*3);
+    el.textContent=base.toLocaleString();
+  },8000);
+}
+
+// ══ ROLE-BASED NAV ══
+function setNavRole(){
+  const sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const isAdmin=sessionStorage.getItem('sar_admin')==='true';
+  const body=document.getElementById('body');
+  if(isAdmin){
+    body.className='role-admin';
+    document.getElementById('adminBtn').style.display='inline-flex';
+    document.getElementById('staffDashBtn').style.display='inline-flex';
+    document.getElementById('kitchenBtn').style.display='inline-flex';
+  } else if(sc&&sc.id){
+    body.className='role-customer';
+    document.getElementById('dashBtn').style.display='inline-flex';
+    document.getElementById('payBtn2').style.display='inline-flex';
+  }
+}
+
 // ══ INIT ══
 window.addEventListener('load',()=>{
   buildMenuCards();
+  buildTicker();
+  initParticles();
   initReveal();
+  startClock();
+  animateMembers();
+  setNavRole();
   setTimeout(animateCounters,600);
-
-  // PWA
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
-  }
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(()=>{});
 });
 </script>
 </body>
