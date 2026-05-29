@@ -1163,8 +1163,8 @@ const H = {
 
 // Get customer ID from URL or localStorage
 const urlParams = new URLSearchParams(window.location.search);
-const CID = urlParams.get('cid') || localStorage.getItem('sar_cid');
-const CNAME = localStorage.getItem('sar_name') || 'গ্রাহক';
+const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}'); const CID=urlParams.get('cid')||_sc.id||localStorage.getItem('sar_customer_id');
+const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'গ্রাহক';
 
 // Set nav name
 document.getElementById('navName').textContent = CNAME;
