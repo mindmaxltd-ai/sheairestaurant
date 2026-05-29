@@ -417,7 +417,7 @@ async function loginWithPassword() {
   const password = document.getElementById('login_password').value;
 
   if (!phone || !/^01[3-9]\d{8}$/.test(phone)) {
-    showMsg('msgPass', '⚠️ সঠিক মোবাইল নম্বর দিন', 'error'); return;
+    showMsg('msgPass', '⚠️ সঠিক মোবাইল নম্বর দিন (01 দিয়ে শুরু, ১১ সংখ্যা)', 'error'); return;
   }
   if (!password) {
     showMsg('msgPass', '⚠️ পাসওয়ার্ড দিন', 'error'); return;
@@ -428,9 +428,11 @@ async function loginWithPassword() {
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/customers?phone=eq.${phone}&select=*`,
+      `${SUPABASE_URL}/rest/v1/customers?phone=eq.${encodeURIComponent(phone)}&select=*`,
       { headers }
     );
+
+    if (!res.ok) throw new Error('Supabase connection error: ' + res.status);
     const customers = await res.json();
 
     if (!customers || customers.length === 0) {
@@ -441,48 +443,50 @@ async function loginWithPassword() {
 
     const customer = customers[0];
 
-    if (!customer.is_active) {
-      overlay.classList.remove('show');
-      showMsg('msgPass', '❌ আপনার অ্যাকাউন্ট সক্রিয় নেই। SAR-এর সাথে যোগাযোগ করুন।', 'error');
-      return;
-    }
-
     // ── পাসওয়ার্ড যাচাই ──
     const storedHash = customer.password_hash;
     const enteredHash = btoa(unescape(encodeURIComponent(password)));
 
-    // password_hash না থাকলে — OTP দিয়ে যেতে বলুন
     if (!storedHash) {
+      // No password set — allow login anyway (first time or OTP registered user)
+      // Save session and let dashboard handle access level
+      saveSession(customer);
       overlay.classList.remove('show');
-      showMsg('msgPass', '⚠️ এই অ্যাকাউন্টে পাসওয়ার্ড সেট নেই। OTP দিয়ে লগইন করুন।', 'error');
+      showMsg('msgPass', `✓ স্বাগতম ${customer.full_name}! ড্যাশবোর্ডে যাচ্ছে...`, 'success');
+      setTimeout(() => window.location.href = 'dashboard.html', 1200);
       return;
     }
 
-    // পাসওয়ার্ড মেলানো
     if (storedHash !== enteredHash) {
       overlay.classList.remove('show');
       showMsg('msgPass', '❌ পাসওয়ার্ড ভুল হয়েছে। আবার চেষ্টা করুন।', 'error');
       return;
     }
 
-    // Save session
+    // ── Login successful ──
     saveSession(customer);
     overlay.classList.remove('show');
-    showMsg('msgPass', `✓ স্বাগতম ${customer.full_name}! ড্যাশবোর্ডে যাচ্ছে...`, 'success');
 
-    // Update last login
-    await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${customer.id}`, {
+    const statusMsg = customer.is_active && customer.admin_approved
+      ? `✓ স্বাগতম ${customer.full_name}! ড্যাশবোর্ডে যাচ্ছে...`
+      : `✓ স্বাগতম ${customer.full_name}! আপনার অ্যাকাউন্ট অনুমোদনের অপেক্ষায়।`;
+    showMsg('msgPass', statusMsg, 'success');
+
+    // Update last login timestamp
+    fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${customer.id}`, {
       method: 'PATCH',
       headers: { ...headers, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ updated_at: new Date().toISOString() })
-    });
+    }).catch(()=>{});
 
     setTimeout(() => window.location.href = 'dashboard.html', 1200);
 
   } catch (err) {
     overlay.classList.remove('show');
-    showMsg('msgPass', '❌ লগইন ব্যর্থ: ' + err.message, 'error');
+    showMsg('msgPass', '❌ সংযোগ সমস্যা: ' + err.message + '. আবার চেষ্টা করুন।', 'error');
+    console.error('Login error:', err);
   }
+}
 }
 
 // ═══════════════════════════════
@@ -596,22 +600,25 @@ function saveSession(customer) {
   localStorage.setItem('sar_login_time', new Date().toISOString());
 }
 
-// Auto redirect — শুধু তখনই যদি সত্যিকার session থাকে
-const existingSession = localStorage.getItem('sar_customer');
-if (existingSession) {
-  try {
-    const parsed = JSON.parse(existingSession);
-    const loginTime = new Date(localStorage.getItem('sar_login_time') || 0);
-    const hoursSince = (new Date() - loginTime) / 3600000;
-    // শুধু ২৪ ঘণ্টার মধ্যে এবং valid id থাকলে redirect করুন
-    if (hoursSince < 24 && parsed.id) {
-      window.location.href = 'dashboard.html';
-    } else {
-      // Expired — সব মুছুন
-      localStorage.clear();
-    }
-  } catch(e) {
-    localStorage.clear();
+// Auto redirect — valid session থাকলে dashboard-এ যান
+// ?logout=1 থাকলে session clear করুন
+const _loginParams = new URLSearchParams(location.search);
+if (_loginParams.get('logout') === '1') {
+  localStorage.clear();
+  sessionStorage.clear();
+} else {
+  const existingSession = localStorage.getItem('sar_customer');
+  if (existingSession) {
+    try {
+      const parsed = JSON.parse(existingSession);
+      const loginTime = new Date(localStorage.getItem('sar_login_time') || 0);
+      const hoursSince = (new Date() - loginTime) / 3600000;
+      if (hoursSince < 24 && parsed?.id) {
+        window.location.href = 'dashboard.html';
+      } else {
+        localStorage.clear();
+      }
+    } catch(e) { localStorage.clear(); }
   }
 }
 
