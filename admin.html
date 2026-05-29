@@ -278,8 +278,13 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </div>
       <div class="field-wrap">
         <label class="field-label">পাসওয়ার্ড</label>
-        <input class="field-input" id="adminPass" type="password" placeholder="••••••••••"
-          onkeydown="if(event.key==='Enter')adminLogin()">
+        <div style="display:flex;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+          <input class="field-input" id="adminPass" type="password" placeholder="••••••••••"
+            onkeydown="if(event.key==='Enter')adminLogin()"
+            style="flex:1;background:none;border:none;border-radius:0">
+          <button type="button" onclick="toggleAdminPassEye()"
+            style="background:none;border:none;padding:0 .8rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.85rem">👁</button>
+        </div>
       </div>
       <div class="login-error" id="loginError">ভুল ইউজার আইডি বা পাসওয়ার্ড</div>
       <button class="login-btn" onclick="adminLogin()">লগইন করুন →</button>
@@ -916,21 +921,38 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
-// ADMIN CREDENTIALS
-// tutul/aimthm@2008 is the REAL super admin (always present)
-// 'mama' on login form is a FALSE hint — actual user is 'tutul'
+// ══════════════════════════════════════════════
+// ADMIN CREDENTIALS — FIXED, CANNOT BE OVERRIDDEN
+// Real login: tutul / aimthm@2008
+// False hint on form: mama
+// ══════════════════════════════════════════════
 const HARDCODED_CREDS = [
-  { user: 'tutul',         pass: 'aimthm@2008', role: 'super_admin', name: 'Tutul (Super Admin)' },
-  { user: 'sar_dietitian', pass: 'sar2024',      role: 'sar_dietitian', name: 'SAR ডায়েটিশিয়ান' },
-  { user: 'sar_nutrition', pass: 'sar2024',      role: 'sar_nutritionist', name: 'SAR নিউট্রিশনিস্ট' },
+  { user:'tutul',         pass:'aimthm@2008', role:'super_admin',      name:'Tutul (Super Admin)' },
+  { user:'sar_dietitian', pass:'sar2024',      role:'sar_dietitian',    name:'SAR ডায়েটিশিয়ান' },
+  { user:'sar_nutrition', pass:'sar2024',      role:'sar_nutritionist', name:'SAR নিউট্রিশনিস্ট' },
 ];
 
-// Merge: always keep hardcoded, add any extras saved via admin panel
-let _savedCreds = [];
-try { _savedCreds = JSON.parse(localStorage.getItem('sar_admin_creds') || '[]'); } catch(e){}
-// Remove any old 'kaku' or duplicate 'tutul' from saved, then merge
-const _extra = _savedCreds.filter(c => !HARDCODED_CREDS.find(h => h.user === c.user));
-const ADMIN_CREDS = [...HARDCODED_CREDS, ..._extra];
+// ALWAYS clear old bad localStorage credentials on page load
+// (This fixes the bug where old 'kaku' data blocked login)
+const _rawSaved = localStorage.getItem('sar_admin_creds');
+if(_rawSaved){
+  try{
+    const _parsed = JSON.parse(_rawSaved);
+    // If saved creds don't contain tutul, wipe them — they're corrupted
+    if(!_parsed.find(c=>c.user==='tutul')){
+      localStorage.removeItem('sar_admin_creds');
+      console.log('Admin creds reset: tutul was missing');
+    }
+  } catch(e){ localStorage.removeItem('sar_admin_creds'); }
+}
+
+// Load merged creds (hardcoded always win)
+function loadAdminCreds(){
+  let extras = [];
+  try{ extras = JSON.parse(localStorage.getItem('sar_admin_creds')||'[]').filter(c=>!HARDCODED_CREDS.find(h=>h.user===c.user)); } catch(e){}
+  return [...HARDCODED_CREDS, ...extras];
+}
+let ADMIN_CREDS = loadAdminCreds();
 
 let currentAdmin = null;
 let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
@@ -956,14 +978,22 @@ function applySuperAdminAccess(){
 
 // LOGIN
 function adminLogin() {
-  const u = document.getElementById('adminUser').value.trim();
-  const p = document.getElementById('adminPass').value;
+  // ALWAYS reload creds fresh to pick up any hardcoded fixes
+  ADMIN_CREDS = loadAdminCreds();
+
+  const u = (document.getElementById('adminUser').value || '').trim();
+  const p = (document.getElementById('adminPass').value || '');
+  const errEl = document.getElementById('loginError');
+
   if(!u || !p){
-    document.getElementById('loginError').textContent = 'ইউজার আইডি ও পাসওয়ার্ড দিন।';
-    document.getElementById('loginError').classList.add('show'); return;
+    errEl.textContent = '⚠️ ইউজার আইডি ও পাসওয়ার্ড দুটোই দিন।';
+    errEl.style.color = '#FCD34D';
+    errEl.classList.add('show'); return;
   }
+
   const found = ADMIN_CREDS.find(c => c.user === u && c.pass === p);
-  if (found) {
+  if(found){
+    errEl.classList.remove('show');
     currentAdmin = found;
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('adminApp').style.display = 'flex';
@@ -971,12 +1001,17 @@ function adminLogin() {
     applySuperAdminAccess();
     loadAllData();
   } else {
-    document.getElementById('loginError').textContent = `ভুল ইউজার আইডি বা পাসওয়ার্ড। (username: tutul)`;
-    document.getElementById('loginError').classList.add('show');
+    errEl.textContent = '❌ ভুল ইউজার আইডি বা পাসওয়ার্ড।';
+    errEl.style.color = '#F87171';
+    errEl.classList.add('show');
     document.getElementById('adminPass').value = '';
-    // Auto-hide error after 4s
-    setTimeout(()=>document.getElementById('loginError').classList.remove('show'), 4000);
+    setTimeout(()=>errEl.classList.remove('show'), 5000);
   }
+}
+
+function toggleAdminPassEye(){
+  const el = document.getElementById('adminPass');
+  el.type = el.type==='password' ? 'text' : 'password';
 }
 
 function adminLogout() {
@@ -1001,14 +1036,24 @@ function resetAdminCreds(){
   }, 5000);
 }
 
-// CHECK SESSION
+// CHECK SESSION — restore if valid
 const saved = sessionStorage.getItem('sar_admin');
-if (saved) {
-  currentAdmin = JSON.parse(saved);
-  document.getElementById('loginOverlay').classList.add('hidden');
-  document.getElementById('adminApp').style.display = 'flex';
-  applySuperAdminAccess();
-  loadAllData();
+if(saved){
+  try{
+    ADMIN_CREDS = loadAdminCreds(); // reload fresh first
+    currentAdmin = JSON.parse(saved);
+    // Verify the saved session is still valid against current creds
+    const valid = ADMIN_CREDS.find(c => c.user === currentAdmin.user);
+    if(valid){
+      currentAdmin = valid; // use latest (in case password changed)
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('adminApp').style.display = 'flex';
+      applySuperAdminAccess();
+      loadAllData();
+    } else {
+      sessionStorage.removeItem('sar_admin');
+    }
+  } catch(e){ sessionStorage.removeItem('sar_admin'); }
 }
 
 // SUPABASE FETCH
@@ -1056,7 +1101,6 @@ const sampleCustomers = [
   { id:'c3', member_id:'SAR-2026-087654', full_name:'ফাতেমা খানম',   phone:'01933456789', email:'fatema@email.com',  bmi:24.8, sar_category:'PR', monthly_sub_paid:false, monthly_sub_expiry_date:null,          loyalty_points:0,   is_active:false, admin_approved:true,  account_status:'pending_subscription',  registration_fee_paid:true,  created_at:'2026-05-22' },
   { id:'c4', member_id:'SAR-2026-076543', full_name:'সাবিনা আক্তার', phone:'01644567890', email:'sabina@email.com',  bmi:26.3, sar_category:'FL', monthly_sub_paid:true,  monthly_sub_expiry_date:'2026-08-15', loyalty_points:890, is_active:true,  admin_approved:true,  account_status:'active',              registration_fee_paid:true,  created_at:'2026-01-28' },
   { id:'c5', member_id:'SAR-2026-065432', full_name:'রোকেয়া বেগম',   phone:'01555678901', email:'rokeya@email.com',  bmi:22.7, sar_category:'IB', monthly_sub_paid:false, monthly_sub_expiry_date:null,          loyalty_points:0,   is_active:false, admin_approved:false, account_status:'pending_payment',        registration_fee_paid:false, created_at:'2026-05-28' },
-];
 ];
 
 const sampleOrders = [
