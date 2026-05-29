@@ -625,7 +625,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           </div>
 
           <!-- AI ANALYSIS -->
-          <div class="dcard analysis-card">
+          <div class="dcard analysis-card" id="analysisSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🔬</span>AI স্বাস্থ্য বিশ্লেষণ</span>
               <span class="dcard-action" id="analysisDate" style="color:rgba(255,255,255,.3)"></span>
@@ -640,7 +640,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           </div>
 
           <!-- DAILY MENU -->
-          <div class="dcard menu-card">
+          <div class="dcard menu-card" id="dailyMenuSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🥗</span>আজকের থেরাপিউটিক মেনু</span>
               <a href="dashboard.html" class="dcard-action">সব দেখুন →</a>
@@ -651,7 +651,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           </div>
 
           <!-- RECENT ORDERS -->
-          <div class="dcard">
+          <div class="dcard" id="ordersSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🛒</span>সাম্প্রতিক অর্ডার</span>
               <a href="dashboard.html" class="dcard-action">নতুন অর্ডার →</a>
@@ -671,23 +671,33 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">⚡</span>দ্রুত কাজ</span>
             </div>
-            <div class="dcard-body">
+            <div class="dcard-body" id="quickActionsSection">
               <div class="qa-grid">
-                <a href="dashboard.html" class="qa-btn highlight">
+                <a href="order.html" target="_blank" class="qa-btn highlight approved-only" id="qaOrder"
+                  onclick="return checkApprovalGate(event,'অর্ডার করতে')">
                   <span class="qa-icon">🛒</span>
                   <span class="qa-label">অর্ডার করুন</span>
                 </a>
-                <a href="dashboard.html" class="qa-btn">
+                <a href="track.html" target="_blank" class="qa-btn">
                   <span class="qa-icon">📍</span>
                   <span class="qa-label">ট্র্যাক করুন</span>
                 </a>
-                <a href="metrics.html" class="qa-btn">
+                <a href="metrics.html" target="_blank" class="qa-btn">
                   <span class="qa-icon">📊</span>
                   <span class="qa-label">মেট্রিক্স আপডেট</span>
                 </a>
-                <a href="dashboard.html" class="qa-btn">
+                <a href="receipt.html" target="_blank" class="qa-btn">
                   <span class="qa-icon">🧾</span>
                   <span class="qa-label">রিসিট দেখুন</span>
+                </a>
+                <a href="menu.html" target="_blank" class="qa-btn approved-only"
+                  onclick="return checkApprovalGate(event,'মেনু দেখতে')">
+                  <span class="qa-icon">🍱</span>
+                  <span class="qa-label">মেনু দেখুন</span>
+                </a>
+                <a href="payment.html" target="_blank" class="qa-btn highlight">
+                  <span class="qa-icon">💳</span>
+                  <span class="qa-label">পেমেন্ট করুন</span>
                 </a>
               </div>
             </div>
@@ -806,10 +816,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
 
-    const approved = cust?.admin_approved === true ||
+    const approved = (cust?.admin_approved === true && cust?.subscription_approved === true) ||
                      localStorage.getItem('sar_admin_approved') === 'true';
     const paidReg   = cust?.registration_fee_paid === true ||
                      localStorage.getItem('sar_reg_paid') === 'true';
+    const memApproved = cust?.admin_approved === true;
+    const subApproved = cust?.subscription_approved === true;
 
     // Always render these (all users)
     renderCustomer(cust);
@@ -829,7 +841,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       removePendingBanner();
     } else {
       // LIMITED ACCESS — show status banner, lock premium sections
-      showAccessBanner(cust, paidReg);
+    showAccessBanner(cust, paidReg, memApproved, subApproved);
       lockSection('analysisSection',   '🤖 AI বিশ্লেষণ',  'সুপার অ্যাডমিন অনুমোদনের পরে উপলব্ধ হবে।');
       lockSection('ordersSection',     '🍱 মেনু ও অর্ডার', 'সুপার অ্যাডমিন অনুমোদনের পরে অর্ডার করা যাবে।');
       lockSection('dailyMenuSection',  '📋 দৈনিক মেনু',   'অনুমোদনের পরে আপনার ব্যক্তিগত মেনু দেখাবে।');
@@ -869,11 +881,83 @@ function lockSection(sectionId, title, msg) {
 // ─────────────────────────────────────
 // Top-of-dashboard status banner
 // ─────────────────────────────────────
-function showAccessBanner(cust, paidReg) {
+function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
   const existing = document.getElementById('accessBanner');
   if (existing) existing.remove();
   const mid = cust?.member_id || localStorage.getItem('sar_member_id') || '—';
   const waUrl = `https://wa.me/8801346098892?text=SAR+পেমেন্ট+স্ক্রিনশট%0Aসদস্য+নং:+${mid}`;
+
+  // Determine stage
+  let stageTitle, stageMsg, stageColor;
+  if(!paidReg){
+    stageTitle  = '⏳ নিবন্ধন ফি প্রদানের অপেক্ষায়';
+    stageMsg    = 'নিবন্ধন ফি <strong style="color:#fff">৳১,০০০</strong> পরিশোধ করুন এবং WhatsApp-এ স্ক্রিনশট পাঠান। অ্যাডমিন মেম্বারশিপ অনুমোদন করবেন।';
+    stageColor  = '#F59E0B';
+  } else if(!memApproved){
+    stageTitle  = '📝 মেম্বারশিপ অনুমোদনের অপেক্ষায়';
+    stageMsg    = 'আপনার নিবন্ধন ফি পেয়েছি। সুপার অ্যাডমিন মেম্বারশিপ অনুমোদন করার পরে সাবস্ক্রিপশন পেমেন্ট করতে পারবেন।';
+    stageColor  = '#E91E8C';
+  } else {
+    stageTitle  = '📅 সাবস্ক্রিপশন অনুমোদনের অপেক্ষায়';
+    stageMsg    = 'মেম্বারশিপ অনুমোদিত! এখন মাসিক সাবস্ক্রিপশন <strong style="color:#fff">৳৫০০</strong> পরিশোধ করুন এবং স্ক্রিনশট পাঠান। অ্যাডমিন সাবস্ক্রিপশন সক্রিয় করলে সব features চালু হবে।';
+    stageColor  = '#6B21A8';
+  }
+
+  // Progress indicator
+  const step1 = paidReg   ? '✅' : '⭕';
+  const step2 = memApproved ? '✅' : '⭕';
+  const step3 = subApproved ? '✅' : '⭕';
+
+  const banner = document.createElement('div');
+  banner.id = 'accessBanner';
+  banner.style.cssText = `position:relative;z-index:50;margin:0 0 1.25rem;`;
+  banner.innerHTML = `
+    <div style="background:rgba(10,10,20,.85);border:1px solid rgba(${stageColor==='#F59E0B'?'245,158,11':'E91E8C'?'233,30,140,':'107,33,168,'},.25);border-radius:18px;padding:1.25rem 1.5rem;border-color:${stageColor}40">
+
+      <!-- Progress bar -->
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
+        <span style="font-size:.7rem;color:rgba(255,255,255,.4)">অগ্রগতি:</span>
+        ${[
+          {icon:step1, label:'নিবন্ধন ফি'},
+          {icon:'→', label:'', small:true},
+          {icon:step2, label:'মেম্বারশিপ'},
+          {icon:'→', label:'', small:true},
+          {icon:step3, label:'সাবস্ক্রিপশন'},
+          {icon:'→', label:'', small:true},
+          {icon:subApproved?'🌟':'⭕', label:'সম্পূর্ণ'},
+        ].map(s => s.small
+          ? `<span style="font-size:.7rem;color:rgba(255,255,255,.2)">${s.icon}</span>`
+          : `<div style="display:flex;flex-direction:column;align-items:center;gap:.1rem">
+              <span style="font-size:.9rem">${s.icon}</span>
+              <span style="font-size:.58rem;color:rgba(255,255,255,.35)">${s.label}</span>
+            </div>`
+        ).join('')}
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="font-family:'Playfair Display',serif;font-size:.95rem;color:${stageColor};font-weight:700;margin-bottom:.35rem">${stageTitle}</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.75;margin-bottom:.85rem">${stageMsg}</div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
+            ${!paidReg ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:10px;padding:.52rem 1.2rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 নিবন্ধন ফি দিন ৳১,০০০</a>` : ''}
+            ${memApproved && !subApproved ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#6B21A8,#A855F7);border:none;border-radius:10px;padding:.52rem 1.2rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 সাবস্ক্রিপশন দিন ৳৫০০</a>` : ''}
+            <a href="${waUrl}" target="_blank" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:.5rem 1rem;color:#4ade80;font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;text-decoration:none">💬 WhatsApp স্ক্রিনশট</a>
+            <button onclick="checkApprovalStatus()" id="checkApprovalBtn" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.5rem .9rem;color:#FCD34D;font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer">🔄 স্ট্যাটাস পরীক্ষা করুন</button>
+          </div>
+        </div>
+        <div style="flex-shrink:0;text-align:right">
+          <div style="font-family:'Space Mono',monospace;font-size:.62rem;color:rgba(255,255,255,.25)">সদস্য নং</div>
+          <div style="font-family:'Space Mono',monospace;font-size:.8rem;color:#FCD34D">${mid}</div>
+          <a href="metrics.html" target="_blank" style="display:inline-block;margin-top:.65rem;background:rgba(5,150,105,.1);border:1px solid rgba(52,211,153,.2);border-radius:9px;padding:.38rem .75rem;color:#34D399;font-size:.72rem;font-weight:600;text-decoration:none">📊 মেট্রিক্স পূরণ</a>
+        </div>
+      </div>
+    </div>`;
+
+  const main = document.querySelector('.dash-main') || document.querySelector('main') || document.body;
+  const firstChild = main.querySelector('.section, .card, [id]');
+  if (firstChild) main.insertBefore(banner, firstChild);
+  else main.prepend(banner);
+}
 
   const banner = document.createElement('div');
   banner.id = 'accessBanner';
@@ -914,6 +998,19 @@ function showAccessBanner(cust, paidReg) {
   else main.prepend(banner);
 }
 
+function checkApprovalGate(event, action){
+  const approved = localStorage.getItem('sar_admin_approved') === 'true' ||
+    JSON.parse(localStorage.getItem('sar_customer')||'{}')?.admin_approved === true;
+  if(!approved){
+    event.preventDefault();
+    toast(`🔒 ${action} সুপার অ্যাডমিনের অনুমোদন দরকার।`, false);
+    const banner = document.getElementById('accessBanner');
+    if(banner) banner.scrollIntoView({behavior:'smooth'});
+    return false;
+  }
+  return true;
+}
+
 function removePendingBanner(){
   const b = document.getElementById('accessBanner');
   if(b) b.remove();
@@ -926,19 +1023,21 @@ async function checkApprovalStatus() {
     const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=admin_approved,account_status,registration_fee_paid`, {headers:H});
     const data = await r.json();
     const cust = data?.[0];
-    if (cust?.admin_approved === true) {
+    if (cust?.admin_approved === true && cust?.subscription_approved === true) {
       localStorage.setItem('sar_admin_approved', 'true');
-      toast('✅ অ্যাকাউন্ট অনুমোদিত! সব features চালু হচ্ছে... 🎉', true);
-      // Remove locks
+      toast('✅ অ্যাকাউন্ট সম্পূর্ণ সক্রিয়! সব features চালু হচ্ছে... 🎉', true);
       document.querySelectorAll('.lock-overlay').forEach(o=>o.remove());
       removePendingBanner();
       showLoader('সব features লোড হচ্ছে...');
       const [c,m,a,o,n]=await Promise.all([fetchCustomer(),fetchMetrics(),fetchAnalysis(),fetchOrders(),fetchNotes()]);
       renderAnalysis(a,c);renderOrders(o,c);renderNotes(n);renderDailyMenu(a,c);renderSubAlert(c);
       hideLoader();
+    } else if(cust?.admin_approved === true && !cust?.subscription_approved){
+      toast('📅 মেম্বারশিপ অনুমোদিত! এখন সাবস্ক্রিপশন পেমেন্ট করুন এবং স্ক্রিনশট পাঠান।', true);
+      if(btn){ btn.textContent='🔄 স্ট্যাটাস পরীক্ষা করুন'; btn.disabled=false; }
     } else {
-      toast('⏳ এখনো অনুমোদন হয়নি। WhatsApp-এ স্ক্রিনশট পাঠান।', false);
-      if(btn){ btn.textContent='🔄 অনুমোদন পরীক্ষা করুন'; btn.disabled=false; }
+      toast('⏳ এখনো অনুমোদন হয়নি। WhatsApp-এ স্ক্রিনশট পাঠান: 01346098892', false);
+      if(btn){ btn.textContent='🔄 স্ট্যাটাস পরীক্ষা করুন'; btn.disabled=false; }
     }
   } catch(e) {
     if(btn){ btn.textContent='🔄 অনুমোদন পরীক্ষা করুন'; btn.disabled=false; }
