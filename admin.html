@@ -834,22 +834,72 @@ function timeAgo(d) {
 function renderCustomers(data) {
   const rows = (data || allCustomers);
   document.getElementById('custTotal').textContent = `(${rows.length})`;
+  const pendingCount = rows.filter(c => !c.admin_approved).length;
+  if(pendingCount > 0){
+    const existing = document.getElementById('pendingBanner');
+    if(!existing){
+      const banner = document.createElement('div');
+      banner.id = 'pendingBanner';
+      banner.style.cssText = 'background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.75rem 1rem;margin-bottom:.85rem;font-size:.82rem;color:#FCD34D;display:flex;align-items:center;gap:.6rem';
+      banner.innerHTML = `⚠️ <strong>${pendingCount} জন গ্রাহক অনুমোদনের অপেক্ষায় আছেন।</strong> নিচে ✅ বাটনে ক্লিক করে পেমেন্ট যাচাই করুন।`;
+      document.getElementById('customersBody').parentElement.parentElement.prepend(banner);
+    }
+  }
   document.getElementById('customersBody').innerHTML = rows.map(c => {
     const exp = c.monthly_sub_expiry_date ? new Date(c.monthly_sub_expiry_date) < new Date() : true;
-    return `<tr>
+    const approved = c.admin_approved === true;
+    return `<tr style="${!approved?'background:rgba(245,158,11,.04)':''}">
       <td style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--yellow2)">${c.member_id || '—'}</td>
       <td>${c.full_name || '—'}</td>
       <td>${c.phone || '—'}</td>
       <td><span class="status-badge ${getCatClass(c.sar_category)}">${getCatLabel(c.sar_category)}</span></td>
       <td style="font-family:'Space Mono',monospace">${c.bmi || '—'}</td>
-      <td><span class="status-badge ${exp ? 'status-expired' : 'status-paid'}">${exp ? 'মেয়াদোত্তীর্ণ' : 'সক্রিয়'}</span></td>
-      <td style="font-family:'Space Mono',monospace;color:var(--purple2)">${c.loyalty_points || 0}</td>
       <td>
+        <span class="status-badge ${approved ? (exp?'status-expired':'status-paid') : 'status-pending'}">
+          ${approved ? (exp?'মেয়াদোত্তীর্ণ':'সক্রিয়') : '⏳ অনুমোদন বাকি'}
+        </span>
+      </td>
+      <td style="font-family:'Space Mono',monospace;color:var(--purple2)">${c.loyalty_points || 0}</td>
+      <td style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
+        ${!approved ? `
+        <button onclick="approveCustomer('${c.id}','${c.full_name}')"
+          style="background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2);
+          cursor:pointer;font-size:.72rem;border-radius:6px;padding:.25rem .6rem;white-space:nowrap;font-weight:700">
+          ✅ অনুমোদন
+        </button>` : ''}
         <button onclick="viewCustomer('${c.id}')" style="background:none;border:none;color:var(--pink2);cursor:pointer;font-size:.78rem">বিস্তারিত</button>
-        <button onclick="editCustomer('${c.id}')" style="background:none;border:none;color:var(--yellow2);cursor:pointer;font-size:.78rem;margin-left:.5rem">সম্পাদনা</button>
       </td>
     </tr>`;
   }).join('');
+}
+
+async function approveCustomer(id, name){
+  if(!confirm(`${name} — পেমেন্ট যাচাই করে অ্যাকাউন্ট অনুমোদন করবেন?`)) return;
+  try {
+    // Update in Supabase
+    await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${id}`, {
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,
+        'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        admin_approved: true,
+        account_status: 'active',
+        registration_fee_paid: true,
+        updated_at: new Date().toISOString()
+      })
+    });
+    // Update local array
+    const c = allCustomers.find(x=>x.id===id);
+    if(c){ c.admin_approved=true; c.account_status='active'; c.registration_fee_paid=true; }
+    renderCustomers();
+    showToast(`✅ ${name} — অনুমোদিত! গ্রাহক এখন সব features ব্যবহার করতে পারবেন।`);
+  } catch(e) {
+    // Offline fallback
+    const c = allCustomers.find(x=>x.id===id);
+    if(c){ c.admin_approved=true; }
+    renderCustomers();
+    showToast(`✅ ${name} — অনুমোদিত (অফলাইন)`);
+  }
 }
 
 function getCatClass(c) { return { DM:'status-pending', OB:'status-inactive', FL:'status-active', IB:'status-inactive', PR:'status-expired' }[c] || ''; }
