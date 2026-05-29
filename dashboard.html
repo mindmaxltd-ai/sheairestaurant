@@ -799,6 +799,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     const [cust, metrics, analysis, orders, notes] = await Promise.all([
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
+
+    // ── APPROVAL GATE ──
+    const approved = cust?.admin_approved === true ||
+                     localStorage.getItem('sar_admin_approved') === 'true';
+
+    if (!approved) {
+      hideLoader();
+      showPendingApprovalOverlay(cust);
+      return;
+    }
+
     renderCustomer(cust);
     renderMetrics(metrics);
     renderAnalysis(analysis, cust);
@@ -811,6 +822,116 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch(e) { console.error(e); toast('❌ কিছু তথ্য লোড হয়নি।', false); }
   hideLoader();
 });
+
+function showPendingApprovalOverlay(cust) {
+  // Build overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'approvalGate';
+  overlay.style.cssText = `position:fixed;inset:0;z-index:500;background:rgba(6,6,10,.97);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:2rem;text-align:center`;
+
+  overlay.innerHTML = `
+    <div style="max-width:520px;width:100%">
+      <div style="font-size:3.5rem;margin-bottom:1rem">⏳</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.75rem;
+        background:linear-gradient(135deg,#F59E0B,#FCD34D);-webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;margin-bottom:.5rem">
+        অ্যাডমিন অনুমোদনের অপেক্ষায়
+      </h2>
+      <p style="color:rgba(255,255,255,.5);font-size:.9rem;line-height:1.8;margin-bottom:2rem">
+        আপনার নিবন্ধন সফল হয়েছে। পেমেন্ট যাচাই করার পরে অ্যাডমিন আপনার অ্যাকাউন্ট সক্রিয় করবেন।
+        এরপরই সব features ব্যবহার করতে পারবেন।
+      </p>
+
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);
+        border-radius:18px;padding:1.5rem;margin-bottom:1.5rem;text-align:left">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;
+          letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem">পেমেন্ট করুন</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:1rem">
+          <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:.9rem;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:.3rem">📱</div>
+            <div style="font-weight:700;color:#FF69B4;font-size:.9rem">bKash</div>
+            <div style="font-family:'Space Mono',monospace;font-size:.82rem;color:#FCD34D;margin:.3rem 0">01346098892</div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,.4)">Send Money করুন</div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:12px;padding:.9rem;text-align:center">
+            <div style="font-size:1.4rem;margin-bottom:.3rem">🟠</div>
+            <div style="font-weight:700;color:#F7941D;font-size:.9rem">Nagad</div>
+            <div style="font-family:'Space Mono',monospace;font-size:.82rem;color:#FCD34D;margin:.3rem 0">01346098892</div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,.4)">Send Money করুন</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);
+          border-radius:12px;padding:.85rem">
+          <div style="font-size:.82rem;color:rgba(255,255,255,.6);line-height:1.7">
+            পেমেন্টের পরে নিচের নম্বরে <strong style="color:#fff">WhatsApp-এ স্ক্রিনশট পাঠান:</strong><br>
+            📱 <strong style="color:#FCD34D;font-size:1rem">01346098892</strong><br>
+            <span style="font-size:.72rem;color:rgba(255,255,255,.35)">সদস্য নং: ${cust?.member_id||localStorage.getItem('sar_member_id')||'—'} উল্লেখ করুন</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.85rem;
+          font-size:.78rem;color:rgba(255,255,255,.5)">
+          <div>💰 নিবন্ধন ফি: <strong style="color:#fff">৳১,০০০</strong></div>
+          <div>📅 মাসিক সাবস্ক্রিপশন: <strong style="color:#fff">৳৫০০/মাস</strong></div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <button onclick="checkApprovalStatus()"
+          style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:14px;
+          padding:.85rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;
+          cursor:pointer;width:100%">
+          🔄 অনুমোদন পরীক্ষা করুন
+        </button>
+        <a href="https://wa.me/8801346098892?text=SAR+পেমেন্ট+স্ক্রিনশট+সদস্য:+${cust?.member_id||''}" target="_blank"
+          style="background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:14px;
+          padding:.75rem;color:#4ade80;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:600;
+          text-decoration:none;display:block">
+          💬 WhatsApp-এ স্ক্রিনশট পাঠান
+        </a>
+        <button onclick="logout()"
+          style="background:none;border:1px solid rgba(255,255,255,.1);border-radius:14px;
+          padding:.65rem;color:rgba(255,255,255,.35);font-family:'Hind Siliguri',sans-serif;
+          font-size:.82rem;cursor:pointer;width:100%">
+          লগআউট
+        </button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+
+async function checkApprovalStatus() {
+  const btn = event.currentTarget;
+  btn.textContent = '⏳ পরীক্ষা করা হচ্ছে...';
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=admin_approved,account_status,registration_fee_paid`, {headers:H});
+    const data = await r.json();
+    const cust = data?.[0];
+    if (cust?.admin_approved === true) {
+      localStorage.setItem('sar_admin_approved', 'true');
+      const ov = document.getElementById('approvalGate');
+      if (ov) ov.remove();
+      toast('✅ অ্যাকাউন্ট অনুমোদিত! স্বাগতম 🎉', true);
+      showLoader('ড্যাশবোর্ড লোড হচ্ছে...');
+      const [c,m,a,o,n] = await Promise.all([fetchCustomer(),fetchMetrics(),fetchAnalysis(),fetchOrders(),fetchNotes()]);
+      renderCustomer(c); renderMetrics(m); renderAnalysis(a,c); renderOrders(o,c); renderNotes(n); renderDailyMenu(a,c); renderLoyalty(c); renderMembership(c); renderSubAlert(c);
+      hideLoader();
+    } else {
+      btn.textContent = '⏳ এখনো অনুমোদন হয়নি। পরে আবার চেষ্টা করুন।';
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = '🔄 অনুমোদন পরীক্ষা করুন'; }, 3000);
+    }
+  } catch(e) {
+    btn.textContent = '🔄 অনুমোদন পরীক্ষা করুন';
+    btn.disabled = false;
+  }
+}
 
 // ═══════════════════════════════════════
 // GREETING
