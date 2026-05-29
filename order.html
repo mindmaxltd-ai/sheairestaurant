@@ -783,8 +783,8 @@ const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const H    = {'apikey':KEY,'Authorization':'Bearer '+KEY,
   'Content-Type':'application/json','Prefer':'return=representation'};
 
-const CID   = localStorage.getItem('sar_cid');
-const CNAME = localStorage.getItem('sar_name') || 'গ্রাহক';
+const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}'); const CID=_sc.id||localStorage.getItem('sar_customer_id');
+const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'গ্রাহক';
 
 if (!CID) { window.location.href = 'login.html'; }
 
