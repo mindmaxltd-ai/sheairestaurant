@@ -283,6 +283,12 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </div>
       <div class="login-error" id="loginError">ভুল ইউজার আইডি বা পাসওয়ার্ড</div>
       <button class="login-btn" onclick="adminLogin()">লগইন করুন →</button>
+      <div style="text-align:center;margin-top:.85rem">
+        <a href="javascript:void(0)" onclick="resetAdminCreds()"
+          style="font-size:.68rem;color:rgba(255,255,255,.2);text-decoration:none;font-family:'Space Mono',monospace">
+          reset saved credentials
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -910,13 +916,21 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
-// ADMIN CREDENTIALS — from localStorage or hardcoded defaults
-// NOTE: 'mama' is a false hint. Actual user is 'tutul'
-const ADMIN_CREDS = JSON.parse(localStorage.getItem('sar_admin_creds') || JSON.stringify([
+// ADMIN CREDENTIALS
+// tutul/aimthm@2008 is the REAL super admin (always present)
+// 'mama' on login form is a FALSE hint — actual user is 'tutul'
+const HARDCODED_CREDS = [
   { user: 'tutul',         pass: 'aimthm@2008', role: 'super_admin', name: 'Tutul (Super Admin)' },
   { user: 'sar_dietitian', pass: 'sar2024',      role: 'sar_dietitian', name: 'SAR ডায়েটিশিয়ান' },
   { user: 'sar_nutrition', pass: 'sar2024',      role: 'sar_nutritionist', name: 'SAR নিউট্রিশনিস্ট' },
-]));
+];
+
+// Merge: always keep hardcoded, add any extras saved via admin panel
+let _savedCreds = [];
+try { _savedCreds = JSON.parse(localStorage.getItem('sar_admin_creds') || '[]'); } catch(e){}
+// Remove any old 'kaku' or duplicate 'tutul' from saved, then merge
+const _extra = _savedCreds.filter(c => !HARDCODED_CREDS.find(h => h.user === c.user));
+const ADMIN_CREDS = [...HARDCODED_CREDS, ..._extra];
 
 let currentAdmin = null;
 let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
@@ -944,6 +958,10 @@ function applySuperAdminAccess(){
 function adminLogin() {
   const u = document.getElementById('adminUser').value.trim();
   const p = document.getElementById('adminPass').value;
+  if(!u || !p){
+    document.getElementById('loginError').textContent = 'ইউজার আইডি ও পাসওয়ার্ড দিন।';
+    document.getElementById('loginError').classList.add('show'); return;
+  }
   const found = ADMIN_CREDS.find(c => c.user === u && c.pass === p);
   if (found) {
     currentAdmin = found;
@@ -953,8 +971,11 @@ function adminLogin() {
     applySuperAdminAccess();
     loadAllData();
   } else {
+    document.getElementById('loginError').textContent = `ভুল ইউজার আইডি বা পাসওয়ার্ড। (username: tutul)`;
     document.getElementById('loginError').classList.add('show');
     document.getElementById('adminPass').value = '';
+    // Auto-hide error after 4s
+    setTimeout(()=>document.getElementById('loginError').classList.remove('show'), 4000);
   }
 }
 
@@ -963,6 +984,21 @@ function adminLogout() {
   document.getElementById('loginOverlay').classList.remove('hidden');
   document.getElementById('adminApp').style.display = 'none';
   currentAdmin = null;
+}
+
+// Reset saved credentials — use if login not working
+function resetAdminCreds(){
+  localStorage.removeItem('sar_admin_creds');
+  sessionStorage.removeItem('sar_admin');
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('loginError').textContent = '✅ Credentials reset. Use: tutul / aimthm@2008';
+  document.getElementById('loginError').style.color = 'var(--green2)';
+  document.getElementById('loginError').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('loginError').style.color = '';
+  }, 5000);
 }
 
 // CHECK SESSION
@@ -1761,10 +1797,13 @@ function changeAdminPwd(){
   if(curr !== currentAdmin.pass){ show('❌ বর্তমান পাসওয়ার্ড ভুল।', false); return; }
   if(nw.length < 6){ show('⚠️ নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।', false); return; }
   if(nw !== conf){ show('❌ নতুন পাসওয়ার্ড দুটি মিলছে না।', false); return; }
-  // Update
+  // Update in ADMIN_CREDS array (in-memory)
   const idx = ADMIN_CREDS.findIndex(c => c.user === currentAdmin.user);
   if(idx > -1) ADMIN_CREDS[idx].pass = nw;
   currentAdmin.pass = nw;
+
+  // Save ALL non-hardcoded creds + updated hardcoded to localStorage
+  // This ensures tutul password change is saved too
   localStorage.setItem('sar_admin_creds', JSON.stringify(ADMIN_CREDS));
   sessionStorage.setItem('sar_admin', JSON.stringify(currentAdmin));
   ['cpCurrent','cpNew','cpConfirm'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
@@ -1829,15 +1868,10 @@ function saveApiKeys(){
     if(el && el.value.trim()) data[storeKey] = btoa(el.value.trim());
   });
   localStorage.setItem(API_KEY_STORE, JSON.stringify(data));
-  // Also save to sar_settings for use by edge functions
-  const settings = JSON.parse(localStorage.getItem('sar_settings')||'{}');
-  Object.assign(settings, data);
-  localStorage.setItem('sar_settings', JSON.stringify(settings));
-  // Mark all as saved
   document.querySelectorAll('.api-input.changed').forEach(el=>el.classList.remove('changed'));
   const status = document.getElementById('apiSaveStatus');
   if(status){ status.style.display='inline'; setTimeout(()=>status.style.display='none', 3000); }
-  showToast('✅ API Keys সেভ হয়েছে! Edge Functions আপডেট করুন।');
+  showToast('✅ API Keys সেভ হয়েছে!');
 }
 
 // Helper: get saved API key
