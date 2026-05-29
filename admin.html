@@ -265,7 +265,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
     <div class="login-form">
       <div class="field-wrap">
         <label class="field-label">ইউজার আইডি</label>
-        <input class="field-input" id="adminUser" type="text" placeholder="tutul">
+        <input class="field-input" id="adminUser" type="text" placeholder="kaku">
       </div>
       <div class="field-wrap">
         <label class="field-label">পাসওয়ার্ড</label>
@@ -308,6 +308,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <div class="sb-section">সেটিংস</div>
       <button class="sb-item" onclick="showSection('settings',this)"><span class="sb-item-icon">⚙️</span>ওয়েবসাইট সেটিংস</button>
       <button class="sb-item" onclick="showSection('notifications',this)"><span class="sb-item-icon">🔔</span>বিজ্ঞপ্তি</button>
+      <button class="sb-item" onclick="showSection('articles',this)"><span class="sb-item-icon">✏️</span>Why SAR লেখা</button>
     </div>
     <div class="sb-bottom">
       <div class="sb-user">
@@ -601,6 +602,18 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         </div>
       </div>
 
+      <!-- ARTICLE WRITER -->
+      <div class="section" id="sec-articles">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+          <div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">Content Management</div>
+            <div style="font-size:1.05rem;font-weight:700;color:#fff">✏️ Why SAR আর্টিকেল লেখা</div>
+          </div>
+          <a href="why-sar.html" target="_blank" style="background:var(--glass2);border:1px solid var(--border2);border-radius:10px;padding:.4rem .9rem;color:var(--yellow2);font-size:.78rem;text-decoration:none">👁 পেজ দেখুন ↗</a>
+        </div>
+        <div id="articleWriterSection">লোড হচ্ছে...</div>
+      </div>
+
     </div><!-- .content -->
   </div><!-- .main -->
 
@@ -747,11 +760,11 @@ const samplePayments = [
   { id:'p3', transaction_id:'BK20260527ZS63', customer_name:'সাবিনা আক্তার', payment_type:'order', final_amount:504, payment_method:'bkash', status:'success', created_at:'2026-05-27T13:08:00' },
 ];
 
-const sampleStaff = [
-  { id:'s1', name:'Tutul', email:'tutul@sar.com', phone:'01700000001', role:'super_admin', is_active:true, last_login:'2026-05-28T09:00:00' },
-  { id:'s2', name:'ডাঃ সানজিদা', email:'sanjida@sar.com', phone:'01700000002', role:'sar_dietitian', is_active:true, last_login:'2026-05-28T08:30:00' },
-  { id:'s3', name:'করিম', email:'karim@sar.com', phone:'01700000003', role:'kitchen_manager', is_active:true, last_login:'2026-05-28T07:00:00' },
-];
+let sampleStaff = JSON.parse(localStorage.getItem('sar_staff') || JSON.stringify([
+  { id:'s1', name:'কাকু (Admin)', email:'kaku@sar.com', phone:'01346098892', role:'super_admin', password:'aimthm@2008', is_active:true, last_login:'2026-05-28T09:00:00' },
+  { id:'s2', name:'ডাঃ সানজিদা', email:'sanjida@sar.com', phone:'01700000002', role:'sar_dietitian', password:'sar2024', is_active:true, last_login:'2026-05-28T08:30:00' },
+  { id:'s3', name:'কিচেন ম্যানেজার', email:'kitchen@sar.com', phone:'01700000003', role:'kitchen_manager', password:'kitchen2024', is_active:true, last_login:'2026-05-28T07:00:00' },
+]));
 
 // RENDER OVERVIEW
 function renderOverview() {
@@ -906,9 +919,83 @@ function renderPayments() {
       <td>${p.payment_type === 'order' ? '🛍️ অর্ডার' : p.payment_type === 'registration' ? '📝 নিবন্ধন' : '📅 সাবস্ক্রিপশন'}</td>
       <td style="font-family:'Space Mono',monospace;color:var(--green2)">৳${(p.final_amount||0).toLocaleString()}</td>
       <td>${p.payment_method ? p.payment_method.toUpperCase() : '—'}</td>
-      <td><span class="status-badge ${p.status === 'success' ? 'status-paid' : 'status-pending'}">${p.status === 'success' ? '✓ সফল' : '⏳ বাকি'}</span></td>
+      <td><span class="status-badge ${p.status === 'success' ? 'status-paid' : 'status-pending'}" id="pstatus-${p.id}">${p.status === 'success' ? '✓ সফল' : '⏳ বাকি'}</span></td>
       <td style="font-size:.75rem;color:rgba(255,255,255,.4)">${timeAgo(p.created_at)}</td>
+      <td>
+        ${p.status !== 'success' ? `
+        <button onclick="manualVerifyPayment('${p.id}')"
+          style="background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2);cursor:pointer;font-size:.72rem;border-radius:6px;padding:.25rem .65rem;white-space:nowrap">
+          ✅ ম্যানুয়াল যাচাই
+        </button>` : `<span style="font-size:.7rem;color:rgba(255,255,255,.2)">যাচাইকৃত</span>`}
+      </td>
     </tr>`).join('');
+}
+
+function manualVerifyPayment(pid){
+  const p = allPayments.find(x=>x.id===pid);
+  if(!p) return;
+  if(!confirm(`পেমেন্ট ম্যানুয়ালি যাচাই করবেন?\nট্রানজেকশন: ${p.transaction_id}\nপরিমাণ: ৳${p.final_amount}`)) return;
+  p.status = 'success';
+  p.verified_by = 'admin_manual';
+  p.verified_at = new Date().toISOString();
+  const el = document.getElementById('pstatus-'+pid);
+  if(el){ el.textContent='✓ সফল'; el.className='status-badge status-paid'; }
+  renderPayments();
+  showToast(`✅ পেমেন্ট যাচাই সম্পন্ন: ${p.transaction_id}`);
+}
+
+// WRITE ARTICLE (for why-sar.html)
+function renderArticleWriter(){
+  const el = document.getElementById('articleWriterSection');
+  if(!el) return;
+  const saved = JSON.parse(localStorage.getItem('sar_articles')||'[]');
+  el.innerHTML = `
+    <div style="background:var(--glass2);border:1px solid var(--border2);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem">
+      <div style="font-size:.85rem;font-weight:700;color:var(--yellow2);margin-bottom:1rem">✏️ নতুন আর্টিকেল লিখুন (why-sar.html পেজে প্রকাশ পাবে)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+        <div><label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">শিরোনাম *</label>
+          <input id="art-title" placeholder="আর্টিকেলের শিরোনাম" style="width:100%;background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none"></div>
+        <div><label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">বিভাগ</label>
+          <select id="art-tag" style="width:100%;background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none">
+            <option>স্বাস্থ্য</option><option>AI প্রযুক্তি</option><option>নারী শক্তি</option><option>থেরাপিউটিক ফুড</option><option>সাফল্যের গল্প</option><option>আপডেট</option>
+          </select></div>
+        <div><label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">সারসংক্ষেপ (১ লাইন)</label>
+          <input id="art-excerpt" placeholder="সংক্ষিপ্ত বিবরণ" style="width:100%;background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none"></div>
+        <div><label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">ইমোজি আইকন</label>
+          <input id="art-emoji" placeholder="🌸" maxlength="4" style="width:100%;background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.55rem .8rem;color:#fff;font-size:1.2rem;outline:none"></div>
+      </div>
+      <div style="margin-bottom:.75rem"><label style="font-size:.72rem;color:rgba(255,255,255,.4);display:block;margin-bottom:.3rem">সম্পূর্ণ আর্টিকেল *</label>
+        <textarea id="art-content" rows="6" placeholder="এখানে সম্পূর্ণ আর্টিকেল লিখুন..." style="width:100%;background:var(--glass);border:1px solid var(--border);border-radius:9px;padding:.65rem .9rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none;resize:vertical;min-height:120px"></textarea></div>
+      <button onclick="publishAdminArticle()" style="background:linear-gradient(135deg,var(--green),var(--green2));border:none;border-radius:10px;padding:.65rem 1.5rem;color:#000;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">✅ প্রকাশ করুন</button>
+    </div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:.5rem">প্রকাশিত আর্টিকেল (${saved.length}টি)</div>
+    ${saved.length ? saved.map((a,i)=>`
+      <div style="display:flex;align-items:center;gap:.75rem;padding:.65rem .85rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;margin-bottom:.5rem">
+        <span style="font-size:1.1rem">${a.emoji||'📝'}</span>
+        <div style="flex:1"><div style="font-size:.83rem;color:#fff">${a.title}</div><div style="font-size:.68rem;color:rgba(255,255,255,.3)">${a.tag||''} · ${a.date||''}</div></div>
+        <button onclick="deleteAdminArticle(${i})" style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#F87171;cursor:pointer;font-size:.72rem;border-radius:6px;padding:.2rem .55rem">🗑 মুছুন</button>
+      </div>`).join('') : '<div style="color:rgba(255,255,255,.3);font-size:.82rem;text-align:center;padding:1rem">কোনো আর্টিকেল নেই</div>'}`;
+}
+
+function publishAdminArticle(){
+  const title = document.getElementById('art-title').value.trim();
+  const content = document.getElementById('art-content').value.trim();
+  if(!title||!content){ showToast('⚠️ শিরোনাম ও আর্টিকেল লিখুন'); return; }
+  const articles = JSON.parse(localStorage.getItem('sar_articles')||'[]');
+  articles.unshift({id:'a'+Date.now(),tag:document.getElementById('art-tag').value,emoji:document.getElementById('art-emoji').value||'📝',imgClass:'a'+(Math.floor(Math.random()*4)+1),title,excerpt:document.getElementById('art-excerpt').value||content.substring(0,100)+'...',date:new Date().toLocaleDateString('bn-BD',{month:'long',year:'numeric'}),content:`<p>${content.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`});
+  localStorage.setItem('sar_articles', JSON.stringify(articles));
+  ['art-title','art-excerpt','art-content','art-emoji'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  renderArticleWriter();
+  showToast('✅ আর্টিকেল প্রকাশিত হয়েছে!');
+}
+
+function deleteAdminArticle(idx){
+  const articles = JSON.parse(localStorage.getItem('sar_articles')||'[]');
+  if(!confirm('এই আর্টিকেল মুছবেন?')) return;
+  articles.splice(idx,1);
+  localStorage.setItem('sar_articles', JSON.stringify(articles));
+  renderArticleWriter();
+  showToast('🗑 আর্টিকেল মুছে ফেলা হয়েছে');
 }
 
 // RENDER STAFF
@@ -918,48 +1005,207 @@ function renderStaff() {
       <td>${s.name}</td>
       <td><span class="staff-role ${getRoleClass(s.role)}">${getRoleLabel(s.role)}</span></td>
       <td>${s.phone || '—'}</td>
-      <td>${s.email || '—'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:.72rem">${s.password ? '●●●●●●' : '—'}
+        <button onclick="toggleShowPwd('${s.id}')" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:.7rem" title="পাসওয়ার্ড দেখুন">👁</button>
+        <span id="pwd-${s.id}" style="display:none;color:var(--yellow2);font-size:.72rem">${s.password||'—'}</span>
+      </td>
       <td><span class="status-badge ${s.is_active ? 'status-active' : 'status-inactive'}">${s.is_active ? 'সক্রিয়' : 'নিষ্ক্রিয়'}</span></td>
       <td style="font-size:.75rem;color:rgba(255,255,255,.4)">${timeAgo(s.last_login)}</td>
-      <td>
-        <button onclick="showToast('স্টাফ ${s.name} সম্পাদনা')" style="background:none;border:none;color:var(--yellow2);cursor:pointer;font-size:.78rem">সম্পাদনা</button>
-        ${s.role !== 'super_admin' ? `<button onclick="toggleStaffStatus('${s.id}')" style="background:none;border:none;color:var(--red2);cursor:pointer;font-size:.78rem;margin-left:.5rem">নিষ্ক্রিয়</button>` : ''}
+      <td style="display:flex;gap:.4rem;align-items:center">
+        ${s.role !== 'super_admin' ? `
+        <button onclick="toggleStaffStatus('${s.id}')" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--yellow2);cursor:pointer;font-size:.72rem;border-radius:6px;padding:.2rem .5rem">
+          ${s.is_active?'নিষ্ক্রিয়':'সক্রিয়'}
+        </button>
+        <button onclick="deleteStaff('${s.id}')" style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);color:#F87171;cursor:pointer;font-size:.72rem;border-radius:6px;padding:.2rem .5rem">
+          🗑 মুছুন
+        </button>` : '<span style="font-size:.7rem;color:rgba(255,255,255,.25)">সুরক্ষিত</span>'}
       </td>
     </tr>`).join('');
+}
+
+function toggleShowPwd(id){
+  const el = document.getElementById('pwd-'+id);
+  if(el) el.style.display = el.style.display==='none'?'inline':'none';
+}
+
+function deleteStaff(id){
+  const s = allStaff.find(x=>x.id===id);
+  if(!s) return;
+  if(!confirm(`"${s.name}" কে স্টাফ তালিকা থেকে মুছবেন?`)) return;
+  allStaff = allStaff.filter(x=>x.id!==id);
+  localStorage.setItem('sar_staff', JSON.stringify(allStaff));
+  renderStaff();
+  showToast(`🗑 ${s.name} মুছে ফেলা হয়েছে`);
 }
 
 function getRoleClass(r) { return { super_admin:'role-super', admin:'role-admin', kitchen_manager:'role-kitchen', sar_dietitian:'role-admin', sar_nutritionist:'role-admin' }[r] || 'role-other'; }
 function getRoleLabel(r) { return { super_admin:'সুপার অ্যাডমিন', admin:'অ্যাডমিন', sar_dietitian:'ডায়েটিশিয়ান', sar_nutritionist:'পুষ্টিবিদ', kitchen_manager:'কিচেন ম্যানেজার', floor_manager:'ফ্লোর ম্যানেজার', rider:'রাইডার', cashier:'ক্যাশিয়ার' }[r] || r; }
 
 // INVENTORY
-const inventoryItems = [
-  { name:'কুইনোয়া', qty:45, unit:'কেজি', max:50, cat:'DM' },
-  { name:'মরিঙ্গা পাতা', qty:8, unit:'কেজি', max:20, cat:'all' },
-  { name:'পালং শাক', qty:12, unit:'কেজি', max:30, cat:'all' },
-  { name:'করলা', qty:6, unit:'কেজি', max:15, cat:'DM' },
-  { name:'নারকেল দুধ', qty:35, unit:'লিটার', max:40, cat:'all' },
-  { name:'চিয়া বীজ', qty:4, unit:'কেজি', max:10, cat:'all' },
-  { name:'তিসি বীজ', qty:9, unit:'কেজি', max:15, cat:'all' },
-  { name:'আমলকী', qty:18, unit:'কেজি', max:20, cat:'all' },
-  { name:'মেথি বীজ', qty:7, unit:'কেজি', max:15, cat:'DM' },
-  { name:'হলুদ গুঁড়া', qty:22, unit:'কেজি', max:25, cat:'all' },
-  { name:'ঘি (দেশি গরু)', qty:3, unit:'কেজি', max:10, cat:'all' },
-  { name:'মুগ ডাল', qty:28, unit:'কেজি', max:30, cat:'all' },
+// Load inventory from localStorage or defaults
+const DEFAULT_INVENTORY = [
+  {id:'i01',name:'কুইনোয়া',qty:45,unit:'কেজি',max:50,cat:'DM',perMeal:.15},
+  {id:'i02',name:'মরিঙ্গা পাতা',qty:8,unit:'কেজি',max:20,cat:'all',perMeal:.02},
+  {id:'i03',name:'পালং শাক',qty:12,unit:'কেজি',max:30,cat:'all',perMeal:.1},
+  {id:'i04',name:'করলা',qty:6,unit:'কেজি',max:15,cat:'DM',perMeal:.08},
+  {id:'i05',name:'নারকেল দুধ',qty:35,unit:'লিটার',max:40,cat:'all',perMeal:.2},
+  {id:'i06',name:'চিয়া বীজ',qty:4,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i07',name:'তিসি বীজ',qty:9,unit:'কেজি',max:15,cat:'all',perMeal:.03},
+  {id:'i08',name:'আমলকী',qty:18,unit:'কেজি',max:20,cat:'all',perMeal:.05},
+  {id:'i09',name:'মেথি বীজ',qty:7,unit:'কেজি',max:15,cat:'DM',perMeal:.05},
+  {id:'i10',name:'হলুদ গুঁড়া',qty:22,unit:'কেজি',max:25,cat:'all',perMeal:.02},
+  {id:'i11',name:'ঘি (দেশি গরু)',qty:3,unit:'কেজি',max:10,cat:'all',perMeal:.02},
+  {id:'i12',name:'মুগ ডাল',qty:28,unit:'কেজি',max:30,cat:'all',perMeal:.12},
+  {id:'i13',name:'কুমড়া বীজ',qty:6,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i14',name:'সূর্যমুখী বীজ',qty:7,unit:'কেজি',max:12,cat:'all',perMeal:.03},
+  {id:'i15',name:'আদা',qty:15,unit:'কেজি',max:20,cat:'all',perMeal:.03},
+  {id:'i16',name:'রসুন',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.02},
+  {id:'i17',name:'লেবু',qty:20,unit:'কেজি',max:25,cat:'all',perMeal:.05},
+  {id:'i18',name:'টমেটো',qty:18,unit:'কেজি',max:25,cat:'all',perMeal:.1},
+  {id:'i19',name:'গাজর',qty:14,unit:'কেজি',max:20,cat:'all',perMeal:.1},
+  {id:'i20',name:'বিট',qty:8,unit:'কেজি',max:15,cat:'OB',perMeal:.08},
+  {id:'i21',name:'ব্রকলি',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.1},
+  {id:'i22',name:'ফুলকপি',qty:12,unit:'কেজি',max:18,cat:'all',perMeal:.1},
+  {id:'i23',name:'বাঁধাকপি',qty:15,unit:'কেজি',max:20,cat:'all',perMeal:.1},
+  {id:'i24',name:'শসা',qty:20,unit:'কেজি',max:25,cat:'all',perMeal:.08},
+  {id:'i25',name:'লাউ',qty:16,unit:'কেজি',max:20,cat:'all',perMeal:.12},
+  {id:'i26',name:'পটল',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.1},
+  {id:'i27',name:'ঢেঁড়স',qty:8,unit:'কেজি',max:12,cat:'IB',perMeal:.1},
+  {id:'i28',name:'মিষ্টি কুমড়া',qty:12,unit:'কেজি',max:18,cat:'DM',perMeal:.12},
+  {id:'i29',name:'সজনে পাতা',qty:5,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i30',name:'নিম পাতা',qty:3,unit:'কেজি',max:8,cat:'FL',perMeal:.01},
+  {id:'i31',name:'তুলসী পাতা',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.01},
+  {id:'i32',name:'পুদিনা পাতা',qty:5,unit:'কেজি',max:10,cat:'IB',perMeal:.02},
+  {id:'i33',name:'ধনিয়া পাতা',qty:6,unit:'কেজি',max:10,cat:'all',perMeal:.02},
+  {id:'i34',name:'কারি পাতা',qty:3,unit:'কেজি',max:6,cat:'DM',perMeal:.01},
+  {id:'i35',name:'জিরা',qty:8,unit:'কেজি',max:12,cat:'all',perMeal:.02},
+  {id:'i36',name:'ধনিয়া গুঁড়া',qty:7,unit:'কেজি',max:10,cat:'all',perMeal:.02},
+  {id:'i37',name:'কালো জিরা',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.01},
+  {id:'i38',name:'এলাচ',qty:2,unit:'কেজি',max:5,cat:'all',perMeal:.005},
+  {id:'i39',name:'দারুচিনি',qty:2,unit:'কেজি',max:5,cat:'DM',perMeal:.005},
+  {id:'i40',name:'লবঙ্গ',qty:1,unit:'কেজি',max:3,cat:'all',perMeal:.003},
+  {id:'i41',name:'মৌরি',qty:4,unit:'কেজি',max:8,cat:'IB',perMeal:.02},
+  {id:'i42',name:'অজওয়াইন',qty:3,unit:'কেজি',max:6,cat:'IB',perMeal:.01},
+  {id:'i43',name:'কাঁচা হলুদ',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.05},
+  {id:'i44',name:'আখরোট',qty:5,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i45',name:'কাঠবাদাম',qty:8,unit:'কেজি',max:12,cat:'all',perMeal:.04},
+  {id:'i46',name:'কাজুবাদাম',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.03},
+  {id:'i47',name:'খেজুর',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.05},
+  {id:'i48',name:'কিশমিশ',qty:6,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i49',name:'শুকনো আলু বোখারা',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.03},
+  {id:'i50',name:'তিল বীজ',qty:5,unit:'কেজি',max:10,cat:'PR',perMeal:.03},
+  {id:'i51',name:'শণ বীজ',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.02},
+  {id:'i52',name:'ওটস',qty:20,unit:'কেজি',max:25,cat:'OB',perMeal:.1},
+  {id:'i53',name:'বার্লি',qty:15,unit:'কেজি',max:20,cat:'FL',perMeal:.1},
+  {id:'i54',name:'রাগি (মিলেট)',qty:12,unit:'কেজি',max:18,cat:'DM',perMeal:.1},
+  {id:'i55',name:'বাজরা',qty:10,unit:'কেজি',max:15,cat:'all',perMeal:.1},
+  {id:'i56',name:'সরিষার তেল (ন্যূনতম)',qty:5,unit:'লিটার',max:10,cat:'all',perMeal:.01},
+  {id:'i57',name:'নারকেল তেল',qty:8,unit:'লিটার',max:12,cat:'all',perMeal:.01},
+  {id:'i58',name:'আপেল সিডার ভিনেগার',qty:6,unit:'লিটার',max:10,cat:'OB',perMeal:.02},
+  {id:'i59',name:'তেঁতুল',qty:4,unit:'কেজি',max:8,cat:'IB',perMeal:.03},
+  {id:'i60',name:'আমচুর',qty:3,unit:'কেজি',max:6,cat:'DM',perMeal:.01},
+  {id:'i61',name:'মধু (কাঁচা)',qty:8,unit:'কেজি',max:12,cat:'all',perMeal:.02},
+  {id:'i62',name:'স্টেভিয়া পাতা',qty:2,unit:'কেজি',max:5,cat:'DM',perMeal:.005},
+  {id:'i63',name:'গোলমরিচ',qty:3,unit:'কেজি',max:6,cat:'all',perMeal:.005},
+  {id:'i64',name:'লাল মরিচ',qty:4,unit:'কেজি',max:8,cat:'all',perMeal:.005},
+  {id:'i65',name:'কাঁচা মরিচ',qty:8,unit:'কেজি',max:12,cat:'all',perMeal:.02},
+  {id:'i66',name:'পাস্তুরড ডিম',qty:200,unit:'পিস',max:300,cat:'DM',perMeal:1},
+  {id:'i67',name:'ঘাস-খাওয়া মুরগি',qty:25,unit:'কেজি',max:40,cat:'DM',perMeal:.15},
+  {id:'i68',name:'ইসবগুল ভুসি',qty:5,unit:'কেজি',max:10,cat:'IB',perMeal:.02},
+  {id:'i69',name:'ত্রিফলা চূর্ণ',qty:3,unit:'কেজি',max:6,cat:'all',perMeal:.01},
+  {id:'i70',name:'অশ্বগন্ধা',qty:2,unit:'কেজি',max:5,cat:'PR',perMeal:.005},
+  {id:'i71',name:'শতাবরী',qty:2,unit:'কেজি',max:5,cat:'PR',perMeal:.005},
+  {id:'i72',name:'অর্জুন ছাল',qty:3,unit:'কেজি',max:6,cat:'FL',perMeal:.01},
+  {id:'i73',name:'ভৃঙ্গরাজ',qty:2,unit:'কেজি',max:5,cat:'FL',perMeal:.01},
+  {id:'i74',name:'কালমেঘ',qty:2,unit:'কেজি',max:5,cat:'FL',perMeal:.01},
+  {id:'i75',name:'নিম ছাল',qty:2,unit:'কেজি',max:5,cat:'DM',perMeal:.01},
+  {id:'i76',name:'গুড়মার পাতা',qty:1,unit:'কেজি',max:3,cat:'DM',perMeal:.005},
+  {id:'i77',name:'জামের বীজ',qty:2,unit:'কেজি',max:5,cat:'DM',perMeal:.01},
+  {id:'i78',name:'বেলপাতা',qty:2,unit:'কেজি',max:5,cat:'IB',perMeal:.01},
+  {id:'i79',name:'পান পাতা',qty:1,unit:'কেজি',max:3,cat:'IB',perMeal:.005},
+  {id:'i80',name:'গাঁদা ফুল',qty:1,unit:'কেজি',max:3,cat:'all',perMeal:.005},
+  {id:'i81',name:'গোলাপ পাপড়ি',qty:1,unit:'কেজি',max:3,cat:'all',perMeal:.005},
+  {id:'i82',name:'শুকনো আদা',qty:4,unit:'কেজি',max:8,cat:'IB',perMeal:.02},
+  {id:'i83',name:'কালো তিল',qty:3,unit:'কেজি',max:6,cat:'PR',perMeal:.02},
+  {id:'i84',name:'মিষ্টি দই (প্রোবায়োটিক)',qty:20,unit:'কেজি',max:30,cat:'IB',perMeal:.15},
+  {id:'i85',name:'পনির (হোমমেড)',qty:8,unit:'কেজি',max:15,cat:'PR',perMeal:.1},
+  {id:'i86',name:'ছানা',qty:5,unit:'কেজি',max:10,cat:'PR',perMeal:.08},
+  {id:'i87',name:'মুগ স্প্রাউট',qty:6,unit:'কেজি',max:10,cat:'all',perMeal:.08},
+  {id:'i88',name:'মসুর ডাল',qty:20,unit:'কেজি',max:25,cat:'all',perMeal:.12},
+  {id:'i89',name:'ছোলা',qty:15,unit:'কেজি',max:20,cat:'OB',perMeal:.12},
+  {id:'i90',name:'সয়া প্রোটিন',qty:8,unit:'কেজি',max:12,cat:'OB',perMeal:.08},
+  {id:'i91',name:'আলোভেরা জেল',qty:5,unit:'কেজি',max:10,cat:'all',perMeal:.03},
+  {id:'i92',name:'কারকুমা এক্সট্র্যাক্ট',qty:2,unit:'কেজি',max:5,cat:'all',perMeal:.01},
+  {id:'i93',name:'বাওবাব পাউডার',qty:2,unit:'কেজি',max:5,cat:'PR',perMeal:.01},
+  {id:'i94',name:'স্পিরুলিনা',qty:2,unit:'কেজি',max:5,cat:'all',perMeal:.01},
+  {id:'i95',name:'কালো জিরার তেল',qty:3,unit:'লিটার',max:6,cat:'all',perMeal:.01},
+  {id:'i96',name:'ব্রাহ্মী পাতা',qty:2,unit:'কেজি',max:5,cat:'all',perMeal:.01},
+  {id:'i97',name:'জলপাই',qty:6,unit:'কেজি',max:10,cat:'FL',perMeal:.05},
+  {id:'i98',name:'আতা ফল',qty:5,unit:'কেজি',max:10,cat:'PR',perMeal:.08},
+  {id:'i99',name:'সাজনা ফুল',qty:2,unit:'কেজি',max:5,cat:'all',perMeal:.02},
 ];
 
-function renderInventory() {
-  document.getElementById('inventoryGrid').innerHTML = inventoryItems.map(i => {
-    const pct = Math.round(i.qty / i.max * 100);
-    const cls = i.qty < 10 ? 'low' : i.qty < 15 ? 'warning' : '';
-    const barColor = i.qty < 10 ? 'var(--red2)' : i.qty < 15 ? 'var(--yellow2)' : 'var(--green2)';
-    const valCls = i.qty < 10 ? 'low' : i.qty < 15 ? 'warn' : 'ok';
-    return `<div class="inv-card ${cls}">
-      <div class="inv-name">${i.name}</div>
-      <div><span class="inv-qty ${valCls}">${i.qty}</span> <span class="inv-unit">${i.unit} বাকি</span></div>
-      <div class="inv-bar-wrap"><div class="inv-bar" style="width:${pct}%;background:${barColor}"></div></div>
-      ${i.qty < 10 ? '<div style="font-size:.68rem;color:var(--red2);margin-top:.3rem">⚠️ স্বল্প স্টক!</div>' : ''}
-    </div>`;
-  }).join('');
+let inventoryItems = JSON.parse(localStorage.getItem('sar_inventory') || JSON.stringify(DEFAULT_INVENTORY));
+
+// Auto-decrease inventory after order completed
+function decreaseInventoryForOrder(catCode, meals=1){
+  inventoryItems.forEach(item => {
+    if(item.cat === catCode || item.cat === 'all'){
+      item.qty = Math.max(0, parseFloat((item.qty - item.perMeal * meals).toFixed(2)));
+    }
+  });
+  saveInventory();
+}
+
+function saveInventory(){
+  localStorage.setItem('sar_inventory', JSON.stringify(inventoryItems));
+}
+
+function updateIngredientQty(id, newQty){
+  const item = inventoryItems.find(i=>i.id===id);
+  if(item){ item.qty = parseFloat(newQty)||0; saveInventory(); renderInventory(); showToast('✅ স্টক আপডেট হয়েছে: '+item.name); }
+}
+
+function renderInventory(filterCat='') {
+  const items = filterCat ? inventoryItems.filter(i=>i.cat===filterCat||i.cat==='all') : inventoryItems;
+  const low = items.filter(i=>i.qty<10).length;
+  document.getElementById('inventoryGrid').innerHTML = `
+    <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
+      <div style="font-family:'Space Mono',monospace;font-size:.72rem;color:rgba(255,255,255,.35)">${items.length} উপাদান${low?' | <span style="color:var(--red2)">⚠️ '+low+' স্বল্প স্টক</span>':''}</div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        ${['সব','DM','OB','FL','IB','PR'].map(c=>`<button onclick="renderInventory('${c==='সব'?'':c}')" style="padding:.25rem .65rem;border-radius:8px;background:${filterCat===(c==='সব'?'':c)?'var(--pink3)':'var(--glass)'};border:1px solid ${filterCat===(c==='সব'?'':c)?'var(--pink2)':'var(--border)'};color:${filterCat===(c==='সব'?'':c)?'var(--pink2)':'rgba(255,255,255,.5)'};font-size:.72rem;cursor:pointer">${c}</button>`).join('')}
+        <button onclick="resetInventory()" style="padding:.25rem .65rem;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--yellow2);font-size:.72rem;cursor:pointer">↺ রিসেট</button>
+      </div>
+    </div>
+    ${items.map(i => {
+      const pct = Math.min(100, Math.round(i.qty / i.max * 100));
+      const valCls = i.qty < 10 ? 'low' : i.qty < 15 ? 'warn' : 'ok';
+      const barColor = i.qty < 10 ? 'var(--red2)' : i.qty < 15 ? 'var(--yellow2)' : 'var(--green2)';
+      return `<div class="inv-card ${i.qty<10?'low':''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem">
+          <div class="inv-name">${i.name}</div>
+          <span style="font-size:.62rem;padding:.1rem .4rem;border-radius:4px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.35)">${i.cat}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem">
+          <input type="number" value="${i.qty}" step="0.5" min="0" max="${i.max*2}"
+            style="width:60px;background:var(--glass2);border:1px solid var(--border);border-radius:7px;padding:.25rem .4rem;color:#fff;font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;outline:none"
+            onchange="updateIngredientQty('${i.id}',this.value)"
+            onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+          <span class="inv-unit" style="font-size:.72rem;color:rgba(255,255,255,.4)">${i.unit}</span>
+          <span style="margin-left:auto;font-size:.65rem;color:${i.qty<10?'var(--red2)':'rgba(255,255,255,.25)'}">/ ${i.max}</span>
+        </div>
+        <div class="inv-bar-wrap"><div class="inv-bar" style="width:${pct}%;background:${barColor}"></div></div>
+        ${i.qty<10?`<div style="font-size:.65rem;color:var(--red2);margin-top:.3rem">⚠️ স্বল্প স্টক! পুনরায় অর্ডার করুন</div>`:''}
+      </div>`;
+    }).join('')}`;
+}
+
+function resetInventory(){
+  if(confirm('স্টক ডিফল্ট মানে রিসেট করবেন?')){
+    inventoryItems = JSON.parse(JSON.stringify(DEFAULT_INVENTORY));
+    saveInventory(); renderInventory();
+    showToast('✅ স্টক রিসেট হয়েছে');
+  }
 }
 
 function sendLowStockAlert() {
@@ -1067,8 +1313,10 @@ function showSection(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি' };
+  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা' };
   document.getElementById('pageTitle').textContent = titles[id] || id;
+  if(id === 'articles') renderArticleWriter();
+  if(id === 'inventory') renderInventory();
 }
 
 // MODAL
@@ -1083,7 +1331,7 @@ async function addStaff() {
   const role = document.getElementById('new-staff-role').value;
   if (!name || !phone) { showToast('নাম ও ফোন আবশ্যক!', true); return; }
 
-  const newStaff = { name, phone, email, role, is_active: true, password_hash: 'TEMP', created_at: new Date().toISOString() };
+  const newStaff = { name, phone, email, role, is_active: true, password: document.getElementById('new-staff-pass').value || 'sar2024', created_at: new Date().toISOString() };
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/staff`, {
       method: 'POST',
@@ -1093,12 +1341,16 @@ async function addStaff() {
   } catch {}
 
   allStaff.push({ ...newStaff, id: 's' + Date.now() });
+  localStorage.setItem('sar_staff', JSON.stringify(allStaff));
   renderStaff();
   closeModal('addStaff');
-  showToast('✓ নতুন স্টাফ যোগ হয়েছে');
+  showToast('✓ নতুন স্টাফ যোগ হয়েছে: ' + newStaff.name);
 }
 
-function toggleStaffStatus(id) { showToast('স্টাফ স্ট্যাটাস পরিবর্তন হয়েছে'); }
+function toggleStaffStatus(id) {
+  const s = allStaff.find(x=>x.id===id);
+  if(s){ s.is_active=!s.is_active; localStorage.setItem('sar_staff',JSON.stringify(allStaff)); renderStaff(); showToast('স্টাফ স্ট্যাটাস পরিবর্তন হয়েছে'); }
+}
 function viewCustomer(id) { window.open('dashboard.html?customer_id=' + id, '_blank'); }
 function editCustomer(id) { showToast('গ্রাহক সম্পাদনা মোড'); }
 function generateReport() { showToast('📊 রিপোর্ট তৈরি হচ্ছে...'); }
