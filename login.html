@@ -223,20 +223,13 @@ async function doLogin(){
   }
 }
 
-// Auto redirect ONLY if valid recent session
-(function checkExisting(){
-  try {
-    const raw = localStorage.getItem('sar_customer');
-    if(!raw) return;
-    const c = JSON.parse(raw);
-    if(!c || !c.id) { localStorage.clear(); return; }
-    const t = localStorage.getItem('sar_login_time');
-    if(!t) { localStorage.clear(); return; }
-    const hours = (Date.now() - new Date(t).getTime()) / 3600000;
-    if(hours < 24){ window.location.href = 'dashboard.html'; }
-    else { localStorage.clear(); }
-  } catch(e){ localStorage.clear(); }
-})();
+// No auto-redirect — user must always login manually
+// Clear any stale session when landing on login page
+localStorage.removeItem('sar_customer');
+localStorage.removeItem('sar_customer_id');
+localStorage.removeItem('sar_customer_name');
+localStorage.removeItem('sar_login_time');
+localStorage.removeItem('sar_admin_approved');
 </script>
 </body>
 </html>
