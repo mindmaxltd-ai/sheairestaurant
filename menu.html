@@ -536,8 +536,8 @@ const SKEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 const CLAUDE = 'YOUR_CLAUDE_API_KEY_HERE';
 const SH = {'apikey':SKEY,'Authorization':'Bearer '+SKEY,'Content-Type':'application/json'};
 
-const CID   = localStorage.getItem('sar_cid');
-const CNAME = localStorage.getItem('sar_name') || 'আপা';
+const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}'); const CID=_sc.id||localStorage.getItem('sar_customer_id');
+const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
 if (!CID) { window.location.href = 'login.html'; }
 
 // State
