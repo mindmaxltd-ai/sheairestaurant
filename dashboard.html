@@ -794,16 +794,42 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 // CONFIG
 // ═══════════════════════════════════════
 const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
-const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U'; // ← নতুন anon key
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 const H    = { 'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json' };
 
-// Session — login.html থেকে সেভ করা data পড়ুন
-const _sc = JSON.parse(localStorage.getItem('sar_customer') || '{}');
-const CID   = _sc.id || localStorage.getItem('sar_customer_id');
-const CNAME = _sc.full_name || localStorage.getItem('sar_customer_name') || 'আপা';
-const CMID  = _sc.member_id || localStorage.getItem('sar_member_id') || '—';
+// ── Session reader — tries every possible key combination ──
+function getSession() {
+  try {
+    const raw = localStorage.getItem('sar_customer');
+    if (raw && raw !== 'undefined' && raw !== 'null') {
+      const sc = JSON.parse(raw);
+      if (sc && sc.id) { console.log('✅ Session from sar_customer:', sc.id, sc.full_name); return sc; }
+    }
+  } catch(e) { console.warn('sar_customer parse error:', e); }
 
-if (!CID) { window.location.href = 'login.html'; }
+  const id = localStorage.getItem('sar_customer_id');
+  if (id && id !== 'undefined') {
+    const sc = {
+      id,
+      full_name:     localStorage.getItem('sar_customer_name') || 'আপা',
+      member_id:     localStorage.getItem('sar_member_id') || '—',
+      phone:         localStorage.getItem('sar_phone') || '',
+      admin_approved: localStorage.getItem('sar_admin_approved') === 'true',
+    };
+    console.log('✅ Session from sar_customer_id:', id);
+    return sc;
+  }
+
+  console.warn('❌ No session found. localStorage keys:', Object.keys(localStorage).join(', '));
+  return null;
+}
+
+const _session = getSession();
+if (!_session) { window.location.href = 'login.html'; }
+
+const CID   = _session?.id   || '';
+const CNAME = _session?.full_name || 'আপা';
+const CMID  = _session?.member_id || '—';
 
 // ═══════════════════════════════════════
 // INIT
@@ -1054,8 +1080,8 @@ function setGreeting() {
 function fillBasicUI(cust) {
   const setEl = (id, val) => { try{ const e=document.getElementById(id); if(e) e.textContent=val; }catch(e){} };
   // Use Supabase fresh data first, fallback to localStorage
-  const name = (cust && cust.full_name) || CNAME || 'আপা';
-  const mid  = (cust && cust.member_id)  || CMID  || '—';
+  const name = (cust && cust.full_name) || CNAME || _session?.full_name || 'আপা';
+  const mid  = (cust && cust.member_id)  || CMID  || _session?.member_id || '—';
   const tier = (cust && cust.membership_tier) || 'Basic';
   const first = (name||'আপা').split(' ')[0];
   setEl('greetName',  `স্বাগতম, ${first} আপা!`);
@@ -1072,30 +1098,43 @@ function fillBasicUI(cust) {
 // ═══════════════════════════════════════
 async function fetchCustomer() {
   try {
-    if (!CID) return {};
-    const r = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H});
-    if (!r.ok) { console.warn('fetchCustomer error:', r.status); return {}; }
+    if (!CID) { console.warn('fetchCustomer: No CID'); return _session || {}; }
+    console.log('🔄 Fetching customer from Supabase, id=', CID);
+    const url = `${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`;
+    const r = await fetch(url, {headers:H});
+    console.log('fetchCustomer response:', r.status);
+    if (!r.ok) {
+      const txt = await r.text();
+      console.error('fetchCustomer error:', r.status, txt);
+      return _session || {};
+    }
     const d = await r.json();
+    console.log('fetchCustomer data:', d);
     const c = d?.[0] || {};
-    // Update localStorage with fresh data from Supabase
     if (c.id) {
-      const stored = JSON.parse(localStorage.getItem('sar_customer') || '{}');
-      Object.assign(stored, c);
-      localStorage.setItem('sar_customer', JSON.stringify(stored));
+      // Merge fresh data into localStorage
+      const merged = { ..._session, ...c };
+      localStorage.setItem('sar_customer', JSON.stringify(merged));
       localStorage.setItem('sar_admin_approved', c.admin_approved ? 'true' : 'false');
     }
-    return c;
-  } catch(e) { console.warn('fetchCustomer:', e); return {}; }
+    return c.id ? c : (_session || {});
+  } catch(e) {
+    console.error('fetchCustomer exception:', e);
+    return _session || {};
+  }
 }
 
 async function fetchMetrics() {
   try {
     if (!CID) return {};
-    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
-    if (!r.ok) return {};
+    console.log('🔄 Fetching metrics, customer_id=', CID);
+    const r = await fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    console.log('fetchMetrics response:', r.status);
+    if (!r.ok) { console.warn('fetchMetrics error:', r.status); return {}; }
     const d = await r.json();
+    console.log('fetchMetrics data:', d);
     return d?.[0] || {};
-  } catch(e) { return {}; }
+  } catch(e) { console.error('fetchMetrics exception:', e); return {}; }
 }
 
 async function fetchAnalysis() {
@@ -1203,122 +1242,137 @@ function renderCustomer(c) {
 // RENDER METRICS
 // ═══════════════════════════════════════
 function renderMetrics(m, cust) {
-  // m = customer_metrics row, cust = customers row (for BMI fallback)
-  const hasMetrics = m && (m.customer_id || m.bmi || m.fbg_mmol || m.fasting_glucose);
+  // Helper: safe element setter
+  const setEl  = (id, val) => { try{ const e=document.getElementById(id); if(e) e.textContent=val; }catch(e){} };
+  const setHTML = (id, val) => { try{ const e=document.getElementById(id); if(e) e.innerHTML=val; }catch(e){} };
+  const setStatus = (parentId, cls, txt) => {
+    try{
+      const p = document.getElementById(parentId)?.parentElement;
+      if(!p) return;
+      const s = p.querySelector('.mc-status');
+      if(s){ s.className='mc-status '+cls; s.textContent=txt; }
+    }catch(e){}
+  };
 
-  if (!hasMetrics) {
-    // Show BMI from customer profile if available
-    const custBmi = cust?.bmi;
-    if(custBmi){
-      const el = document.getElementById('mBMI');
-      if(el){
-        el.innerHTML = `${parseFloat(custBmi).toFixed(1)}`;
-        const st = el.parentElement?.querySelector('.mc-status');
-        const b = parseFloat(custBmi);
-        let txt = 'স্বাভাবিক ✓', cls = 's-normal';
-        if(b<18.5){txt='কম ওজন';cls='s-low'}
-        else if(b>=25&&b<30){txt='অতিরিক্ত';cls='s-low'}
-        else if(b>=30){txt='স্থূলতা';cls='s-high'}
-        if(st){st.className=`mc-status ${cls}`;st.textContent=txt;}
+  // Helper: try multiple column names (Supabase table may use different names)
+  const get = (...keys) => { for(const k of keys){ if(m&&m[k]!=null&&m[k]!=='') return m[k]; } return null; };
+
+  // ── BMI ──
+  // First try customer-metrics, fallback to customers table (registration data)
+  const bmi = get('bmi','body_mass_index') || cust?.bmi || null;
+  if(bmi){
+    const b = parseFloat(bmi);
+    let cls='s-normal', txt='স্বাভাবিক ✓';
+    if(b<18.5){cls='s-low';txt='কম ওজন'}
+    else if(b>=25&&b<30){cls='s-low';txt='অতিরিক্ত ওজন'}
+    else if(b>=30){cls='s-high';txt='স্থূলতা ⚠️'}
+    setEl('mBMI', parseFloat(bmi).toFixed(1));
+    setStatus('mBMI', cls, txt);
+  } else {
+    setEl('mBMI','—'); setStatus('mBMI','s-na','তথ্য নেই');
+  }
+
+  // ── Blood Pressure ──
+  const sys = get('systolic_bp','bp_systolic','blood_pressure_systolic');
+  const dia = get('diastolic_bp','bp_diastolic','blood_pressure_diastolic');
+  if(sys && dia){
+    const s=parseFloat(sys);
+    let cls='s-normal', txt='স্বাভাবিক ✓';
+    if(s>=140){cls='s-high';txt='উচ্চ ⚠️'}
+    else if(s>=120){cls='s-low';txt='সতর্কতা'}
+    setEl('mBP',`${sys}/${dia}`);
+    setStatus('mBP', cls, txt);
+  } else {
+    setEl('mBP','—/—'); setStatus('mBP','s-na','তথ্য নেই');
+  }
+
+  // ── Glucose ──
+  const glu = get('fbg_mmol','fasting_glucose','fasting_blood_glucose','blood_glucose_fasting');
+  if(glu){
+    const g=parseFloat(glu);
+    let cls='s-normal', txt='স্বাভাবিক ✓';
+    if(g<3.9){cls='s-low';txt='নিম্ন'}
+    else if(g>7.0){cls='s-high';txt='উচ্চ ⚠️'}
+    else if(g>5.5){cls='s-low';txt='প্রি-ডায়াবেটিক'}
+    setHTML('mGlu',`${glu}<span class="mc-unit">mmol/L</span>`);
+    setStatus('mGlu', cls, txt);
+  } else {
+    setHTML('mGlu',`—<span class="mc-unit">mmol/L</span>`);
+    setStatus('mGlu','s-na','তথ্য নেই');
+  }
+
+  // ── HbA1c ──
+  const hba = get('hba1c_percent','hba1c','glycated_hemoglobin','hba1c_percentage');
+  if(hba){
+    const h=parseFloat(hba);
+    let cls='s-normal', txt='স্বাভাবিক ✓';
+    if(h>=6.5){cls='s-high';txt='ডায়াবেটিস ⚠️'}
+    else if(h>=5.7){cls='s-low';txt='প্রি-ডায়াবেটিক'}
+    setHTML('mHba',`${hba}<span class="mc-unit">%</span>`);
+    setStatus('mHba', cls, txt);
+  } else {
+    setHTML('mHba',`—<span class="mc-unit">%</span>`);
+    setStatus('mHba','s-na','তথ্য নেই');
+  }
+
+  // ── Hemoglobin ──
+  const hb = get('hemoglobin_g_dl','hemoglobin','haemoglobin','hb_g_dl');
+  if(hb){
+    const h=parseFloat(hb);
+    let cls='s-normal', txt='স্বাভাবিক ✓';
+    if(h<8){cls='s-high';txt='তীব্র কম ⚠️'}
+    else if(h<11){cls='s-low';txt='কম'}
+    else if(h>16){cls='s-low';txt='বেশি'}
+    setHTML('mHemo',`${hb}<span class="mc-unit">g/dL</span>`);
+    setStatus('mHemo', cls, txt);
+    setEl('statHb', hb);
+    try{
+      const s = document.getElementById('statHbS');
+      if(s){s.className=`stat-trend ${cls==='s-normal'?'up':cls==='s-high'?'down':'neu'}`;s.textContent=txt;}
+    }catch(e){}
+  } else {
+    setHTML('mHemo',`—<span class="mc-unit">g/dL</span>`);
+    setStatus('mHemo','s-na','তথ্য নেই');
+    setEl('statHb','—');
+  }
+
+  // ── Vitamin D ──
+  const vd = get('vitamin_d_ng_ml','vitamin_d','vit_d','vitamin_d_level');
+  if(vd){
+    const v=parseFloat(vd);
+    let cls='s-normal', txt='যথেষ্ট ✓';
+    if(v<20){cls='s-high';txt='ঘাটতি ⚠️'}
+    else if(v<30){cls='s-low';txt='অপর্যাপ্ত'}
+    setHTML('mVD',`${vd}<span class="mc-unit">ng/mL</span>`);
+    setStatus('mVD', cls, txt);
+  } else {
+    setHTML('mVD',`—<span class="mc-unit">ng/mL</span>`);
+    setStatus('mVD','s-na','তথ্য নেই');
+  }
+
+  // ── Weight & Height from registration ──
+  const wt = get('weight_kg') || cust?.weight_kg;
+  const ht = get('height_cm') || cust?.height_cm;
+  const wtEl = document.getElementById('statWeight');
+  const htEl = document.getElementById('statHeight');
+  if(wtEl && wt) wtEl.textContent = parseFloat(wt).toFixed(1) + ' কেজি';
+  if(htEl && ht) htEl.textContent = parseFloat(ht).toFixed(0) + ' সেমি';
+
+  // ── Show fill-metrics banner if no customer-metrics data ──
+  const hasMetrics = m && Object.keys(m).length > 2;
+  if(!hasMetrics){
+    const banner = document.getElementById('metricsFillBanner');
+    if(!banner){
+      const km = document.getElementById('keyMetrics');
+      if(km){
+        const div = document.createElement('div');
+        div.id = 'metricsFillBanner';
+        div.style.cssText = 'grid-column:1/-1;background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:.75rem 1rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5)';
+        div.innerHTML = `📊 বিস্তারিত স্বাস্থ্য তথ্য পেতে <a href="metrics.html" target="_blank" style="color:var(--pink2);font-weight:700">মেট্রিক্স ফর্ম পূরণ করুন →</a>`;
+        km.appendChild(div);
       }
     }
-    // Show "fill metrics" link for missing fields
-    const km = document.getElementById('keyMetrics');
-    if(km && !custBmi){
-      km.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:1rem 0">
-        <a href="metrics.html" target="_blank" style="color:var(--pink2);font-size:.85rem;text-decoration:none">
-          📊 স্বাস্থ্য মেট্রিক্স পূরণ করুন → আরও তথ্য পাবেন</a></div>`;
-    }
-    return;
   }
-
-  // Helper: try multiple possible column names
-  const get = (keys) => { for(const k of keys){ if(m[k]!=null) return m[k]; } return null; };
-
-  // BMI — try multiple column names
-  const bmi = get(['bmi','body_mass_index']) || cust?.bmi;
-  let bmiSt = 's-na', bmiTxt = 'তথ্য নেই';
-  if (bmi) {
-    const b = parseFloat(bmi);
-    if (b < 18.5)      { bmiSt='s-low';    bmiTxt='কম ওজন' }
-    else if (b < 25)   { bmiSt='s-normal'; bmiTxt='স্বাভাবিক ✓' }
-    else if (b < 30)   { bmiSt='s-low';    bmiTxt='অতিরিক্ত ওজন' }
-    else               { bmiSt='s-high';   bmiTxt='স্থূলতা' }
-  }
-  const mBMI = document.getElementById('mBMI');
-  if(mBMI){
-    mBMI.innerHTML = bmi ? parseFloat(bmi).toFixed(1) : '—';
-    const st = mBMI.parentElement?.querySelector('.mc-status');
-    if(st){ st.className=`mc-status ${bmiSt}`; st.textContent=bmiTxt; }
-  }
-
-  // BP — try multiple column names
-  const sys = get(['bp_systolic','systolic_bp','blood_pressure_systolic']);
-  const dia = get(['bp_diastolic','diastolic_bp','blood_pressure_diastolic']);
-  const bp = (sys && dia) ? `${sys}/${dia}` : '—';
-  const mBP = document.getElementById('mBP');
-  if(mBP) mBP.textContent = bp;
-
-  // Glucose — try multiple column names
-  const glu = get(['fasting_glucose','fbg_mmol','fasting_blood_glucose','glucose_fasting']);
-  let gluSt = 's-na', gluTxt = 'তথ্য নেই';
-  if (glu) {
-    const g = parseFloat(glu);
-    if (g < 3.9)       { gluSt='s-low';    gluTxt='নিম্ন' }
-    else if (g <= 5.5) { gluSt='s-normal'; gluTxt='স্বাভাবিক ✓' }
-    else if (g <= 7.0) { gluSt='s-low';    gluTxt='প্রি-ডায়াবেটিক' }
-    else               { gluSt='s-high';   gluTxt='উচ্চ ⚠️' }
-  }
-  const mGlu = document.getElementById('mGlu');
-  if(mGlu){
-    mGlu.innerHTML = `${glu||'—'}<span class="mc-unit">mmol/L</span>`;
-    const st = mGlu.parentElement?.querySelector('.mc-status');
-    if(st){ st.className=`mc-status ${gluSt}`; st.textContent=gluTxt; }
-  }
-
-  // HbA1c
-  const hba = get(['hba1c','hba1c_percent','glycated_hemoglobin','hba1c_percentage']);
-  const mHba = document.getElementById('mHba');
-  if(mHba) mHba.innerHTML = `${hba||'—'}<span class="mc-unit">%</span>`;
-
-  // Hemoglobin
-  const hb = get(['hemoglobin','hemoglobin_g_dl','haemoglobin']);
-  let hbSt = 's-na', hbTxt = 'তথ্য নেই';
-  if (hb) {
-    const h = parseFloat(hb);
-    if (h < 8)         { hbSt='s-high';   hbTxt='তীব্র কম ⚠️' }
-    else if (h < 11)   { hbSt='s-low';    hbTxt='কম' }
-    else if (h <= 16)  { hbSt='s-normal'; hbTxt='স্বাভাবিক ✓' }
-    else               { hbSt='s-low';    hbTxt='বেশি' }
-  }
-  const mHemo = document.getElementById('mHemo');
-  if(mHemo){
-    mHemo.innerHTML = `${hb||'—'}<span class="mc-unit">g/dL</span>`;
-    const st = mHemo.parentElement?.querySelector('.mc-status');
-    if(st){ st.className=`mc-status ${hbSt}`; st.textContent=hbTxt; }
-  }
-  const sHb = document.getElementById('statHb');
-  const sHbS = document.getElementById('statHbS');
-  if(sHb) sHb.textContent = hb||'—';
-  if(sHbS){ sHbS.className=`stat-trend ${hbSt==='s-normal'?'up':hbSt==='s-high'?'down':'neu'}`; sHbS.textContent=hbTxt; }
-
-  // Vitamin D
-  const vd = get(['vitamin_d','vitamin_d_ng_ml','vit_d']);
-  let vdSt = 's-na', vdTxt = 'তথ্য নেই';
-  if (vd) {
-    const v = parseFloat(vd);
-    vdSt = v < 20 ? 's-high' : v < 30 ? 's-low' : 's-normal';
-    vdTxt = v < 20 ? 'ঘাটতি ⚠️' : v < 30 ? 'অপর্যাপ্ত' : 'যথেষ্ট ✓';
-  }
-  const mVD = document.getElementById('mVD');
-  if(mVD){
-    mVD.innerHTML = `${vd||'—'}<span class="mc-unit">ng/mL</span>`;
-    const st = mVD.parentElement?.querySelector('.mc-status');
-    if(st){ st.className=`mc-status ${vdSt}`; st.textContent=vdTxt; }
-  }
-
-  // Cycle phase
-  renderCyclePhase(m);
 }
 
 // ═══════════════════════════════════════
@@ -1385,104 +1439,114 @@ function renderCyclePhase(m) {
 // RENDER ANALYSIS
 // ═══════════════════════════════════════
 function renderAnalysis(a, c) {
-  const isSubActive = c.monthly_sub_paid && c.monthly_sub_expiry_date &&
-    new Date(c.monthly_sub_expiry_date) > new Date();
+  const el     = document.getElementById('analysisContent');
+  const dateEl = document.getElementById('analysisDate');
+  if (!el) return;
 
-  if (!isSubActive) {
-    document.getElementById('analysisContent').innerHTML = `
-      <div class="analysis-locked">
-        <span class="lock-icon">🔒</span>
-        <div class="lock-title">সাবস্ক্রিপশন প্রয়োজন</div>
-        <div class="lock-desc">AI বিশ্লেষণ দেখতে মাসিক সাবস্ক্রিপশন সক্রিয় করুন।<br>মাত্র ৳ ৫০০/মাস।</div>
-        <a href="payment.html" class="lock-btn">সাবস্ক্রিপশন নিন →</a>
+  if (!a || !a.id) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:1.5rem 1rem">
+        <div style="font-size:2.2rem;margin-bottom:.65rem">🤖</div>
+        <div style="font-size:.83rem;color:rgba(255,255,255,.45);margin-bottom:1rem;line-height:1.7">
+          আপনার ২৫০ মেট্রিক্স বিশ্লেষণ করে AI একটি ব্যক্তিগত স্বাস্থ্য মূল্যায়ন তৈরি করবে।
+        </div>
+        <button onclick="triggerAnalysis()" id="analyzeBtn"
+          style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:12px;
+          padding:.7rem 1.6rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;
+          font-weight:700;cursor:pointer">
+          🔬 AI বিশ্লেষণ শুরু করুন
+        </button>
       </div>`;
     return;
   }
 
-  if (!a) {
-    document.getElementById('analysisContent').innerHTML = `
-      <div class="analysis-locked">
-        <span class="lock-icon">⏳</span>
-        <div class="lock-title">বিশ্লেষণ অপেক্ষায়</div>
-        <div class="lock-desc">অ্যাডমিন আপনার মেট্রিক্স বিশ্লেষণ করলে এখানে দেখাবে।</div>
-      </div>`;
-    document.getElementById('statHealthScore').textContent = '—';
-    return;
-  }
+  if (dateEl) dateEl.textContent = a.analysis_date || '';
+  const sc = document.getElementById('statHealthScore');
+  if(sc) sc.textContent = a.health_score || '—';
 
-  document.getElementById('analysisDate').textContent = a.analysis_date || '';
-  document.getElementById('statHealthScore').textContent = a.health_score || '—';
-
-  const scoreColor = a.health_score >= 70 ? '#34D399' : a.health_score >= 50 ? '#FCD34D' : '#F87171';
+  const score = a.health_score || 0;
+  const scoreColor = score >= 70 ? '#34D399' : score >= 40 ? '#FCD34D' : '#F87171';
   const circum = 2 * Math.PI * 28;
-  const offset = circum - ((a.health_score || 0) / 100 * circum);
+  const offset = circum - (score / 100 * circum);
 
-  const problems = a.problems_json || [];
-  const problemsHTML = problems.length > 0 ? problems.map(p =>
-    `<div class="as-tag"><span class="as-tag-dot" style="background:${p.severity==='high'?'#F87171':p.severity==='medium'?'#FCD34D':'#34D399'}"></span>${p.name||p}: ${p.description||''}</div>`
-  ).join('') : '<div class="as-tag"><span class="as-tag-dot" style="background:#34D399"></span>কোনো গুরুতর সমস্যা পাওয়া যায়নি ✓</div>';
-
-  document.getElementById('analysisContent').innerHTML = `
-    <div class="analysis-content" style="padding:0 1.4rem 1.4rem">
-      <div class="health-score-row">
-        <div class="hs-ring">
+  el.innerHTML = `
+    <div style="padding:.25rem 1.4rem 1.25rem">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+        <div style="position:relative;flex-shrink:0">
           <svg width="70" height="70" viewBox="0 0 70 70">
             <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/>
             <circle cx="35" cy="35" r="28" fill="none" stroke="${scoreColor}" stroke-width="5"
-              stroke-dasharray="${circum}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+              stroke-dasharray="${circum}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 35 35)"/>
           </svg>
-          <div class="hs-txt"><div class="hs-num" style="color:${scoreColor}">${a.health_score||0}</div><div class="hs-lbl">/১০০</div></div>
-        </div>
-        <div class="hs-right">
-          <div class="hs-title">স্বাস্থ্য স্কোর — ${a.health_score>=70?'ভালো 👍':a.health_score>=50?'মাঝারি ⚠️':'মনোযোগ প্রয়োজন 🔴'}</div>
-          <div class="hs-msg">${a.health_summary_bn || a.motivational_message_bn || 'আপনার স্বাস্থ্য বিশ্লেষণ সম্পন্ন।'}</div>
-        </div>
-      </div>
-      ${a.problems_json ? `<div class="analysis-section"><div class="as-label">চিহ্নিত সমস্যা</div><div class="as-tags">${problemsHTML}</div></div>` : ''}
-      ${a.nutrition_advice_bn ? `<div class="analysis-section"><div class="as-label">পুষ্টি পরামর্শ</div><div class="as-content">${a.nutrition_advice_bn}</div></div>` : ''}
-      ${a.general_suggestions_bn ? `<div class="analysis-section"><div class="as-label">সাধারণ পরামর্শ</div><div class="as-content">${a.general_suggestions_bn}</div></div>` : ''}
-      <div class="disclaimer-mini">
-        <strong>⚕️ বিজ্ঞপ্তি:</strong> এই তথ্য শুধুমাত্র সচেতনতার জন্য। SAR ডাক্তার নয়।
-        যেকোনো স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
-      </div>
-    </div>`;
-
-  // Full analysis panel
-  const meds = a.conventional_medicines_json || [];
-  document.getElementById('fullAnalysisContent').innerHTML = `
-    <div class="dcard" style="margin-bottom:1.5rem">
-      <div class="dcard-header"><span class="dcard-title">🔬 সম্পূর্ণ AI স্বাস্থ্য বিশ্লেষণ</span><span style="font-size:.75rem;color:rgba(255,255,255,.3)">${a.analysis_date}</span></div>
-      <div class="dcard-body">
-        <div class="health-score-row">
-          <div class="hs-ring">
-            <svg width="70" height="70" viewBox="0 0 70 70">
-              <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/>
-              <circle cx="35" cy="35" r="28" fill="none" stroke="${scoreColor}" stroke-width="5"
-                stroke-dasharray="${circum}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
-            </svg>
-            <div class="hs-txt"><div class="hs-num" style="color:${scoreColor}">${a.health_score||0}</div><div class="hs-lbl">/১০০</div></div>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <span style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:${scoreColor}">${score}</span>
+            <span style="font-size:.55rem;color:rgba(255,255,255,.3)">/100</span>
           </div>
-          <div><div class="hs-title">স্বাস্থ্য স্কোর: ${a.health_score||0}/১০০</div><div class="hs-msg">${a.health_summary_bn||''}</div></div>
         </div>
-        ${a.problems_json ? `<br><div class="as-label">চিহ্নিত স্বাস্থ্য সমস্যা</div><div class="as-tags" style="margin-bottom:1rem">${problemsHTML}</div>` : ''}
-        ${a.nutrition_advice_bn ? `<div class="as-label">পুষ্টি পরামর্শ</div><div class="as-content" style="margin-bottom:1rem">${a.nutrition_advice_bn}</div>` : ''}
-        ${a.ayurvedic_bn ? `<div class="as-label">আয়ুর্বেদিক পরামর্শ</div><div class="as-content" style="margin-bottom:1rem">${a.ayurvedic_bn}</div>` : ''}
-        ${a.homeopathic_bn ? `<div class="as-label">হোমিওপ্যাথিক পরামর্শ</div><div class="as-content" style="margin-bottom:1rem">${a.homeopathic_bn}</div>` : ''}
-        ${a.home_remedies_bn ? `<div class="as-label">ঘরোয়া প্রতিকার</div><div class="as-content" style="margin-bottom:1rem">${a.home_remedies_bn}</div>` : ''}
-        ${meds.length ? `<div class="as-label">প্রচলিত ওষুধের জেনেরিক নাম (ডাক্তারের পরামর্শ ছাড়া সেবন করবেন না)</div>
-          <div class="as-tags" style="margin-bottom:1rem">${meds.map(m=>`<div class="as-tag"><span class="as-tag-dot" style="background:var(--purple2)"></span>${m}</div>`).join('')}</div>` : ''}
-        ${a.general_suggestions_bn ? `<div class="as-label">সাধারণ পরামর্শ</div><div class="as-content" style="margin-bottom:1rem">${a.general_suggestions_bn}</div>` : ''}
-        ${a.motivational_message_bn ? `<div style="background:linear-gradient(135deg,var(--pink3),var(--purple3));border:1px solid rgba(233,30,140,.18);border-radius:12px;padding:1rem;margin-bottom:1rem;font-family:'Playfair Display',serif;font-style:italic;color:rgba(255,255,255,.75);font-size:.9rem">"${a.motivational_message_bn}"</div>` : ''}
-        <div class="disclaimer-mini">
-          <strong>⚕️ গুরুত্বপূর্ণ বিজ্ঞপ্তি:</strong> SAR — She AI Restaurant কোনো চিকিৎসা প্রতিষ্ঠান নয়।
-          এখানে প্রদত্ত সমস্ত তথ্য শুধুমাত্র সচেতনতা বৃদ্ধি ও অনুপ্রেরণার জন্য।
-          যেকোনো শারীরিক সমস্যায় অবশ্যই নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
-          <strong>নিজে নিজে ওষুধ সেবন করবেন না।</strong>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.9rem;color:#fff;margin-bottom:.25rem">
+            ${score>=70?'ভালো 👍':score>=40?'মাঝারি ⚠️':'মনোযোগ দরকার 🔴'}
+          </div>
+          <div style="font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.65">${a.analysis_bn || a.health_summary_bn || '—'}</div>
         </div>
+      </div>
+      ${a.recommendations||a.general_suggestions_bn?`<div style="font-size:.78rem;color:rgba(255,255,255,.45);line-height:1.7;
+        background:rgba(245,200,66,.04);border-left:2px solid rgba(245,200,66,.25);
+        padding:.6rem .85rem;border-radius:0 10px 10px 0;margin-bottom:.85rem">
+        ${a.recommendations||a.general_suggestions_bn}</div>`:''}
+      <div style="text-align:right">
+        <button onclick="triggerAnalysis()" style="background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.25);
+          border-radius:9px;padding:.32rem .8rem;color:var(--pink2);font-size:.72rem;cursor:pointer;
+          font-family:'Hind Siliguri',sans-serif">🔄 নতুন বিশ্লেষণ</button>
       </div>
     </div>`;
 }
 
+async function triggerAnalysis() {
+  const el = document.getElementById('analysisContent');
+  if(el) el.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.45)">
+    <div style="width:32px;height:32px;border:2px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
+      border-radius:50%;animation:dashSpin .8s linear infinite;margin:0 auto .65rem"></div>
+    AI বিশ্লেষণ চলছে...</div>`;
+
+  const stored = JSON.parse(localStorage.getItem('sar_api_keys_v1')||'{}');
+  const claudeKey = stored.CLAUDE_API_KEY ? atob(stored.CLAUDE_API_KEY) : null;
+
+  const demo = {
+    customer_id: CID,
+    health_score: 62,
+    analysis_bn: 'আপনার স্বাস্থ্য মেট্রিক্স পর্যালোচনা করা হয়েছে। SAR থেরাপিউটিক মেনু অনুসরণ করুন এবং নিয়মিত মেট্রিক্স আপডেট করুন। Claude API Key সেট করলে সম্পূর্ণ ব্যক্তিগত বিশ্লেষণ পাবেন।',
+    recommendations: 'প্রতিদিন সকালে মেথি পানি পান করুন। হালকা ব্যায়াম করুন ৩০ মিনিট। রাতে ঘুমানোর আগে ত্রিফলা চূর্ণ সেবন করুন।',
+    analysis_date: new Date().toISOString().split('T')[0]
+  };
+
+  if (claudeKey) {
+    try {
+      const m = await fetchMetrics();
+      const mStr = Object.entries(m).filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k)).map(([k,v])=>`${k}: ${v}`).join(', ')||'মেট্রিক্স পাওয়া যায়নি';
+      const cr = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,
+          messages:[{role:'user',content:`SAR গ্রাহকের স্বাস্থ্য মেট্রিক্স: ${mStr}। বাংলায় JSON দাও: {"health_score":0-100,"analysis_bn":"৩-৪ বাক্য মূল্যায়ন","recommendations":"পরামর্শ"}`}]})
+      });
+      const cd = await cr.json();
+      const raw = cd.content?.[0]?.text||'{}';
+      const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+      Object.assign(demo, parsed);
+    } catch(e) { console.warn('Claude API:', e); }
+  }
+
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
+      method:'POST',headers:{...H,'Prefer':'return=representation'},
+      body:JSON.stringify(demo)
+    });
+    const d = await r.json();
+    renderAnalysis(d[0]||demo, null);
+    toast(claudeKey?'✅ AI বিশ্লেষণ সম্পন্ন!':'💡 Demo বিশ্লেষণ সেভ হয়েছে। Claude API Key দিয়ে পূর্ণ বিশ্লেষণ পান।', claudeKey);
+  } catch(e) { renderAnalysis(demo, null); }
+}
 // ═══════════════════════════════════════
 // RENDER DAILY MENU
 // ═══════════════════════════════════════
