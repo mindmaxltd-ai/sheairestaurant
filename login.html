@@ -441,12 +441,17 @@ async function loginWithPassword() {
 
     const customer = customers[0];
 
-    // Simple check — in production use proper auth
-    // For now checking if registration_fee_paid
-    if (!customer.is_active) {
-      overlay.classList.remove('show');
-      showMsg('msgPass', '❌ আপনার অ্যাকাউন্ট সক্রিয় নেই। SAR-এর সাথে যোগাযোগ করুন।', 'error');
-      return;
+    // All registered users can login regardless of is_active
+    // Dashboard will show appropriate access level
+
+    // Optional password check if password_hash set
+    if (customer.password_hash && password) {
+      const entered = btoa(unescape(encodeURIComponent(password)));
+      if (customer.password_hash !== entered) {
+        overlay.classList.remove('show');
+        showMsg('msgPass', '❌ পাসওয়ার্ড ভুল। আবার চেষ্টা করুন।', 'error');
+        return;
+      }
     }
 
     // Save session
@@ -568,16 +573,16 @@ function resetOTP() {
 // SESSION SAVE
 // ═══════════════════════════════
 function saveSession(customer) {
-  localStorage.setItem('sar_customer',       JSON.stringify(customer));
-  localStorage.setItem('sar_customer_id',    customer.id);
-  localStorage.setItem('sar_member_id',      customer.member_id || '');
-  localStorage.setItem('sar_customer_name',  customer.full_name);
-  localStorage.setItem('sar_phone',          customer.phone);
-  localStorage.setItem('sar_membership_tier',customer.membership_tier || 'Basic');
-  localStorage.setItem('sar_sub_paid',       String(customer.monthly_sub_paid || false));
-  localStorage.setItem('sar_sub_expiry',     customer.monthly_sub_expiry_date || '');
-  localStorage.setItem('sar_login_time',     new Date().toISOString());
-  localStorage.setItem('sar_admin_approved', customer.admin_approved ? 'true' : 'false');
+  localStorage.setItem('sar_customer',        JSON.stringify(customer));
+  localStorage.setItem('sar_customer_id',     customer.id);
+  localStorage.setItem('sar_member_id',       customer.member_id || '');
+  localStorage.setItem('sar_customer_name',   customer.full_name);
+  localStorage.setItem('sar_phone',           customer.phone);
+  localStorage.setItem('sar_membership_tier', customer.membership_tier || 'Basic');
+  localStorage.setItem('sar_sub_paid',        String(customer.monthly_sub_paid || false));
+  localStorage.setItem('sar_sub_expiry',      customer.monthly_sub_expiry_date || '');
+  localStorage.setItem('sar_login_time',      new Date().toISOString());
+  localStorage.setItem('sar_admin_approved',  customer.admin_approved ? 'true' : 'false');
 }
 
 // Auto redirect if already logged in
