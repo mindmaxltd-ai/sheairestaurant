@@ -1379,15 +1379,18 @@ function renderMetrics(m, cust) {
 // CYCLE PHASE
 // ═══════════════════════════════════════
 function renderCyclePhase(m) {
-  if (!m || !m.last_period_date || !m.cycle_length_days) {
+  // Try metrics first, fallback to customer table data
+  const sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const lastPeriod = m?.last_period_date || sc?.last_period_date || null;
+  const cycleLen   = m?.cycle_length_days || sc?.cycle_length_days || 28;
+
+  if (!lastPeriod) {
     document.getElementById('cycleInner').innerHTML =
       `<div style="padding:1.2rem;color:rgba(255,255,255,.38);font-size:.82rem;text-align:center">
-        মাসিক চক্রের তারিখ দিন → <a href="metrics.html" style="color:var(--pink2)">মেট্রিক্স আপডেট</a></div>`;
+        মাসিক চক্রের তারিখ দিন → <a href="metrics.html" target="_blank" style="color:var(--pink2)">মেট্রিক্স আপডেট</a></div>`;
     return;
   }
-
-  const last = new Date(m.last_period_date);
-  const cycleLen = parseInt(m.cycle_length_days) || 28;
+  const last = new Date(lastPeriod);
   const today = new Date();
   const dayInCycle = Math.floor((today - last) / 86400000) % cycleLen + 1;
   const pct = (dayInCycle / cycleLen * 100).toFixed(0);
@@ -1551,22 +1554,64 @@ async function triggerAnalysis() {
 // RENDER DAILY MENU
 // ═══════════════════════════════════════
 function renderDailyMenu(a, c) {
-  const isActive = c.monthly_sub_paid && c.monthly_sub_expiry_date &&
-    new Date(c.monthly_sub_expiry_date) > new Date();
+  // Use admin_approved as the gate (not monthly_sub_paid)
+  const isActive = (c && c.admin_approved === true) ||
+                   localStorage.getItem('sar_admin_approved') === 'true';
 
   const el = document.getElementById('dailyMenuContent');
+  if (!el) return;
+
   if (!isActive) {
     el.innerHTML = `<div class="menu-locked">
       <div style="font-size:2rem;margin-bottom:.6rem">🔒</div>
-      <div style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:.85rem">সাবস্ক্রিপশন সক্রিয় করলে আজকের মেনু দেখতে পাবেন।</div>
-      <a href="payment.html" style="color:var(--pink2);font-size:.82rem;text-decoration:none">সাবস্ক্রাইব করুন →</a>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:.85rem">Super Admin অনুমোদনের পরে আজকের মেনু দেখতে পাবেন।</div>
+      <a href="payment.html" style="color:var(--pink2);font-size:.82rem;text-decoration:none">পেমেন্ট করুন →</a>
     </div>`; return;
   }
 
   if (!a || !a.daily_menu_recommendation_json) {
-    el.innerHTML = `<div class="empty-state" style="font-size:.82rem">
-      অ্যাডমিন আজকের মেনু নির্ধারণ করেননি।<br>
-      <a href="#" style="color:var(--pink2);margin-top:.4rem;display:inline-block">সম্পূর্ণ মেনু দেখুন →</a></div>`; return;
+    // Show default menu based on disease category
+    const cat = c?.sar_category || JSON.parse(localStorage.getItem('sar_customer')||'{}')?.sar_category || 'DM';
+    const defaultMenus = {
+      DM: {breakfast:{name_bn:'মেথি কুইনোয়া পরিজ',calories:280,description_bn:'ডায়াবেটিস নিয়ন্ত্রণে সহায়ক'},
+           lunch:{name_bn:'ঘি-পোচড চিকেন বাটি',calories:420,description_bn:'প্রোটিন সমৃদ্ধ'},
+           dinner:{name_bn:'করলা ডাল স্যুপ',calories:310,description_bn:'রক্তে শর্করা কমায়'}},
+      OB: {breakfast:{name_bn:'প্রোটিন সিড পরিজ',calories:220,description_bn:'মেটাবলিজম বাড়ায়'},
+           lunch:{name_bn:'রেইনবো ডিটক্স বাটি',calories:380,description_bn:'ফ্যাট বার্ন সহায়ক'},
+           dinner:{name_bn:'মেটাবলিক সবুজ স্যুপ',calories:280,description_bn:'হালকা ও পুষ্টিকর'}},
+      FL: {breakfast:{name_bn:'হলুদ গোল্ডেন ব্রোথ',calories:190,description_bn:'লিভার পরিষ্কার করে'},
+           lunch:{name_bn:'লিভার ডেটক্স বাটি',calories:350,description_bn:'ALT কমাতে সহায়ক'},
+           dinner:{name_bn:'ভৃঙ্গরাজ হিলিং বাটি',calories:290,description_bn:'লিভার পুনরুদ্ধার'}},
+      IB: {breakfast:{name_bn:'গাট-সুথ মর্নিং বাটি',calories:240,description_bn:'পেট শান্ত করে'},
+           lunch:{name_bn:'ফার্মেন্টেড কিচরি',calories:360,description_bn:'প্রোবায়োটিক সমৃদ্ধ'},
+           dinner:{name_bn:'প্রোবায়োটিক লাসি বাটি',calories:270,description_bn:'গাট হেলথ উন্নত করে'}},
+      PR: {breakfast:{name_bn:'নারিশিং মামা বাটি',calories:320,description_bn:'ফোলিক অ্যাসিড সমৃদ্ধ'},
+           lunch:{name_bn:'আয়রন-রিচ স্পিনাচ বাটি',calories:410,description_bn:'মা ও শিশুর পুষ্টি'},
+           dinner:{name_bn:'ক্যালসিয়াম হিলিং স্যুপ',calories:350,description_bn:'হাড় মজবুত করে'}},
+    };
+    const menu = defaultMenus[cat] || defaultMenus.DM;
+    const meals = [
+      {type:'সকালের নাস্তা', key:'breakfast', emoji:'🌅', cls:'mt-b'},
+      {type:'দুপুরের খাবার', key:'lunch',     emoji:'☀️', cls:'mt-l'},
+      {type:'রাতের খাবার',  key:'dinner',    emoji:'🌙', cls:'mt-d'},
+    ];
+    el.innerHTML = '<div class="menu-grid">' +
+      meals.map(meal => {
+        const m = menu[meal.key];
+        return `<div class="menu-item" onclick="window.open('order.html','_blank')">
+          <span class="menu-item-emoji">${meal.emoji}</span>
+          <div class="menu-item-info">
+            <div class="menu-item-name">${m.name_bn}</div>
+            <div class="menu-item-meta">
+              <span>${m.description_bn}</span>
+              <span class="menu-item-kcal">${m.calories} kcal</span>
+            </div>
+          </div>
+          <span class="menu-item-type ${meal.cls}">${meal.type.split('ের')[0]}</span>
+          <button class="menu-order-btn" onclick="event.stopPropagation();window.open('order.html','_blank')">অর্ডার</button>
+        </div>`;
+      }).join('') + '</div>';
+    return;
   }
 
   const menus = a.daily_menu_recommendation_json;
@@ -1581,7 +1626,7 @@ function renderDailyMenu(a, c) {
       const m = menus[meal.key];
       if (!m) return '';
       return `
-        <div class="menu-item" onclick="addToOrder('${m.id||''}','${m.name||meal.type}')">
+        <div class="menu-item" onclick="window.open('order.html','_blank')">
           <span class="menu-item-emoji">${meal.emoji}</span>
           <div class="menu-item-info">
             <div class="menu-item-name">${m.name_bn || m.name || meal.type}</div>
@@ -1591,7 +1636,7 @@ function renderDailyMenu(a, c) {
             </div>
           </div>
           <span class="menu-item-type ${meal.cls}">${meal.type.split('ের')[0]}</span>
-          <button class="menu-order-btn" ${isActive?'':'disabled'}>অর্ডার</button>
+          <button class="menu-order-btn" onclick="event.stopPropagation();window.open('order.html','_blank')">অর্ডার</button>
         </div>`;
     }).join('') + '</div>';
 }
@@ -1604,7 +1649,7 @@ function renderOrders(orders, c) {
   document.getElementById('statOrders').textContent = orders.length;
   if (!orders.length) {
     el.innerHTML = `<div class="empty-state">কোনো অর্ডার নেই।<br>
-      <a href="dashboard.html" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
+      <a href="order.html" target="_blank" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
   }
   const statusMap = {
     pending:{cls:'os-pending',lbl:'অপেক্ষায়'},
