@@ -363,8 +363,8 @@ body{
 </div><!-- end page -->
 
 <script>
-const SUPABASE_URL = 'https://jvegmswznzwlaylieaqbo.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_NEW_ANON_KEY_HERE';
+const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
 const headers = {
   'apikey': SUPABASE_ANON_KEY,
@@ -442,9 +442,7 @@ async function loginWithPassword() {
     const customer = customers[0];
 
     // All registered users can login regardless of is_active
-    // Dashboard will show appropriate access level
-
-    // Optional password check if password_hash set
+    // Password check if hash exists
     if (customer.password_hash && password) {
       const entered = btoa(unescape(encodeURIComponent(password)));
       if (customer.password_hash !== entered) {
