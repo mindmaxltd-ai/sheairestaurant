@@ -274,15 +274,26 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
     <div class="login-form">
       <div class="field-wrap">
         <label class="field-label">ইউজার আইডি</label>
-        <input class="field-input" id="adminUser" type="text" placeholder="kaku">
+        <input class="field-input" id="adminUser" type="text" placeholder="mama" autocomplete="off">
       </div>
       <div class="field-wrap">
         <label class="field-label">পাসওয়ার্ড</label>
-        <input class="field-input" id="adminPass" type="password" placeholder="••••••••••"
-          onkeydown="if(event.key==='Enter')adminLogin()">
+        <div style="display:flex;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+          <input class="field-input" id="adminPass" type="password" placeholder="••••••••••"
+            onkeydown="if(event.key==='Enter')adminLogin()"
+            style="flex:1;background:none;border:none;border-radius:0">
+          <button type="button" onclick="toggleAdminPassEye()"
+            style="background:none;border:none;padding:0 .8rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.85rem">👁</button>
+        </div>
       </div>
       <div class="login-error" id="loginError">ভুল ইউজার আইডি বা পাসওয়ার্ড</div>
       <button class="login-btn" onclick="adminLogin()">লগইন করুন →</button>
+      <div style="text-align:center;margin-top:.85rem">
+        <a href="javascript:void(0)" onclick="resetAdminCreds()"
+          style="font-size:.68rem;color:rgba(255,255,255,.2);text-decoration:none;font-family:'Space Mono',monospace">
+          reset saved credentials
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -322,10 +333,23 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
     </div>
     <div class="sb-bottom">
       <div class="sb-user">
-        <div class="sb-avatar">T</div>
-        <div><div class="sb-user-name">Tutul</div><div class="sb-user-role">Super Admin</div></div>
+        <div class="sb-avatar" id="sbAvatar">T</div>
+        <div>
+          <div class="sb-user-name" id="sbUserName">Tutul</div>
+          <div class="sb-user-role" id="sbUserRole">Super Admin</div>
+        </div>
       </div>
-      <button class="sb-item" onclick="adminLogout()" style="color:rgba(239,68,68,.7)"><span class="sb-item-icon">🚪</span>লগআউট</button>
+      <!-- SAR Clinical Portal — opens new window, hint kaku but real user tutul -->
+      <a href="sar-portal.html" target="_blank" class="sb-item" style="text-decoration:none;color:rgba(52,211,153,.8)">
+        <span class="sb-item-icon">🩺</span>SAR ক্লিনিক্যাল পোর্টাল ↗
+      </a>
+      <!-- Change password — super admin only -->
+      <button class="sb-item super-admin-only" onclick="showSection('changepwd',this)" style="color:rgba(245,200,66,.7)">
+        <span class="sb-item-icon">🔐</span>পাসওয়ার্ড পরিবর্তন
+      </button>
+      <button class="sb-item" onclick="adminLogout()" style="color:rgba(239,68,68,.7)">
+        <span class="sb-item-icon">🚪</span>লগআউট
+      </button>
     </div>
   </nav>
 
@@ -600,8 +624,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <textarea class="field-input" rows="4" placeholder="আপনার বার্তা লিখুন..."></textarea>
           </div>
           <div style="display:flex;gap:.75rem">
-            <button class="topbar-btn primary" onclick="showToast('📱 WhatsApp বার্তা পাঠানো হয়েছে!')">📱 WhatsApp পাঠান</button>
-            <button class="topbar-btn ghost" onclick="showToast('📧 Email পাঠানো হয়েছে!')">📧 Email পাঠান</button>
+            <button class="topbar-btn primary" onclick="sendAdminWhatsApp()">📱 WhatsApp পাঠান</button>
+            <button class="topbar-btn ghost" onclick="sendAdminEmail()">📧 Email পাঠান</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -790,6 +814,58 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         </div>
       </div><!-- /sec-apikeys -->
 
+      <!-- ══ CHANGE PASSWORD (Super Admin only) ══ -->
+      <div class="section super-admin-only" id="sec-changepwd">
+        <div style="margin-bottom:1.5rem">
+          <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">Super Admin Only</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#fff">🔐 পাসওয়ার্ড পরিবর্তন</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:800px">
+          <!-- Admin password change -->
+          <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:16px;padding:1.4rem">
+            <div style="font-size:.82rem;font-weight:700;color:var(--yellow2);margin-bottom:1rem">👑 আমার পাসওয়ার্ড পরিবর্তন</div>
+            <div style="margin-bottom:.75rem">
+              <label class="field-label">বর্তমান পাসওয়ার্ড</label>
+              <div style="display:flex;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+                <input type="password" id="cpCurrent" placeholder="বর্তমান পাসওয়ার্ড" style="flex:1;background:none;border:none;padding:.6rem .85rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none">
+                <button onclick="togglePwdField('cpCurrent',this)" style="background:none;border:none;padding:0 .7rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.82rem">👁</button>
+              </div>
+            </div>
+            <div style="margin-bottom:.75rem">
+              <label class="field-label">নতুন পাসওয়ার্ড</label>
+              <div style="display:flex;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+                <input type="password" id="cpNew" placeholder="কমপক্ষে ৬ অক্ষর" style="flex:1;background:none;border:none;padding:.6rem .85rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none">
+                <button onclick="togglePwdField('cpNew',this)" style="background:none;border:none;padding:0 .7rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.82rem">👁</button>
+              </div>
+            </div>
+            <div style="margin-bottom:1rem">
+              <label class="field-label">নিশ্চিত করুন</label>
+              <div style="display:flex;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+                <input type="password" id="cpConfirm" placeholder="আবার লিখুন" style="flex:1;background:none;border:none;padding:.6rem .85rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none">
+                <button onclick="togglePwdField('cpConfirm',this)" style="background:none;border:none;padding:0 .7rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.82rem">👁</button>
+              </div>
+            </div>
+            <div id="cpMsg" style="font-size:.78rem;padding:.4rem .7rem;border-radius:8px;margin-bottom:.6rem;display:none"></div>
+            <button onclick="changeAdminPwd()" class="topbar-btn primary" style="width:100%">✅ পাসওয়ার্ড পরিবর্তন করুন</button>
+          </div>
+          <!-- Staff password reset -->
+          <div style="background:rgba(220,38,38,.05);border:1px solid rgba(220,38,38,.15);border-radius:16px;padding:1.4rem">
+            <div style="font-size:.82rem;font-weight:700;color:#F87171;margin-bottom:1rem">🔄 স্টাফ পাসওয়ার্ড রিসেট</div>
+            <div style="margin-bottom:.75rem">
+              <label class="field-label">স্টাফ নির্বাচন করুন</label>
+              <select id="staffResetSel" class="filter-select" style="width:100%;margin-top:.25rem">
+                <option value="">-- নির্বাচন করুন --</option>
+              </select>
+            </div>
+            <div style="margin-bottom:1rem">
+              <label class="field-label">নতুন পাসওয়ার্ড</label>
+              <input type="password" id="staffNewPwd" placeholder="নতুন পাসওয়ার্ড" class="field-input" style="margin-top:.25rem">
+            </div>
+            <button onclick="resetStaffPwd()" class="topbar-btn primary" style="width:100%;background:rgba(220,38,38,.6)">🔄 পাসওয়ার্ড রিসেট করুন</button>
+          </div>
+        </div>
+      </div><!-- /sec-changepwd -->
+
     </div><!-- .content -->
   </div><!-- .main -->
 
@@ -799,30 +875,40 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 <div class="modal-overlay" id="modal-addStaff">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">নতুন স্টাফ যোগ করুন</span>
+      <span class="modal-title">নতুন স্টাফ / অ্যাডমিন যোগ করুন</span>
       <button class="modal-close" onclick="closeModal('addStaff')">✕</button>
     </div>
     <div class="modal-body">
       <div class="modal-form">
-        <div class="field-wrap"><label class="field-label">নাম</label><input class="field-input" id="new-staff-name" placeholder="স্টাফের পূর্ণ নাম"></div>
-        <div class="field-wrap"><label class="field-label">ফোন</label><input class="field-input" id="new-staff-phone" placeholder="০১XXXXXXXXX"></div>
+        <div class="field-wrap"><label class="field-label">পূর্ণ নাম *</label><input class="field-input" id="new-staff-name" placeholder="স্টাফের পূর্ণ নাম"></div>
+        <div class="field-wrap"><label class="field-label">ফোন *</label><input class="field-input" id="new-staff-phone" placeholder="০১XXXXXXXXX"></div>
         <div class="field-wrap"><label class="field-label">ইমেইল</label><input class="field-input" id="new-staff-email" placeholder="email@example.com"></div>
         <div class="field-wrap">
-          <label class="field-label">ভূমিকা</label>
+          <label class="field-label">ভূমিকা *</label>
           <select class="filter-select" id="new-staff-role" style="width:100%">
-            <option value="admin">অ্যাডমিন</option>
             <option value="sar_dietitian">SAR ডায়েটিশিয়ান</option>
             <option value="sar_nutritionist">SAR পুষ্টিবিদ</option>
             <option value="kitchen_manager">কিচেন ম্যানেজার</option>
             <option value="floor_manager">ফ্লোর ম্যানেজার</option>
             <option value="rider">রাইডার</option>
             <option value="cashier">ক্যাশিয়ার</option>
+            <option value="admin">অ্যাডমিন</option>
+            <option value="super_admin">সুপার অ্যাডমিন ⚠️</option>
           </select>
         </div>
-        <div class="field-wrap"><label class="field-label">পাসওয়ার্ড</label><input class="field-input" id="new-staff-pass" type="password" placeholder="শক্তিশালী পাসওয়ার্ড"></div>
+        <div class="field-wrap">
+          <label class="field-label">পাসওয়ার্ড *</label>
+          <div style="display:flex;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+            <input type="password" id="new-staff-pass" placeholder="শক্তিশালী পাসওয়ার্ড" style="flex:1;background:none;border:none;padding:.6rem .85rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;outline:none">
+            <button onclick="togglePwdField('new-staff-pass',this)" type="button" style="background:none;border:none;padding:0 .7rem;cursor:pointer;color:rgba(255,255,255,.3);font-size:.82rem">👁</button>
+          </div>
+        </div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.3);padding:.4rem 0;line-height:1.5">
+          ⚠️ সুপার অ্যাডমিন ভূমিকায় সব features-এ প্রবেশাধিকার থাকবে। সতর্কতার সাথে যোগ করুন।
+        </div>
         <div class="modal-actions">
           <button class="topbar-btn ghost" onclick="closeModal('addStaff')">বাতিল</button>
-          <button class="topbar-btn primary" onclick="addStaff()">স্টাফ যোগ করুন</button>
+          <button class="topbar-btn primary" onclick="addStaff()">✅ যোগ করুন</button>
         </div>
       </div>
     </div>
@@ -835,12 +921,38 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 const SUPABASE_URL = 'https://xlkrggspepnysbouatec.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
-// ADMIN CREDENTIALS — from localStorage (set via API keys section) or hardcoded defaults
-const ADMIN_CREDS = JSON.parse(localStorage.getItem('sar_admin_creds') || JSON.stringify([
-  { user: 'kaku',           pass: 'aimthm@2008', role: 'super_admin', name: 'কাকু (Super Admin)' },
-  { user: 'sar_dietitian',  pass: 'sar2024',      role: 'sar_dietitian', name: 'SAR ডায়েটিশিয়ান' },
-  { user: 'sar_nutrition',  pass: 'sar2024',      role: 'sar_nutritionist', name: 'SAR নিউট্রিশনিস্ট' },
-]));
+// ══════════════════════════════════════════════
+// ADMIN CREDENTIALS — FIXED, CANNOT BE OVERRIDDEN
+// Real login: tutul / aimthm@2008
+// False hint on form: mama
+// ══════════════════════════════════════════════
+const HARDCODED_CREDS = [
+  { user:'tutul',         pass:'aimthm@2008', role:'super_admin',      name:'Tutul (Super Admin)' },
+  { user:'sar_dietitian', pass:'sar2024',      role:'sar_dietitian',    name:'SAR ডায়েটিশিয়ান' },
+  { user:'sar_nutrition', pass:'sar2024',      role:'sar_nutritionist', name:'SAR নিউট্রিশনিস্ট' },
+];
+
+// ALWAYS clear old bad localStorage credentials on page load
+// (This fixes the bug where old 'kaku' data blocked login)
+const _rawSaved = localStorage.getItem('sar_admin_creds');
+if(_rawSaved){
+  try{
+    const _parsed = JSON.parse(_rawSaved);
+    // If saved creds don't contain tutul, wipe them — they're corrupted
+    if(!_parsed.find(c=>c.user==='tutul')){
+      localStorage.removeItem('sar_admin_creds');
+      console.log('Admin creds reset: tutul was missing');
+    }
+  } catch(e){ localStorage.removeItem('sar_admin_creds'); }
+}
+
+// Load merged creds (hardcoded always win)
+function loadAdminCreds(){
+  let extras = [];
+  try{ extras = JSON.parse(localStorage.getItem('sar_admin_creds')||'[]').filter(c=>!HARDCODED_CREDS.find(h=>h.user===c.user)); } catch(e){}
+  return [...HARDCODED_CREDS, ...extras];
+}
+let ADMIN_CREDS = loadAdminCreds();
 
 let currentAdmin = null;
 let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
@@ -848,22 +960,40 @@ let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
 // Check if current user is super admin
 function isSuperAdmin(){ return currentAdmin?.role === 'super_admin'; }
 
-// Hide super-admin-only elements for non-super
+// Apply role-based UI access
 function applySuperAdminAccess(){
   document.querySelectorAll('.super-admin-only').forEach(el=>{
     el.style.display = isSuperAdmin() ? '' : 'none';
   });
-  // Show role badge
   const rb = document.getElementById('adminRoleBadge');
-  if(rb) rb.textContent = currentAdmin?.role === 'super_admin' ? '👑 Super Admin' : currentAdmin?.name || '';
+  if(rb) rb.textContent = isSuperAdmin() ? '👑 Super Admin' : (currentAdmin?.name || '');
+  // Update sidebar user info
+  const nameEl = document.getElementById('sbUserName');
+  const roleEl = document.getElementById('sbUserRole');
+  const avEl   = document.getElementById('sbAvatar');
+  if(nameEl) nameEl.textContent = currentAdmin?.name || 'Admin';
+  if(roleEl) roleEl.textContent = isSuperAdmin() ? 'Super Admin' : getRoleLabel(currentAdmin?.role || '');
+  if(avEl)   avEl.textContent   = (currentAdmin?.name || 'A')[0].toUpperCase();
 }
 
 // LOGIN
 function adminLogin() {
-  const u = document.getElementById('adminUser').value.trim();
-  const p = document.getElementById('adminPass').value;
+  // ALWAYS reload creds fresh to pick up any hardcoded fixes
+  ADMIN_CREDS = loadAdminCreds();
+
+  const u = (document.getElementById('adminUser').value || '').trim();
+  const p = (document.getElementById('adminPass').value || '');
+  const errEl = document.getElementById('loginError');
+
+  if(!u || !p){
+    errEl.textContent = '⚠️ ইউজার আইডি ও পাসওয়ার্ড দুটোই দিন।';
+    errEl.style.color = '#FCD34D';
+    errEl.classList.add('show'); return;
+  }
+
   const found = ADMIN_CREDS.find(c => c.user === u && c.pass === p);
-  if (found) {
+  if(found){
+    errEl.classList.remove('show');
     currentAdmin = found;
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('adminApp').style.display = 'flex';
@@ -871,9 +1001,17 @@ function adminLogin() {
     applySuperAdminAccess();
     loadAllData();
   } else {
-    document.getElementById('loginError').classList.add('show');
+    errEl.textContent = '❌ ভুল ইউজার আইডি বা পাসওয়ার্ড।';
+    errEl.style.color = '#F87171';
+    errEl.classList.add('show');
     document.getElementById('adminPass').value = '';
+    setTimeout(()=>errEl.classList.remove('show'), 5000);
   }
+}
+
+function toggleAdminPassEye(){
+  const el = document.getElementById('adminPass');
+  el.type = el.type==='password' ? 'text' : 'password';
 }
 
 function adminLogout() {
@@ -883,14 +1021,39 @@ function adminLogout() {
   currentAdmin = null;
 }
 
-// CHECK SESSION
+// Reset saved credentials — use if login not working
+function resetAdminCreds(){
+  localStorage.removeItem('sar_admin_creds');
+  sessionStorage.removeItem('sar_admin');
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('loginError').textContent = '✅ Credentials reset. Use: tutul / aimthm@2008';
+  document.getElementById('loginError').style.color = 'var(--green2)';
+  document.getElementById('loginError').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('loginError').style.color = '';
+  }, 5000);
+}
+
+// CHECK SESSION — restore if valid
 const saved = sessionStorage.getItem('sar_admin');
-if (saved) {
-  currentAdmin = JSON.parse(saved);
-  document.getElementById('loginOverlay').classList.add('hidden');
-  document.getElementById('adminApp').style.display = 'flex';
-  applySuperAdminAccess();
-  loadAllData();
+if(saved){
+  try{
+    ADMIN_CREDS = loadAdminCreds(); // reload fresh first
+    currentAdmin = JSON.parse(saved);
+    // Verify the saved session is still valid against current creds
+    const valid = ADMIN_CREDS.find(c => c.user === currentAdmin.user);
+    if(valid){
+      currentAdmin = valid; // use latest (in case password changed)
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('adminApp').style.display = 'flex';
+      applySuperAdminAccess();
+      loadAllData();
+    } else {
+      sessionStorage.removeItem('sar_admin');
+    }
+  } catch(e){ sessionStorage.removeItem('sar_admin'); }
 }
 
 // SUPABASE FETCH
@@ -933,11 +1096,11 @@ async function loadAllData() {
 
 // SAMPLE DATA
 const sampleCustomers = [
-  { id:'c1', member_id:'SAR-2026-104872', full_name:'নাসরিন আক্তার', phone:'01711234567', email:'nasrin@email.com', bmi:28.5, sar_category:'DM', monthly_sub_paid:true, monthly_sub_expiry_date:'2026-06-28', loyalty_points:450, is_active:true, created_at:'2026-01-15' },
-  { id:'c2', member_id:'SAR-2026-098321', full_name:'রাহেলা বেগম', phone:'01822345678', email:'rahela@email.com', bmi:32.1, sar_category:'OB', monthly_sub_paid:true, monthly_sub_expiry_date:'2026-07-10', loyalty_points:280, is_active:true, created_at:'2026-02-20' },
-  { id:'c3', member_id:'SAR-2026-087654', full_name:'ফাতেমা খানম', phone:'01933456789', email:'fatema@email.com', bmi:24.8, sar_category:'PR', monthly_sub_paid:false, monthly_sub_expiry_date:'2026-04-30', loyalty_points:120, is_active:false, created_at:'2026-03-05' },
-  { id:'c4', member_id:'SAR-2026-076543', full_name:'সাবিনা আক্তার', phone:'01644567890', email:'sabina@email.com', bmi:26.3, sar_category:'FL', monthly_sub_paid:true, monthly_sub_expiry_date:'2026-08-15', loyalty_points:890, is_active:true, created_at:'2026-01-28' },
-  { id:'c5', member_id:'SAR-2026-065432', full_name:'রোকেয়া বেগম', phone:'01555678901', email:'rokeya@email.com', bmi:22.7, sar_category:'IB', monthly_sub_paid:true, monthly_sub_expiry_date:'2026-06-01', loyalty_points:340, is_active:true, created_at:'2026-02-10' },
+  { id:'c1', member_id:'SAR-2026-104872', full_name:'নাসরিন আক্তার', phone:'01711234567', email:'nasrin@email.com', bmi:28.5, sar_category:'DM', monthly_sub_paid:true,  monthly_sub_expiry_date:'2026-06-28', loyalty_points:450, is_active:true,  admin_approved:true,  account_status:'active',              registration_fee_paid:true,  created_at:'2026-01-15' },
+  { id:'c2', member_id:'SAR-2026-098321', full_name:'রাহেলা বেগম',   phone:'01822345678', email:'rahela@email.com',  bmi:32.1, sar_category:'OB', monthly_sub_paid:false, monthly_sub_expiry_date:null,          loyalty_points:0,   is_active:false, admin_approved:false, account_status:'pending_payment',        registration_fee_paid:false, created_at:'2026-05-20' },
+  { id:'c3', member_id:'SAR-2026-087654', full_name:'ফাতেমা খানম',   phone:'01933456789', email:'fatema@email.com',  bmi:24.8, sar_category:'PR', monthly_sub_paid:false, monthly_sub_expiry_date:null,          loyalty_points:0,   is_active:false, admin_approved:true,  account_status:'pending_subscription',  registration_fee_paid:true,  created_at:'2026-05-22' },
+  { id:'c4', member_id:'SAR-2026-076543', full_name:'সাবিনা আক্তার', phone:'01644567890', email:'sabina@email.com',  bmi:26.3, sar_category:'FL', monthly_sub_paid:true,  monthly_sub_expiry_date:'2026-08-15', loyalty_points:890, is_active:true,  admin_approved:true,  account_status:'active',              registration_fee_paid:true,  created_at:'2026-01-28' },
+  { id:'c5', member_id:'SAR-2026-065432', full_name:'রোকেয়া বেগম',   phone:'01555678901', email:'rokeya@email.com',  bmi:22.7, sar_category:'IB', monthly_sub_paid:false, monthly_sub_expiry_date:null,          loyalty_points:0,   is_active:false, admin_approved:false, account_status:'pending_payment',        registration_fee_paid:false, created_at:'2026-05-28' },
 ];
 
 const sampleOrders = [
@@ -954,9 +1117,9 @@ const samplePayments = [
 ];
 
 let sampleStaff = JSON.parse(localStorage.getItem('sar_staff') || JSON.stringify([
-  { id:'s1', name:'কাকু (Admin)', email:'kaku@sar.com', phone:'01346098892', role:'super_admin', password:'aimthm@2008', is_active:true, last_login:'2026-05-28T09:00:00' },
-  { id:'s2', name:'ডাঃ সানজিদা', email:'sanjida@sar.com', phone:'01700000002', role:'sar_dietitian', password:'sar2024', is_active:true, last_login:'2026-05-28T08:30:00' },
-  { id:'s3', name:'কিচেন ম্যানেজার', email:'kitchen@sar.com', phone:'01700000003', role:'kitchen_manager', password:'kitchen2024', is_active:true, last_login:'2026-05-28T07:00:00' },
+  { id:'s1', name:'Tutul (Super Admin)', email:'tutul@sar.com',   phone:'01346098892', role:'super_admin',      password:'aimthm@2008', is_active:true, last_login:'2026-05-28T09:00:00' },
+  { id:'s2', name:'ডাঃ সানজিদা',       email:'sanjida@sar.com', phone:'01700000002', role:'sar_dietitian',    password:'sar2024',      is_active:true, last_login:'2026-05-28T08:30:00' },
+  { id:'s3', name:'কিচেন ম্যানেজার',    email:'kitchen@sar.com', phone:'01700000003', role:'kitchen_manager',  password:'kitchen2024',  is_active:true, last_login:'2026-05-28T07:00:00' },
 ]));
 
 // RENDER OVERVIEW
@@ -1030,69 +1193,156 @@ function renderCustomers(data) {
   const pendingCount = rows.filter(c => !c.admin_approved).length;
   if(pendingCount > 0){
     const existing = document.getElementById('pendingBanner');
-    if(!existing){
+    if(existing) existing.remove();
+    if(pendingCount > 0){
       const banner = document.createElement('div');
       banner.id = 'pendingBanner';
       banner.style.cssText = 'background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.75rem 1rem;margin-bottom:.85rem;font-size:.82rem;color:#FCD34D;display:flex;align-items:center;gap:.6rem';
-      banner.innerHTML = `⚠️ <strong>${pendingCount} জন গ্রাহক অনুমোদনের অপেক্ষায় আছেন।</strong> নিচে ✅ বাটনে ক্লিক করে পেমেন্ট যাচাই করুন।`;
+      banner.innerHTML = `⚠️ <strong>${pendingCount} জন গ্রাহক নিষ্ক্রিয়।</strong> ✅ সক্রিয় বাটনে ক্লিক করলে সব payment সম্পন্ন ধরা হবে এবং সব feature চালু হবে।`;
       document.getElementById('customersBody').parentElement.parentElement.prepend(banner);
     }
   }
   document.getElementById('customersBody').innerHTML = rows.map(c => {
-    const exp = c.monthly_sub_expiry_date ? new Date(c.monthly_sub_expiry_date) < new Date() : true;
-    const approved = c.admin_approved === true;
-    return `<tr style="${!approved?'background:rgba(245,158,11,.04)':''}">
-      <td style="font-family:'Space Mono',monospace;font-size:.75rem;color:var(--yellow2)">${c.member_id || '—'}</td>
-      <td>${c.full_name || '—'}</td>
-      <td>${c.phone || '—'}</td>
-      <td><span class="status-badge ${getCatClass(c.sar_category)}">${getCatLabel(c.sar_category)}</span></td>
-      <td style="font-family:'Space Mono',monospace">${c.bmi || '—'}</td>
+    const isActive = c.admin_approved === true && c.is_active !== false && c.account_status !== 'deactivated';
+    const exp      = c.monthly_sub_expiry_date ? new Date(c.monthly_sub_expiry_date) < new Date() : !isActive;
+
+    // Status badge
+    let badge, rowBg = '';
+    if(c.account_status === 'deactivated' || c.is_active === false && c.admin_approved){
+      badge  = `<span class="status-badge status-inactive" style="background:rgba(100,100,100,.15);border:1px solid rgba(150,150,150,.3);color:rgba(255,255,255,.4)">⛔ নিষ্ক্রিয়</span>`;
+      rowBg  = 'background:rgba(80,80,80,.04)';
+    } else if(!c.admin_approved){
+      badge  = `<span class="status-badge status-pending">⏳ নিষ্ক্রিয় (pending)</span>`;
+      rowBg  = 'background:rgba(233,30,140,.04)';
+    } else if(exp && isActive){
+      badge  = `<span class="status-badge status-expired">⚠️ মেয়াদোত্তীর্ণ</span>`;
+      rowBg  = 'background:rgba(245,158,11,.03)';
+    } else {
+      badge  = `<span class="status-badge status-paid">✅ সক্রিয় (সব চালু)</span>`;
+    }
+
+    // Buttons
+    let btns = '';
+    if(!isActive || c.account_status === 'deactivated'){
+      // Activate → assumes all payment done, unlocks everything
+      btns += `<button onclick="approveCustomer('${c.id}','${(c.full_name||'').replace(/'/g,"&#39;")}')"
+        style="background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2);
+        cursor:pointer;font-size:.72rem;border-radius:7px;padding:.28rem .7rem;font-weight:700;white-space:nowrap">
+        ✅ সক্রিয় করুন
+      </button>`;
+    } else {
+      // Deactivate
+      btns += `<button onclick="deactivateCustomer('${c.id}','${(c.full_name||'').replace(/'/g,"&#39;")}')"
+        style="background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.25);color:#F87171;
+        cursor:pointer;font-size:.72rem;border-radius:7px;padding:.28rem .55rem;white-space:nowrap">
+        ⏸️ নিষ্ক্রিয়
+      </button>`;
+      // Renew subscription
+      btns += `<button onclick="renewSubscription('${c.id}','${(c.full_name||'').replace(/'/g,"&#39;")}')"
+        style="background:rgba(107,33,168,.12);border:1px solid rgba(168,85,247,.25);color:var(--purple2);
+        cursor:pointer;font-size:.72rem;border-radius:7px;padding:.28rem .55rem;white-space:nowrap">
+        🔄 নবায়ন
+      </button>`;
+    }
+    btns += `<button onclick="viewCustomer('${c.id}')" style="background:none;border:none;color:var(--pink2);cursor:pointer;font-size:.78rem;padding:.2rem .35rem">👁</button>`;
+
+    return `<tr style="${rowBg}">
+      <td style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--yellow2)">${c.member_id || '—'}</td>
       <td>
-        <span class="status-badge ${approved ? (exp?'status-expired':'status-paid') : 'status-pending'}">
-          ${approved ? (exp?'মেয়াদোত্তীর্ণ':'সক্রিয়') : '⏳ অনুমোদন বাকি'}
-        </span>
+        <div style="font-weight:600;font-size:.85rem">${c.full_name || '—'}</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.3)">${c.phone || ''}</div>
       </td>
-      <td style="font-family:'Space Mono',monospace;color:var(--purple2)">${c.loyalty_points || 0}</td>
-      <td style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
-        ${!approved ? `
-        <button onclick="approveCustomer('${c.id}','${c.full_name}')"
-          style="background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2);
-          cursor:pointer;font-size:.72rem;border-radius:6px;padding:.25rem .6rem;white-space:nowrap;font-weight:700">
-          ✅ অনুমোদন
-        </button>` : ''}
-        <button onclick="viewCustomer('${c.id}')" style="background:none;border:none;color:var(--pink2);cursor:pointer;font-size:.78rem">বিস্তারিত</button>
-      </td>
+      <td><span class="status-badge ${getCatClass(c.sar_category)}">${getCatLabel(c.sar_category)}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:.78rem">${c.bmi || '—'}</td>
+      <td style="min-width:170px">${badge}</td>
+      <td style="font-family:'Space Mono',monospace;color:var(--purple2);font-size:.78rem">${c.loyalty_points || 0}</td>
+      <td><div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">${btns}</div></td>
     </tr>`;
   }).join('');
 }
 
+// ══ ACTIVATE — assumes ALL payment done, unlocks EVERYTHING ══
 async function approveCustomer(id, name){
-  if(!confirm(`${name} — পেমেন্ট যাচাই করে অ্যাকাউন্ট অনুমোদন করবেন?`)) return;
+  if(!confirm(`"${name}" কে সক্রিয় করবেন?\n\n✅ সব payment সম্পন্ন ধরা হবে\n✅ Registration fee: পরিশোধিত\n✅ Monthly subscription: সক্রিয়\n✅ সব features চালু হবে`)) return;
+
+  const now    = new Date().toISOString();
+  const expiry = new Date(); expiry.setDate(expiry.getDate() + 30);
+  const expStr = expiry.toISOString().split('T')[0];
+
+  // Full payload — mark everything as paid and active
+  const payload = {
+    admin_approved:        true,
+    is_active:             true,
+    account_status:        'active',
+    registration_fee_paid: true,
+    monthly_sub_paid:      true,
+    subscription_approved: true,
+    monthly_sub_expiry_date: expStr,
+    activated_at:          now,
+    updated_at:            now,
+  };
+
+  // Update local immediately
+  const c = allCustomers.find(x=>x.id===id);
+  if(c) Object.assign(c, payload);
+  renderCustomers();
+  showToast(`✅ ${name} — সক্রিয়! সব payment সম্পন্ন ধরা হয়েছে। সব feature চালু।`);
+
+  // Sync Supabase
   try {
-    // Update in Supabase
     await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${id}`, {
       method:'PATCH',
       headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,
         'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({
-        admin_approved: true,
-        account_status: 'active',
-        registration_fee_paid: true,
-        updated_at: new Date().toISOString()
-      })
+      body: JSON.stringify(payload)
     });
-    // Update local array
-    const c = allCustomers.find(x=>x.id===id);
-    if(c){ c.admin_approved=true; c.account_status='active'; c.registration_fee_paid=true; }
-    renderCustomers();
-    showToast(`✅ ${name} — অনুমোদিত! গ্রাহক এখন সব features ব্যবহার করতে পারবেন।`);
-  } catch(e) {
-    // Offline fallback
-    const c = allCustomers.find(x=>x.id===id);
-    if(c){ c.admin_approved=true; }
-    renderCustomers();
-    showToast(`✅ ${name} — অনুমোদিত (অফলাইন)`);
-  }
+    // Notify customer via WhatsApp
+    const phone = allCustomers.find(x=>x.id===id)?.phone;
+    if(phone){
+      const msg = `✅ *SAR সার — অ্যাকাউন্ট সক্রিয়!*\n\nপ্রিয় ${name},\n\nআপনার SAR অ্যাকাউন্ট সম্পূর্ণ সক্রিয় হয়েছে! 🎉\n\nএখন আপনি ব্যবহার করতে পারবেন:\n✅ মেনু ও অর্ডার\n✅ AI স্বাস্থ্য বিশ্লেষণ\n✅ দৈনিক থেরাপিউটিক মেনু\n✅ ক্লিনিক্যাল নোট\n\nলগইন করুন: sheairestaurant.com\n📞 01346098892`;
+      await fetch(`${SUPABASE_URL}/functions/v1/send-whatsapp`,{
+        method:'POST',
+        headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({to_phone:phone, custom_message:msg, customer_id:id})
+      }).catch(()=>{});
+    }
+  } catch(e){ console.warn('Supabase sync:', e); }
+}
+
+// ══ DEACTIVATE ══
+async function deactivateCustomer(id, name){
+  if(!confirm(`"${name}" কে নিষ্ক্রিয় করবেন?\nগ্রাহক login করতে পারবেন কিন্তু features ব্যবহার করতে পারবেন না।`)) return;
+  const payload = { is_active:false, account_status:'deactivated', updated_at:new Date().toISOString() };
+  const c = allCustomers.find(x=>x.id===id);
+  if(c) Object.assign(c, payload);
+  renderCustomers();
+  showToast(`⏸️ ${name} — নিষ্ক্রিয় করা হয়েছে।`);
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(payload)
+    });
+  } catch(e){}
+}
+
+// ══ RENEW SUBSCRIPTION ══
+async function renewSubscription(id, name){
+  if(!confirm(`"${name}" — সাবস্ক্রিপশন ১ মাস নবায়ন করবেন?`)) return;
+  const expiry = new Date(); expiry.setDate(expiry.getDate()+30);
+  const expStr = expiry.toISOString().split('T')[0];
+  const payload = { monthly_sub_paid:true, monthly_sub_expiry_date:expStr, updated_at:new Date().toISOString() };
+  const c = allCustomers.find(x=>x.id===id);
+  if(c) Object.assign(c, payload);
+  renderCustomers();
+  showToast(`🔄 ${name} — সাবস্ক্রিপশন নবায়ন হয়েছে (${expStr} পর্যন্ত)`);
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(payload)
+    });
+  } catch(e){}
 }
 
 function getCatClass(c) { return { DM:'status-pending', OB:'status-inactive', FL:'status-active', IB:'status-inactive', PR:'status-expired' }[c] || ''; }
@@ -1556,12 +1806,75 @@ function showSection(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + id)?.classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা', apikeys:'API Keys' };
+  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা', apikeys:'API Keys', changepwd:'পাসওয়ার্ড পরিবর্তন' };
   document.getElementById('pageTitle').textContent = titles[id] || id;
   if(id==='articles') renderArticleWriter();
   if(id==='inventory') renderInventory();
-  if(id==='apikeys'){ if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin এই section দেখতে পারেন।'); return; } loadApiKeys(); }
-  if(id==='settings' && !isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin সেটিংস পরিবর্তন করতে পারেন।'); return; }
+  if(id==='apikeys'){
+    if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin এই section দেখতে পারেন।'); return; }
+    loadApiKeys();
+  }
+  if((id==='settings'||id==='changepwd') && !isSuperAdmin()){
+    showToast('⛔ শুধুমাত্র Super Admin এই section ব্যবহার করতে পারেন।'); return;
+  }
+  if(id==='changepwd') populateStaffResetDropdown();
+}
+
+// ══ PASSWORD CHANGE HELPERS ══
+function togglePwdField(id, btn){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.type = el.type==='password' ? 'text' : 'password';
+  btn.textContent = el.type==='password' ? '👁' : '🙈';
+}
+
+function changeAdminPwd(){
+  const curr = document.getElementById('cpCurrent')?.value;
+  const nw   = document.getElementById('cpNew')?.value;
+  const conf = document.getElementById('cpConfirm')?.value;
+  const msg  = document.getElementById('cpMsg');
+  const show = (txt, ok) => {
+    msg.textContent = txt; msg.style.display = 'block';
+    msg.style.cssText += `;background:rgba(${ok?'5,150,105':'220,38,38'},.15);border:1px solid rgba(${ok?'52,211,153':'220,38,38'},.3);color:${ok?'#34D399':'#F87171'}`;
+  };
+  if(!curr||!nw||!conf){ show('⚠️ সব ঘর পূরণ করুন।', false); return; }
+  if(curr !== currentAdmin.pass){ show('❌ বর্তমান পাসওয়ার্ড ভুল।', false); return; }
+  if(nw.length < 6){ show('⚠️ নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।', false); return; }
+  if(nw !== conf){ show('❌ নতুন পাসওয়ার্ড দুটি মিলছে না।', false); return; }
+  // Update in ADMIN_CREDS array (in-memory)
+  const idx = ADMIN_CREDS.findIndex(c => c.user === currentAdmin.user);
+  if(idx > -1) ADMIN_CREDS[idx].pass = nw;
+  currentAdmin.pass = nw;
+
+  // Save ALL non-hardcoded creds + updated hardcoded to localStorage
+  // This ensures tutul password change is saved too
+  localStorage.setItem('sar_admin_creds', JSON.stringify(ADMIN_CREDS));
+  sessionStorage.setItem('sar_admin', JSON.stringify(currentAdmin));
+  ['cpCurrent','cpNew','cpConfirm'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  show('✅ পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!', true);
+  showToast('✅ পাসওয়ার্ড পরিবর্তন সম্পন্ন');
+}
+
+function populateStaffResetDropdown(){
+  const sel = document.getElementById('staffResetSel');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">-- স্টাফ নির্বাচন করুন --</option>' +
+    allStaff.filter(s=>s.role!=='super_admin').map(s=>
+      `<option value="${s.id}">${s.name} (${getRoleLabel(s.role)})</option>`
+    ).join('');
+}
+
+function resetStaffPwd(){
+  const id  = document.getElementById('staffResetSel')?.value;
+  const pwd = document.getElementById('staffNewPwd')?.value?.trim();
+  if(!id||!pwd){ showToast('⚠️ স্টাফ ও পাসওয়ার্ড দিন'); return; }
+  if(pwd.length < 4){ showToast('⚠️ পাসওয়ার্ড কমপক্ষে ৪ অক্ষর'); return; }
+  const s = allStaff.find(x=>x.id===id);
+  if(!s) return;
+  s.password = pwd;
+  localStorage.setItem('sar_staff', JSON.stringify(allStaff));
+  document.getElementById('staffNewPwd').value = '';
+  showToast(`✅ ${s.name}-এর পাসওয়ার্ড পরিবর্তন হয়েছে`);
 }
 
 // ─── API KEY HELPERS ───
@@ -1599,15 +1912,10 @@ function saveApiKeys(){
     if(el && el.value.trim()) data[storeKey] = btoa(el.value.trim());
   });
   localStorage.setItem(API_KEY_STORE, JSON.stringify(data));
-  // Also save to sar_settings for use by edge functions
-  const settings = JSON.parse(localStorage.getItem('sar_settings')||'{}');
-  Object.assign(settings, data);
-  localStorage.setItem('sar_settings', JSON.stringify(settings));
-  // Mark all as saved
   document.querySelectorAll('.api-input.changed').forEach(el=>el.classList.remove('changed'));
   const status = document.getElementById('apiSaveStatus');
   if(status){ status.style.display='inline'; setTimeout(()=>status.style.display='none', 3000); }
-  showToast('✅ API Keys সেভ হয়েছে! Edge Functions আপডেট করুন।');
+  showToast('✅ API Keys সেভ হয়েছে!');
 }
 
 // Helper: get saved API key
@@ -1666,6 +1974,81 @@ function saveSettings() {
   };
   localStorage.setItem('sar_settings', JSON.stringify(settings));
   showToast('✓ সেটিংস সেভ হয়েছে!');
+}
+
+// ── SEND WHATSAPP (uses Twilio API key from API Keys section) ──
+async function sendAdminWhatsApp(){
+  const msgEl = document.querySelector('#sec-notifications textarea');
+  const recipEl = document.querySelector('#sec-notifications select');
+  const msg = msgEl?.value?.trim();
+  if(!msg){ showToast('⚠️ বার্তা লিখুন'); return; }
+
+  const twilioSid   = getApiKey('TWILIO_SID');
+  const twilioToken = getApiKey('TWILIO_TOKEN');
+
+  if(!twilioSid || !twilioToken){
+    showToast('⚠️ Twilio API Key সেট করুন (API Keys section থেকে)', true);
+    return;
+  }
+
+  showToast('⏳ WhatsApp পাঠানো হচ্ছে...');
+
+  try {
+    // Send via Supabase Edge Function (preferred)
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-whatsapp`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recipient: recipEl?.value || 'সব সক্রিয় গ্রাহক',
+        custom_message: msg,
+        sent_by: 'admin'
+      })
+    });
+    if(r.ok){
+      showToast('✅ WhatsApp বার্তা পাঠানো হয়েছে!');
+      if(msgEl) msgEl.value = '';
+    } else {
+      const e = await r.text();
+      showToast('❌ WhatsApp পাঠানো যায়নি: ' + e.substring(0,80), true);
+    }
+  } catch(e) {
+    showToast('❌ Edge Function unavailable: ' + e.message, true);
+  }
+}
+
+// ── SEND EMAIL (uses Resend API key from API Keys section) ──
+async function sendAdminEmail(){
+  const msgEl = document.querySelector('#sec-notifications textarea');
+  const msg = msgEl?.value?.trim();
+  if(!msg){ showToast('⚠️ বার্তা লিখুন'); return; }
+
+  const resendKey = getApiKey('RESEND_KEY');
+  if(!resendKey){
+    showToast('⚠️ Resend Email API Key সেট করুন (API Keys section থেকে)', true);
+    return;
+  }
+
+  showToast('⏳ Email পাঠানো হচ্ছে...');
+
+  try {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        template: 'admin_broadcast',
+        message: msg,
+        sent_by: 'admin'
+      })
+    });
+    if(r.ok){
+      showToast('✅ Email পাঠানো হয়েছে!');
+      if(msgEl) msgEl.value = '';
+    } else {
+      showToast('❌ Email পাঠানো যায়নি। Edge Function চেক করুন।', true);
+    }
+  } catch(e) {
+    showToast('❌ Edge Function unavailable: ' + e.message, true);
+  }
 }
 
 // TOAST
