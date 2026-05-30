@@ -808,19 +808,22 @@ function getSession() {
   } catch(e) { console.warn('sar_customer parse error:', e); }
 
   const id = localStorage.getItem('sar_customer_id');
-  if (id && id !== 'undefined') {
+  if (id && id !== 'undefined' && id !== 'null') {
     const sc = {
       id,
-      full_name:     localStorage.getItem('sar_customer_name') || 'আপা',
-      member_id:     localStorage.getItem('sar_member_id') || '—',
-      phone:         localStorage.getItem('sar_phone') || '',
+      full_name:      localStorage.getItem('sar_customer_name') || 'আপা',
+      member_id:      localStorage.getItem('sar_member_id') || '—',
+      phone:          localStorage.getItem('sar_phone') || '',
+      membership_tier:localStorage.getItem('sar_membership_tier') || 'Basic',
+      monthly_sub_paid: localStorage.getItem('sar_sub_paid') === 'true',
       admin_approved: localStorage.getItem('sar_admin_approved') === 'true',
+      is_active:      localStorage.getItem('sar_admin_approved') === 'true',
     };
-    console.log('✅ Session from sar_customer_id:', id);
+    console.log('✅ Session from sar_customer_id:', id, sc.full_name);
     return sc;
   }
 
-  console.warn('❌ No session found. localStorage keys:', Object.keys(localStorage).join(', '));
+  console.warn('❌ No session found. All localStorage keys:', JSON.stringify(Object.keys(localStorage)));
   return null;
 }
 
@@ -852,10 +855,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Update UI with fresh Supabase data
     fillBasicUI(cust);
 
-    // Fully active check — try multiple sources
+    // Fully active = super admin activated (is_active=true AND admin_approved=true)
     const approved = (cust?.is_active === true && cust?.admin_approved === true) ||
-                     localStorage.getItem('sar_admin_approved') === 'true' ||
-                     (_session?.admin_approved === true && _session?.is_active === true);
+                     localStorage.getItem('sar_admin_approved') === 'true';
     const paidReg     = cust?.registration_fee_paid === true;
     const memApproved = cust?.admin_approved === true;
     const subApproved = cust?.is_active === true;
@@ -1380,18 +1382,15 @@ function renderMetrics(m, cust) {
 // CYCLE PHASE
 // ═══════════════════════════════════════
 function renderCyclePhase(m) {
-  const sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
-  const lastPeriod = m?.last_period_date || sc?.last_period_date || null;
-  const cycleLen   = parseInt(m?.cycle_length_days || sc?.cycle_length_days || 28);
-
-  if (!lastPeriod) {
+  if (!m || !m.last_period_date || !m.cycle_length_days) {
     document.getElementById('cycleInner').innerHTML =
       `<div style="padding:1.2rem;color:rgba(255,255,255,.38);font-size:.82rem;text-align:center">
-        মাসিক চক্রের তারিখ দিন → <a href="metrics.html" target="_blank" style="color:var(--pink2)">মেট্রিক্স আপডেট</a></div>`;
+        মাসিক চক্রের তারিখ দিন → <a href="metrics.html" style="color:var(--pink2)">মেট্রিক্স আপডেট</a></div>`;
     return;
   }
 
-  const last = new Date(lastPeriod);
+  const last = new Date(m.last_period_date);
+  const cycleLen = parseInt(m.cycle_length_days) || 28;
   const today = new Date();
   const dayInCycle = Math.floor((today - last) / 86400000) % cycleLen + 1;
   const pct = (dayInCycle / cycleLen * 100).toFixed(0);
@@ -1555,52 +1554,22 @@ async function triggerAnalysis() {
 // RENDER DAILY MENU
 // ═══════════════════════════════════════
 function renderDailyMenu(a, c) {
-  // Gate: admin_approved only (not monthly_sub_paid)
-  const isActive = (c && c.admin_approved === true) ||
-                   localStorage.getItem('sar_admin_approved') === 'true';
+  const isActive = c.monthly_sub_paid && c.monthly_sub_expiry_date &&
+    new Date(c.monthly_sub_expiry_date) > new Date();
 
   const el = document.getElementById('dailyMenuContent');
-  if (!el) return;
-
   if (!isActive) {
     el.innerHTML = `<div class="menu-locked">
       <div style="font-size:2rem;margin-bottom:.6rem">🔒</div>
-      <div style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:.85rem">Super Admin অনুমোদনের পরে আজকের মেনু দেখতে পাবেন।</div>
-      <a href="payment.html" style="color:var(--pink2);font-size:.82rem;text-decoration:none">পেমেন্ট করুন →</a>
+      <div style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:.85rem">সাবস্ক্রিপশন সক্রিয় করলে আজকের মেনু দেখতে পাবেন।</div>
+      <a href="payment.html" style="color:var(--pink2);font-size:.82rem;text-decoration:none">সাবস্ক্রাইব করুন →</a>
     </div>`; return;
   }
 
   if (!a || !a.daily_menu_recommendation_json) {
-    // Show default menu by disease category
-    const cat = (c && c.sar_category) || JSON.parse(localStorage.getItem('sar_customer')||'{}').sar_category || 'DM';
-    const defaults = {
-      DM:[{e:'🌅',n:'মেথি কুইনোয়া পরিজ',t:'সকাল',k:280,d:'রক্তে শর্করা নিয়ন্ত্রণ'},
-          {e:'☀️',n:'ঘি-পোচড চিকেন বাটি',t:'দুপুর',k:420,d:'প্রোটিন সমৃদ্ধ'},
-          {e:'🌙',n:'করলা মুগ ডাল স্যুপ', t:'রাত', k:310,d:'গ্লুকোজ নিয়ন্ত্রণ'}],
-      OB:[{e:'🌅',n:'প্রোটিন সিড পরিজ',   t:'সকাল',k:220,d:'মেটাবলিজম বাড়ায়'},
-          {e:'☀️',n:'রেইনবো ডিটক্স বাটি', t:'দুপুর',k:380,d:'ফ্যাট বার্ন'},
-          {e:'🌙',n:'মেটাবলিক সবুজ স্যুপ',t:'রাত', k:280,d:'হালকা ও পুষ্টিকর'}],
-      FL:[{e:'🌅',n:'হলুদ গোল্ডেন ব্রোথ', t:'সকাল',k:190,d:'লিভার পরিষ্কার'},
-          {e:'☀️',n:'লিভার ডেটক্স বাটি',  t:'দুপুর',k:350,d:'ALT কমায়'},
-          {e:'🌙',n:'ভৃঙ্গরাজ হিলিং বাটি',t:'রাত', k:290,d:'লিভার পুনরুদ্ধার'}],
-      IB:[{e:'🌅',n:'গাট-সুথ মর্নিং বাটি',t:'সকাল',k:240,d:'পেট শান্ত করে'},
-          {e:'☀️',n:'ফার্মেন্টেড কিচরি',  t:'দুপুর',k:360,d:'প্রোবায়োটিক সমৃদ্ধ'},
-          {e:'🌙',n:'প্রোবায়োটিক লাসি বাটি',t:'রাত',k:270,d:'গাট হেলথ'}],
-      PR:[{e:'🌅',n:'নারিশিং মামা বাটি',  t:'সকাল',k:320,d:'ফোলিক অ্যাসিড সমৃদ্ধ'},
-          {e:'☀️',n:'আয়রন স্পিনাচ বাটি',  t:'দুপুর',k:410,d:'মা ও শিশুর পুষ্টি'},
-          {e:'🌙',n:'ক্যালসিয়াম হিলিং স্যুপ',t:'রাত',k:350,d:'হাড় মজবুত করে'}],
-    };
-    const menu = defaults[cat] || defaults.DM;
-    el.innerHTML = '<div class="menu-grid">' + menu.map(m=>`
-      <div class="menu-item" onclick="window.open('order.html','_blank')">
-        <span class="menu-item-emoji">${m.e}</span>
-        <div class="menu-item-info">
-          <div class="menu-item-name">${m.n}</div>
-          <div class="menu-item-meta"><span>${m.d}</span><span class="menu-item-kcal">${m.k} kcal</span></div>
-        </div>
-        <span class="menu-item-type">${m.t}</span>
-        <button class="menu-order-btn" onclick="event.stopPropagation();window.open('order.html','_blank')">অর্ডার</button>
-      </div>`).join('') + '</div>'; return;
+    el.innerHTML = `<div class="empty-state" style="font-size:.82rem">
+      অ্যাডমিন আজকের মেনু নির্ধারণ করেননি।<br>
+      <a href="#" style="color:var(--pink2);margin-top:.4rem;display:inline-block">সম্পূর্ণ মেনু দেখুন →</a></div>`; return;
   }
 
   const menus = a.daily_menu_recommendation_json;
@@ -1638,7 +1607,7 @@ function renderOrders(orders, c) {
   document.getElementById('statOrders').textContent = orders.length;
   if (!orders.length) {
     el.innerHTML = `<div class="empty-state">কোনো অর্ডার নেই।<br>
-      <a href="order.html" target="_blank" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
+      <a href="dashboard.html" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
   }
   const statusMap = {
     pending:{cls:'os-pending',lbl:'অপেক্ষায়'},
