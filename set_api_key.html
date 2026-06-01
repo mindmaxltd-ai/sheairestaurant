@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>SAR API Key Setup</title>
+<style>
+body{font-family:'Segoe UI',sans-serif;background:#0a0a10;color:#fff;padding:2rem;max-width:600px;margin:0 auto}
+h2{color:#F5C842;margin-bottom:.5rem}
+p{color:rgba(255,255,255,.5);font-size:.88rem;margin-bottom:1.5rem}
+label{display:block;font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:.35rem;font-family:monospace}
+.row{display:flex;gap:.5rem;margin-bottom:1rem}
+input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:.65rem 1rem;color:#fff;font-size:.88rem;outline:none}
+input:focus{border-color:#F5C842}
+button{background:#E91E8C;border:none;border-radius:9px;padding:.65rem 1.25rem;color:#fff;font-size:.88rem;cursor:pointer;white-space:nowrap}
+button.sec{background:rgba(5,150,105,.8)}
+.msg{padding:.65rem 1rem;border-radius:9px;font-size:.85rem;margin-top:.5rem;display:none}
+.ok{background:rgba(5,150,105,.2);border:1px solid #34D399;color:#34D399}
+.err{background:rgba(220,38,38,.2);border:1px solid #F87171;color:#F87171}
+.saved{color:rgba(245,200,66,.6);font-size:.72rem;font-family:monospace;margin-top:.2rem}
+</style></head>
+<body>
+<h2>🔑 SAR API Key Setup</h2>
+<p>এখানে API Key দিন — সব page-এ কাজ করবে।</p>
+
+<label>Claude AI API Key (sk-ant-api03-...)</label>
+<div class="row">
+  <input type="password" id="claudeKey" placeholder="sk-ant-api03-...">
+  <button onclick="saveKey()">💾 Save</button>
+  <button class="sec" onclick="testKey()">▶ Test</button>
+</div>
+<div id="savedVal" class="saved"></div>
+<div class="msg" id="msg"></div>
+
+<script>
+const STORE = 'sar_api_keys_v1';
+
+// Show existing key
+window.onload = () => {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE)||'{}');
+    const k = s.CLAUDE_API_KEY ? atob(s.CLAUDE_API_KEY) : null;
+    if(k) {
+      document.getElementById('savedVal').textContent = '✅ Saved: ' + k.substring(0,20) + '...';
+    }
+  } catch(e){}
+};
+
+function saveKey() {
+  const key = document.getElementById('claudeKey').value.trim();
+  if(!key || !key.startsWith('sk-')) {
+    show('⚠️ সঠিক Claude API Key দিন (sk- দিয়ে শুরু হবে)', 'err'); return;
+  }
+  const data = JSON.parse(localStorage.getItem(STORE)||'{}');
+  data.CLAUDE_API_KEY = btoa(key);
+  localStorage.setItem(STORE, JSON.stringify(data));
+  document.getElementById('savedVal').textContent = '✅ Saved: ' + key.substring(0,20) + '...';
+  show('✅ Claude API Key সেভ হয়েছে! এখন dashboard-এ AI বিশ্লেষণ কাজ করবে।', 'ok');
+}
+
+async function testKey() {
+  const key = document.getElementById('claudeKey').value.trim() ||
+    (() => { try { const s=JSON.parse(localStorage.getItem(STORE)||'{}'); return s.CLAUDE_API_KEY?atob(s.CLAUDE_API_KEY):null; } catch(e){return null;} })();
+
+  if(!key) { show('⚠️ আগে Key দিন ও Save করুন', 'err'); return; }
+  show('⏳ Claude API test হচ্ছে...', 'ok');
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:50,
+        messages:[{role:'user',content:'Say "SAR AI কাজ করছে!" only.'}]
+      })
+    });
+    const d = await r.json();
+    if(r.ok) show('✅ Claude API কাজ করছে! Response: ' + d.content?.[0]?.text, 'ok');
+    else show('❌ API Error: ' + (d.error?.message || JSON.stringify(d)), 'err');
+  } catch(e) {
+    show('❌ ' + e.message, 'err');
+  }
+}
+
+function show(msg, cls) {
+  const el = document.getElementById('msg');
+  el.textContent = msg; el.className = 'msg ' + cls; el.style.display = 'block';
+}
+</script>
+</body></html>
