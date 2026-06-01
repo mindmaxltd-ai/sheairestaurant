@@ -808,22 +808,19 @@ function getSession() {
   } catch(e) { console.warn('sar_customer parse error:', e); }
 
   const id = localStorage.getItem('sar_customer_id');
-  if (id && id !== 'undefined' && id !== 'null') {
+  if (id && id !== 'undefined') {
     const sc = {
       id,
-      full_name:      localStorage.getItem('sar_customer_name') || 'আপা',
-      member_id:      localStorage.getItem('sar_member_id') || '—',
-      phone:          localStorage.getItem('sar_phone') || '',
-      membership_tier:localStorage.getItem('sar_membership_tier') || 'Basic',
-      monthly_sub_paid: localStorage.getItem('sar_sub_paid') === 'true',
+      full_name:     localStorage.getItem('sar_customer_name') || 'আপা',
+      member_id:     localStorage.getItem('sar_member_id') || '—',
+      phone:         localStorage.getItem('sar_phone') || '',
       admin_approved: localStorage.getItem('sar_admin_approved') === 'true',
-      is_active:      localStorage.getItem('sar_admin_approved') === 'true',
     };
-    console.log('✅ Session from sar_customer_id:', id, sc.full_name);
+    console.log('✅ Session from sar_customer_id:', id);
     return sc;
   }
 
-  console.warn('❌ No session found. All localStorage keys:', JSON.stringify(Object.keys(localStorage)));
+  console.warn('❌ No session found. localStorage keys:', Object.keys(localStorage).join(', '));
   return null;
 }
 
@@ -1507,69 +1504,125 @@ function renderAnalysis(a, c) {
 
 async function triggerAnalysis() {
   const el = document.getElementById('analysisContent');
-  if(el) el.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.45)">
-    <div style="width:32px;height:32px;border:2px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
-      border-radius:50%;animation:dashSpin .8s linear infinite;margin:0 auto .65rem"></div>
+  if(el) el.innerHTML = `<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.5)">
+    <div style="width:36px;height:36px;border:3px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
+      border-radius:50%;animation:dashSpin .8s linear infinite;margin:0 auto 1rem"></div>
     AI বিশ্লেষণ চলছে...</div>`;
 
-  const stored = JSON.parse(localStorage.getItem('sar_api_keys_v1')||'{}');
-  const claudeKey = stored.CLAUDE_API_KEY ? atob(stored.CLAUDE_API_KEY) : null;
+  const cust   = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const cat    = cust?.sar_category || 'DM';
+  const catMap = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+  const today  = new Date().toISOString().split('T')[0];
+  const dob    = cust?.date_of_birth ? new Date(cust.date_of_birth) : null;
+  const age    = dob ? Math.floor((new Date()-dob)/31557600000) : null;
+  const isBday = dob && dob.getDate()===new Date().getDate() && dob.getMonth()===new Date().getMonth();
+
+  const m = await fetchMetrics().catch(()=>({}));
+  const mStr = Object.entries(m)
+    .filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k))
+    .map(([k,v])=>`${k}: ${v}`).join(', ') || 'মেট্রিক্স পাওয়া যায়নি';
+
+  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI স্বাস্থ্য বিশ্লেষক।
+
+গ্রাহক: ${cust?.full_name||'SAR গ্রাহক'}, বয়স: ${age||'অজানা'}, রোগ: ${catMap[cat]||cat}
+${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
+মেট্রিক্স: ${mStr}
+
+নিচের JSON-এ বাংলায় উত্তর দাও (শুধু JSON):
+{
+  "health_score": 0থেকে100,
+  "analysis_bn": "৩-৪ বাক্যে স্বাস্থ্য মূল্যায়ন",
+  "problems": ["সমস্যা ১","সমস্যা ২"],
+  "solutions": ["সমাধান ১","সমাধান ২"],
+  "conventional_medicine": ["প্রচলিত ওষুধ Generic নাম ও ডোজ"],
+  "homeopathic": ["হোমিওপ্যাথিক পরামর্শ"],
+  "ayurvedic": ["আয়ুর্বেদিক পরামর্শ"],
+  "islamic_remedy": ["ইসলামিক/সুন্নাহ প্রতিকার"],
+  "food_remedies": ["খাবারভিত্তিক প্রতিকার"],
+  "recommendations": "সার্বিক পরামর্শ",
+  "dangers": "বিপদ সংকেত",
+  ${isBday?'"birthday_message": "জন্মদিনের বিশেষ বার্তা",':""}
+  "daily_menu_recommendation_json": {
+    "breakfast": {"name_bn":"নাস্তা","calories":280,"description_bn":"বর্ণনা"},
+    "lunch":     {"name_bn":"দুপুর","calories":400,"description_bn":"বর্ণনা"},
+    "dinner":    {"name_bn":"রাত", "calories":350,"description_bn":"বর্ণনা"}
+  }
+}`;
 
   const demo = {
-    customer_id: CID,
-    health_score: 62,
-    analysis_bn: 'আপনার স্বাস্থ্য মেট্রিক্স পর্যালোচনা করা হয়েছে। SAR থেরাপিউটিক মেনু অনুসরণ করুন এবং নিয়মিত মেট্রিক্স আপডেট করুন। Claude API Key সেট করলে সম্পূর্ণ ব্যক্তিগত বিশ্লেষণ পাবেন।',
-    recommendations: 'প্রতিদিন সকালে মেথি পানি পান করুন। হালকা ব্যায়াম করুন ৩০ মিনিট। রাতে ঘুমানোর আগে ত্রিফলা চূর্ণ সেবন করুন।',
-    analysis_date: new Date().toISOString().split('T')[0]
+    customer_id: CID, health_score: 60,
+    analysis_bn: 'Demo বিশ্লেষণ — Netlify deploy হলে real AI analysis দেখাবে।',
+    recommendations: 'SAR থেরাপিউটিক মেনু অনুসরণ করুন।',
+    daily_menu_recommendation_json: null, analysis_date: today
   };
 
-  if (claudeKey) {
-    try {
-      const m = await fetchMetrics();
-      const mStr = Object.entries(m).filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k)).map(([k,v])=>`${k}: ${v}`).join(', ')||'মেট্রিক্স পাওয়া যায়নি';
-      const cr = await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,
-          messages:[{role:'user',content:`SAR গ্রাহকের স্বাস্থ্য মেট্রিক্স: ${mStr}। বাংলায় JSON দাও: {"health_score":0-100,"analysis_bn":"৩-৪ বাক্য মূল্যায়ন","recommendations":"পরামর্শ"}`}]})
-      });
-      const cd = await cr.json();
-      const raw = cd.content?.[0]?.text||'{}';
-      const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
-      Object.assign(demo, parsed);
-    } catch(e) { console.warn('Claude API:', e); }
+  try {
+    const r = await fetch('/.netlify/functions/analyze', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prompt })
+    });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const d  = await r.json();
+    const raw = d.text || '{}';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { parsed = {health_score:65, analysis_bn: raw.substring(0,300)}; }
+    Object.assign(demo, parsed);
+    toast('✅ AI বিশ্লেষণ সম্পন্ন!', true);
+  } catch(e) {
+    console.warn('Netlify function error:', e.message);
+    toast('⚠️ ' + e.message + ' — Demo দেখাচ্ছে', false);
   }
 
+  // Save to Supabase
   try {
-    const r = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
-      method:'POST',headers:{...H,'Prefer':'return=representation'},
-      body:JSON.stringify(demo)
+    const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
+      method:'POST', headers:{...H,'Prefer':'return=representation'},
+      body: JSON.stringify(demo)
     });
-    const d = await r.json();
-    renderAnalysis(d[0]||demo, null);
-    toast(claudeKey?'✅ AI বিশ্লেষণ সম্পন্ন!':'💡 Demo বিশ্লেষণ সেভ হয়েছে। Claude API Key দিয়ে পূর্ণ বিশ্লেষণ পান।', claudeKey);
+    const d2 = await r2.json();
+    renderAnalysis(d2[0]||demo, null);
   } catch(e) { renderAnalysis(demo, null); }
 }
 // ═══════════════════════════════════════
 // RENDER DAILY MENU
 // ═══════════════════════════════════════
 function renderDailyMenu(a, c) {
-  const isActive = c.monthly_sub_paid && c.monthly_sub_expiry_date &&
-    new Date(c.monthly_sub_expiry_date) > new Date();
-
+  const isActive = (c && c.admin_approved===true) || localStorage.getItem('sar_admin_approved')==='true';
   const el = document.getElementById('dailyMenuContent');
-  if (!isActive) {
-    el.innerHTML = `<div class="menu-locked">
-      <div style="font-size:2rem;margin-bottom:.6rem">🔒</div>
-      <div style="font-size:.85rem;color:rgba(255,255,255,.45);margin-bottom:.85rem">সাবস্ক্রিপশন সক্রিয় করলে আজকের মেনু দেখতে পাবেন।</div>
-      <a href="payment.html" style="color:var(--pink2);font-size:.82rem;text-decoration:none">সাবস্ক্রাইব করুন →</a>
-    </div>`; return;
-  }
+  if(!el) return;
 
   if (!a || !a.daily_menu_recommendation_json) {
-    el.innerHTML = `<div class="empty-state" style="font-size:.82rem">
-      অ্যাডমিন আজকের মেনু নির্ধারণ করেননি।<br>
-      <a href="#" style="color:var(--pink2);margin-top:.4rem;display:inline-block">সম্পূর্ণ মেনু দেখুন →</a></div>`; return;
+    const cat = (c&&c.sar_category)||JSON.parse(localStorage.getItem('sar_customer')||'{}').sar_category||'DM';
+    const def = {
+      DM:[{e:'🌅',n:'মেথি কুইনোয়া পরিজ',t:'সকাল',k:280,d:'রক্তে শর্করা নিয়ন্ত্রণ'},
+          {e:'☀️',n:'ঘি-পোচড চিকেন বাটি',t:'দুপুর',k:420,d:'প্রোটিন সমৃদ্ধ'},
+          {e:'🌙',n:'করলা মুগ ডাল স্যুপ', t:'রাত', k:310,d:'গ্লুকোজ নিয়ন্ত্রণ'}],
+      OB:[{e:'🌅',n:'প্রোটিন সিড পরিজ',   t:'সকাল',k:220,d:'মেটাবলিজম বাড়ায়'},
+          {e:'☀️',n:'রেইনবো ডিটক্স বাটি', t:'দুপুর',k:380,d:'ফ্যাট বার্ন'},
+          {e:'🌙',n:'মেটাবলিক সবুজ স্যুপ',t:'রাত', k:280,d:'হালকা ও পুষ্টিকর'}],
+      FL:[{e:'🌅',n:'হলুদ গোল্ডেন ব্রোথ', t:'সকাল',k:190,d:'লিভার পরিষ্কার'},
+          {e:'☀️',n:'লিভার ডেটক্স বাটি',  t:'দুপুর',k:350,d:'ALT কমায়'},
+          {e:'🌙',n:'ভৃঙ্গরাজ হিলিং বাটি',t:'রাত', k:290,d:'লিভার পুনরুদ্ধার'}],
+      IB:[{e:'🌅',n:'গাট-সুথ মর্নিং বাটি',t:'সকাল',k:240,d:'পেট শান্ত করে'},
+          {e:'☀️',n:'ফার্মেন্টেড কিচরি',  t:'দুপুর',k:360,d:'প্রোবায়োটিক সমৃদ্ধ'},
+          {e:'🌙',n:'প্রোবায়োটিক লাসি',   t:'রাত', k:270,d:'গাট হেলথ'}],
+      PR:[{e:'🌅',n:'নারিশিং মামা বাটি',  t:'সকাল',k:320,d:'ফোলিক অ্যাসিড'},
+          {e:'☀️',n:'আয়রন স্পিনাচ বাটি',  t:'দুপুর',k:410,d:'মা ও শিশুর পুষ্টি'},
+          {e:'🌙',n:'ক্যালসিয়াম স্যুপ',   t:'রাত', k:350,d:'হাড় মজবুত'}],
+    };
+    const menu = def[cat]||def.DM;
+    el.innerHTML='<div class="menu-grid">'+menu.map(m=>`
+      <div class="menu-item" onclick="window.open('order.html','_blank')">
+        <span class="menu-item-emoji">${m.e}</span>
+        <div class="menu-item-info">
+          <div class="menu-item-name">${m.n}</div>
+          <div class="menu-item-meta"><span>${m.d}</span><span class="menu-item-kcal">${m.k} kcal</span></div>
+        </div>
+        <span class="menu-item-type">${m.t}</span>
+        <button class="menu-order-btn" onclick="event.stopPropagation();window.open('order.html','_blank')">অর্ডার</button>
+      </div>`).join('')+'</div>'; return;
   }
 
   const menus = a.daily_menu_recommendation_json;
@@ -1607,7 +1660,7 @@ function renderOrders(orders, c) {
   document.getElementById('statOrders').textContent = orders.length;
   if (!orders.length) {
     el.innerHTML = `<div class="empty-state">কোনো অর্ডার নেই।<br>
-      <a href="dashboard.html" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
+      <a href="order.html" target="_blank" style="color:var(--pink2);margin-top:.4rem;display:inline-block">প্রথম অর্ডার করুন →</a></div>`; return;
   }
   const statusMap = {
     pending:{cls:'os-pending',lbl:'অপেক্ষায়'},
