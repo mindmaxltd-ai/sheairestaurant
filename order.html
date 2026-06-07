@@ -580,7 +580,10 @@ textarea{resize:vertical;min-height:72px}
           </div>
 
           <div class="msg" id="m1"></div>
-          <button class="btn-primary" onclick="showInvoicePreview('preview')" id="nextBtn1">
+          <button class="btn-invoice-preview" onclick="showInvoicePreview('preview')">
+            🧾 Invoice Preview দেখুন (ঐচ্ছিক)
+          </button>
+          <button class="btn-primary" onclick="goToDelivery()" id="nextBtn1">
             পরবর্তী — ডেলিভারি তথ্য →
           </button>
         </div>
@@ -828,6 +831,9 @@ textarea{resize:vertical;min-height:72px}
             <strong>নিজে নিজে ওষুধ সেবন করবেন না।</strong>
           </div>
 
+          <button class="btn-invoice-preview" onclick="showInvoicePreview('step3')">
+            🧾 পেমেন্টের আগে Invoice দেখুন
+          </button>
           <div class="msg" id="m3"></div>
           <button class="btn-pay" onclick="processOrder()" id="payOrderBtn">
             🔒 পেমেন্ট করুন ও অর্ডার নিশ্চিত করুন —
@@ -940,8 +946,8 @@ textarea{resize:vertical;min-height:72px}
     <div class="inv-actions">
       <button class="inv-act-btn inv-act-close" onclick="closeInvoice()">✕ বন্ধ করুন</button>
       <button class="inv-act-btn inv-act-print" onclick="printInvoice()">🖨️ Print</button>
-      <button class="inv-act-btn inv-act-order" onclick="closeInvoice();goToPayment()">
-        ✓ OK — পেমেন্টে যান
+      <button class="inv-act-btn inv-act-order" onclick="closeInvoice()">
+        ✓ ঠিক আছে — বন্ধ করুন
       </button>
     </div>
 
@@ -986,8 +992,9 @@ if(!_orderApproved){
 let cart        = JSON.parse(localStorage.getItem('sar_cart') || '[]');
 let orderType   = 'dine_in';
 let payMethod   = 'bkash';
-let createdOrderId = null;
-let currentStep = 1;
+let createdOrderId    = null;
+let currentStep       = 1;
+let _savedOrderItems  = JSON.parse(localStorage.getItem('sar_last_order_items') || '[]');
 
 const CAT_EMOJI = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱'};
 const MEAL_LBL  = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
@@ -1401,7 +1408,9 @@ async function processOrder() {
       })
     });
 
-    // 7. Clear cart
+    // 7. Save items snapshot BEFORE clearing (for post-order invoice)
+    _savedOrderItems = JSON.parse(JSON.stringify(cart));
+    localStorage.setItem('sar_last_order_items', JSON.stringify(_savedOrderItems));
     localStorage.removeItem('sar_cart');
     localStorage.setItem('sar_last_order_id', order.id);
     localStorage.setItem('sar_last_order_num', orderNum);
@@ -1626,138 +1635,302 @@ function genInvNumber() {
   return 'SAR-INV-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
 }
 
-// ── Build invoice HTML for modal body ─────────────────
-function buildInvoiceHTML(invNum, previewOnly) {
-  const {sub, del, vat, grand} = calcTotals();
-  const cust  = JSON.parse(localStorage.getItem('sar_customer') || '{}');
-  const today = new Date().toLocaleDateString('bn-BD', {
-    year:'numeric', month:'long', day:'numeric'
-  });
+// ── Disease-specific benefits library ─────────────────────
+const DISEASE_BENEFITS = {
+  DM: { label:'ডায়াবেটিস', benefits:['রক্তে শর্করা নিয়ন্ত্রণ করে','ইনসুলিন সংবেদনশীলতা বাড়ায়','গ্লাইসেমিক ইনডেক্স কম'] },
+  OB: { label:'স্থূলতা',   benefits:['মেটাবলিজম ত্বরান্বিত করে','দীর্ঘ সময় পেট ভরা রাখে','ফ্যাট বার্ন সহায়তা করে'] },
+  FL: { label:'ফ্যাটি লিভার', benefits:['লিভার পরিষ্কার করে','ALT/AST কমাতে সাহায্য করে','অ্যান্টি-ইনফ্লামেটরি'] },
+  IB: { label:'IBS/গ্যাস্ট্রিক', benefits:['গাট হেলথ উন্নত করে','পেট ফাঁপা কমায়','প্রোবায়োটিক সমৃদ্ধ'] },
+  PR: { label:'গর্ভাবস্থা', benefits:['ফোলেট সমৃদ্ধ','আয়রন শোষণে সাহায্য করে','মা ও শিশু উভয়ের পুষ্টি'] },
+};
 
-  const DAILY_KCAL = 2000;
-  const DAILY_PRO  = 50;
+// ── Therapeutic herbs library ────────────────────────────
+const HERB_MAP = {
+  'মেথি':'রক্তে শর্করা নিয়ন্ত্রণ','হলুদ':'অ্যান্টি-ইনফ্লামেটরি',
+  'আদা':'হজম সহায়ক','করলা':'গ্লুকোজ কমায়','দারচিনি':'ইনসুলিন সংবেদনশীলতা',
+  'অশ্বগন্ধা':'স্ট্রেস হ্রাস','তুলসি':'ইমিউন বুস্টার','নিম':'রক্ত পরিষ্কার',
+  'ত্রিফলা':'অ্যান্টিঅক্সিডেন্ট','শিলাজিৎ':'শক্তি বৃদ্ধি',
+};
 
-  // Items table rows
-  const rows = cart.map((item, i) => {
-    const kcal    = parseInt(item.kcal) || 0;
+// ── Build full invoice HTML ────────────────────────────────
+function buildInvoiceHTML(invNum, items, mode) {
+  const cust   = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  const cat    = cust.sar_category || 'DM';
+  const catInfo = DISEASE_BENEFITS[cat] || DISEASE_BENEFITS.DM;
+  const today  = new Date().toLocaleDateString('bn-BD',
+    {year:'numeric', month:'long', day:'numeric'});
+  const now    = new Date().toLocaleTimeString('bn-BD',
+    {hour:'2-digit', minute:'2-digit'});
+
+  // Totals from items (works even if cart cleared)
+  const sub   = items.reduce((s,i) => s + (i.price * (i.qty||1)), 0);
+  const del   = orderType === 'delivery' ? 50 : 0;
+  const vat   = Math.round(sub * 0.05);
+  const grand = sub + del + vat;
+
+  // Daily reference values
+  const DAILY = { kcal:2000, protein:50, carb:260, fat:65, fiber:25, iron:18,
+                  calcium:1000, vd:600, folate:400, b12:2.4 };
+
+  // ── Item rows ────────────────────────────────────────────
+  const itemRows = items.map((item) => {
+    const qty     = item.qty || 1;
+    const price   = item.price * qty;
+    const kcal    = parseInt(item.kcal)    || 0;
     const protein = parseFloat(item.protein) || 0;
-    const pctKcal = kcal ? Math.round(kcal / DAILY_KCAL * 100) : 0;
-    const pctPro  = protein ? Math.round(protein / DAILY_PRO * 100) : 0;
-    const benefits = item.benefits || item.desc || 'থেরাপিউটিক ফুড';
-    return `<tr>
-      <td>
-        <div class="inv-item-name">${item.name || '—'}</div>
-        <div class="inv-item-nutr">⚡ ${kcal} kcal · 💪 ${protein}g protein</div>
-        <div class="inv-item-pct">দৈনিক চাহিদা: ${pctKcal}% ক্যালরি · ${pctPro}% প্রোটিন</div>
-        <div class="inv-item-benefit">✦ ${benefits}</div>
+    const carb    = parseFloat(item.carb)    || Math.round(kcal * 0.5 / 4);
+    const fat     = parseFloat(item.fat)     || Math.round(kcal * 0.3 / 9);
+    const fiber   = parseFloat(item.fiber)   || 3;
+
+    // % Daily Values
+    const pKcal   = kcal    ? Math.min(99, Math.round(kcal    / DAILY.kcal    * 100)) : 0;
+    const pProt   = protein ? Math.min(99, Math.round(protein / DAILY.protein * 100)) : 0;
+    const pCarb   = carb    ? Math.min(99, Math.round(carb    / DAILY.carb    * 100)) : 0;
+    const pFat    = fat     ? Math.min(99, Math.round(fat     / DAILY.fat     * 100)) : 0;
+    const pFib    = fiber   ? Math.min(99, Math.round(fiber   / DAILY.fiber   * 100)) : 0;
+
+    // Benefits
+    const itemBenefits = item.benefits || item.desc || catInfo.benefits.slice(0,2).join(' · ');
+    const herbs   = item.powders || item.herbs || '';
+    const mealMap = {breakfast:'🌅 সকাল', lunch:'☀️ দুপুর', dinner:'🌙 রাত'};
+    const mealLbl = mealMap[item.meal] || '';
+
+    // Blockchain verification URL
+    const bcUrl   = `blockchain.html?item=${encodeURIComponent(item.name || '')}`;
+
+    return `
+    <tr>
+      <td style="padding:10px">
+        <div style="font-weight:700;color:#111;font-size:13px;margin-bottom:3px">
+          ${item.name || '—'}
+          ${mealLbl ? `<span style="font-size:10px;color:#006A4E;font-weight:400;margin-left:6px">${mealLbl}</span>` : ''}
+        </div>
+
+        <!-- Nutrition Facts Mini Table -->
+        <table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:10.5px">
+          <tr style="background:#f0faf4">
+            <td style="padding:3px 5px;border:1px solid #dde"><b>ক্যালরি</b></td>
+            <td style="padding:3px 5px;border:1px solid #dde">${kcal} kcal</td>
+            <td style="padding:3px 5px;border:1px solid #dde;color:#E91E8C"><b>${pKcal}% DV</b></td>
+            <td style="padding:3px 5px;border:1px solid #dde"><b>প্রোটিন</b></td>
+            <td style="padding:3px 5px;border:1px solid #dde">${protein}g</td>
+            <td style="padding:3px 5px;border:1px solid #dde;color:#E91E8C"><b>${pProt}% DV</b></td>
+          </tr>
+          <tr>
+            <td style="padding:3px 5px;border:1px solid #dde">কার্বোহাইড্রেট</td>
+            <td style="padding:3px 5px;border:1px solid #dde">${carb}g</td>
+            <td style="padding:3px 5px;border:1px solid #dde;color:#666">${pCarb}% DV</td>
+            <td style="padding:3px 5px;border:1px solid #dde">ফ্যাট</td>
+            <td style="padding:3px 5px;border:1px solid #dde">${fat}g</td>
+            <td style="padding:3px 5px;border:1px solid #dde;color:#666">${pFat}% DV</td>
+          </tr>
+          <tr style="background:#f0faf4">
+            <td style="padding:3px 5px;border:1px solid #dde">ফাইবার</td>
+            <td style="padding:3px 5px;border:1px solid #dde">${fiber}g</td>
+            <td style="padding:3px 5px;border:1px solid #dde;color:#666">${pFib}% DV</td>
+            <td colspan="3" style="padding:3px 5px;border:1px solid #dde;color:#888;font-size:9.5px">
+              *% DV = দৈনিক চাহিদার শতাংশ (2000 kcal ভিত্তিক)
+            </td>
+          </tr>
+        </table>
+
+        <!-- Benefits -->
+        <div style="font-size:11px;color:#006A4E;margin-bottom:3px">
+          ✦ <b>উপকার:</b> ${itemBenefits}
+        </div>
+
+        ${herbs ? `<div style="font-size:10.5px;color:#6B21A8;margin-bottom:3px">
+          🌿 <b>Herbs/পাউডার:</b> ${herbs}
+        </div>` : ''}
+
+        <!-- Blockchain link -->
+        <div style="margin-top:4px">
+          <a href="${bcUrl}" target="_blank"
+            style="font-size:10px;color:#005BAA;text-decoration:none;
+            background:#e8f0fe;padding:2px 8px;border-radius:4px;border:1px solid #c5d6f5">
+            ⛓️ Blockchain যাচাই করুন →
+          </a>
+        </div>
       </td>
-      <td style="text-align:center">${item.qty || 1}</td>
-      <td style="text-align:right">৳${(item.price * (item.qty||1))}</td>
+      <td style="padding:10px;text-align:center;vertical-align:top;font-weight:700">${qty}</td>
+      <td style="padding:10px;text-align:right;vertical-align:top;font-weight:700;white-space:nowrap">৳${price}</td>
     </tr>`;
   }).join('');
 
-  // Payment links
+  // ── Condition powders summary ─────────────────────────────
+  const allPowders = [...new Set(
+    items.map(i => i.powders).filter(Boolean)
+      .join(',').split(',').map(s => s.trim()).filter(Boolean)
+  )];
+  const herbsSection = allPowders.length ? `
+    <div style="background:#f3e8ff;border:1px solid #d8b4fe;border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;font-size:11.5px">
+      <b style="color:#6B21A8">🌿 আজকের থেরাপিউটিক Herbs / পাউডার:</b>
+      <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:6px">
+        ${allPowders.map(h => `<span style="background:#6B21A8;color:#fff;
+          padding:2px 10px;border-radius:12px;font-size:10.5px">${h}
+          ${HERB_MAP[h] ? ' — '+HERB_MAP[h] : ''}</span>`).join('')}
+      </div>
+    </div>` : '';
+
+  // ── Disease category box ──────────────────────────────────
+  const diseaseBox = `
+    <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;font-size:11.5px">
+      <b style="color:#006A4E">🏥 আপনার বিভাগ: ${catInfo.label}</b>
+      <div style="margin-top:4px;color:#444">
+        ${catInfo.benefits.map(b => `<span style="margin-right:8px">✓ ${b}</span>`).join('')}
+      </div>
+    </div>`;
+
+  // ── Totals ────────────────────────────────────────────────
+  const totalKcal    = items.reduce((s,i) => s + (parseInt(i.kcal)||0)*(i.qty||1), 0);
+  const totalProtein = items.reduce((s,i) => s + (parseFloat(i.protein)||0)*(i.qty||1), 0).toFixed(1);
+  const pTotalKcal   = Math.round(totalKcal / DAILY.kcal * 100);
+
+  // ── AI suggestion ─────────────────────────────────────────
+  const ai = JSON.parse(localStorage.getItem('sar_last_analysis') || '{}');
+  const aiRec = ai.recommendations || ai.analysis_bn || '';
+
+  // ── Payment links ─────────────────────────────────────────
+  const orderNum = localStorage.getItem('sar_last_order_num') || '';
+  const payRef   = orderNum || invNum;
   const payLinks = [
-    {name:'bKash',    color:'#E2136E', url:'https://payment.bkash.com'},
-    {name:'Nagad',    color:'#F7921E', url:'https://nagad.com.bd'},
-    {name:'Rocket',   color:'#8B1A7E', url:'https://rocket.dutchbanglabank.com'},
+    {name:'bKash',    color:'#E2136E', url:'https://bkash.com', num:'01346098892'},
+    {name:'Nagad',    color:'#F7921E', url:'https://nagad.com.bd', num:'01346098892'},
+    {name:'Rocket',   color:'#8B1A7E', url:'https://rocket.dutchbanglabank.com', num:'01346098892'},
     {name:'ShurjoPay',color:'#FF6600', url:'https://shurjopay.com.bd'},
     {name:'SSL',      color:'#005BAA', url:'https://sslcommerz.com'},
-  ].map(p =>
-    `<a href="${p.url}" target="_blank" class="inv-pay-btn"
-      style="background:${p.color};color:#fff">${p.name}</a>`
-  ).join('');
-
-  // AI suggestion
-  const aiAnalysis = JSON.parse(localStorage.getItem('sar_last_analysis') || '{}');
-  const aiSuggestion = aiAnalysis.recommendations || aiAnalysis.analysis_bn || '';
+  ].map(p => `
+    <div style="text-align:center">
+      <a href="${p.url}" target="_blank" class="inv-pay-btn"
+        style="background:${p.color};color:#fff;display:block;margin-bottom:3px">${p.name}</a>
+      ${p.num ? `<div style="font-size:9.5px;color:#666">${p.num}</div>
+      <div style="font-size:9px;color:#999">Ref: ${payRef}</div>` : ''}
+    </div>`).join('');
 
   return `
-    <!-- Customer Info -->
+    <!-- Customer Info Row -->
     <div class="inv-cust-row">
       <div><span>গ্রাহক: </span><strong>${cust.full_name || CNAME}</strong></div>
-      <div><span>তারিখ: </span><strong>${today}</strong></div>
+      <div><span>তারিখ: </span><strong>${today} ${now}</strong></div>
       <div><span>সদস্য নং: </span><strong>${cust.member_id || '—'}</strong></div>
       <div><span>Invoice: </span><strong>#${invNum}</strong></div>
       <div><span>ফোন: </span><strong>${cust.phone || '—'}</strong></div>
-      <div><span>রোগ বিভাগ: </span><strong>${({DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'})[cust.sar_category] || '—'}</strong></div>
+      <div><span>বিভাগ: </span><strong>${catInfo.label}</strong></div>
     </div>
 
-    <!-- Items Table -->
+    ${diseaseBox}
+    ${herbsSection}
+
+    <!-- Items Table with full nutrition -->
     <table class="inv-table">
       <thead>
         <tr>
-          <th>খাবার · পুষ্টিমান · উপকার</th>
-          <th style="text-align:center;width:50px">পরিমাণ</th>
-          <th style="text-align:right;width:80px">মূল্য</th>
+          <th>খাবার · পুষ্টিমান · উপকার · Blockchain</th>
+          <th style="text-align:center;width:44px">পরিমাণ</th>
+          <th style="text-align:right;width:72px">মূল্য</th>
         </tr>
       </thead>
-      <tbody>${rows}</tbody>
+      <tbody>${itemRows}</tbody>
       <tfoot>
-        <tr><td colspan="2" style="text-align:right;padding:8px 10px">Subtotal:</td><td style="text-align:right;padding:8px 10px">৳${sub}</td></tr>
-        ${del > 0 ? `<tr><td colspan="2" style="text-align:right;padding:8px 10px">ডেলিভারি:</td><td style="text-align:right;padding:8px 10px">৳${del}</td></tr>` : ''}
-        <tr><td colspan="2" style="text-align:right;padding:8px 10px">VAT (৫%):</td><td style="text-align:right;padding:8px 10px">৳${vat}</td></tr>
+        <tr style="background:#f9f9f9">
+          <td colspan="3" style="padding:8px 10px;font-size:11px;color:#006A4E">
+            📊 <b>মোট পুষ্টিমান:</b> ${totalKcal} kcal (${pTotalKcal}% DV) · প্রোটিন ${totalProtein}g
+          </td>
+        </tr>
+        <tr><td colspan="2" style="text-align:right;padding:7px 10px;font-size:12px">Subtotal</td>
+            <td style="text-align:right;padding:7px 10px">৳${sub}</td></tr>
+        ${del>0 ? `<tr><td colspan="2" style="text-align:right;padding:7px 10px">ডেলিভারি</td>
+            <td style="text-align:right;padding:7px 10px">৳${del}</td></tr>` : ''}
+        <tr><td colspan="2" style="text-align:right;padding:7px 10px">VAT (৫%)</td>
+            <td style="text-align:right;padding:7px 10px">৳${vat}</td></tr>
         <tr class="inv-total-row">
-          <td colspan="2" style="text-align:right;padding:10px">সর্বমোট:</td>
+          <td colspan="2" style="text-align:right;padding:10px;font-size:14px">সর্বমোট</td>
           <td style="text-align:right;padding:10px;font-size:15px">৳${grand}</td>
         </tr>
-        <tr><td colspan="3" style="text-align:center;padding:5px;font-size:11px;color:#666">
-          মোট: ${grand} টাকা মাত্র (${grand} BDT)
+        <tr><td colspan="3" style="text-align:center;padding:5px;font-size:10.5px;color:#666">
+          ${grand} টাকা মাত্র · Ref: ${payRef}
         </td></tr>
       </tfoot>
     </table>
 
-    ${aiSuggestion ? `
-    <div class="inv-ai-box">
-      <strong style="color:#6B21A8">🤖 AI পরামর্শ:</strong> ${aiSuggestion}
+    ${aiRec ? `<div class="inv-ai-box">
+      <b style="color:#6B21A8">🤖 AI স্বাস্থ্য পরামর্শ:</b> ${aiRec}
     </div>` : ''}
+
+    <!-- Blockchain notice -->
+    <div style="background:#e8f0fe;border:1px solid #c5d6f5;border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;font-size:11px;color:#1a237e">
+      ⛓️ <b>Blockchain Transparency:</b> SAR-এর প্রতিটি উপাদান blockchain-এ রেকর্ড করা।
+      উৎস, প্রস্তুতি, প্যাকেজিং ও পরিবহনের ভিডিও যাচাই করুন।
+      <a href="blockchain.html" target="_blank" style="color:#E91E8C;font-weight:700">
+        → blockchain.html
+      </a>
+    </div>
 
     <!-- Payment Links -->
     <div class="inv-pay-section">
-      <div class="inv-pay-title">💳 পেমেন্ট করুন</div>
-      <div class="inv-pay-grid">${payLinks}</div>
-      <div style="margin-top:8px;font-size:11px;color:#888;text-align:center">
-        অথবা: <a href="payment.html" style="color:#E91E8C">sheairestaurant.com/payment.html</a>
+      <div class="inv-pay-title">💳 পেমেন্ট করুন — যেকোনো মাধ্যমে</div>
+      <div class="inv-pay-grid" style="grid-template-columns:repeat(5,1fr)">${payLinks}</div>
+      <div style="margin-top:8px;font-size:10.5px;color:#888;text-align:center">
+        বা সরাসরি:
+        <a href="payment.html" style="color:#E91E8C;font-weight:600">sheairestaurant.com/payment.html</a>
       </div>
     </div>
 
-    <div style="font-size:10.5px;color:#888;text-align:center;padding:8px 0;border-top:1px solid #eee">
+    <!-- Footer -->
+    <div style="font-size:10px;color:#999;text-align:center;padding:8px 0;border-top:1px solid #eee;line-height:1.7">
       SAR She AI Restaurant · Women-Led · Women-Run · For Women Only<br>
-      📞 01346098892 · mindmaxltd@gmail.com · sheairestaurant.com
+      📞 01346098892 · mindmaxltd@gmail.com · sheairestaurant.com<br>
+      <i>⚕️ এটি একটি থেরাপিউটিক ফুড সার্ভিস। চিকিৎসা প্রতিষ্ঠান নয়। যেকোনো স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন।</i>
     </div>
   `;
 }
 
-// ── Show Invoice Preview ────────────────────────────────
+// ── Show Invoice Preview ─────────────────────────────────
 function showInvoicePreview(mode) {
-  if (!cart.length) {
-    showMsg('m1', 'কার্ট খালি। মেনু থেকে আইটেম যোগ করুন।', 'err');
-    return;
+  // Decide which items to use
+  let items = [];
+  if (mode === 'after_order') {
+    // Use saved snapshot from before cart was cleared
+    items = _savedOrderItems.length ? _savedOrderItems
+          : JSON.parse(localStorage.getItem('sar_last_order_items') || '[]');
+    if (!items.length) {
+      toast('অর্ডার তথ্য পাওয়া যায়নি।');
+      return;
+    }
+  } else {
+    items = cart;
+    if (!items.length) {
+      const msgId = (mode === 'step3') ? 'm3' : 'm1';
+      showMsg(msgId, '❌ কার্ট খালি। মেনু থেকে আইটেম যোগ করুন।', 'err');
+      return;
+    }
+    // Invoice limit: max 2 previews per day if no order placed
+    if (!orderedToday()) {
+      const count = getInvCount();
+      if (count >= 2) {
+        const msgId = (mode === 'step3') ? 'm3' : 'm1';
+        showMsg(msgId,
+          '❌ আজকে ২টি invoice preview শেষ। Order করলে unlimited।', 'err');
+        return;
+      }
+      incInvCount();
+    }
   }
 
-  // Check invoice limit (max 2 per day if no order placed today)
-  const count = getInvCount();
-  if (!orderedToday() && count >= 2) {
-    showMsg('m1',
-      '❌ আজকে ২টি invoice preview করা হয়েছে। Order place করলে unlimited হবে।',
-      'err'
-    );
-    return;
-  }
-
-  const invNum = genInvNumber();
-  document.getElementById('invNumber').textContent = invNum;
-  document.getElementById('invBody').innerHTML = buildInvoiceHTML(invNum, true);
-
-  // Store current invoice number
+  // Generate invoice number
+  const invNum = (mode === 'after_order' && localStorage.getItem('sar_current_inv_num'))
+    ? localStorage.getItem('sar_current_inv_num')
+    : genInvNumber();
   localStorage.setItem('sar_current_inv_num', invNum);
 
-  // Open modal
+  // Build and show
+  document.getElementById('invNumber').textContent = invNum;
+  document.getElementById('invBody').innerHTML = buildInvoiceHTML(invNum, items, mode);
   document.getElementById('invOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-
-  // Count only if this is a preview (not after order)
-  if (mode === 'preview') incInvCount();
 }
 
 function closeInvoice() {
