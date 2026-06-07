@@ -130,6 +130,12 @@ body{background:#f0f0f0;margin:0;font-family:Arial,sans-serif}
   .pgbrk{page-break-before:always;margin-top:0}
   @page{size:A4;margin:6mm 8mm}
 }
+
+/* 3 courses in receipt items */
+.crs{display:flex;gap:4px;font-size:9.5px;margin:2px 0;line-height:1.4}
+.cn{color:#C2185B;font-weight:700;min-width:15px;font-family:'Space Mono',monospace;flex-shrink:0}
+.pwr{font-size:9px;color:#E65100;padding:2px 6px;background:rgba(230,81,0,.07);border-left:2px solid #FF8F00;margin:3px 0;border-radius:0 3px 3px 0}
+
 </style>
 </head>
 <body>
@@ -316,6 +322,11 @@ function buildOrderReceipt(ord,cust,ai,log,prev){
         <span class="iblk-price">৳${price}</span>
       </div>
       <div class="iblk-bd">
+        ${(md.c1||item.c1)?`<div class="crs"><span class="cn">১.</span><span>${md.c1||item.c1}</span></div>`:''}
+        ${(md.c2||item.c2)?`<div class="crs"><span class="cn">২.</span><span>${md.c2||item.c2}</span></div>`:''}
+        ${(md.c3||item.c3)?`<div class="crs"><span class="cn">৩.</span><span>${md.c3||item.c3}</span></div>`:''}
+        ${(item.powders||md.powders)?`<div class="pwr">💊 ${item.powders||md.powders}</div>`:''}
+        <div class="sep1"></div>
         <div class="nutr">${kc}kcal<span class="nutr-dv">(${pct(kc,DAILY.kcal)}%)</span> · Pro ${fmt(pr)}g<span class="nutr-dv">(${pct(pr,DAILY.protein)}%)</span> · Carb ${fmt(cb)}g · Fat ${fmt(ft)}g · Fiber ${fmt(fi)}g${fe>0?` · Fe ${fe}mg<span class="nutr-dv">(${pct(fe,DAILY.iron)}%)</span>`:''}${ca>0?` · Ca ${ca}mg`:''}${fo_val>0?` · Folate ${fo_val}µg<span class="nutr-dv">(${pct(fo_val,DAILY.folate)}%)</span>`:''}${vc_val>0?` · VitC ${vc_val}mg<span class="nutr-dv">(${pct(vc_val,DAILY.vitC)}%)</span>`:''}  <span class="nutr-dv">*%DV=2000kcal</span></div>
         <div class="ben">✦ ${catL}: ${ben}</div>
         ${note?`<div class="note">💡 ${note}</div>`:''}
@@ -405,18 +416,72 @@ function buildPaymentReceiptFallback(txn,cust,ai){
 // ══ PERSONALIZED MESSAGES ══
 function buildMsgs(cust,ai,log,prev,ds){
   const msgs=[],cat=cust.sar_category||'DM',catL=CAT[cat]||cat;
-  const hba1c=parseFloat(ai.hba1c||0),aiSc=ai.health_score||0,pcos=(ai.pcos_status||'');
-  if(ds<30)msgs.push({t:'g',pr:5,title:'🌸 SAR পরিবারে স্বাগতম!',body:`মাত্র ${ds} দিন। ৯০ দিনে পার্থক্য দেখবেন।`});
-  else msgs.push({t:'g',pr:4,title:'😊 খাবার কেমন লাগলো?',body:`SAR থেরাপিউটিক মেনু নিয়মিত খান।`});
-  if(cat==='DM')msgs.push(hba1c>7.5?{t:'r',pr:9,title:`🩸 HbA1c ${hba1c}% সতর্কতা`,body:`মেথি-করলা রুটিন মিস করবেন না। ডাক্তার দেখান।`}:{t:'g',pr:5,title:'💚 ডায়াবেটিস ম্যানেজমেন্ট',body:`SAR মেনু রক্তে শর্করা স্থিতিশীল রাখে।`});
-  else if(cat==='IB'&&log.stomach_upset)msgs.push({t:'r',pr:8,title:'🌿 গতকাল পেট খারাপ',body:`হালকা খাবার রাখুন। Gut Healing কিচরি অর্ডার করুন।`});
-  else if(cat==='PR')msgs.push({t:'p',pr:7,title:'🤱 গর্ভাবস্থার পুষ্টি',body:`ফোলেট, আয়রন, ক্যালসিয়াম আপনার সবচেয়ে দরকার।`});
-  else msgs.push({t:'g',pr:5,title:`💚 ${catL} ম্যানেজমেন্ট`,body:`SAR থেরাপিউটিক মেনু নিয়মিত খান।`});
-  if(pcos&&pcos!=='না')msgs.push({t:'r',pr:8,title:'⚠️ PCOS সচেতনতা',body:`PCOS থেকে অনিয়মিত মাসিক, মোটা হওয়া হতে পারে। SAR PCOS মেনু দেখুন।`});
-  if(log.period_today)msgs.push({t:'p',pr:9,title:'🌸 মাসিকে আয়রন দরকার',body:`পালং-ডাল বাটি অর্ডার করুন।`});
-  if(log.fever)msgs.push({t:'r',pr:9,title:'🌡️ জ্বরে হালকা খাবার',body:`Healing Broth অর্ডার করুন।`});
-  msgs.push(aiSc>0?{t:'g',pr:3,title:`📊 স্বাস্থ্য স্কোর ${aiSc}/100`,body:`নিয়মিত মেনু ও AI বিশ্লেষণ চালিয়ে যান।`}:{t:'g',pr:2,title:'✦ ১,০০০+ নারী SAR বেছে নিয়েছেন',body:`Blockchain-verified · Oil-free · AI-powered`});
-  return msgs.sort((a,b)=>b.pr-a.pr).slice(0,4);
+  const hba1c=parseFloat(ai.hba1c||cust.hba1c||0);
+  const aiSc=parseInt(ai.health_score||cust.health_score||0);
+  const pcos=(ai.pcos_status||cust.pcos_status||'');
+  const wt=parseFloat(cust.weight||0),ht=parseFloat(cust.height||0);
+  const bmi=ht>0?+(wt/(ht/100)**2).toFixed(1):0;
+  const h=new Date().getHours();
+  const nm=cust.full_name?.split(' ')[0]||'আপা';
+
+  // 1. Time-based greeting
+  const greet=h<12?'সুপ্রভাত':h<17?'শুভ অপরাহ্ন':'শুভ সন্ধ্যা';
+  msgs.push({t:'p',pr:10,title:`🌸 ${greet}, ${nm}!`,
+    body:`SAR-এর থেরাপিউটিক খাবার আপনার শরীরে পৌঁছে দেওয়া হচ্ছে। আল্লাহর রহমতে সুস্থ থাকুন।`});
+
+  // 2. First/returning visit
+  if(ds<1)msgs.push({t:'g',pr:9,title:'💫 প্রথম অর্ডার — ধন্যবাদ!',
+    body:`SAR-এ স্বাগতম! আপনার ${catL} থেরাপিউটিক যাত্রা শুরু হলো। ৩০ দিন নিয়মিত খেলে পার্থক্য বুঝবেন।`});
+  else if(ds<30)msgs.push({t:'g',pr:6,title:`🌱 ${ds} দিনের যাত্রা`,
+    body:`চমৎকার! প্রথম মাস সবচেয়ে গুরুত্বপূর্ণ। ${catL} রুটিন চালিয়ে যান।`});
+  else if(ds>=90)msgs.push({t:'g',pr:7,title:`⭐ ${ds} দিনের নিষ্ঠা`,
+    body:`আপনি SAR-এর অনুগত সদস্য। আপনার স্বাস্থ্যের উন্নতি হচ্ছে। ধন্যবাদ।`});
+  else msgs.push({t:'g',pr:4,title:'😊 নিয়মিত সদস্য',
+    body:`SAR পরিবারের সাথে থাকার জন্য ধন্যবাদ। আজকের থেরাপিউটিক মেনু উপভোগ করুন।`});
+
+  // 3. Disease-specific magic
+  if(cat==='DM'){
+    if(hba1c>7.5)msgs.push({t:'r',pr:9,title:`🩸 HbA1c ${hba1c}% — সতর্কতা!`,
+      body:`আপনার HbA1c বেশি। করলা গুঁড়া + মেথি রুটিন মিস করবেন না। ডাক্তারের সাথে দেখা করুন।`});
+    else if(hba1c>0)msgs.push({t:'g',pr:7,title:`💚 HbA1c ${hba1c}% — ভালো!`,
+      body:`আপনার রক্তে শর্করা নিয়ন্ত্রণে আছে। SAR মেনু + করলা রুটিন চালিয়ে যান।`});
+    else msgs.push({t:'g',pr:5,title:'💚 ডায়াবেটিস থেরাপিউটিক',
+      body:`আজকের Low-GI মেনু রক্তে শর্করা স্থিতিশীল রাখবে। মেথি গুঁড়া খেতে ভুলবেন না।`});
+  } else if(cat==='OB'){
+    if(bmi>25)msgs.push({t:'r',pr:8,title:`⚖️ BMI ${bmi} — ওজন নিয়ন্ত্রণ`,
+      body:`আজকের Low-calorie মেনু আপনার জন্য। ত্রিফলা ও সবুজ চা রুটিন মেনে চলুন।`});
+    else msgs.push({t:'g',pr:5,title:'✨ ওজন নিয়ন্ত্রণ থেরাপি',
+      body:`SAR Low-calorie থেরাপিউটিক মেনু আপনার মেটাবলিজম সক্রিয় রাখে।`});
+  } else if(cat==='FL'){
+    msgs.push({t:'v',pr:7,title:'🫀 লিভার ডিটক্স সেশন',
+      body:`আজকের হেপাটোপ্রোটেক্টিভ মেনু আপনার লিভার পরিষ্কার করছে। ভৃঙ্গরাজ রুটিন চালিয়ে যান।`});
+  } else if(cat==='IB'){
+    msgs.push({t:'g',pr:7,title:'🌿 গাট হিলিং সেশন',
+      body:`আজকের Low-FODMAP মেনু আপনার অন্ত্র প্রশমিত করবে। স্লিপারি এলম + পুদিনা রুটিন মেনে চলুন।`});
+  } else if(cat==='PR'){
+    msgs.push({t:'p',pr:9,title:'🤱 মা ও শিশুর পুষ্টি',
+      body:`আজকের মেনুতে প্রচুর ফোলেট, আয়রন, ক্যালসিয়াম। আপনার শিশু সুস্থভাবে বেড়ে উঠছে।`});
+  }
+
+  // 4. Special status
+  if(pcos&&pcos!=='না')msgs.push({t:'r',pr:8,title:'⚠️ PCOS সচেতনতা',
+    body:`PCOS নিয়ন্ত্রণে ইনসুলিন ব্যবস্থাপনা জরুরি। SAR Low-GI + হরমোন ব্যালেন্সিং মেনু সাহায্য করবে।`});
+  if(log&&log.period_today)msgs.push({t:'p',pr:9,title:'🌸 আজ মাসিক — আয়রন দরকার',
+    body:`পালং-ডাল বাটি বা PR আয়রন বাউল অর্ডার করুন। আদা-হলুদ চা ব্যথা কমাবে।`});
+  if(log&&log.fever)msgs.push({t:'r',pr:9,title:'🌡️ জ্বরে হালকা খাবার',
+    body:`আজ Healing Broth বা Gut Healing Kichuri অর্ডার করুন। প্রচুর পানি পান করুন।`});
+
+  // 5. Health score magic
+  if(aiSc>=80)msgs.push({t:'g',pr:6,title:`🏆 স্বাস্থ্য স্কোর ${aiSc}/100!`,
+    body:`চমৎকার! আপনার স্বাস্থ্য স্কোর অনেক ভালো। SAR থেরাপিউটিক রুটিন সফল হচ্ছে।`});
+  else if(aiSc>0)msgs.push({t:'g',pr:3,title:`📊 স্বাস্থ্য স্কোর ${aiSc}/100`,
+    body:`নিয়মিত থেরাপিউটিক মেনু ও AI বিশ্লেষণ চালিয়ে যান। ৯০ দিনে ৮০+ হবে।`});
+
+  // 6. Always: SAR credibility
+  msgs.push({t:'g',pr:2,title:'⭐ SAR Blockchain Verified',
+    body:`আপনার প্রতিটি উপাদান Blockchain-এ রেকর্ড। ১,০০০+ নারী SAR বেছে নিয়েছেন।`});
+
+  return msgs.sort((a,b)=>b.pr-a.pr).slice(0,5);
 }
 
 // ══ AUTO SEND ══
