@@ -603,14 +603,14 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <button class="sb-item active" onclick="showPanel('dashboard')">
         <span class="sb-item-icon">🏠</span>ড্যাশবোর্ড
       </button>
-      <a href="dashboard.html" class="sb-item">
+      <a href="menu.html" class="sb-item">
         <span class="sb-item-icon">🥗</span>আজকের মেনু
       </a>
-      <a href="dashboard.html" class="sb-item">
+      <a href="order.html" class="sb-item">
         <span class="sb-item-icon">🛒</span>অর্ডার করুন
         <span class="sb-badge" id="cartBadge" style="display:none">0</span>
       </a>
-      <a href="dashboard.html" class="sb-item">
+      <a href="track.html" class="sb-item">
         <span class="sb-item-icon">📍</span>অর্ডার ট্র্যাক
       </a>
 
@@ -621,12 +621,12 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <a href="metrics.html" class="sb-item">
         <span class="sb-item-icon">📊</span>স্বাস্থ্য মেট্রিক্স
       </a>
-      <a href="dashboard.html" class="sb-item">
+      <button class="sb-item" onclick="showPanel('ai-report')">
         <span class="sb-item-icon">🧾</span>রিসিট ও পরামর্শ
-      </a>
+      </button>
 
       <div class="sb-section">অ্যাকাউন্ট</div>
-      <a href="dashboard.html" class="sb-item">
+      <a href="metrics.html" class="sb-item">
         <span class="sb-item-icon">👤</span>আমার প্রোফাইল
       </a>
       <a href="payment.html" class="sb-item">
@@ -689,8 +689,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <div class="greet-sub">আপনার স্বাস্থ্য যাত্রার ড্যাশবোর্ড</div>
           </div>
           <div class="greet-right">
-            <a href="dashboard.html" class="hdr-btn primary">🥗 আজকের মেনু</a>
-            <a href="dashboard.html" class="hdr-btn">🛒 অর্ডার করুন</a>
+            <a href="menu.html" class="hdr-btn primary">🥗 আজকের মেনু</a>
+            <a href="order.html" class="hdr-btn">🛒 অর্ডার করুন</a>
           </div>
         </div>
       </div>
@@ -768,7 +768,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <div class="dcard menu-card" id="dailyMenuSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🥗</span>আজকের থেরাপিউটিক মেনু</span>
-              <a href="dashboard.html" class="dcard-action">সব দেখুন →</a>
+              <a href="menu.html" class="dcard-action">সব দেখুন →</a>
             </div>
             <div class="dcard-body" id="dailyMenuContent">
               <div class="empty-state">মেনু লোড হচ্ছে...</div>
@@ -779,7 +779,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <div class="dcard" id="ordersSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🛒</span>সাম্প্রতিক অর্ডার</span>
-              <a href="dashboard.html" class="dcard-action">নতুন অর্ডার →</a>
+              <a href="order.html" class="dcard-action">নতুন অর্ডার →</a>
             </div>
             <div class="dcard-body" id="recentOrdersContent">
               <div class="empty-state">অর্ডার লোড হচ্ছে...</div>
@@ -1333,6 +1333,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   } catch(e) { console.error(e); toast('❌ কিছু তথ্য লোড হয়নি।', false); }
   hideLoader();
+  // Background: pre-load today's log if exists
+  loadTodayLog().catch(()=>{});
 });
 
 // ─────────────────────────────────────
@@ -2198,8 +2200,16 @@ function showPanel(name) {
     if (el) el.style.display = name === p ? 'block' : 'none';
   });
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  // Highlight correct sidebar button
+  document.querySelectorAll('.sb-item').forEach(btn => {
+    const oc = btn.getAttribute('onclick') || '';
+    if (oc.includes("'" + name + "'")) btn.classList.add('active');
+  });
   // Auto-load reports when switching to report panel
   if (name === 'ai-report') loadAnalysisReports();
+  if (name === 'daily-input' || name === 'write-sar') {
+    setTimeout(() => window.scrollTo({top:0, behavior:'smooth'}), 100);
+  }
   closeSidebar();
 }
 
@@ -2324,6 +2334,10 @@ async function saveDailyLog() {
       headers: { ...H, 'Prefer': 'return=minimal' },
       body: JSON.stringify(data)
     });
+    if (r.status === 404) {
+      // Table হয়তো তৈরি হয়নি — Supabase SQL-এ CREATE TABLE চালান
+      throw new Error('daily_health_log table নেই। Supabase SQL রান করুন।');
+    }
     if (r.ok || r.status === 201) {
       toast('✅ আজকের আপডেট সংরক্ষিত হয়েছে! সকালে AI বিশ্লেষণে ব্যবহার হবে।', true);
       if (btn) { btn.textContent = '✅ Saved!'; btn.disabled = false; }
@@ -2588,7 +2602,7 @@ async function submitFeedback() {
         feedback_type: type
       })
     });
-
+    if (r.status === 404) throw new Error('customer_feedback table নেই।');
     if (r.ok || r.status === 201) {
       document.getElementById('feedbackText').value = '';
       toast('✅ আপনার বার্তা SAR-কে পাঠানো হয়েছে। ধন্যবাদ! 🙏', true);
@@ -2636,6 +2650,86 @@ function startVoiceInputFor(targetId) {
   };
 
   recognition.start();
+}
+
+
+// ── Pre-fill Daily Input form with today's saved data ──
+async function loadTodayLog() {
+  if (!CID) return;
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/daily_health_log?customer_id=eq.${CID}&log_date=eq.${today}&limit=1`,
+      { headers: H }
+    );
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d || !d[0]) return;
+    const log = d[0];
+
+    // Pre-fill checkboxes
+    const checks = {
+      di_fever: log.fever, di_cold: log.cold_cough,
+      di_stomach: log.stomach_upset, di_motion: log.loose_motion,
+      di_head: log.headache, di_pain: log.body_pain,
+      di_period: log.period_today, di_cramp: log.cramping
+    };
+    Object.entries(checks).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el && val) {
+        el.checked = true;
+        const lblId = 'lbl-' + id.replace('di_','').replace('_',' ').trim();
+        document.getElementById(lblId)?.classList.add('checked');
+      }
+    });
+
+    // Pre-fill text & numbers
+    const fields = {
+      di_fever_temp: log.fever_temp, di_mental: log.mental_condition,
+      di_stress: log.stress_level, di_cramp_level: log.cramping_level,
+      di_food: log.food_eaten, di_coffee: log.coffee_cups,
+      di_water: log.water_intake, di_drinks: log.drinks_taken,
+      di_food_pref: log.food_preference_today,
+      di_sleep: log.sleep_hours, di_sleep_q: log.sleep_quality,
+      di_notes: log.notes
+    };
+    Object.entries(fields).forEach(([id, val]) => {
+      if (val == null) return;
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+
+    // Range display values
+    if (log.stress_level) {
+      const sv = document.getElementById('stressVal');
+      if (sv) sv.textContent = log.stress_level;
+    }
+    if (log.cramping_level) {
+      const cv = document.getElementById('crampVal');
+      if (cv) cv.textContent = log.cramping_level;
+    }
+
+    // Mood
+    if (log.mood) {
+      document.querySelectorAll('.mood-pill').forEach(btn => {
+        if (btn.textContent.trim() === log.mood) {
+          btn.classList.add('selected');
+          _selectedMood = log.mood;
+        }
+      });
+    }
+
+    // Show fever temp row if fever checked
+    if (log.fever) {
+      const row = document.getElementById('feverTempRow');
+      if (row) row.style.display = 'flex';
+    }
+
+    // Update save btn to show "Update"
+    const btn = document.getElementById('saveLogBtn');
+    if (btn) btn.textContent = '🔄 আজকের আপডেট পরিবর্তন করুন';
+
+  } catch(e) { /* silent fail */ }
 }
 
 </script>
