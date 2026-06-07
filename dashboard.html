@@ -574,6 +574,175 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .new-panel .dcard{margin-bottom:1.25rem}
 .new-panel .dcard-body{padding:1.2rem 1.4rem}
 
+
+/* ══════════════════════════════════════════════
+   MODAL OVERLAY SYSTEM
+   ══════════════════════════════════════════════ */
+.sar-overlay{
+  position:fixed;inset:0;z-index:5000;
+  background:rgba(6,6,15,.82);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+  padding:1rem;
+}
+.sar-overlay.open{display:flex}
+
+.sar-modal{
+  background:#0F0F1A;border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;width:100%;max-width:640px;
+  max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+  animation:modalIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{
+  from{opacity:0;transform:scale(.93) translateY(16px)}
+  to  {opacity:1;transform:scale(1)   translateY(0)}
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.4rem .9rem;
+  border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;
+}
+.modal-title{
+  font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;gap:.55rem;color:#fff;
+}
+.modal-close{
+  background:rgba(255,255,255,.07);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(255,255,255,.6);
+  display:flex;align-items:center;justify-content:center;transition:all .25s;
+}
+.modal-close:hover{background:rgba(220,38,38,.2);color:#F87171}
+
+.modal-body{
+  flex:1;overflow-y:auto;padding:1.2rem 1.4rem;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+.modal-foot{
+  padding:.85rem 1.4rem;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;gap:.7rem;align-items:center;flex-shrink:0;
+}
+
+/* ── Profile rows ── */
+.p-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.p-row:last-child{border:none}
+.p-k{font-size:.78rem;color:rgba(255,255,255,.4)}
+.p-v{font-size:.82rem;color:#fff;font-weight:500;text-align:right;max-width:60%}
+.p-v.ok{color:#34D399}.p-v.warn{color:#F87171}.p-v.pend{color:#FCD34D}
+
+/* ── Modal form controls ── */
+.m-label{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);margin:.85rem 0 .4rem}
+.m-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);
+  border-radius:10px;padding:.65rem .9rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;outline:none;
+  transition:border-color .25s}
+.m-input:focus{border-color:var(--pink)}
+.m-textarea{resize:vertical;min-height:90px}
+
+/* ── Symptom checkboxes ── */
+.sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.4rem}
+.sym-cb{display:flex;align-items:center;gap:.5rem;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9px;padding:.45rem .7rem;transition:all .22s;
+  font-size:.82rem;color:rgba(255,255,255,.65)}
+.sym-cb:hover{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.06)}
+.sym-cb input{accent-color:var(--pink);width:15px;height:15px}
+.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:#fff}
+
+/* ── Mood pills ── */
+.mood-wrap{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.4rem}
+.m-mood{background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:18px;padding:.28rem .7rem;font-size:.8rem;cursor:pointer;
+  color:rgba(255,255,255,.55);transition:all .22s}
+.m-mood:hover{border-color:var(--pink);color:var(--pink2)}
+.m-mood.sel{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
+
+/* ── Range ── */
+.m-range-row{display:flex;align-items:center;gap:.7rem;margin-top:.3rem}
+.m-range-row input[type=range]{flex:1;accent-color:var(--pink)}
+.m-range-val{font-family:'Space Mono',monospace;font-size:.85rem;
+  font-weight:700;color:var(--pink2);min-width:22px;text-align:center}
+
+/* ── Voice button ── */
+.m-voice{display:flex;align-items:center;gap:.6rem;
+  background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.25);
+  border-radius:10px;padding:.6rem 1rem;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;font-size:.84rem;color:var(--pink2);
+  transition:all .25s;border-style:dashed}
+.m-voice:hover{background:rgba(233,30,140,.16)}
+.m-voice.rec{background:rgba(220,38,38,.15);border-color:var(--red2);
+  color:var(--red2);animation:mpulse .7s ease infinite;border-style:solid}
+@keyframes mpulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* ── Report cards ── */
+.rpt-card{background:rgba(255,255,255,.035);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:.7rem}
+.rpt-head{display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 1.1rem;cursor:pointer;transition:background .2s}
+.rpt-head:hover{background:rgba(255,255,255,.04)}
+.rpt-score{font-family:'Space Mono',monospace;font-size:.82rem;
+  font-weight:700;padding:.2rem .6rem;border-radius:50px}
+.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(255,255,255,.06);
+  font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.75;display:none}
+.rpt-card.open .rpt-body{display:block}
+.rpt-arrow{font-size:.65rem;color:rgba(255,255,255,.3);transition:transform .25s}
+.rpt-card.open .rpt-arrow{transform:rotate(180deg)}
+.rpt-section{margin-bottom:.75rem}
+.rpt-section-title{font-family:'Space Mono',monospace;font-size:.6rem;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);
+  margin-bottom:.4rem}
+.rpt-tags{display:flex;flex-direction:column;gap:.3rem}
+.rpt-tag{background:rgba(255,255,255,.04);border-radius:8px;
+  padding:.45rem .7rem;font-size:.8rem;color:rgba(255,255,255,.6)}
+.rpt-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.4rem}
+.rpt-meal{background:rgba(255,255,255,.04);border-radius:10px;
+  padding:.6rem .7rem;text-align:center}
+.rpt-meal-time{font-size:.65rem;color:rgba(255,255,255,.35);margin-bottom:.2rem}
+.rpt-meal-name{font-size:.78rem;color:#fff;font-weight:600;line-height:1.3}
+.rpt-meal-kcal{font-family:'Space Mono',monospace;font-size:.65rem;
+  color:var(--yellow2);margin-top:.2rem}
+
+/* ── Modal action btn ── */
+.m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
+  font-weight:700;cursor:pointer;transition:all .3s}
+.m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
+.m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
+.m-btn.outline{background:transparent;border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.65);flex:unset;padding:.7rem 1.2rem}
+.m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
+
+/* ── Profile avatar ── */
+.prof-avatar{width:68px;height:68px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;font-weight:700;flex-shrink:0;
+  box-shadow:0 0 20px rgba(233,30,140,.3)}
+.prof-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff}
+.prof-mid{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--pink2);margin-top:.1rem}
+.prof-tier{display:inline-block;margin-top:.3rem;background:rgba(245,158,11,.12);
+  border:1px solid rgba(245,158,11,.25);border-radius:50px;
+  padding:.15rem .65rem;font-size:.72rem;color:var(--yellow2)}
+.p-section-head{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.25);margin:1rem 0 .5rem;
+  padding-bottom:.3rem;border-bottom:1px solid rgba(255,255,255,.06)}
+
+/* ── Password status msg ── */
+.pw-msg{font-size:.82rem;min-height:1.1rem;margin:.4rem 0}
+.pw-msg.ok{color:#34D399}.pw-msg.err{color:#F87171}
+
+@media(max-width:480px){
+  .sar-modal{border-radius:16px 16px 0 0;max-height:92vh;margin-top:auto}
+  .sar-overlay{align-items:flex-end;padding:0}
+  .rpt-menu-grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
@@ -626,21 +795,21 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </a>
 
       <div class="sb-section">অ্যাকাউন্ট</div>
-      <button class="sb-item" onclick="showPanel('profile')">
+      <button class="sb-item" onclick="openModal('profile')">
         <span class="sb-item-icon">👤</span>আমার প্রোফাইল
       </button>
       <a href="payment.html" class="sb-item">
         <span class="sb-item-icon">💳</span>পেমেন্ট ও সাবস্ক্রিপশন
       </a>
-      <button class="sb-item" onclick="showPanel('change-password')">
+      <button class="sb-item" onclick="openModal('change-password')">
         <span class="sb-item-icon">🔑</span>পাসওয়ার্ড পরিবর্তন
       </button>
       <!-- ══ NEW SIDEBAR ITEMS ══ -->
       <div class="sb-section">আজকের আপডেট</div>
-      <button class="sb-item" onclick="showPanel('daily-input')">
+      <button class="sb-item" onclick="openModal('daily-input')">
         <span class="sb-item-icon">📝</span>আজকের অবস্থা লিখুন
       </button>
-      <button class="sb-item" onclick="showPanel('ai-report')">
+      <button class="sb-item" onclick="openModal('ai-report')">
         <span class="sb-item-icon">📋</span>AI রিপোর্ট দেখুন
       </button>
 
@@ -648,7 +817,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <a href="doctor.html" class="sb-item">
         <span class="sb-item-icon">👩‍⚕️</span>ডাক্তার পরামর্শ
       </a>
-      <button class="sb-item" onclick="showPanel('write-sar')">
+      <button class="sb-item" onclick="openModal('write-sar')">
         <span class="sb-item-icon">✍️</span>Write to SAR
       </button>
       <a href="blockchain.html" target="_blank" class="sb-item">
@@ -914,421 +1083,273 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </div>
 
 
-    <!-- ══════════════════════════════════════
-         NEW PANEL: Daily Health Input
-    ══════════════════════════════════════ -->
-    <div id="panel-daily-input" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">প্রতিরাতে পূরণ করুন</div>
-            <div class="greet-name">আজকের স্বাস্থ্য আপডেট</div>
-            <div class="greet-sub">এটা পূরণ করলে সকাল ৬টার AI বিশ্লেষণ আরও নির্ভুল হবে</div>
-          </div>
-          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-        </div>
-      </div>
-
-      <div class="new-panel">
-
-        <!-- Voice Input -->
-        <div class="dcard">
-          <div class="dcard-body">
-            <button class="voice-btn" id="voiceBtn" onclick="startVoiceInput()">
-              <span style="font-size:1.6rem">🎤</span>
-              <div>
-                <div style="font-weight:700">কণ্ঠে বলুন (বাংলায়)</div>
-                <div style="font-size:.76rem;opacity:.6">বাটনে click করুন তারপর বলুন — Chrome-এ কাজ করে</div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- শারীরিক অবস্থা -->
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">💊</span>আজকের শারীরিক অবস্থা</span>
-          </div>
-          <div class="dcard-body">
-            <div class="check-grid">
-              <label class="check-label" id="lbl-fever">
-                <input type="checkbox" id="di_fever" onchange="toggleCheck(this,'lbl-fever')">
-                🌡️ জ্বর আছে
-              </label>
-              <label class="check-label" id="lbl-cold">
-                <input type="checkbox" id="di_cold" onchange="toggleCheck(this,'lbl-cold')">
-                🤧 সর্দি / কাশি
-              </label>
-              <label class="check-label" id="lbl-stomach">
-                <input type="checkbox" id="di_stomach" onchange="toggleCheck(this,'lbl-stomach')">
-                🤢 পেট খারাপ
-              </label>
-              <label class="check-label" id="lbl-motion">
-                <input type="checkbox" id="di_motion" onchange="toggleCheck(this,'lbl-motion')">
-                💧 পাতলা পায়খানা
-              </label>
-              <label class="check-label" id="lbl-head">
-                <input type="checkbox" id="di_head" onchange="toggleCheck(this,'lbl-head')">
-                🤕 মাথাব্যথা
-              </label>
-              <label class="check-label" id="lbl-pain">
-                <input type="checkbox" id="di_pain" onchange="toggleCheck(this,'lbl-pain')">
-                😣 শরীর ব্যথা
-              </label>
-            </div>
-            <div id="feverTempRow" style="display:none;margin-top:.75rem;display:flex;align-items:center;gap:.7rem">
-              <label style="font-size:.82rem;color:rgba(255,255,255,.55)">তাপমাত্রা:</label>
-              <input type="number" id="di_fever_temp" placeholder="98.6" step="0.1"
-                class="sar-input" style="width:110px">
-              <span style="font-size:.8rem;color:rgba(255,255,255,.4)">°F</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- মাসিক চক্র -->
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">🌸</span>মাসিক চক্র</span>
-          </div>
-          <div class="dcard-body">
-            <div class="check-grid">
-              <label class="check-label" id="lbl-period">
-                <input type="checkbox" id="di_period" onchange="toggleCheck(this,'lbl-period')">
-                🌸 আজ মাসিক হয়েছে
-              </label>
-              <label class="check-label" id="lbl-cramp">
-                <input type="checkbox" id="di_cramp" onchange="toggleCheck(this,'lbl-cramp')">
-                😰 ব্যথা / cramping
-              </label>
-            </div>
-            <div style="margin-top:.9rem">
-              <div class="sec-head">ব্যথার মাত্রা</div>
-              <div class="range-row">
-                <input type="range" id="di_cramp_level" min="1" max="10" value="5"
-                  oninput="document.getElementById('crampVal').textContent=this.value">
-                <span class="range-val" id="crampVal">5</span>
-                <span style="font-size:.75rem;color:rgba(255,255,255,.35)">/10</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- মানসিক অবস্থা -->
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">🧠</span>মানসিক অবস্থা</span>
-          </div>
-          <div class="dcard-body">
-            <div class="sec-head">আজকের Mood</div>
-            <div class="mood-grid" id="moodGrid">
-              <button class="mood-pill" onclick="selectMood(this,'😊 ভালো')">😊 ভালো</button>
-              <button class="mood-pill" onclick="selectMood(this,'😐 মাঝারি')">😐 মাঝারি</button>
-              <button class="mood-pill" onclick="selectMood(this,'😔 খারাপ')">😔 খারাপ</button>
-              <button class="mood-pill" onclick="selectMood(this,'😰 দুশ্চিন্তায়')">😰 দুশ্চিন্তায়</button>
-              <button class="mood-pill" onclick="selectMood(this,'😡 রাগান্বিত')">😡 রাগান্বিত</button>
-              <button class="mood-pill" onclick="selectMood(this,'😴 ক্লান্ত')">😴 ক্লান্ত</button>
-            </div>
-            <div style="margin-top:.85rem">
-              <div class="sec-head">মানসিক অবস্থার বিবরণ</div>
-              <textarea id="di_mental" class="sar-input sar-textarea"
-                placeholder="আজকে কেমন লাগছে বলুন..."></textarea>
-            </div>
-            <div style="margin-top:.85rem">
-              <div class="sec-head">চাপের মাত্রা &nbsp;<span class="range-val" id="stressVal">5</span>/10</div>
-              <div class="range-row">
-                <input type="range" id="di_stress" min="1" max="10" value="5"
-                  oninput="document.getElementById('stressVal').textContent=this.value">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- খাবার ও পানীয় -->
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">🍽️</span>খাবার ও পানীয়</span>
-          </div>
-          <div class="dcard-body">
-            <div style="display:grid;gap:.75rem">
-              <div>
-                <div class="sec-head">আজকে কী খেয়েছেন</div>
-                <textarea id="di_food" class="sar-input sar-textarea" rows="2"
-                  placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
-                <div>
-                  <div class="sec-head">☕ কফি (কাপ)</div>
-                  <input type="number" id="di_coffee" min="0" max="20" value="0" class="sar-input">
-                </div>
-                <div>
-                  <div class="sec-head">💧 পানি (লিটার)</div>
-                  <input type="number" id="di_water" min="0" max="10" step="0.5" value="2" class="sar-input">
-                </div>
-              </div>
-              <div>
-                <div class="sec-head">অন্য পানীয় (চা, জুস, soft drink)</div>
-                <input type="text" id="di_drinks" class="sar-input" placeholder="কী পানীয় পান করেছেন...">
-              </div>
-              <div>
-                <div class="sec-head">আগামীকাল কী খেতে চান</div>
-                <input type="text" id="di_food_pref" class="sar-input" placeholder="পছন্দের খাবার লিখুন...">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ঘুম ও কার্যকলাপ -->
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">😴</span>ঘুম ও কার্যকলাপ</span>
-          </div>
-          <div class="dcard-body">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
-              <div>
-                <div class="sec-head">ঘুম (ঘণ্টা)</div>
-                <input type="number" id="di_sleep" min="0" max="24" step="0.5" value="7" class="sar-input">
-              </div>
-              <div>
-                <div class="sec-head">ঘুমের মান</div>
-                <select id="di_sleep_q" class="sar-input sar-select">
-                  <option value="ভালো">ভালো</option>
-                  <option value="মাঝারি" selected>মাঝারি</option>
-                  <option value="খারাপ">খারাপ</option>
-                </select>
-              </div>
-            </div>
-            <div style="margin-top:.75rem">
-              <div class="sec-head">অন্য কোনো তথ্য SAR-কে জানান</div>
-              <textarea id="di_notes" class="sar-input sar-textarea" rows="2"
-                placeholder="আর কিছু জানাতে চান?"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <button class="save-log-btn" id="saveLogBtn" onclick="saveDailyLog()">
-          💾 আজকের আপডেট Save করুন
-        </button>
-
-      </div><!-- end new-panel -->
-    </div><!-- end panel-daily-input -->
+    <!-- panel-daily-input removed — using modal -->
 
 
-    <!-- ══════════════════════════════════════
-         NEW PANEL: AI Analysis Reports
-    ══════════════════════════════════════ -->
-    <div id="panel-ai-report" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">শেষ ৭ দিনের রিপোর্ট</div>
-            <div class="greet-name">AI বিশ্লেষণ রিপোর্ট</div>
-            <div class="greet-sub">৭ দিনের পুরনো রিপোর্ট স্বয়ংক্রিয়ভাবে মুছে যায়</div>
-          </div>
-          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-        </div>
-      </div>
-      <div class="new-panel">
-        <div id="reportsList">
-          <div class="empty-state" style="padding:3rem">
-            <div style="font-size:2rem;margin-bottom:.75rem">📋</div>
-            রিপোর্ট লোড হচ্ছে...
-          </div>
-        </div>
-      </div>
-    </div><!-- end panel-ai-report -->
+    <!-- panel-ai-report removed — using modal -->
 
 
-    <!-- ══════════════════════════════════════
-         NEW PANEL: Doctor Consultation
-    ══════════════════════════════════════ -->
-    <div id="panel-doctor-consult" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">AI-চালিত চিকিৎসা পরামর্শ</div>
-            <div class="greet-name">ডাক্তার পরামর্শ</div>
-          </div>
-          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-        </div>
-      </div>
-      <div class="new-panel">
-
-        <div class="dcard">
-          <div class="dcard-body">
-            <div class="consult-fee-box">
-              <strong>💊 পরামর্শ ফি: ৳৭৫০/বার</strong><br>
-              পেমেন্টের পরে Super Admin approve করলে সক্রিয় হবে। আপনি পাবেন:
-              <ul class="consult-list">
-                <li>প্রচলিত ওষুধ (Generic নাম ও ডোজ)</li>
-                <li>হোমিওপ্যাথিক পরামর্শ</li>
-                <li>আয়ুর্বেদিক পরামর্শ ও herbs</li>
-                <li>ঘরোয়া প্রতিকার / কবিরাজি</li>
-                <li>ইসলামিক চিকিৎসা পরামর্শ</li>
-                <li>চিকিৎসাকালীন বিশেষ খাদ্য নির্দেশিকা</li>
-              </ul>
-            </div>
-
-            <div class="sec-head">আজকের লক্ষণ বিস্তারিত লিখুন</div>
-            <textarea id="consultSymptoms" class="sar-input sar-textarea" rows="4"
-              placeholder="আজকে কী সমস্যা হচ্ছে বিস্তারিত বলুন — যে কারণে বিশেষভাবে পরামর্শ চান..."></textarea>
-
-            <button class="consult-btn" onclick="startConsultation()">
-              👩‍⚕️ পরামর্শ শুরু করুন (৳৭৫০)
-            </button>
-          </div>
-        </div>
-
-        <!-- Prescription area -->
-        <div id="prescriptionOutput" style="display:none" class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">📄</span>AI প্রেসক্রিপশন</span>
-            <button class="dcard-action" onclick="printPrescription()">🖨️ Print</button>
-          </div>
-          <div class="dcard-body" id="prescriptionContent"></div>
-        </div>
-
-      </div>
-    </div><!-- end panel-doctor-consult -->
+    <!-- panel-doctor-consult removed — using modal -->
 
 
-    <!-- ══════════════════════════════════════
-         NEW PANEL: Write to SAR
-    ══════════════════════════════════════ -->
-    <div id="panel-write-sar" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">আপনার মতামত গুরুত্বপূর্ণ</div>
-            <div class="greet-name">Write to SAR</div>
-            <div class="greet-sub">মতামত, পরামর্শ বা যেকোনো কথা আমাদের জানান</div>
-          </div>
-          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-        </div>
-      </div>
-      <div class="new-panel">
-        <div class="dcard">
-          <div class="dcard-body">
-            <div class="sec-head">বিষয়</div>
-            <select id="feedbackType" class="feedback-type-select">
-              <option value="general">সাধারণ মতামত</option>
-              <option value="suggestion">পরামর্শ</option>
-              <option value="complaint">অভিযোগ</option>
-              <option value="appreciation">প্রশংসা</option>
-              <option value="idea">নতুন আইডিয়া</option>
-              <option value="other">অন্যান্য</option>
-            </select>
-
-            <div class="sec-head">আপনার বার্তা</div>
-            <textarea id="feedbackText" class="sar-input sar-textarea" rows="6"
-              placeholder="আপনার কথা লিখুন..."></textarea>
-
-            <div style="margin-top:.9rem;display:flex;gap:.75rem;align-items:center">
-              <button class="send-feedback-btn" onclick="submitFeedback()">
-                📨 পাঠান
-              </button>
-              <button class="voice-btn" style="flex:1" onclick="startVoiceInputFor('feedbackText')">
-                <span>🎤</span><span>কণ্ঠে বলুন</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- end panel-write-sar -->
+    <!-- panel-write-sar removed — using modal -->
 
 
 
     <!-- ══════════════════════════════════════
          PROFILE PANEL — আমার প্রোফাইল
     ══════════════════════════════════════ -->
-    <div id="panel-profile" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">আপনার তথ্য</div>
-            <div class="greet-name">আমার প্রোফাইল</div>
-          </div>
-          <div style="display:flex;gap:.6rem">
-            <a href="metrics.html" class="hdr-btn primary">📊 মেট্রিক্স আপডেট</a>
-            <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-          </div>
-        </div>
-      </div>
-      <div class="new-panel">
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">👤</span>ব্যক্তিগত তথ্য</span>
-          </div>
-          <div class="dcard-body" id="profileBasicData">
-            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
-          </div>
-        </div>
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">🏥</span>স্বাস্থ্য তথ্য</span>
-          </div>
-          <div class="dcard-body" id="profileHealthData">
-            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
-          </div>
-        </div>
-        <div class="dcard">
-          <div class="dcard-header">
-            <span class="dcard-title"><span class="dcard-title-icon">📋</span>সদস্যতা তথ্য</span>
-          </div>
-          <div class="dcard-body" id="profileMemberData">
-            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
-          </div>
-        </div>
-      </div>
-    </div><!-- end panel-profile -->
+    <!-- panel-profile → modal -->
 
 
     <!-- ══════════════════════════════════════
          CHANGE PASSWORD PANEL
     ══════════════════════════════════════ -->
-    <div id="panel-change-password" style="display:none">
-      <div class="dash-header">
-        <div class="greet-row">
-          <div class="greet-left">
-            <div class="greet-time">নিরাপত্তা</div>
-            <div class="greet-name">পাসওয়ার্ড পরিবর্তন</div>
-          </div>
-          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
-        </div>
-      </div>
-      <div class="new-panel">
-        <div class="dcard">
-          <div class="dcard-body">
-            <div style="display:grid;gap:1rem;max-width:440px">
-              <div>
-                <div class="sec-head">বর্তমান পাসওয়ার্ড</div>
-                <input type="password" id="pwCurrent" class="sar-input"
-                  placeholder="বর্তমান পাসওয়ার্ড দিন">
-              </div>
-              <div>
-                <div class="sec-head">নতুন পাসওয়ার্ড</div>
-                <input type="password" id="pwNew" class="sar-input"
-                  placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
-              </div>
-              <div>
-                <div class="sec-head">নতুন পাসওয়ার্ড নিশ্চিত করুন</div>
-                <input type="password" id="pwConfirm" class="sar-input"
-                  placeholder="আবার নতুন পাসওয়ার্ড দিন">
-              </div>
-              <div id="pwMsg" style="font-size:.82rem;min-height:1.2rem"></div>
-              <button onclick="changePassword()"
-                style="background:linear-gradient(135deg,var(--green),var(--purple));
-                border:none;border-radius:12px;padding:.9rem;color:#fff;
-                font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer">
-                🔑 পাসওয়ার্ড পরিবর্তন করুন
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- end panel-change-password -->
+    <!-- panel-change-password → modal -->
 
 
   </main>
+
+<!-- ════════════════════════════════════════════════════
+     SAR MODAL OVERLAY SYSTEM
+     ════════════════════════════════════════════════════ -->
+<div class="sar-overlay" id="sarOverlay" onclick="overlayClose(event)">
+
+  <!-- ── MODAL 1: আমার প্রোফাইল ── -->
+  <div class="sar-modal" id="modal-profile">
+    <div class="modal-head">
+      <div class="modal-title">👤 আমার প্রোফাইল</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="profileModalBody">
+      <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.35)">লোড হচ্ছে...</div>
+    </div>
+    <div class="modal-foot">
+      <a href="metrics.html" class="m-btn green" style="text-align:center;text-decoration:none">
+        📊 মেট্রিক্স আপডেট করুন
+      </a>
+      <button class="m-btn outline" onclick="openModal('change-password')">🔑 পাসওয়ার্ড</button>
+    </div>
+  </div>
+
+  <!-- ── MODAL 2: আজকের অবস্থা ── -->
+  <div class="sar-modal" id="modal-daily-input">
+    <div class="modal-head">
+      <div class="modal-title">📝 আজকের স্বাস্থ্য আপডেট</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Voice -->
+      <button class="m-voice" id="diVoiceBtn" onclick="mVoice('diNotes')">
+        <span style="font-size:1.4rem">🎤</span>
+        <div>
+          <div style="font-weight:700;font-size:.85rem">কণ্ঠে বলুন (বাংলায়)</div>
+          <div style="font-size:.72rem;opacity:.6">Click করুন তারপর বলুন — Chrome-এ কাজ করে</div>
+        </div>
+      </button>
+
+      <!-- শারীরিক লক্ষণ -->
+      <div class="m-label">💊 আজকের শারীরিক লক্ষণ</div>
+      <div class="sym-grid">
+        <label class="sym-cb" id="scb-fever">
+          <input type="checkbox" id="di2_fever" onchange="symToggle(this,'scb-fever')">🌡️ জ্বর
+        </label>
+        <label class="sym-cb" id="scb-cold">
+          <input type="checkbox" id="di2_cold" onchange="symToggle(this,'scb-cold')">🤧 সর্দি/কাশি
+        </label>
+        <label class="sym-cb" id="scb-stomach">
+          <input type="checkbox" id="di2_stomach" onchange="symToggle(this,'scb-stomach')">🤢 পেট খারাপ
+        </label>
+        <label class="sym-cb" id="scb-motion">
+          <input type="checkbox" id="di2_motion" onchange="symToggle(this,'scb-motion')">💧 পাতলা পায়খানা
+        </label>
+        <label class="sym-cb" id="scb-head">
+          <input type="checkbox" id="di2_head" onchange="symToggle(this,'scb-head')">🤕 মাথাব্যথা
+        </label>
+        <label class="sym-cb" id="scb-pain">
+          <input type="checkbox" id="di2_pain" onchange="symToggle(this,'scb-pain')">😣 শরীর ব্যথা
+        </label>
+      </div>
+      <div id="diFevrRow" style="display:none;margin-top:.5rem;display:flex;align-items:center;gap:.6rem">
+        <span style="font-size:.8rem;color:rgba(255,255,255,.5)">তাপমাত্রা:</span>
+        <input type="number" id="di2_temp" placeholder="98.6" step="0.1" class="m-input" style="width:100px">
+        <span style="font-size:.78rem;color:rgba(255,255,255,.35)">°F</span>
+      </div>
+
+      <!-- মাসিক -->
+      <div class="m-label">🌸 মাসিক চক্র</div>
+      <div class="sym-grid">
+        <label class="sym-cb" id="scb-period">
+          <input type="checkbox" id="di2_period" onchange="symToggle(this,'scb-period')">🌸 আজ মাসিক হয়েছে
+        </label>
+        <label class="sym-cb" id="scb-cramp">
+          <input type="checkbox" id="di2_cramp" onchange="symToggle(this,'scb-cramp')">😰 ব্যথা/cramping
+        </label>
+      </div>
+      <div style="margin-top:.6rem">
+        <div style="font-size:.76rem;color:rgba(255,255,255,.4)">ব্যথার মাত্রা</div>
+        <div class="m-range-row">
+          <input type="range" id="di2_clvl" min="1" max="10" value="5"
+            oninput="document.getElementById('diClVal').textContent=this.value">
+          <span class="m-range-val" id="diClVal">5</span>
+          <span style="font-size:.72rem;color:rgba(255,255,255,.3)">/10</span>
+        </div>
+      </div>
+
+      <!-- মানসিক -->
+      <div class="m-label">🧠 মানসিক অবস্থা</div>
+      <div class="mood-wrap" id="diMoodWrap">
+        <button class="m-mood" onclick="mMood(this,'😊 ভালো')">😊 ভালো</button>
+        <button class="m-mood" onclick="mMood(this,'😐 মাঝারি')">😐 মাঝারি</button>
+        <button class="m-mood" onclick="mMood(this,'😔 খারাপ')">😔 খারাপ</button>
+        <button class="m-mood" onclick="mMood(this,'😰 দুশ্চিন্তায়')">😰 দুশ্চিন্তায়</button>
+        <button class="m-mood" onclick="mMood(this,'😡 রাগান্বিত')">😡 রাগান্বিত</button>
+        <button class="m-mood" onclick="mMood(this,'😴 ক্লান্ত')">😴 ক্লান্ত</button>
+      </div>
+      <div style="margin-top:.6rem">
+        <div style="font-size:.76rem;color:rgba(255,255,255,.4)">চাপের মাত্রা</div>
+        <div class="m-range-row">
+          <input type="range" id="di2_stress" min="1" max="10" value="5"
+            oninput="document.getElementById('diStVal').textContent=this.value">
+          <span class="m-range-val" id="diStVal">5</span>
+          <span style="font-size:.72rem;color:rgba(255,255,255,.3)">/10</span>
+        </div>
+      </div>
+      <textarea id="di2_mental" class="m-input m-textarea" style="margin-top:.5rem"
+        placeholder="মানসিক অবস্থা বিস্তারিত বলুন..."></textarea>
+
+      <!-- খাবার -->
+      <div class="m-label">🍽️ আজকের খাবার ও পানীয়</div>
+      <textarea id="di2_food" class="m-input m-textarea"
+        placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem">
+        <div>
+          <div style="font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:.3rem">☕ কফি (কাপ)</div>
+          <input type="number" id="di2_coffee" min="0" max="20" value="0" class="m-input">
+        </div>
+        <div>
+          <div style="font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:.3rem">💧 পানি (লিটার)</div>
+          <input type="number" id="di2_water" min="0" max="10" step="0.5" value="2" class="m-input">
+        </div>
+      </div>
+      <input type="text" id="di2_drinks" class="m-input" style="margin-top:.5rem"
+        placeholder="পানীয় (চা, জুস, soft drink...)">
+
+      <!-- ঘুম -->
+      <div class="m-label">😴 ঘুম ও বিবিধ</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+        <div>
+          <div style="font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:.3rem">ঘুম (ঘণ্টা)</div>
+          <input type="number" id="di2_sleep" min="0" max="24" step="0.5" value="7" class="m-input">
+        </div>
+        <div>
+          <div style="font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:.3rem">ঘুমের মান</div>
+          <select id="di2_sleepq" class="m-input" style="background:#0F0F1A;cursor:pointer">
+            <option value="ভালো">ভালো</option>
+            <option value="মাঝারি" selected>মাঝারি</option>
+            <option value="খারাপ">খারাপ</option>
+          </select>
+        </div>
+      </div>
+      <textarea id="diNotes" class="m-input m-textarea" style="margin-top:.5rem"
+        placeholder="আর কিছু SAR-কে জানাতে চান?"></textarea>
+
+    </div><!-- end modal-body -->
+    <div class="modal-foot">
+      <span id="diStatus" style="font-size:.78rem;flex:1"></span>
+      <button class="m-btn outline" onclick="mVoice('diNotes')">🎤 কণ্ঠে</button>
+      <button class="m-btn" id="diSaveBtn" onclick="mSaveDailyLog()">💾 Save করুন</button>
+    </div>
+  </div><!-- end modal-daily-input -->
+
+  <!-- ── MODAL 3: Write to SAR ── -->
+  <div class="sar-modal" id="modal-write-sar">
+    <div class="modal-head">
+      <div class="modal-title">✍️ Write to SAR</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.83rem;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:1rem">
+        আপনার মতামত, পরামর্শ, অভিযোগ বা যেকোনো কথা আমাদের জানান।
+        আমরা প্রতিটি বার্তা পড়ি। 🙏
+      </p>
+
+      <button class="m-voice" id="sarVoiceBtn" onclick="mVoice('sarText')">
+        <span style="font-size:1.3rem">🎤</span>
+        <div>
+          <div style="font-weight:700;font-size:.85rem">কণ্ঠে বলুন</div>
+          <div style="font-size:.72rem;opacity:.6">Click করুন → বলুন → text হয়ে যাবে</div>
+        </div>
+      </button>
+
+      <div class="m-label" style="margin-top:.9rem">বিষয়</div>
+      <select id="sarType" class="m-input" style="background:#0F0F1A;cursor:pointer">
+        <option value="general">সাধারণ মতামত</option>
+        <option value="suggestion">পরামর্শ</option>
+        <option value="complaint">অভিযোগ</option>
+        <option value="appreciation">প্রশংসা</option>
+        <option value="idea">নতুন আইডিয়া</option>
+        <option value="food_feedback">খাবারের মতামত</option>
+        <option value="service_feedback">সেবার মতামত</option>
+      </select>
+
+      <div class="m-label">আপনার বার্তা</div>
+      <textarea id="sarText" class="m-input m-textarea" rows="5"
+        placeholder="আপনার কথা লিখুন অথবা উপরের মাইক বাটনে click করে কণ্ঠে বলুন..."></textarea>
+
+    </div>
+    <div class="modal-foot">
+      <span id="sarStatus" style="font-size:.78rem;flex:1"></span>
+      <button class="m-btn" onclick="mSubmitFeedback()">📨 পাঠান</button>
+    </div>
+  </div><!-- end modal-write-sar -->
+
+  <!-- ── MODAL 4: AI রিপোর্ট ── -->
+  <div class="sar-modal" id="modal-ai-report">
+    <div class="modal-head">
+      <div class="modal-title">📋 AI স্বাস্থ্য রিপোর্ট</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="aiReportBody">
+      <div style="text-align:center;padding:2rem;color:rgba(255,255,255,.35)">
+        <div style="font-size:1.8rem;margin-bottom:.5rem">📋</div>
+        রিপোর্ট লোড হচ্ছে...
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span style="font-size:.74rem;color:rgba(255,255,255,.3)">শেষ ৭ দিনের রিপোর্ট · স্বয়ংক্রিয়ভাবে মুছে যায়</span>
+      <button class="m-btn outline" onclick="mLoadReports()">🔄 রিফ্রেশ</button>
+    </div>
+  </div><!-- end modal-ai-report -->
+
+  <!-- ── MODAL 5: পাসওয়ার্ড পরিবর্তন ── -->
+  <div class="sar-modal" id="modal-change-password">
+    <div class="modal-head">
+      <div class="modal-title">🔑 পাসওয়ার্ড পরিবর্তন</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="max-width:380px;margin:0 auto">
+        <div class="m-label">বর্তমান পাসওয়ার্ড</div>
+        <input type="password" id="pw2Current" class="m-input" placeholder="বর্তমান পাসওয়ার্ড">
+
+        <div class="m-label">নতুন পাসওয়ার্ড</div>
+        <input type="password" id="pw2New" class="m-input" placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
+
+        <div class="m-label">নতুন পাসওয়ার্ড নিশ্চিত করুন</div>
+        <input type="password" id="pw2Confirm" class="m-input" placeholder="আবার নতুন পাসওয়ার্ড">
+
+        <div class="pw-msg" id="pwMsg2"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="m-btn" onclick="mChangePassword()">🔑 পাসওয়ার্ড Set করুন</button>
+    </div>
+  </div><!-- end modal-change-password -->
+
+</div><!-- end .sar-overlay -->
+
 </div>
 
 <script>
@@ -2673,7 +2694,176 @@ function printPrescription() {
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
     <style>body{font-family:'Hind Siliguri',sans-serif;color:#111;padding:2cm;max-width:21cm;margin:0 auto}
     .as-label{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;
-      color:#666;margin:.8rem 0 .3rem}</style>
+      color:#666;margin:.8rem 0 .3rem}
+/* ══════════════════════════════════════════════
+   MODAL OVERLAY SYSTEM
+   ══════════════════════════════════════════════ */
+.sar-overlay{
+  position:fixed;inset:0;z-index:5000;
+  background:rgba(6,6,15,.82);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+  padding:1rem;
+}
+.sar-overlay.open{display:flex}
+
+.sar-modal{
+  background:#0F0F1A;border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;width:100%;max-width:640px;
+  max-height:88vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.6);
+  animation:modalIn .28s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalIn{
+  from{opacity:0;transform:scale(.93) translateY(16px)}
+  to  {opacity:1;transform:scale(1)   translateY(0)}
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.4rem .9rem;
+  border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;
+}
+.modal-title{
+  font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;gap:.55rem;color:#fff;
+}
+.modal-close{
+  background:rgba(255,255,255,.07);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(255,255,255,.6);
+  display:flex;align-items:center;justify-content:center;transition:all .25s;
+}
+.modal-close:hover{background:rgba(220,38,38,.2);color:#F87171}
+
+.modal-body{
+  flex:1;overflow-y:auto;padding:1.2rem 1.4rem;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;
+}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+.modal-foot{
+  padding:.85rem 1.4rem;border-top:1px solid rgba(255,255,255,.06);
+  display:flex;gap:.7rem;align-items:center;flex-shrink:0;
+}
+
+/* ── Profile rows ── */
+.p-row{display:flex;justify-content:space-between;align-items:center;
+  padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.p-row:last-child{border:none}
+.p-k{font-size:.78rem;color:rgba(255,255,255,.4)}
+.p-v{font-size:.82rem;color:#fff;font-weight:500;text-align:right;max-width:60%}
+.p-v.ok{color:#34D399}.p-v.warn{color:#F87171}.p-v.pend{color:#FCD34D}
+
+/* ── Modal form controls ── */
+.m-label{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);margin:.85rem 0 .4rem}
+.m-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);
+  border-radius:10px;padding:.65rem .9rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;outline:none;
+  transition:border-color .25s}
+.m-input:focus{border-color:var(--pink)}
+.m-textarea{resize:vertical;min-height:90px}
+
+/* ── Symptom checkboxes ── */
+.sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.4rem}
+.sym-cb{display:flex;align-items:center;gap:.5rem;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9px;padding:.45rem .7rem;transition:all .22s;
+  font-size:.82rem;color:rgba(255,255,255,.65)}
+.sym-cb:hover{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.06)}
+.sym-cb input{accent-color:var(--pink);width:15px;height:15px}
+.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:#fff}
+
+/* ── Mood pills ── */
+.mood-wrap{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.4rem}
+.m-mood{background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:18px;padding:.28rem .7rem;font-size:.8rem;cursor:pointer;
+  color:rgba(255,255,255,.55);transition:all .22s}
+.m-mood:hover{border-color:var(--pink);color:var(--pink2)}
+.m-mood.sel{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
+
+/* ── Range ── */
+.m-range-row{display:flex;align-items:center;gap:.7rem;margin-top:.3rem}
+.m-range-row input[type=range]{flex:1;accent-color:var(--pink)}
+.m-range-val{font-family:'Space Mono',monospace;font-size:.85rem;
+  font-weight:700;color:var(--pink2);min-width:22px;text-align:center}
+
+/* ── Voice button ── */
+.m-voice{display:flex;align-items:center;gap:.6rem;
+  background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.25);
+  border-radius:10px;padding:.6rem 1rem;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;font-size:.84rem;color:var(--pink2);
+  transition:all .25s;border-style:dashed}
+.m-voice:hover{background:rgba(233,30,140,.16)}
+.m-voice.rec{background:rgba(220,38,38,.15);border-color:var(--red2);
+  color:var(--red2);animation:mpulse .7s ease infinite;border-style:solid}
+@keyframes mpulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+/* ── Report cards ── */
+.rpt-card{background:rgba(255,255,255,.035);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:.7rem}
+.rpt-head{display:flex;align-items:center;justify-content:space-between;
+  padding:.85rem 1.1rem;cursor:pointer;transition:background .2s}
+.rpt-head:hover{background:rgba(255,255,255,.04)}
+.rpt-score{font-family:'Space Mono',monospace;font-size:.82rem;
+  font-weight:700;padding:.2rem .6rem;border-radius:50px}
+.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(255,255,255,.06);
+  font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.75;display:none}
+.rpt-card.open .rpt-body{display:block}
+.rpt-arrow{font-size:.65rem;color:rgba(255,255,255,.3);transition:transform .25s}
+.rpt-card.open .rpt-arrow{transform:rotate(180deg)}
+.rpt-section{margin-bottom:.75rem}
+.rpt-section-title{font-family:'Space Mono',monospace;font-size:.6rem;
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);
+  margin-bottom:.4rem}
+.rpt-tags{display:flex;flex-direction:column;gap:.3rem}
+.rpt-tag{background:rgba(255,255,255,.04);border-radius:8px;
+  padding:.45rem .7rem;font-size:.8rem;color:rgba(255,255,255,.6)}
+.rpt-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.4rem}
+.rpt-meal{background:rgba(255,255,255,.04);border-radius:10px;
+  padding:.6rem .7rem;text-align:center}
+.rpt-meal-time{font-size:.65rem;color:rgba(255,255,255,.35);margin-bottom:.2rem}
+.rpt-meal-name{font-size:.78rem;color:#fff;font-weight:600;line-height:1.3}
+.rpt-meal-kcal{font-family:'Space Mono',monospace;font-size:.65rem;
+  color:var(--yellow2);margin-top:.2rem}
+
+/* ── Modal action btn ── */
+.m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
+  font-weight:700;cursor:pointer;transition:all .3s}
+.m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
+.m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
+.m-btn.outline{background:transparent;border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.65);flex:unset;padding:.7rem 1.2rem}
+.m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
+
+/* ── Profile avatar ── */
+.prof-avatar{width:68px;height:68px;border-radius:50%;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;font-weight:700;flex-shrink:0;
+  box-shadow:0 0 20px rgba(233,30,140,.3)}
+.prof-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff}
+.prof-mid{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--pink2);margin-top:.1rem}
+.prof-tier{display:inline-block;margin-top:.3rem;background:rgba(245,158,11,.12);
+  border:1px solid rgba(245,158,11,.25);border-radius:50px;
+  padding:.15rem .65rem;font-size:.72rem;color:var(--yellow2)}
+.p-section-head{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.25);margin:1rem 0 .5rem;
+  padding-bottom:.3rem;border-bottom:1px solid rgba(255,255,255,.06)}
+
+/* ── Password status msg ── */
+.pw-msg{font-size:.82rem;min-height:1.1rem;margin:.4rem 0}
+.pw-msg.ok{color:#34D399}.pw-msg.err{color:#F87171}
+
+@media(max-width:480px){
+  .sar-modal{border-radius:16px 16px 0 0;max-height:92vh;margin-top:auto}
+  .sar-overlay{align-items:flex-end;padding:0}
+  .rpt-menu-grid{grid-template-columns:1fr}
+}
+
+</style>
   </head><body>${content}</body></html>`);
   win.document.close();
   win.print();
@@ -2913,7 +3103,7 @@ function renderProfilePanel(cust, metrics) {
     ${row('অ্যাকাউন্ট স্ট্যাটাস', cust?.account_status || '—',
         cust?.is_active ? 'active' : 'pending')}
     <div style="margin-top:.75rem;text-align:center">
-      <button onclick="showPanel('change-password')"
+      <button onclick="openModal('change-password')"
         style="background:rgba(107,33,168,.15);border:1px solid rgba(107,33,168,.3);
         border-radius:10px;padding:.55rem 1.2rem;color:var(--purple2);
         font-family:'Hind Siliguri',sans-serif;font-size:.83rem;cursor:pointer">
@@ -3001,6 +3191,508 @@ async function loadAndRenderProfile() {
   } catch(e) {
     console.error('loadAndRenderProfile:', e);
   }
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL SYSTEM — complete JS
+   ═══════════════════════════════════════════════════════════ */
+
+let _diMood = '';        // daily input mood
+let _mVoiceTarget = '';  // current voice input target
+let _voiceRecog = null;  // SpeechRecognition instance
+
+// ── open / close ──────────────────────────────────────────
+function openModal(name) {
+  // hide all modals first
+  document.querySelectorAll('.sar-modal').forEach(m => m.style.display = 'none');
+  const modal = document.getElementById('modal-' + name);
+  if (!modal) { console.warn('Modal not found:', name); return; }
+  modal.style.display = 'flex';
+  modal.style.flexDirection = 'column';
+  document.getElementById('sarOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // On open actions
+  if (name === 'profile')        mLoadProfile();
+  if (name === 'ai-report')      mLoadReports();
+  if (name === 'daily-input')    mPreloadDailyLog();
+}
+
+function closeModal() {
+  document.getElementById('sarOverlay').classList.remove('open');
+  document.querySelectorAll('.sar-modal').forEach(m => m.style.display = 'none');
+  document.body.style.overflow = '';
+  // Stop any voice recording
+  if (_voiceRecog) { try { _voiceRecog.stop(); } catch(e){} }
+}
+
+function overlayClose(e) {
+  if (e.target === document.getElementById('sarOverlay')) closeModal();
+}
+
+// ESC key closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── MODAL 1: প্রোফাইল লোড ────────────────────────────────
+async function mLoadProfile() {
+  const body = document.getElementById('profileModalBody');
+  if (!body || !CID) return;
+  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.35)">⏳ লোড হচ্ছে...</div>';
+
+  try {
+    const [custR, metR] = await Promise.all([
+      fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}),
+      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
+    ]);
+    const cust    = (await custR.json())?.[0] || {};
+    const metrics = (await metR.json())?.[0]  || {};
+
+    const age = cust.date_of_birth
+      ? Math.floor((new Date() - new Date(cust.date_of_birth)) / 31557600000) + ' বছর'
+      : '—';
+    const bmi = (metrics.bmi || cust.bmi)
+      ? parseFloat(metrics.bmi || cust.bmi).toFixed(1) : '—';
+    const catMap = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+    const isActive = cust.monthly_sub_paid && cust.monthly_sub_expiry_date &&
+      new Date(cust.monthly_sub_expiry_date) > new Date();
+
+    const prow = (k,v,cls='') => `
+      <div class="p-row">
+        <span class="p-k">${k}</span>
+        <span class="p-v ${cls}">${v||'—'}</span>
+      </div>`;
+
+    body.innerHTML = `
+      <!-- Avatar -->
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem">
+        <div class="prof-avatar">${(cust.full_name||'?').charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="prof-name">${cust.full_name||'—'}</div>
+          <div class="prof-mid">${cust.member_id||'—'}</div>
+          <span class="prof-tier">${cust.membership_tier||'Basic'}</span>
+        </div>
+      </div>
+
+      <div class="p-section-head">👤 ব্যক্তিগত তথ্য</div>
+      ${prow('ফোন', cust.phone)}
+      ${prow('ইমেইল', cust.email)}
+      ${prow('জন্ম তারিখ', cust.date_of_birth)}
+      ${prow('বয়স', age)}
+      ${prow('রক্তের গ্রুপ', cust.blood_group)}
+      ${prow('ঠিকানা', cust.address)}
+      ${prow('বিভাগ', [cust.division,cust.district].filter(Boolean).join(', '))}
+
+      <div class="p-section-head">🏥 স্বাস্থ্য তথ্য</div>
+      ${prow('রোগ বিভাগ', catMap[cust.sar_category]||cust.sar_category)}
+      ${prow('উচ্চতা', cust.height_cm ? cust.height_cm+' সেমি' : metrics.height_cm ? metrics.height_cm+' সেমি' : '—')}
+      ${prow('ওজন', cust.weight_kg ? cust.weight_kg+' কেজি' : metrics.weight_kg ? metrics.weight_kg+' কেজি' : '—')}
+      ${prow('BMI', bmi)}
+      ${prow('রক্তচাপ', metrics.bp_systolic ? metrics.bp_systolic+'/'+metrics.bp_diastolic : '—')}
+      ${prow('ফাস্টিং গ্লুকোজ', metrics.fasting_glucose ? metrics.fasting_glucose+' mmol/L' : '—')}
+      ${prow('HbA1c', metrics.hba1c ? metrics.hba1c+'%' : '—')}
+      ${prow('হিমোগ্লোবিন', metrics.hemoglobin ? metrics.hemoglobin+' g/dL' : '—')}
+      ${prow('ভিটামিন ডি', metrics.vitamin_d ? metrics.vitamin_d+' ng/mL' : '—')}
+      ${prow('কোলেস্টেরল', metrics.cholesterol_total ? metrics.cholesterol_total+' mg/dL' : '—')}
+
+      <div class="p-section-head">💎 সদস্যতা তথ্য</div>
+      ${prow('সদস্য আইডি', cust.member_id)}
+      ${prow('সদস্যতার স্তর', cust.membership_tier||'Basic')}
+      ${prow('নিবন্ধন ফি', cust.registration_fee_paid?'✓ পরিশোধিত':'✗ বাকি',
+        cust.registration_fee_paid?'ok':'warn')}
+      ${prow('সাবস্ক্রিপশন', isActive?'✓ সক্রিয়':'✗ সক্রিয় নেই',
+        isActive?'ok':'warn')}
+      ${prow('মেয়াদ শেষ', cust.monthly_sub_expiry_date||'—')}
+      ${prow('লয়্যালটি পয়েন্ট', cust.loyalty_points||0)}
+      ${prow('অ্যাকাউন্ট স্ট্যাটাস', cust.account_status||'—',
+        cust.is_active?'ok':'pend')}
+    `;
+  } catch(e) {
+    body.innerHTML = `<div style="color:var(--red2);padding:1rem">লোড হয়নি: ${e.message}</div>`;
+  }
+}
+
+// ── MODAL 2: Daily Log Save ───────────────────────────────
+async function mSaveDailyLog() {
+  const btn    = document.getElementById('diSaveBtn');
+  const status = document.getElementById('diStatus');
+  if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
+  if (status) status.textContent = '';
+
+  const data = {
+    customer_id:      CID,
+    log_date:         new Date().toISOString().split('T')[0],
+    fever:            document.getElementById('di2_fever')?.checked   || false,
+    fever_temp:       parseFloat(document.getElementById('di2_temp')?.value) || null,
+    cold_cough:       document.getElementById('di2_cold')?.checked    || false,
+    stomach_upset:    document.getElementById('di2_stomach')?.checked || false,
+    loose_motion:     document.getElementById('di2_motion')?.checked  || false,
+    headache:         document.getElementById('di2_head')?.checked    || false,
+    body_pain:        document.getElementById('di2_pain')?.checked    || false,
+    period_today:     document.getElementById('di2_period')?.checked  || false,
+    cramping:         document.getElementById('di2_cramp')?.checked   || false,
+    cramping_level:   parseInt(document.getElementById('di2_clvl')?.value   || 5),
+    mood:             _diMood,
+    mental_condition: document.getElementById('di2_mental')?.value || '',
+    stress_level:     parseInt(document.getElementById('di2_stress')?.value || 5),
+    food_eaten:       document.getElementById('di2_food')?.value   || '',
+    coffee_cups:      parseInt(document.getElementById('di2_coffee')?.value || 0),
+    water_intake:     parseFloat(document.getElementById('di2_water')?.value || 2),
+    drinks_taken:     document.getElementById('di2_drinks')?.value || '',
+    sleep_hours:      parseFloat(document.getElementById('di2_sleep')?.value || 7),
+    sleep_quality:    document.getElementById('di2_sleepq')?.value || 'মাঝারি',
+    notes:            document.getElementById('diNotes')?.value    || '',
+  };
+
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/daily_health_log`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(data)
+    });
+    if (r.ok || r.status === 201 || r.status === 204) {
+      if (status) { status.style.color='#34D399'; status.textContent='✅ সংরক্ষিত!'; }
+      toast('✅ আজকের স্বাস্থ্য আপডেট সংরক্ষিত হয়েছে!', true);
+      setTimeout(closeModal, 1200);
+    } else {
+      const err = await r.text();
+      // If 404 = table missing
+      if (r.status === 404) throw new Error('daily_health_log table নেই। Supabase-এ SQL রান করুন।');
+      throw new Error(`HTTP ${r.status}: ${err.substring(0,80)}`);
+    }
+  } catch(e) {
+    if (status) { status.style.color='#F87171'; status.textContent='❌ '+e.message; }
+    toast('❌ Save হয়নি।', false);
+  } finally {
+    if (btn) { btn.textContent = '💾 Save করুন'; btn.disabled = false; }
+  }
+}
+
+// Pre-load today's saved data into daily input form
+async function mPreloadDailyLog() {
+  if (!CID) return;
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const r = await fetch(
+      `${SUPA}/rest/v1/daily_health_log?customer_id=eq.${CID}&log_date=eq.${today}&limit=1`,
+      {headers:H}
+    );
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d?.[0]) return;
+    const log = d[0];
+    // Fill checkboxes
+    const cbMap = {
+      'di2_fever':log.fever,'di2_cold':log.cold_cough,
+      'di2_stomach':log.stomach_upset,'di2_motion':log.loose_motion,
+      'di2_head':log.headache,'di2_pain':log.body_pain,
+      'di2_period':log.period_today,'di2_cramp':log.cramping
+    };
+    Object.entries(cbMap).forEach(([id,val])=>{
+      const el=document.getElementById(id);
+      if(el&&val){ el.checked=true;
+        const lbl=el.closest('.sym-cb'); if(lbl) lbl.classList.add('on'); }
+    });
+    // Fill inputs
+    [['di2_temp',log.fever_temp],['di2_mental',log.mental_condition],
+     ['di2_stress',log.stress_level],['di2_clvl',log.cramping_level],
+     ['di2_food',log.food_eaten],['di2_coffee',log.coffee_cups],
+     ['di2_water',log.water_intake],['di2_drinks',log.drinks_taken],
+     ['di2_sleep',log.sleep_hours],['di2_sleepq',log.sleep_quality],
+     ['diNotes',log.notes]
+    ].forEach(([id,val])=>{ if(val!=null){ const el=document.getElementById(id); if(el) el.value=val; } });
+    // Ranges display
+    if(log.stress_level){ const e=document.getElementById('diStVal'); if(e) e.textContent=log.stress_level; }
+    if(log.cramping_level){ const e=document.getElementById('diClVal'); if(e) e.textContent=log.cramping_level; }
+    // Mood
+    if(log.mood){
+      document.querySelectorAll('#diMoodWrap .m-mood').forEach(b=>{
+        if(b.textContent.trim()===log.mood){ b.classList.add('sel'); _diMood=log.mood; }
+      });
+    }
+    // Save btn label
+    const btn=document.getElementById('diSaveBtn');
+    if(btn) btn.textContent='🔄 আপডেট করুন';
+  } catch(e){ /* silent */ }
+}
+
+// Mood selector for daily input
+function mMood(btn, mood) {
+  document.querySelectorAll('#diMoodWrap .m-mood').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  _diMood = mood;
+}
+
+// Symptom checkbox toggle style
+function symToggle(input, lblId) {
+  const lbl = document.getElementById(lblId) || input.closest('.sym-cb');
+  if(lbl) lbl.classList.toggle('on', input.checked);
+}
+
+// ── MODAL 3: Write to SAR ────────────────────────────────
+async function mSubmitFeedback() {
+  const text   = document.getElementById('sarText')?.value?.trim();
+  const type   = document.getElementById('sarType')?.value || 'general';
+  const status = document.getElementById('sarStatus');
+  const cust   = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+
+  if (!text) { toast('কিছু লিখুন।', false); return; }
+  if (status) { status.style.color='var(--yellow2)'; status.textContent='পাঠানো হচ্ছে...'; }
+
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/customer_feedback`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        customer_id:   CID,
+        customer_name: cust.full_name || CNAME,
+        feedback_text: text,
+        feedback_type: type
+      })
+    });
+    if (r.ok || r.status === 201 || r.status === 204) {
+      if (status) { status.style.color='#34D399'; status.textContent='✅ পাঠানো হয়েছে!'; }
+      document.getElementById('sarText').value = '';
+      toast('✅ আপনার বার্তা SAR-এ পৌঁছেছে। ধন্যবাদ! 🙏', true);
+      setTimeout(closeModal, 1500);
+    } else {
+      if (r.status === 404) throw new Error('customer_feedback table নেই।');
+      throw new Error('HTTP ' + r.status);
+    }
+  } catch(e) {
+    if (status) { status.style.color='#F87171'; status.textContent='❌ '+e.message; }
+    toast('❌ পাঠানো যায়নি।', false);
+  }
+}
+
+// ── MODAL 4: AI Reports ──────────────────────────────────
+async function mLoadReports() {
+  const body = document.getElementById('aiReportBody');
+  if (!body || !CID) return;
+  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(255,255,255,.35)">⏳ রিপোর্ট লোড হচ্ছে...</div>';
+
+  try {
+    // Try analysis_reports first, fallback to ai_analysis
+    let reports = [];
+    const r1 = await fetch(
+      `${SUPA}/rest/v1/analysis_reports?customer_id=eq.${CID}&order=created_at.desc&limit=7`,
+      {headers:H}
+    );
+    if (r1.ok) { const d1 = await r1.json(); reports = d1||[]; }
+
+    if (!reports.length) {
+      const r2 = await fetch(
+        `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=7&select=*`,
+        {headers:H}
+      );
+      if (r2.ok) {
+        const d2 = await r2.json();
+        reports = (d2||[]).map(a => ({
+          ...a,
+          report_date: a.analysis_date || a.created_at?.split('T')[0],
+        }));
+      }
+    }
+
+    if (!reports.length) {
+      body.innerHTML = `
+        <div style="text-align:center;padding:2.5rem">
+          <div style="font-size:2rem;margin-bottom:.6rem">📋</div>
+          <div style="color:rgba(255,255,255,.4);font-size:.85rem;line-height:1.7">
+            এখনো কোনো রিপোর্ট নেই।<br>
+            প্রতিদিন সকাল ৬টায় AI বিশ্লেষণের পরে এখানে দেখাবে।
+          </div>
+          <button onclick="triggerAnalysis()" style="margin-top:1rem;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;border-radius:10px;padding:.6rem 1.4rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer">
+            🔬 এখনই বিশ্লেষণ করুন
+          </button>
+        </div>`;
+      return;
+    }
+
+    body.innerHTML = reports.map((rpt, i) => {
+      const score     = rpt.health_score || rpt.report_json?.health_score || 0;
+      const scoreN    = parseInt(score) || 0;
+      const scoreClr  = scoreN >= 70 ? '#34D399' : scoreN >= 40 ? '#FCD34D' : '#F87171';
+      const date      = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
+      const analysis  = rpt.analysis_bn || '—';
+      const recs      = rpt.recommendations || '';
+      const problems  = Array.isArray(rpt.problems) ? rpt.problems : [];
+      const solutions = Array.isArray(rpt.solutions) ? rpt.solutions : [];
+      const menu      = rpt.daily_menu_recommendation_json || rpt.daily_menu || null;
+      const pdfUrl    = rpt.pdf_url || '';
+      const morning   = rpt.morning_greeting || '';
+      const bday      = rpt.birthday_message || '';
+
+      const menuHtml = menu ? `
+        <div class="rpt-section" style="margin-top:.6rem">
+          <div class="rpt-section-title">🍽️ আজকের মেনু</div>
+          <div class="rpt-menu-grid">
+            ${['breakfast','lunch','dinner'].map(k => {
+              const m = menu[k];
+              if (!m) return '';
+              const icons = {breakfast:'🌅',lunch:'☀️',dinner:'🌙'};
+              const labels = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
+              return `<div class="rpt-meal">
+                <div class="rpt-meal-time">${icons[k]} ${labels[k]}</div>
+                <div class="rpt-meal-name">${m.name_bn||m.name||'—'}</div>
+                ${m.calories ? `<div class="rpt-meal-kcal">${m.calories} kcal</div>` : ''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>` : '';
+
+      return `
+      <div class="rpt-card" id="rpt2-${i}">
+        <div class="rpt-head" onclick="toggleRpt2(${i})">
+          <div style="display:flex;align-items:center;gap:.65rem;flex:1">
+            <span style="font-size:.82rem;color:rgba(255,255,255,.5)">${date}</span>
+            <span class="rpt-score" style="background:${scoreClr}1a;color:${scoreClr};border:1px solid ${scoreClr}40">
+              স্কোর: ${scoreN}/100
+            </span>
+            ${bday ? '<span style="font-size:.75rem">🎂</span>' : ''}
+          </div>
+          <span class="rpt-arrow">▼</span>
+        </div>
+        <div class="rpt-body">
+          ${morning ? `<div style="background:rgba(5,150,105,.07);border-left:2px solid var(--green2);padding:.5rem .8rem;border-radius:0 8px 8px 0;margin-bottom:.7rem;font-size:.8rem;color:rgba(255,255,255,.6)">${morning}</div>` : ''}
+          ${bday ? `<div style="background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:10px;padding:.6rem .9rem;margin-bottom:.7rem;font-size:.82rem;color:var(--pink2)">🎂 ${bday}</div>` : ''}
+
+          <div class="rpt-section">
+            <div class="rpt-section-title">📊 স্বাস্থ্য মূল্যায়ন</div>
+            <p style="font-size:.83rem;color:rgba(255,255,255,.65);line-height:1.7">${analysis}</p>
+          </div>
+
+          ${problems.length ? `<div class="rpt-section">
+            <div class="rpt-section-title">⚠️ সমস্যা</div>
+            <div class="rpt-tags">${problems.map(p=>`<div class="rpt-tag">• ${p}</div>`).join('')}</div>
+          </div>` : ''}
+
+          ${solutions.length ? `<div class="rpt-section">
+            <div class="rpt-section-title">✅ সমাধান</div>
+            <div class="rpt-tags">${solutions.map(s=>`<div class="rpt-tag">• ${s}</div>`).join('')}</div>
+          </div>` : ''}
+
+          ${recs ? `<div class="rpt-section">
+            <div class="rpt-section-title">💡 পরামর্শ</div>
+            <p style="font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.7;background:rgba(245,200,66,.04);border-left:2px solid rgba(245,200,66,.25);padding:.5rem .8rem;border-radius:0 8px 8px 0">${recs}</p>
+          </div>` : ''}
+
+          ${menuHtml}
+
+          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.25);border-radius:8px;padding:.35rem .85rem;color:var(--pink2);text-decoration:none;font-size:.78rem">📄 PDF ডাউনলোড</a>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    body.innerHTML = `<div style="color:var(--red2);padding:1rem;font-size:.83rem">রিপোর্ট লোড হয়নি: ${e.message}</div>`;
+  }
+}
+
+function toggleRpt2(i) {
+  document.getElementById('rpt2-' + i)?.classList.toggle('open');
+}
+
+// ── MODAL 5: Change Password ─────────────────────────────
+async function mChangePassword() {
+  const cur    = document.getElementById('pw2Current')?.value?.trim();
+  const nw     = document.getElementById('pw2New')?.value?.trim();
+  const conf   = document.getElementById('pw2Confirm')?.value?.trim();
+  const msgEl  = document.getElementById('pwMsg2');
+
+  const show = (txt, ok) => {
+    if (msgEl) { msgEl.textContent = txt; msgEl.className = 'pw-msg ' + (ok?'ok':'err'); }
+  };
+
+  if (!cur)         { show('বর্তমান পাসওয়ার্ড দিন।', false); return; }
+  if (!nw)          { show('নতুন পাসওয়ার্ড দিন।', false); return; }
+  if (nw.length < 6){ show('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর।', false); return; }
+  if (nw !== conf)  { show('দুটি পাসওয়ার্ড মিলছে না।', false); return; }
+
+  show('যাচাই করা হচ্ছে...', true);
+
+  try {
+    // Verify current password
+    const chkR = await fetch(
+      `${SUPA}/rest/v1/customers?id=eq.${CID}&select=password_hash`,
+      {headers:H}
+    );
+    const chkD = await chkR.json();
+    const storedHash = chkD?.[0]?.password_hash || '';
+    const curHash    = btoa(cur);
+
+    // Allow if stored is empty (first time set) or matches
+    if (storedHash && storedHash !== curHash) {
+      show('বর্তমান পাসওয়ার্ড ভুল।', false);
+      return;
+    }
+
+    // Update password
+    const updR = await fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}`, {
+      method: 'PATCH',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ password_hash: btoa(nw) })
+    });
+
+    if (updR.ok || updR.status === 204) {
+      show('✅ পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!', true);
+      document.getElementById('pw2Current').value = '';
+      document.getElementById('pw2New').value = '';
+      document.getElementById('pw2Confirm').value = '';
+      toast('✅ পাসওয়ার্ড সেট হয়েছে!', true);
+      setTimeout(closeModal, 1800);
+    } else {
+      throw new Error('HTTP ' + updR.status);
+    }
+  } catch(e) {
+    show('❌ ব্যর্থ: ' + e.message, false);
+  }
+}
+
+// ── VOICE INPUT ──────────────────────────────────────────
+function mVoice(targetId) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Voice: Chrome browser-এ কাজ করে।', false); return; }
+
+  // Determine button to style
+  const btnMap = { diNotes:'diVoiceBtn', sarText:'sarVoiceBtn' };
+  const voiceBtn = document.getElementById(btnMap[targetId]) ||
+    document.querySelector('[onclick*="mVoice"]');
+
+  // If already recording, stop
+  if (_voiceRecog) {
+    try { _voiceRecog.stop(); } catch(e){}
+    _voiceRecog = null;
+    if (voiceBtn) voiceBtn.classList.remove('rec');
+    return;
+  }
+
+  _voiceRecog = new SR();
+  _voiceRecog.lang = 'bn-BD';
+  _voiceRecog.continuous = false;
+  _voiceRecog.interimResults = false;
+  _mVoiceTarget = targetId;
+
+  if (voiceBtn) voiceBtn.classList.add('rec');
+
+  _voiceRecog.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    const el = document.getElementById(_mVoiceTarget);
+    if (el) el.value = (el.value ? el.value + '\n' : '') + text;
+    toast('🎤 শোনা হয়েছে: ' + text.substring(0,50) + (text.length>50?'...':''), true);
+  };
+
+  _voiceRecog.onerror = (e) => {
+    toast('🎤 Voice error: ' + e.error, false);
+  };
+
+  _voiceRecog.onend = () => {
+    if (voiceBtn) voiceBtn.classList.remove('rec');
+    _voiceRecog = null;
+  };
+
+  _voiceRecog.start();
 }
 
 </script>
