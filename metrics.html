@@ -222,6 +222,69 @@ input[type=range]::-webkit-slider-thumb{
   .sp2,.sp3,.sp4{grid-column:span 1}
   .chk-grid,.chk-grid.three{grid-template-columns:1fr}
 }
+
+/* ── VOICE INPUT BUTTON ── */
+.voice-input-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:rgba(233,30,140,.08);border:1px dashed rgba(233,30,140,.3);
+  border-radius:8px;padding:.35rem .75rem;cursor:pointer;
+  font-family:'Hind Siliguri',sans-serif;font-size:.78rem;
+  color:rgba(233,30,140,.9);transition:all .25s;margin-top:.35rem;
+  width:100%;justify-content:center;
+}
+.voice-input-btn:hover{background:rgba(233,30,140,.15)}
+.voice-input-btn.rec{
+  background:rgba(220,38,38,.15);border-color:rgba(220,38,38,.5);
+  color:#F87171;animation:vbPulse .7s ease infinite;
+}
+@keyframes vbPulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── SECTION 12 DAILY LOG ── */
+.daily-log-banner{
+  background:linear-gradient(135deg,rgba(233,30,140,.08),rgba(107,33,168,.06));
+  border:1px solid rgba(233,30,140,.18);border-radius:14px;
+  padding:1rem 1.2rem;margin-bottom:1.2rem;
+  font-size:.85rem;color:rgba(255,255,255,.65);line-height:1.7;
+}
+.daily-log-banner strong{color:var(--pink2)}
+.sym-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+.sym-chip{
+  display:inline-flex;align-items:center;gap:.3rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;padding:.28rem .7rem;cursor:pointer;
+  font-size:.78rem;color:rgba(255,255,255,.6);transition:all .22s;
+}
+.sym-chip:hover{border-color:rgba(233,30,140,.4);color:var(--pink2)}
+.sym-chip.on{background:rgba(233,30,140,.12);border-color:rgba(233,30,140,.4);color:var(--pink2)}
+.mood-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.4rem}
+.mood-chip{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:.28rem .75rem;cursor:pointer;
+  font-size:.8rem;color:rgba(255,255,255,.55);transition:all .22s;
+}
+.mood-chip:hover{border-color:rgba(107,33,168,.4);color:var(--purple2)}
+.mood-chip.sel{background:rgba(107,33,168,.15);border-color:rgba(107,33,168,.4);color:var(--purple2)}
+.range-wrap{display:flex;align-items:center;gap:.65rem;margin-top:.3rem}
+.range-wrap input[type=range]{flex:1;accent-color:var(--pink)}
+.range-num{font-family:'Space Mono',monospace;font-size:.88rem;
+  font-weight:700;color:var(--pink2);min-width:22px;text-align:center}
+.dl-2col{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.dl-input{width:100%;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);border-radius:9px;
+  padding:.55rem .8rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.85rem;outline:none;transition:border-color .25s}
+.dl-input:focus{border-color:var(--pink)}
+.dl-textarea{resize:vertical;min-height:72px}
+.dl-label{font-size:.72rem;color:rgba(255,255,255,.38);margin-bottom:.3rem;
+  font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.btn-save-log{width:100%;padding:.85rem;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:1rem;
+  font-weight:700;cursor:pointer;transition:all .3s;margin-top:.5rem}
+.btn-save-log:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(233,30,140,.4)}
+.log-status{font-size:.82rem;text-align:center;min-height:1.2rem;margin:.4rem 0}
+.log-status.ok{color:#34D399}.log-status.err{color:#F87171}
+
 </style>
 </head>
 <body>
@@ -265,6 +328,7 @@ input[type=range]::-webkit-slider-thumb{
         <button class="stab" onclick="gotoSec(9,this)">ঞ. খাদ্যাভ্যাস</button>
         <button class="stab" onclick="gotoSec(10,this)">ট. স্বাস্থ্য লক্ষ্য</button>
         <button class="stab" onclick="gotoSec(11,this)">ঠ. বিশেষ অ্যাক্সেস</button>
+        <button class="stab" onclick="gotoSec(12,this)">ড. আজকের লগ 🌸</button>
       </div>
       <div class="overall-bar"><div class="overall-fill" id="overallBar" style="width:8.33%"></div></div>
       <div class="prog-info">
@@ -1131,18 +1195,180 @@ input[type=range]::-webkit-slider-thumb{
         </button>
         <div class="btn-row" style="margin-top:.85rem">
           <button class="btn-back" onclick="prevSec(11)">← পিছনে</button>
+          <button class="btn-save" onclick="nextSec(11)">আজকের লগ → 🌸</button>
         </div>
       </div>
 
+
+      <!-- ════════════════════════════════════════════
+           SEC 12 — আজকের দৈনিক স্বাস্থ্য লগ (নতুন)
+           daily_health_log table-এ save হবে
+      ════════════════════════════════════════════ -->
+      <div class="sec-panel" id="sec12">
+        <div class="sec-hd">
+          <span class="sec-icon">🌸</span>
+          <div class="sec-title">বিভাগ ড — আজকের স্বাস্থ্য আপডেট</div>
+          <div class="sec-desc">প্রতিদিনের তথ্য — AI সকালের বিশ্লেষণে এটা ব্যবহার করবে।</div>
+        </div>
+
+        <div class="daily-log-banner">
+          <strong>💡 কেন এটা গুরুত্বপূর্ণ?</strong><br>
+          আপনি আজ কেমন আছেন সেটা SAR AI জানলে সকালে আরও নির্ভুল
+          ব্যক্তিগতকৃত খাদ্য পরামর্শ দিতে পারবে।
+          এটা <strong>ঐচ্ছিক</strong> কিন্তু অত্যন্ত কার্যকর।
+        </div>
+
+        <!-- Voice Input -->
+        <div style="margin-bottom:1rem">
+          <button class="voice-input-btn" id="dlVoiceBtn" onclick="dlVoice('dlNotes')">
+            🎤 কণ্ঠে বলুন — click করুন তারপর বাংলায় বলুন (Chrome-এ কাজ করে)
+          </button>
+        </div>
+
+        <!-- শারীরিক লক্ষণ -->
+        <div class="fld-group">
+          <div class="fld-group-title">💊 আজকের শারীরিক লক্ষণ</div>
+          <div class="sym-chips">
+            <span class="sym-chip" id="sc-fever"   onclick="dlToggle(this,'dl_fever')">🌡️ জ্বর</span>
+            <span class="sym-chip" id="sc-cold"    onclick="dlToggle(this,'dl_cold')">🤧 সর্দি/কাশি</span>
+            <span class="sym-chip" id="sc-stomach" onclick="dlToggle(this,'dl_stomach')">🤢 পেট খারাপ</span>
+            <span class="sym-chip" id="sc-motion"  onclick="dlToggle(this,'dl_motion')">💧 পাতলা পায়খানা</span>
+            <span class="sym-chip" id="sc-head"    onclick="dlToggle(this,'dl_head')">🤕 মাথাব্যথা</span>
+            <span class="sym-chip" id="sc-pain"    onclick="dlToggle(this,'dl_pain')">😣 শরীর ব্যথা</span>
+          </div>
+          <!-- Hidden checkboxes for value tracking -->
+          <input type="checkbox" id="dl_fever"   style="display:none">
+          <input type="checkbox" id="dl_cold"    style="display:none">
+          <input type="checkbox" id="dl_stomach" style="display:none">
+          <input type="checkbox" id="dl_motion"  style="display:none">
+          <input type="checkbox" id="dl_head"    style="display:none">
+          <input type="checkbox" id="dl_pain"    style="display:none">
+        </div>
+
+        <!-- জ্বরের তাপমাত্রা -->
+        <div class="fld" id="dlFeverRow" style="display:none;margin-top:.5rem">
+          <label>জ্বরের তাপমাত্রা <span class="unit">°F</span></label>
+          <input type="number" id="dl_fever_temp" placeholder="98.6" step="0.1" class="dl-input" style="width:130px">
+        </div>
+
+        <!-- মাসিক চক্র -->
+        <div class="fld-group" style="margin-top:.85rem">
+          <div class="fld-group-title">🌸 মাসিক চক্র</div>
+          <div class="sym-chips">
+            <span class="sym-chip" id="sc-period" onclick="dlToggle(this,'dl_period')">🌸 আজ মাসিক হয়েছে</span>
+            <span class="sym-chip" id="sc-cramp"  onclick="dlToggle(this,'dl_cramp')">😰 ব্যথা/cramping আছে</span>
+          </div>
+          <input type="checkbox" id="dl_period" style="display:none">
+          <input type="checkbox" id="dl_cramp"  style="display:none">
+          <div style="margin-top:.6rem">
+            <div class="dl-label">ব্যথার মাত্রা</div>
+            <div class="range-wrap">
+              <input type="range" id="dl_cramp_level" min="1" max="10" value="5"
+                oninput="document.getElementById('dlClV').textContent=this.value">
+              <span class="range-num" id="dlClV">5</span>
+              <span style="font-size:.72rem;color:rgba(255,255,255,.3)">/10</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- মানসিক অবস্থা -->
+        <div class="fld-group" style="margin-top:.85rem">
+          <div class="fld-group-title">🧠 মানসিক অবস্থা</div>
+          <div class="dl-label">আজকের Mood</div>
+          <div class="mood-chips" id="dlMoodChips">
+            <span class="mood-chip" onclick="dlMood(this,'😊 ভালো')">😊 ভালো</span>
+            <span class="mood-chip" onclick="dlMood(this,'😐 মাঝারি')">😐 মাঝারি</span>
+            <span class="mood-chip" onclick="dlMood(this,'😔 খারাপ')">😔 খারাপ</span>
+            <span class="mood-chip" onclick="dlMood(this,'😰 দুশ্চিন্তায়')">😰 দুশ্চিন্তায়</span>
+            <span class="mood-chip" onclick="dlMood(this,'😡 রাগান্বিত')">😡 রাগান্বিত</span>
+            <span class="mood-chip" onclick="dlMood(this,'😴 ক্লান্ত')">😴 ক্লান্ত</span>
+          </div>
+          <div style="margin-top:.75rem">
+            <div class="dl-label">মানসিক অবস্থার বিবরণ</div>
+            <textarea id="dl_mental" class="dl-input dl-textarea"
+              placeholder="আজ কেমন লাগছে বলুন..."></textarea>
+          </div>
+          <div style="margin-top:.6rem">
+            <div class="dl-label">চাপের মাত্রা &nbsp;<span id="dlStV" style="color:var(--pink2);font-weight:700">5</span>/10</div>
+            <div class="range-wrap">
+              <input type="range" id="dl_stress" min="1" max="10" value="5"
+                oninput="document.getElementById('dlStV').textContent=this.value">
+            </div>
+          </div>
+        </div>
+
+        <!-- খাবার ও পানীয় -->
+        <div class="fld-group" style="margin-top:.85rem">
+          <div class="fld-group-title">🍽️ আজকের খাবার ও পানীয়</div>
+          <textarea id="dl_food" class="dl-input dl-textarea"
+            placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+          <div class="dl-2col" style="margin-top:.6rem">
+            <div>
+              <div class="dl-label">☕ কফি (কাপ)</div>
+              <input type="number" id="dl_coffee" min="0" max="20" value="0" class="dl-input">
+            </div>
+            <div>
+              <div class="dl-label">💧 পানি (লিটার)</div>
+              <input type="number" id="dl_water" min="0" max="10" step="0.5" value="2" class="dl-input">
+            </div>
+          </div>
+          <div style="margin-top:.5rem">
+            <div class="dl-label">পানীয় (চা, জুস, soft drink)</div>
+            <input type="text" id="dl_drinks" class="dl-input" placeholder="কী পানীয় পান করেছেন...">
+          </div>
+          <div style="margin-top:.5rem">
+            <div class="dl-label">আগামীকাল কী খেতে চান</div>
+            <input type="text" id="dl_food_pref" class="dl-input" placeholder="পছন্দের খাবার লিখুন...">
+          </div>
+        </div>
+
+        <!-- ঘুম -->
+        <div class="fld-group" style="margin-top:.85rem">
+          <div class="fld-group-title">😴 ঘুম ও অতিরিক্ত তথ্য</div>
+          <div class="dl-2col">
+            <div>
+              <div class="dl-label">ঘুম (ঘণ্টা)</div>
+              <input type="number" id="dl_sleep" min="0" max="24" step="0.5" value="7" class="dl-input">
+            </div>
+            <div>
+              <div class="dl-label">ঘুমের মান</div>
+              <select id="dl_sleep_q" class="dl-input" style="background:#12121A;cursor:pointer">
+                <option value="ভালো">ভালো</option>
+                <option value="মাঝারি" selected>মাঝারি</option>
+                <option value="খারাপ">খারাপ</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:.5rem">
+            <div class="dl-label">অন্য কোনো তথ্য (Voice-এ বলুন)</div>
+            <textarea id="dlNotes" class="dl-input dl-textarea"
+              placeholder="আর কিছু জানাতে চান? SAR-কে বলুন..."></textarea>
+          </div>
+        </div>
+
+        <div class="log-status" id="dlStatus"></div>
+        <button class="btn-save-log" id="dlSaveBtn" onclick="saveDailyLog()">
+          💾 আজকের স্বাস্থ্য লগ Save করুন
+        </button>
+        <div class="btn-row" style="margin-top:.85rem">
+          <button class="btn-back" onclick="prevSec(12)">← পিছনে</button>
+          <button class="btn-save" onclick="skipToSuccess()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)">
+            এড়িয়ে যান →
+          </button>
+        </div>
+      </div><!-- end sec12 -->
+
       <!-- SUCCESS -->
       <div class="suc-panel" id="sucPanel">
-        <div class="suc-icon">✓</div>
-        <div class="suc-title">মেট্রিক্স সেভ হয়েছে!</div>
-        <p class="suc-txt">আপনার সম্পূর্ণ স্বাস্থ্য প্রোফাইল Supabase-এ সংরক্ষিত হয়েছে। AI এখন আপনার জন্য বিশ্লেষণ তৈরি করবে।</p>
-        <p class="suc-txt">পরের ধাপ: মাসিক সাবস্ক্রিপশন (৳ ৫০০) নিন এবং আজকের ব্যক্তিগতকৃত মেনু ও AI বিশ্লেষণ পান।</p>
-        <div>
-          <a href="payment.html" class="btn-gd">সাবস্ক্রিপশন নিন →</a>
-          <a href="dashboard.html" class="btn-gd" style="background:linear-gradient(135deg,var(--purple),var(--purple2))">ড্যাশবোর্ড →</a>
+        <div class="suc-icon" id="sucIcon">✓</div>
+        <div class="suc-title" id="sucTitle">সেভ হয়েছে!</div>
+        <p class="suc-txt" id="sucMsg">আপনার স্বাস্থ্য তথ্য সংরক্ষিত হয়েছে।</p>
+        <p class="suc-txt" style="color:rgba(255,255,255,.45);font-size:.82rem">
+          সকাল ৬টায় AI আপনার তথ্য বিশ্লেষণ করে ব্যক্তিগতকৃত মেনু ও স্বাস্থ্য পরামর্শ পাঠাবে।
+        </p>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center;margin-top:.5rem">
+          <a href="dashboard.html" class="btn-gd">🏠 ড্যাশবোর্ড →</a>
+          <a href="payment.html" class="btn-gd" style="background:linear-gradient(135deg,var(--green),var(--purple))">💳 সাবস্ক্রিপশন নিন →</a>
         </div>
       </div>
 
@@ -1223,6 +1449,7 @@ function prevSec(idx) {
 }
 
 function updateOverall(idx) {
+  const TOTAL_SECS = 13;
   const pct = ((idx + 1) / 12 * 100).toFixed(0);
   document.getElementById('overallBar').style.width = pct + '%';
   document.getElementById('progPct').textContent = `বিভাগ ${idx + 1}/১২`;
@@ -1438,7 +1665,7 @@ async function saveAllMetrics() {
 
     // Check if metrics already exist for this customer
     const chkRes = await fetch(
-      `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=id`,
+      `${SUPA_URL}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=id`,
       { headers: H }
     );
     const existing = await chkRes.json();
@@ -1447,13 +1674,13 @@ async function saveAllMetrics() {
     if (existing && existing.length > 0) {
       // UPDATE existing record
       res = await fetch(
-        `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}`,
+        `${SUPA_URL}/rest/v1/customer-metrics?customer_id=eq.${CID}`,
         { method: 'PATCH', headers: { ...H, 'Prefer': 'return=minimal' }, body: JSON.stringify(data) }
       );
     } else {
       // INSERT new record
       res = await fetch(
-        `${SUPA_URL}/rest/v1/customer_metrics`,
+        `${SUPA_URL}/rest/v1/customer-metrics`,
         { method: 'POST', headers: H, body: JSON.stringify(data) }
       );
     }
@@ -1497,6 +1724,184 @@ async function saveAllMetrics() {
 // Init
 upStress(5);
 updateOverall(0);
+
+// ════════════════════════════════════════════════════════
+// NEW: Section 12 — Daily Health Log
+// ════════════════════════════════════════════════════════
+
+let _dlMood = '';
+let _dlVoiceRecog = null;
+
+// Toggle symptom chip
+function dlToggle(chip, cbId) {
+  const cb = document.getElementById(cbId);
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  chip.classList.toggle('on', cb.checked);
+  // Show fever temp row
+  if (cbId === 'dl_fever') {
+    const row = document.getElementById('dlFeverRow');
+    if (row) row.style.display = cb.checked ? 'block' : 'none';
+  }
+}
+
+// Mood chip selection
+function dlMood(chip, mood) {
+  document.querySelectorAll('#dlMoodChips .mood-chip').forEach(c => c.classList.remove('sel'));
+  chip.classList.add('sel');
+  _dlMood = mood;
+}
+
+// Skip sec12 — go directly to success
+function skipToSuccess() {
+  document.getElementById('sec12').classList.remove('active');
+  document.getElementById('sucPanel').style.display = 'block';
+  document.getElementById('sucTitle').textContent  = 'মেট্রিক্স সেভ হয়েছে!';
+  document.getElementById('sucMsg').textContent =
+    'আপনার সম্পূর্ণ স্বাস্থ্য প্রোফাইল Supabase-এ সংরক্ষিত হয়েছে।';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Save Daily Health Log → daily_health_log table
+async function saveDailyLog() {
+  const btn    = document.getElementById('dlSaveBtn');
+  const status = document.getElementById('dlStatus');
+  if (btn) { btn.textContent = '⏳ সংরক্ষণ হচ্ছে...'; btn.disabled = true; }
+  if (status) { status.className = 'log-status'; status.textContent = ''; }
+
+  const data = {
+    customer_id:       CID,
+    log_date:          new Date().toISOString().split('T')[0],
+    fever:             document.getElementById('dl_fever')?.checked   || false,
+    fever_temp:        parseFloat(document.getElementById('dl_fever_temp')?.value) || null,
+    cold_cough:        document.getElementById('dl_cold')?.checked    || false,
+    stomach_upset:     document.getElementById('dl_stomach')?.checked || false,
+    loose_motion:      document.getElementById('dl_motion')?.checked  || false,
+    headache:          document.getElementById('dl_head')?.checked    || false,
+    body_pain:         document.getElementById('dl_pain')?.checked    || false,
+    period_today:      document.getElementById('dl_period')?.checked  || false,
+    cramping:          document.getElementById('dl_cramp')?.checked   || false,
+    cramping_level:    parseInt(document.getElementById('dl_cramp_level')?.value || 5),
+    mood:              _dlMood,
+    mental_condition:  document.getElementById('dl_mental')?.value    || '',
+    stress_level:      parseInt(document.getElementById('dl_stress')?.value || 5),
+    food_eaten:        document.getElementById('dl_food')?.value      || '',
+    coffee_cups:       parseInt(document.getElementById('dl_coffee')?.value || 0),
+    water_intake:      parseFloat(document.getElementById('dl_water')?.value || 2),
+    drinks_taken:      document.getElementById('dl_drinks')?.value    || '',
+    food_preference_today: document.getElementById('dl_food_pref')?.value || '',
+    sleep_hours:       parseFloat(document.getElementById('dl_sleep')?.value || 7),
+    sleep_quality:     document.getElementById('dl_sleep_q')?.value   || 'মাঝারি',
+    notes:             document.getElementById('dlNotes')?.value      || '',
+  };
+
+  try {
+    // Use upsert — same day won't duplicate
+    const r = await fetch(`${SUPA_URL}/rest/v1/daily_health_log`, {
+      method:  'POST',
+      headers: {
+        ...H,
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (r.status === 404) {
+      throw new Error('daily_health_log table নেই। Supabase-এ SQL রান করুন।');
+    }
+    if (!r.ok && r.status !== 204) {
+      const errText = await r.text();
+      throw new Error('HTTP ' + r.status + ': ' + errText.substring(0, 80));
+    }
+
+    // Success
+    if (status) {
+      status.className  = 'log-status ok';
+      status.textContent = '✅ আজকের লগ সেভ হয়েছে!';
+    }
+    if (btn) { btn.textContent = '✅ Saved!'; btn.disabled = false; }
+
+    // Show success panel after short delay
+    setTimeout(() => {
+      document.getElementById('sec12').classList.remove('active');
+      const sp = document.getElementById('sucPanel');
+      if (sp) {
+        sp.style.display = 'block';
+        document.getElementById('sucIcon').textContent  = '🌸';
+        document.getElementById('sucTitle').textContent = 'সব তথ্য সেভ হয়েছে!';
+        document.getElementById('sucMsg').textContent   =
+          'আপনার মেট্রিক্স ও আজকের স্বাস্থ্য লগ উভয়ই সংরক্ষিত হয়েছে। সকাল ৬টায় AI বিশ্লেষণ করবে।';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 1000);
+
+  } catch(e) {
+    if (status) {
+      status.className  = 'log-status err';
+      status.textContent = '❌ ' + e.message;
+    }
+    if (btn) { btn.textContent = '💾 আজকের স্বাস্থ্য লগ Save করুন'; btn.disabled = false; }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// VOICE INPUT — metrics page & section 12
+// ════════════════════════════════════════════════════════
+function metricsVoice(targetId, btnEl) {
+  dlVoice(targetId, btnEl);
+}
+
+function dlVoice(targetId, btnEl) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    alert('Voice input শুধু Chrome browser-এ কাজ করে।');
+    return;
+  }
+
+  // Toggle off if already recording
+  if (_dlVoiceRecog) {
+    try { _dlVoiceRecog.stop(); } catch(e) {}
+    _dlVoiceRecog = null;
+    if (btnEl) btnEl.classList.remove('rec');
+    return;
+  }
+
+  const btn = btnEl || document.getElementById('dlVoiceBtn');
+  _dlVoiceRecog = new SR();
+  _dlVoiceRecog.lang = 'bn-BD';
+  _dlVoiceRecog.continuous = false;
+  _dlVoiceRecog.interimResults = false;
+
+  if (btn) btn.classList.add('rec');
+
+  _dlVoiceRecog.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    const el   = document.getElementById(targetId);
+    if (el) {
+      if (el.tagName === 'TEXTAREA' || el.type === 'text') {
+        el.value = (el.value ? el.value + '\n' : '') + text;
+      }
+    }
+    if (btn) btn.classList.remove('rec');
+    _dlVoiceRecog = null;
+  };
+
+  _dlVoiceRecog.onerror = () => {
+    if (btn) btn.classList.remove('rec');
+    _dlVoiceRecog = null;
+  };
+
+  _dlVoiceRecog.onend = () => {
+    if (btn) btn.classList.remove('rec');
+    _dlVoiceRecog = null;
+  };
+
+  _dlVoiceRecog.start();
+}
+
+// Update section progress to handle 13 sections (0-12)
+const _origUpdateOverall = updateOverall;
+
 </script>
 </body>
 </html>
