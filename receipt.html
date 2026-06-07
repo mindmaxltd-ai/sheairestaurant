@@ -3,621 +3,729 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SAR রিসিট — She AI Restaurant</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Hind+Siliguri:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<title>অর্ডার রিসিট — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#F5C842;--gold2:#FFE082;
-  --green:#059669;--green2:#34D399;
-  --pink:#E91E8C;--pink2:#FF6BB5;
-  --dark:#060608;--dark2:#0A0A10;--dark3:#111118;
-  --glass:rgba(255,255,255,.04);--glass2:rgba(255,255,255,.08);
-  --border:rgba(245,200,66,.15);--border2:rgba(245,200,66,.25);
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --dark:#0A0A0F;--dark2:#0F0F1A;
+  --glass:rgba(255,255,255,.048);--border:rgba(255,255,255,.09);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh}
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* BG */
-.bg-fixed{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(ellipse 60% 50% at 20% 20%,rgba(245,200,66,.05),transparent 60%),
-  radial-gradient(ellipse 50% 60% at 80% 80%,rgba(233,30,140,.05),transparent 60%)}
-.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(245,200,66,.02) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(245,200,66,.02) 1px,transparent 1px);
-  background-size:60px 60px}
-.rainbow{height:2px;background:linear-gradient(90deg,var(--gold),var(--green2),var(--pink2),var(--gold));
-  background-size:200%;animation:rb 4s linear infinite;position:fixed;top:0;left:0;right:0;z-index:999}
-@keyframes rb{0%{background-position:0%}100%{background-position:200%}}
+.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.07;animation:orbF 18s ease-in-out infinite}
+.o1{width:500px;height:500px;background:#E91E8C;top:-150px;left:-150px}
+.o2{width:400px;height:400px;background:#6B21A8;bottom:-120px;right:-120px;animation-delay:7s}
+@keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
 
-/* TOPBAR */
-.topbar{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);padding:.7rem 2rem;
-  display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.tb-left{display:flex;align-items:center;gap:.75rem}
-.tb-back{display:flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:8px;
-  background:var(--glass);border:1px solid var(--border);color:rgba(255,255,255,.5);
-  text-decoration:none;font-size:.78rem;transition:all .2s}
-.tb-back:hover{color:var(--gold);border-color:var(--border2)}
-.tb-title{font-family:'Cinzel',serif;font-size:.95rem;
-  background:linear-gradient(90deg,var(--gold),var(--gold2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
-.tb-actions{display:flex;gap:.5rem;flex-wrap:wrap}
-.act-btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .85rem;border-radius:9px;
-  font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;
-  border:1px solid;transition:all .25s}
-.act-pdf{background:rgba(233,30,140,.1);border-color:rgba(233,30,140,.3);color:var(--pink2)}
-.act-pdf:hover{background:rgba(233,30,140,.18);transform:translateY(-1px)}
-.act-wa{background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3);color:#4ade80}
-.act-wa:hover{background:rgba(37,211,102,.18);transform:translateY(-1px)}
-.act-email{background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.3);color:var(--gold2)}
-.act-email:hover{background:rgba(245,200,66,.18);transform:translateY(-1px)}
-.act-print{background:var(--glass2);border-color:var(--border2);color:rgba(255,255,255,.6)}
-.act-print:hover{color:#fff;transform:translateY(-1px)}
+/* LAYOUT */
+.page{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:1.25rem 1rem 4rem}
 
-/* MAIN */
-.main{position:relative;z-index:10;padding:1.5rem 1.5rem 4rem;display:flex;justify-content:center}
+/* NAV */
+.top-nav{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1.5rem;padding:.6rem 1.2rem;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  border:1px solid var(--border);border-radius:50px}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.logo-icon{width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,#E91E8C,#6B21A8);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95rem}
+.logo-text{font-family:'Playfair Display',serif;font-size:1rem;
+  background:linear-gradient(90deg,#E91E8C,#A855F7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:.5rem}
+.nav-pill{font-size:.76rem;color:rgba(255,255,255,.5);text-decoration:none;
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:.28rem .8rem;transition:all .25s}
+.nav-pill:hover{color:#FF6BB5;border-color:rgba(233,30,140,.3)}
 
-/* RECEIPT CARD */
-.receipt{max-width:640px;width:100%;background:rgba(10,10,18,.92);
-  border:1px solid var(--border2);border-radius:24px;overflow:hidden;
-  box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 60px rgba(245,200,66,.05)}
+/* Loading state */
+.loading-wrap{text-align:center;padding:4rem 2rem}
+.loading-spin{width:52px;height:52px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.2);border-top-color:#E91E8C;
+  animation:sp .75s linear infinite;margin:0 auto 1rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading-txt{font-size:.9rem;color:rgba(255,255,255,.45)}
+.error-wrap{text-align:center;padding:3rem 2rem;max-width:480px}
+.error-icon{font-size:3rem;margin-bottom:1rem}
+.error-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:#F87171;margin-bottom:.5rem}
+.error-desc{font-size:.85rem;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:1.5rem}
+.error-btn{display:inline-block;padding:.7rem 1.8rem;border-radius:50px;
+  background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;text-decoration:none;
+  font-size:.88rem;font-weight:700}
 
-/* TOP COLOR BAR */
-.rcp-rainbow{height:3px;background:linear-gradient(90deg,var(--gold),var(--green2),var(--pink2),var(--gold));
-  background-size:200%;animation:rb 4s linear infinite}
-
-/* HEADER */
-.rcp-header{padding:1.5rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);
-  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.rcp-brand{display:flex;align-items:center;gap:.75rem}
-.rcp-gem{width:46px;height:46px;border-radius:12px;
-  background:linear-gradient(135deg,var(--gold),var(--pink));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Cinzel',serif;font-size:1.2rem;font-weight:900;color:#000;
-  box-shadow:0 0 20px rgba(245,200,66,.3);flex-shrink:0}
-.rcp-brand-name{font-family:'Cinzel',serif;font-size:1rem;font-weight:900;
-  background:linear-gradient(90deg,var(--gold),var(--gold2));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
-.rcp-brand-sub{font-size:.62rem;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;letter-spacing:.08em}
-.rcp-meta{text-align:right}
-.rcp-num{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--gold);font-weight:700}
-.rcp-date{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.2rem}
-.rcp-status{display:inline-flex;align-items:center;gap:.35rem;margin-top:.4rem;
-  padding:.2rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;
-  background:rgba(5,150,105,.15);border:1px solid rgba(52,211,153,.3);color:var(--green2)}
-
-/* CUSTOMER */
-.rcp-cust{padding:1rem 1.75rem;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;
-  background:rgba(245,200,66,.03)}
-.rcp-cust-name{font-weight:700;font-size:.9rem;color:#fff}
-.rcp-cust-mid{font-family:'Space Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.15rem}
-.rcp-cat-badge{padding:.25rem .75rem;border-radius:50px;font-size:.7rem;font-weight:700}
-.cat-DM{background:rgba(233,30,140,.12);border:1px solid rgba(233,30,140,.25);color:var(--pink2)}
-.cat-OB{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:#FCD34D}
-.cat-FL{background:rgba(5,150,105,.12);border:1px solid rgba(52,211,153,.25);color:var(--green2)}
-.cat-IB{background:rgba(107,33,168,.12);border:1px solid rgba(168,85,247,.25);color:#C4B5FD}
-.cat-PR{background:rgba(255,107,181,.12);border:1px solid rgba(255,107,181,.25);color:var(--pink2)}
-
-/* ITEMS TABLE */
-.rcp-items{padding:1rem 1.75rem;border-bottom:1px solid var(--border)}
-.items-label{font-size:.65rem;color:rgba(255,255,255,.3);font-family:'Space Mono',monospace;
-  letter-spacing:.12em;text-transform:uppercase;margin-bottom:.75rem}
-.item-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;
-  border-bottom:1px solid rgba(255,255,255,.04)}
-.item-row:last-child{border-bottom:none}
-.item-emoji{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;
-  justify-content:center;font-size:1rem;flex-shrink:0}
-.item-info{flex:1}
-.item-name{font-size:.83rem;font-weight:600;color:#fff}
-.item-meta{font-size:.68rem;color:rgba(255,255,255,.35);margin-top:.1rem}
-.item-price{font-family:'Space Mono',monospace;font-size:.82rem;color:var(--gold);font-weight:700;white-space:nowrap}
-
-/* TOTALS */
-.rcp-totals{padding:.85rem 1.75rem;border-bottom:1px solid var(--border);background:rgba(245,200,66,.03)}
-.total-row{display:flex;justify-content:space-between;font-size:.8rem;color:rgba(255,255,255,.5);padding:.2rem 0}
-.total-row.main-total{font-size:1rem;color:#fff;font-weight:700;border-top:1px solid var(--border);padding-top:.65rem;margin-top:.4rem}
-.total-row.main-total .tv{color:var(--gold);font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:900}
-
-/* NUTRITION MINI */
-.rcp-nutr{padding:1rem 1.75rem;border-bottom:1px solid var(--border)}
-.nutr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:.65rem}
-.nutr-box{background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.55rem;text-align:center}
-.nutr-val{font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;color:var(--gold2)}
-.nutr-label{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:.15rem}
-
-/* MEDICINE NOTE */
-.rcp-med{padding:1rem 1.75rem;border-bottom:1px solid var(--border)}
-.med-title{display:flex;align-items:center;gap:.45rem;font-size:.75rem;font-weight:700;color:var(--green2);margin-bottom:.6rem}
-.med-list{display:flex;flex-direction:column;gap:.3rem}
-.med-item{font-size:.75rem;color:rgba(255,255,255,.5);display:flex;gap:.45rem;align-items:flex-start}
-.med-dot{color:var(--gold);flex-shrink:0}
-
-/* TRACKER */
-.rcp-track{padding:1rem 1.75rem;border-bottom:1px solid var(--border)}
-.track-steps{display:flex;align-items:center;gap:0;margin-top:.65rem}
-.ts-item{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:1}
-.ts-item:not(:last-child)::after{content:'';position:absolute;top:13px;left:50%;right:-50%;
-  height:2px;background:var(--border);z-index:0}
-.ts-item.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green2),var(--border))}
-.ts-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;font-size:.7rem;border:2px solid var(--border);
-  background:var(--dark2);position:relative;z-index:2}
-.ts-item.done .ts-dot{background:var(--green);border-color:var(--green2);
-  box-shadow:0 0 10px rgba(5,150,105,.4)}
-.ts-item.active .ts-dot{background:linear-gradient(135deg,var(--gold),var(--pink));
-  border-color:var(--gold);animation:dotPulse 2s ease-in-out infinite}
-@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(245,200,66,.3)}50%{box-shadow:0 0 20px rgba(245,200,66,.7)}}
-.ts-label{font-size:.55rem;color:rgba(255,255,255,.35);margin-top:.3rem;text-align:center;max-width:52px}
-.ts-item.done .ts-label{color:var(--green2)}
-.ts-item.active .ts-label{color:var(--gold)}
-
-/* FOOTER */
-.rcp-footer{padding:1rem 1.75rem;text-align:center}
-.rcp-disclaimer{font-size:.65rem;color:rgba(255,255,255,.25);line-height:1.6;margin-bottom:.75rem}
-.rcp-mindmax{font-size:.65rem;color:rgba(255,255,255,.2);font-family:'Space Mono',monospace}
-.rcp-mindmax span{color:var(--gold)}
-.rcp-qr{display:flex;flex-direction:column;align-items:center;gap:.3rem;margin-top:.75rem}
-.rcp-qr-box{width:60px;height:60px;background:rgba(255,255,255,.05);border:1px solid var(--border);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.8rem}
-.rcp-qr-label{font-size:.58rem;color:rgba(255,255,255,.2);font-family:'Space Mono',monospace;letter-spacing:.08em}
-
-/* LOADING */
-.loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:300px;gap:1rem;color:rgba(255,255,255,.3)}
-.spinner{width:40px;height:40px;border:2px solid var(--border2);
-  border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* TOAST */
-.toast{position:fixed;bottom:2rem;right:2rem;z-index:999;
-  background:rgba(10,10,20,.95);backdrop-filter:blur(20px);
-  border:1px solid var(--green2);border-radius:14px;padding:.85rem 1.2rem;
-  font-size:.82rem;color:rgba(255,255,255,.85);
-  transform:translateX(400px);transition:transform .4s cubic-bezier(.4,0,.2,1)}
-.toast.show{transform:translateX(0)}
-.toast.err{border-color:var(--pink2)}
-
-/* DEMO NOTICE */
-.demo-notice{text-align:center;padding:.6rem;background:rgba(245,158,11,.08);
-  border-bottom:1px solid rgba(245,158,11,.2);font-size:.72rem;color:rgba(245,200,66,.6)}
-
-/* PRINT */
-@media print{
-  body{background:#fff!important;color:#000!important}
-  .rainbow,.topbar,.act-btn,.toast{display:none!important}
-  .bg-fixed,.grid-bg{display:none!important}
-  .receipt{border:1px solid #ddd!important;border-radius:0!important;
-    box-shadow:none!important;background:#fff!important;color:#000!important}
-  .main{padding:0!important}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* ACTION BAR */
+.action-bar{
+  width:100%;max-width:760px;display:flex;gap:.65rem;flex-wrap:wrap;
+  justify-content:center;margin-bottom:1.25rem;
 }
+.act-btn{
+  padding:.7rem 1.4rem;border-radius:50px;font-size:.85rem;font-weight:700;
+  cursor:pointer;border:none;font-family:'Hind Siliguri',sans-serif;
+  display:flex;align-items:center;gap:.4rem;transition:all .3s;text-decoration:none;
+}
+.act-print{background:#fff;color:#880E4F}
+.act-wa{background:#25D366;color:#fff}
+.act-email{background:rgba(107,33,168,.2);border:1px solid rgba(107,33,168,.3);color:#A855F7}
+.act-back{background:var(--glass);border:1px solid var(--border);color:rgba(255,255,255,.65)}
+.act-btn:hover{transform:translateY(-2px);opacity:.92}
+
+/* ═══════════════════════════════════════════════
+   PINK A4 RECEIPT — Same as payment.html
+   ═══════════════════════════════════════════════ */
+.rcp-a4-wrap{width:100%;max-width:760px}
+
+.rcp-a4{
+  background:linear-gradient(180deg,#FFF0F5 0%,#FEE6F0 15%,#FFF8FC 40%,#FFF0F5 100%);
+  border-radius:6px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.5),
+             inset 0 0 0 1px rgba(233,30,140,.1),
+             4px 0 0 #FFB3D9,-4px 0 0 #FFB3D9;
+  font-family:Arial,sans-serif;color:#222;
+  position:relative;
+}
+.rcp-a4::before{
+  content:'SAR SHE AI';position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);
+  font-size:72px;font-weight:900;color:rgba(233,30,140,.04);
+  white-space:nowrap;pointer-events:none;z-index:0;letter-spacing:.2em;
+}
+
+.rcp-a4-header{
+  background:linear-gradient(135deg,#C2185B,#AD1457,#880E4F);
+  padding:22px 28px 18px;text-align:center;position:relative;z-index:1;
+}
+.rcp-a4-logo{color:#fff;font-family:Georgia,serif;font-size:22px;font-weight:700;letter-spacing:.05em;margin-bottom:4px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.rcp-a4-logo span{color:#FFD1E8}
+.rcp-a4-tagline{color:#FFB3D1;font-size:11px;letter-spacing:.12em;margin-bottom:10px}
+.rcp-a4-num{display:inline-block;background:rgba(255,255,255,.15);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.3);border-radius:20px;
+  padding:5px 18px;color:#fff;font-size:13px;font-weight:700;letter-spacing:.05em}
+.rcp-order-badge{display:inline-block;background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);border-radius:12px;
+  padding:3px 14px;color:#FFD1E8;font-size:11px;margin-top:6px}
+
+.rcp-a4-success{
+  background:linear-gradient(135deg,#E8F5E9,#F1F8E9);
+  border-bottom:2px solid #A5D6A7;
+  padding:14px 24px;display:flex;align-items:center;gap:12px;
+  position:relative;z-index:1;
+}
+.rcp-suc-icon{font-size:26px;flex-shrink:0}
+.rcp-suc-title{color:#2E7D32;font-weight:700;font-size:15px;margin-bottom:3px}
+.rcp-suc-desc{color:#558B2F;font-size:12px}
+
+.rcp-a4-body{padding:18px 24px;position:relative;z-index:1}
+
+/* Info grid */
+.rcp-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.rcp-info-cell{background:rgba(255,255,255,.7);border:1px solid #FFB3CC;border-radius:8px;padding:8px 11px}
+.rcp-info-k{font-size:10px;color:#AD1457;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.rcp-info-v{font-size:13px;color:#222;font-weight:600}
+
+/* Total stripe */
+.rcp-total-stripe{background:linear-gradient(135deg,#880E4F,#C2185B);border-radius:10px;
+  padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.rcp-total-k{color:#FFD1E8;font-size:12px}
+.rcp-total-v{color:#fff;font-size:20px;font-weight:700;font-family:'Space Mono',Arial}
+
+/* Section head */
+.rcp-section-head{font-size:10.5px;font-weight:700;color:#880E4F;text-transform:uppercase;
+  letter-spacing:.1em;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.rcp-section-head::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#FFB3CC,transparent)}
+
+/* Nutrition table */
+.rcp-nutr-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:11.5px}
+.rcp-nutr-table th{background:#880E4F;color:#FFD1E8;padding:7px 9px;text-align:left;font-size:10px}
+.rcp-nutr-table td{padding:8px 9px;border-bottom:1px solid #FFE0EE;vertical-align:top}
+.rcp-nutr-table tr:nth-child(even) td{background:rgba(255,182,193,.15)}
+.rcp-nutr-total td{background:#FCE4EC!important;font-weight:700;color:#880E4F}
+.rcp-bc-link{font-size:10px;color:#005BAA;background:#E3F2FD;padding:2px 7px;border-radius:4px;
+  border:1px solid #BBDEFB;text-decoration:none;display:inline-block;margin-top:3px}
+
+/* Divider */
+.rcp-divider{display:flex;align-items:center;gap:10px;margin:14px 0}
+.rcp-divider::before,.rcp-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#FFB3CC,transparent)}
+.rcp-divider-txt{font-size:10px;color:#C2185B;white-space:nowrap;letter-spacing:.08em;font-weight:700}
+
+/* Page break — Side B */
+.rcp-page-break{border-top:3px dashed #FFB3CC;margin:18px 0;padding-top:14px;position:relative}
+.rcp-page-label{position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;
+  font-size:10px;padding:2px 14px;border-radius:10px;white-space:nowrap}
+
+/* Personalized messages */
+.rcp-msg-box{border-radius:10px;padding:10px 13px;margin-bottom:9px;position:relative;overflow:hidden}
+.rcp-msg-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.rcp-msg-red{background:#FFF5F5;border:1px solid #FFCDD2}.rcp-msg-red::before{background:#D32F2F}
+.rcp-msg-green{background:#F1F8E9;border:1px solid #C5E1A5}.rcp-msg-green::before{background:#388E3C}
+.rcp-msg-pink{background:#FCE4EC;border:1px solid #F48FB1}.rcp-msg-pink::before{background:#C2185B}
+.rcp-msg-purple{background:#F3E5F5;border:1px solid #CE93D8}.rcp-msg-purple::before{background:#7B1FA2}
+.rcp-msg-title{font-size:11.5px;font-weight:700;margin-bottom:3px}
+.rcp-msg-red .rcp-msg-title{color:#C62828}.rcp-msg-green .rcp-msg-title{color:#2E7D32}
+.rcp-msg-pink .rcp-msg-title{color:#AD1457}.rcp-msg-purple .rcp-msg-title{color:#6A1B9A}
+.rcp-msg-body{font-size:11px;color:#444;line-height:1.6}
+
+/* Survey */
+.rcp-survey{background:#FFF8FC;border:1px solid #FFB3CC;border-radius:10px;padding:11px 13px;margin-top:12px}
+.rcp-survey-q{font-size:11.5px;font-weight:700;color:#880E4F;margin-bottom:7px}
+.rcp-survey-line{border:none;border-bottom:1px solid #FFB3CC;background:transparent;width:100%;margin-bottom:7px}
+
+/* Footer */
+.rcp-footer{text-align:center;padding:10px 0;font-size:10px;color:#AD1457;line-height:1.8}
+
+/* PRINT STYLES */
+@media print{
+  .bg-wrap,.top-nav,.action-bar{display:none!important}
+  .page{padding:0}
+  .rcp-a4{box-shadow:none;border-radius:0}
+  body{background:#FFF0F5!important}
+  .rcp-page-break{page-break-before:always}
+}
+
+/* LOADER */
+.loader-overlay{display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(10,10,15,.88);backdrop-filter:blur(10px);
+  flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
+.loader-overlay.show{display:flex}
+.spin{width:44px;height:44px;border-radius:50%;
+  border:3px solid rgba(233,30,140,.18);border-top-color:#E91E8C;animation:sp .75s linear infinite}
+.load-txt{font-size:.88rem;color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
-<div class="bg-fixed"></div>
-<div class="grid-bg"></div>
-<div class="rainbow"></div>
+<div class="bg-wrap"><div class="orb o1"></div><div class="orb o2"></div></div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="tb-left">
-    <a href="dashboard.html" class="tb-back">← ড্যাশবোর্ড</a>
-    <span class="tb-title">SAR রিসিট</span>
-  </div>
-  <div class="tb-actions">
-    <button class="act-btn act-pdf" onclick="downloadPDF()">⬇️ PDF</button>
-    <button class="act-btn act-wa"  onclick="sendWhatsApp()">📱 WhatsApp</button>
-    <button class="act-btn act-email" onclick="sendEmail()">📧 Email</button>
-    <button class="act-btn act-print" onclick="window.print()">🖨️ প্রিন্ট</button>
-  </div>
+<div class="loader-overlay" id="loader">
+  <div class="spin"></div>
+  <div class="load-txt" id="loadTxt">রিসিট লোড হচ্ছে...</div>
 </div>
 
-<div class="main">
-  <div class="receipt" id="receiptCard">
-    <div class="rcp-rainbow"></div>
+<div class="page">
 
-    <!-- LOADING STATE (replaced by data) -->
-    <div class="loading-state" id="loadingState">
-      <div class="spinner"></div>
-      <div>রিসিট লোড হচ্ছে...</div>
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">S</div>
+      <span class="logo-text">SAR</span>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-pill">📊 ড্যাশবোর্ড</a>
+      <a href="order.html"     class="nav-pill">🛒 অর্ডার</a>
+      <a href="menu.html"      class="nav-pill">🥗 মেনু</a>
     </div>
+  </nav>
 
-    <!-- RECEIPT CONTENT (hidden until loaded) -->
-    <div id="receiptContent" style="display:none">
+  <!-- Loading state -->
+  <div id="loadingState" style="text-align:center;padding:4rem 2rem">
+    <div class="loading-spin"></div>
+    <div class="loading-txt">অর্ডার রিসিট লোড হচ্ছে...</div>
+  </div>
 
-      <!-- DEMO NOTICE -->
-      <div class="demo-notice" id="demoNotice" style="display:none">
-        ℹ️ ডেমো রিসিট — আপনার প্রথম অর্ডারের রিসিট এখানে দেখাবে
+  <!-- Error state (hidden initially) -->
+  <div id="errorState" class="error-wrap" style="display:none">
+    <div class="error-icon">😔</div>
+    <div class="error-title">রিসিট পাওয়া যায়নি</div>
+    <div class="error-desc">অর্ডার ID সঠিক নয় বা রিসিট মেয়াদ শেষ হয়েছে।</div>
+    <a href="dashboard.html" class="error-btn">← ড্যাশবোর্ডে যান</a>
+  </div>
+
+  <!-- Action Buttons (hidden until receipt loads) -->
+  <div class="action-bar" id="actionBar" style="display:none">
+    <button class="act-btn act-wa"    onclick="sendReceiptWA()">💬 WhatsApp</button>
+    <button class="act-btn act-email" onclick="sendReceiptEmail()">📧 Email</button>
+    <button class="act-btn act-print" onclick="printReceipt()">🖨️ Print / PDF</button>
+    <a href="order.html" class="act-btn act-back">🛒 নতুন অর্ডার</a>
+    <a href="dashboard.html" class="act-btn act-back">🏠 ড্যাশবোর্ড</a>
+  </div>
+
+  <!-- Pink A4 Receipt (filled by JS) -->
+  <div class="rcp-a4-wrap" id="receiptWrap" style="display:none">
+    <div class="rcp-a4" id="receiptA4">
+
+      <div class="rcp-a4-header">
+        <div class="rcp-a4-logo">🌸 SAR <span>She AI Restaurant</span></div>
+        <div class="rcp-a4-tagline">WOMEN-LED · WOMEN-RUN · AI THERAPEUTIC FOOD · DHAKA, BANGLADESH</div>
+        <div class="rcp-a4-num">🧾 Receipt #<span id="rcpNumber">—</span></div>
+        <div class="rcp-order-badge" id="rcpOrderBadge">Order: —</div>
       </div>
 
-      <!-- HEADER -->
-      <div class="rcp-header">
-        <div class="rcp-brand">
-          <div class="rcp-gem">S</div>
-          <div>
-            <span class="rcp-brand-name">SAR সার</span>
-            <span class="rcp-brand-sub">She AI Restaurant · MindMax</span>
-          </div>
-        </div>
-        <div class="rcp-meta">
-          <div class="rcp-num" id="rcpNum">RCP-XXXXXXXX</div>
-          <div class="rcp-date" id="rcpDate">—</div>
-          <div class="rcp-status">✅ পেমেন্ট সম্পন্ন</div>
-        </div>
-      </div>
-
-      <!-- CUSTOMER -->
-      <div class="rcp-cust">
+      <div class="rcp-a4-success">
+        <span class="rcp-suc-icon">✅</span>
         <div>
-          <div class="rcp-cust-name" id="custNameEl">—</div>
-          <div class="rcp-cust-mid" id="custMidEl">—</div>
-        </div>
-        <span class="rcp-cat-badge cat-DM" id="catBadge">DM</span>
-      </div>
-
-      <!-- ITEMS -->
-      <div class="rcp-items">
-        <div class="items-label">অর্ডার আইটেম</div>
-        <div id="itemsList"></div>
-      </div>
-
-      <!-- TOTALS -->
-      <div class="rcp-totals">
-        <div class="total-row"><span>সাবটোটাল</span><span class="tv" id="subTotal">৳০</span></div>
-        <div class="total-row"><span>ডেলিভারি</span><span class="tv" id="delivFee">৳৫০</span></div>
-        <div class="total-row"><span>VAT (5%)</span><span class="tv" id="vatAmt">৳০</span></div>
-        <div class="total-row main-total"><span>মোট পরিশোধ</span><span class="tv" id="grandTotal">৳০</span></div>
-        <div class="total-row" style="margin-top:.35rem"><span style="font-size:.72rem">পেমেন্ট পদ্ধতি</span><span style="font-size:.72rem;color:rgba(255,255,255,.5)" id="payMethod">—</span></div>
-        <div class="total-row"><span style="font-size:.72rem">ট্রানজেকশন ID</span><span style="font-size:.68rem;font-family:'Space Mono',monospace;color:rgba(255,255,255,.4)" id="txnId">—</span></div>
-      </div>
-
-      <!-- NUTRITION -->
-      <div class="rcp-nutr">
-        <div class="items-label">পুষ্টিমান (মোট)</div>
-        <div class="nutr-grid">
-          <div class="nutr-box"><div class="nutr-val" id="nCalorie">—</div><div class="nutr-label">ক্যালরি</div></div>
-          <div class="nutr-box"><div class="nutr-val" id="nProtein">—</div><div class="nutr-label">প্রোটিন</div></div>
-          <div class="nutr-box"><div class="nutr-val" id="nCarbs">—</div><div class="nutr-label">কার্বস</div></div>
-          <div class="nutr-box"><div class="nutr-val" id="nFiber">—</div><div class="nutr-label">ফাইবার</div></div>
+          <div class="rcp-suc-title">অর্ডার নিশ্চিত হয়েছে!</div>
+          <div class="rcp-suc-desc" id="rcpSucDesc">আপনার থেরাপিউটিক খাবার প্রস্তুত হচ্ছে।</div>
         </div>
       </div>
 
-      <!-- MEDICINE -->
-      <div class="rcp-med">
-        <div class="med-title">💊 আজকের থেরাপিউটিক পরামর্শ</div>
-        <div class="med-list" id="medList"></div>
+      <div class="rcp-a4-body" id="rcpBody">
+        <!-- Filled by buildOrderReceipt() -->
       </div>
 
-      <!-- TRACKER -->
-      <div class="rcp-track">
-        <div class="items-label">অর্ডার স্ট্যাটাস</div>
-        <div class="track-steps" id="trackSteps"></div>
-      </div>
+    </div>
+  </div>
 
-      <!-- FOOTER -->
-      <div class="rcp-footer">
-        <div class="rcp-disclaimer">
-          ⚕️ এই রিসিটে উল্লিখিত পরামর্শ শুধুমাত্র সহায়ক তথ্য। যেকোনো চিকিৎসা পরিবর্তনের আগে আপনার ডাক্তারের সাথে পরামর্শ করুন।<br>
-          SAR is a therapeutic food service, not a medical provider.
-        </div>
-        <div class="rcp-qr">
-          <div class="rcp-qr-box">📱</div>
-          <div class="rcp-qr-label">SCAN TO VERIFY · sheairestaurant.com</div>
-        </div>
-        <div class="rcp-mindmax" style="margin-top:.75rem">
-          © ২০২৬ <span>SAR সার</span> · <span>MindMax She Enterprises</span> · Dhaka, Bangladesh<br>
-          📞 01346098892 · mindmaxltd@gmail.com · mindmaxbd.xyz
-        </div>
-      </div>
-
-    </div><!-- /receiptContent -->
-  </div><!-- /receipt -->
-</div>
-
-<div class="toast" id="toast"></div>
+</div><!-- /page -->
 
 <script>
-const SUPA_URL = 'https://xlkrggspepnysbouatec.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
-const H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
+// ═══════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════
+const SUPA  = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H     = {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
+const _sc   = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+const CID   = _sc.id || localStorage.getItem('sar_customer_id') || '';
+const CNAME = _sc.full_name || localStorage.getItem('sar_customer_name') || 'গ্রাহক';
+const CMID  = _sc.member_id || '—';
 
-const params  = new URLSearchParams(location.search);
-const orderId = params.get('order_id') || params.get('id');
-const rcpId   = params.get('receipt_id');
-const txnParam= params.get('txn');
+// Global receipt data for WhatsApp/Email
+let _rcpData = {};
+let _custData = {};
 
-// Medicine advice by disease category
-const MEDICINE = {
-  DM: ['মেথি পানি — সকালে খালি পেটে (১ চামচ বীজ ভেজানো)','করলার রস — ১০ মিলি + পানি সমান ভাগ','Syzygium jambolanum 3x — সকাল ও রাতে','কারকুমা-মেথি-করলা পাউডার — ১ চা চামচ প্রতিদিন'],
-  OB: ['আদা-লেবু পানি — সকালে','ত্রিফলা চূর্ণ — রাতে ঘুমানোর আগে','Calcarea carbonica 30c — সপ্তাহে ৩ দিন','ফ্যাট-বার্ন পাউডার — দুপুরের খাবারের আগে'],
-  FL: ['ভৃঙ্গরাজ চা — সন্ধ্যায়','কাঁচা হলুদ রস — ১ চামচ সকালে','Chelidonium majus 6c — সকাল ও রাতে','লিভার-ডেটক্স পাউডার — প্রতিদিন সকালে'],
-  IB: ['জিরা-ধনে-মৌরি চা — প্রতি খাবারের পরে','ইসবগুল ভুসি — রাতে ঘুমানোর আগে','Nux vomica 30c — প্রয়োজনে','গাট-হিল পাউডার — সকাল ও রাতে'],
-  PR: ['ফলিক অ্যাসিড ৪০০mcg — প্রতিদিন (ডাক্তারের পরামর্শে)','শতাবরী চা — সকালে','আদা চা — বমিভাব থাকলে','মাতৃ-পুষ্টি পাউডার — দুপুরে'],
-};
+// Daily reference values
+const DAILY = {kcal:2000,protein:50,carb:260,fat:65,fiber:25};
 
-const STEPS_CONFIG = [
-  {icon:'📝',label:'অর্ডার প্রাপ্ত'},
-  {icon:'✅',label:'নিশ্চিত'},
-  {icon:'👩‍🍳',label:'রান্না'},
-  {icon:'🍱',label:'প্রস্তুত'},
-  {icon:'🚴‍♀️',label:'পথে'},
-  {icon:'🏠',label:'পৌঁছেছে'},
-];
-const STATUS_IDX = {pending:0,confirmed:1,preparing:2,ready:3,out_for_delivery:4,delivered:5};
+// Disease map
+const CAT_MAP = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
 
-let currentOrderData = null;
-let currentCustomer  = null;
+// ═══════════════════════════════════════════════════
+// INIT — read URL, fetch data, build receipt
+// ═══════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  showLoader('অর্ডার তথ্য লোড হচ্ছে...');
+  document.getElementById('loadingState').style.display = 'none';
 
-async function init() {
-  currentCustomer = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  // Get order ID from URL
+  const params  = new URLSearchParams(window.location.search);
+  const orderId = params.get('oid') || params.get('order_id') || '';
+  const txnId   = params.get('txn') || '';
+
+  if (!orderId && !txnId) {
+    showError('URL-এ অর্ডার ID নেই। order.html থেকে রিসিট বাটনে ক্লিক করুন।');
+    return;
+  }
 
   try {
-    let order = null;
+    // Fetch all data in parallel
+    const custId = CID || '';
+    const [orderArr, custArr, metricsArr, aiArr, logArr, prevOrdersArr] = await Promise.all([
+      orderId
+        ? fetch(`${SUPA}/rest/v1/orders?id=eq.${orderId}&select=*`,{headers:H}).then(r=>r.json())
+        : fetch(`${SUPA}/rest/v1/payments?transaction_id=eq.${txnId}&select=*`,{headers:H}).then(r=>r.json()),
+      custId
+        ? fetch(`${SUPA}/rest/v1/customers?id=eq.${custId}&select=*`,{headers:H}).then(r=>r.json())
+        : Promise.resolve([_sc]),
+      custId
+        ? fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${custId}&limit=1`,{headers:H}).then(r=>r.json())
+        : Promise.resolve([]),
+      custId
+        ? fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${custId}&order=created_at.desc&limit=1`,{headers:H}).then(r=>r.json())
+        : Promise.resolve([]),
+      custId
+        ? fetch(`${SUPA}/rest/v1/daily_health_log?customer_id=eq.${custId}&order=log_date.desc&limit=1`,{headers:H}).then(r=>r.json())
+        : Promise.resolve([]),
+      custId
+        ? fetch(`${SUPA}/rest/v1/orders?customer_id=eq.${custId}&order=created_at.desc&limit=4&select=*`,{headers:H}).then(r=>r.json())
+        : Promise.resolve([]),
+    ]);
 
-    // 1. Try receipt table by ID
-    if (rcpId) {
-      const r = await fetch(`${SUPA_URL}/rest/v1/receipts?id=eq.${rcpId}&select=*`, {headers:H});
-      const d = await r.json();
-      if (d?.[0]) { populateFromReceipt(d[0]); return; }
-    }
+    const order    = orderArr?.[0];
+    const cust     = custArr?.[0]  || _sc || {};
+    const metrics  = metricsArr?.[0] || {};
+    const ai       = aiArr?.[0]    || {};
+    const log      = logArr?.[0]   || {};
+    // Previous orders = exclude current
+    const prevOrders = (prevOrdersArr||[]).filter(o => o.id !== orderId).slice(0,3);
 
-    // 2. Try orders table
-    if (orderId) {
-      const r = await fetch(`${SUPA_URL}/rest/v1/orders?id=eq.${orderId}&select=*`, {headers:H});
-      const d = await r.json();
-      if (d?.[0]) order = d[0];
-    }
+    _custData = cust;
 
-    // 3. Try most recent order for this customer
-    if (!order && currentCustomer?.id) {
-      const r = await fetch(`${SUPA_URL}/rest/v1/orders?customer_id=eq.${currentCustomer.id}&order=created_at.desc&limit=1&select=*`, {headers:H});
-      const d = await r.json();
-      if (d?.[0]) order = d[0];
-    }
-
-    if (order) {
-      populateFromOrder(order);
+    if (!order) {
+      // Check localStorage saved items
+      const savedItems = JSON.parse(localStorage.getItem('sar_last_order_items')||'[]');
+      const lastOrderNum = localStorage.getItem('sar_last_order_num') || '—';
+      if (savedItems.length) {
+        await buildOrderReceipt(null, savedItems, cust, metrics, ai, log, prevOrders, lastOrderNum);
+      } else {
+        showError('অর্ডার পাওয়া যায়নি। তথ্য মুছে গিয়ে থাকতে পারে।');
+        return;
+      }
     } else {
-      loadDemo();
+      const items = order.items_json || JSON.parse(localStorage.getItem('sar_last_order_items')||'[]');
+      await buildOrderReceipt(order, items, cust, metrics, ai, log, prevOrders, order.order_number);
     }
+
+    hideLoader();
+    document.getElementById('receiptWrap').style.display = 'block';
+    document.getElementById('actionBar').style.display = 'flex';
+
   } catch(e) {
-    loadDemo();
+    console.error(e);
+    showError('রিসিট লোড করতে সমস্যা হয়েছে: ' + e.message);
   }
-}
+});
 
-function populateFromOrder(o) {
-  currentOrderData = o;
-  show();
-
-  // Basic info
-  document.getElementById('rcpNum').textContent     = 'RCP-' + (o.order_number || o.id?.slice(0,8).toUpperCase() || 'XXXXXXXX');
-  document.getElementById('rcpDate').textContent    = formatDate(o.created_at);
-  document.getElementById('custNameEl').textContent = currentCustomer?.full_name || o.customer_name || 'SAR গ্রাহক';
-  document.getElementById('custMidEl').textContent  = currentCustomer?.member_id || o.member_id || '—';
-  document.getElementById('txnId').textContent      = o.transaction_id || txnParam || '—';
-  document.getElementById('payMethod').textContent  = (o.payment_method || '—').toUpperCase();
-
-  // Category badge
-  const cat = currentCustomer?.sar_category || o.disease_category || 'DM';
-  const catEl = document.getElementById('catBadge');
-  catEl.textContent = catNameBn(cat);
-  catEl.className = `rcp-cat-badge cat-${cat}`;
-
-  // Items
-  let items = o.items_json;
-  if (typeof items === 'string') try { items = JSON.parse(items); } catch(e) { items = []; }
-  renderItems(items || []);
+// ═══════════════════════════════════════════════════
+// BUILD FULL ORDER RECEIPT
+// ═══════════════════════════════════════════════════
+async function buildOrderReceipt(order, items, cust, metrics, ai, log, prevOrders, orderNum) {
+  const today   = order ? new Date(order.created_at) : new Date();
+  const rcpNum  = 'RCP-' + today.toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000+Math.random()*9000);
+  const cat     = cust.sar_category || 'DM';
+  const catLabel = CAT_MAP[cat] || cat;
 
   // Totals
-  const sub  = o.subtotal || o.total_amount || 0;
-  const deliv = o.delivery_fee || 50;
-  const vat  = Math.round(sub * 0.05);
-  const grand = o.total_amount || (sub + deliv + vat);
-  document.getElementById('subTotal').textContent   = '৳' + sub.toLocaleString();
-  document.getElementById('delivFee').textContent   = '৳' + deliv.toLocaleString();
-  document.getElementById('vatAmt').textContent     = '৳' + vat.toLocaleString();
-  document.getElementById('grandTotal').textContent = '৳' + grand.toLocaleString();
+  const sub   = items.reduce((s,i) => s+(i.price||i.unit_price||0)*(i.qty||i.quantity||1), 0);
+  const del   = order?.delivery_fee || 0;
+  const vat   = order?.tax || Math.round(sub * 0.05);
+  const grand = order?.total_amount || (sub + del + vat);
+  const payMethod = order?.payment_method || localStorage.getItem('sar_last_pay_method') || '—';
+  const orderType = order?.order_type || '—';
+  const addr  = order?.delivery_address || '—';
+  const tbl   = order?.table_number || '—';
 
-  // Nutrition
-  const nutr = o.nutrition_summary || {};
-  document.getElementById('nCalorie').textContent = (nutr.calories || '—') + (nutr.calories ? '' : '');
-  document.getElementById('nProtein').textContent = (nutr.protein_g ? nutr.protein_g+'g' : '—');
-  document.getElementById('nCarbs').textContent   = (nutr.carbs_g   ? nutr.carbs_g+'g'   : '—');
-  document.getElementById('nFiber').textContent   = (nutr.fiber_g   ? nutr.fiber_g+'g'   : '—');
+  // ETA
+  const etaMap = {delivery:'৪৫ মিনিট', dine_in:'২৫ মিনিট', takeaway:'২০ মিনিট'};
+  const eta   = etaMap[orderType] || '—';
 
-  // Medicine
-  renderMedicine(cat);
+  // ── Nutrition rows ──────────────────────────────
+  let nutrRows = '';
+  let totalKcal = 0, totalProtein = 0;
+  items.forEach(item => {
+    const name    = item.name_bn || item.menu_name_bn || item.name || '—';
+    const qty     = item.qty || item.quantity || 1;
+    const price   = (item.price || item.unit_price || 0) * qty;
+    const kcal    = parseInt(item.kcal || item.nutrition_json?.kcal) || 0;
+    const protein = parseFloat(item.protein || item.nutrition_json?.protein) || Math.round(kcal*0.15/4);
+    const carb    = parseFloat(item.carb) || Math.round(kcal*0.5/4);
+    const fat     = parseFloat(item.fat)  || Math.round(kcal*0.3/9);
+    const fiber   = parseFloat(item.fiber)|| 3;
+    totalKcal    += kcal * qty;
+    totalProtein += protein * qty;
 
-  // Tracker
-  renderTracker(o.status || 'delivered');
-}
+    const pKcal = kcal   ? Math.min(99,Math.round(kcal/DAILY.kcal*100))     : 0;
+    const pProt = protein? Math.min(99,Math.round(protein/DAILY.protein*100)): 0;
+    const pCarb = carb   ? Math.min(99,Math.round(carb/DAILY.carb*100))     : 0;
+    const pFat  = fat    ? Math.min(99,Math.round(fat/DAILY.fat*100))       : 0;
 
-function populateFromReceipt(r) {
-  show();
-  document.getElementById('rcpNum').textContent     = r.receipt_number || 'RCP-' + r.id?.slice(0,8).toUpperCase();
-  document.getElementById('rcpDate').textContent    = formatDate(r.receipt_date || r.created_at);
-  document.getElementById('custNameEl').textContent = currentCustomer?.full_name || '—';
-  document.getElementById('custMidEl').textContent  = currentCustomer?.member_id || '—';
-  document.getElementById('grandTotal').textContent = '৳' + (r.total_amount || 0).toLocaleString();
+    const benefits = item.benefits || item.desc || getDiseasebenefits(cat).slice(0,1)[0] || 'থেরাপিউটিক ফুড';
+    const herbs    = item.powders  || item.herbs || '';
+    const mealMap  = {breakfast:'🌅 সকাল',lunch:'☀️ দুপুর',dinner:'🌙 রাত'};
+    const mealLbl  = mealMap[item.meal] || '';
+    const bcUrl    = `blockchain.html?item=${encodeURIComponent(name)}`;
 
-  const nutr = r.nutrition_summary || {};
-  document.getElementById('nCalorie').textContent = nutr.calories || '—';
-  document.getElementById('nProtein').textContent = (nutr.protein_g ? nutr.protein_g+'g' : '—');
-  document.getElementById('nCarbs').textContent   = (nutr.carbs_g   ? nutr.carbs_g+'g'   : '—');
-  document.getElementById('nFiber').textContent   = (nutr.fiber_g   ? nutr.fiber_g+'g'   : '—');
+    nutrRows += `<tr>
+      <td>
+        <b>${name}</b>${mealLbl?` <span style="font-size:10px;color:#006A4E">${mealLbl}</span>`:''}
+        ${qty>1?`<span style="font-size:10px;color:#888"> ×${qty}</span>`:''}
+        <div style="font-size:10.5px;color:#006A4E;margin-top:2px">✦ ${benefits}</div>
+        ${herbs?`<div style="font-size:9.5px;color:#7B1FA2">🌿 ${herbs}</div>`:''}
+        <a href="${bcUrl}" target="_blank" class="rcp-bc-link">⛓️ Blockchain →</a>
+      </td>
+      <td style="text-align:center">${kcal}<br><small style="color:#AD1457">${pKcal}%DV</small></td>
+      <td style="text-align:center">${protein}g<br><small style="color:#AD1457">${pProt}%DV</small></td>
+      <td style="text-align:center">${carb}g<br><small style="color:#888">${pCarb}%DV</small></td>
+      <td style="text-align:center">${fat}g<br><small style="color:#888">${pFat}%DV</small></td>
+      <td style="text-align:right;font-weight:700">৳${price}</td>
+    </tr>`;
+  });
 
-  renderItems(r.items_snapshot || []);
-  renderMedicine(currentCustomer?.sar_category || 'DM');
-  renderTracker('delivered');
-}
+  const pTotalKcal = Math.round(totalKcal/DAILY.kcal*100);
 
-function loadDemo() {
-  document.getElementById('demoNotice').style.display = 'block';
-  show();
-  document.getElementById('rcpNum').textContent     = 'RCP-DEMO-2026';
-  document.getElementById('rcpDate').textContent    = new Date().toLocaleDateString('bn-BD');
-  document.getElementById('custNameEl').textContent = currentCustomer?.full_name || 'SAR গ্রাহক';
-  document.getElementById('custMidEl').textContent  = currentCustomer?.member_id || 'SAR-DEMO-000001';
-  document.getElementById('subTotal').textContent   = '৳৫০০';
-  document.getElementById('delivFee').textContent   = '৳৫০';
-  document.getElementById('vatAmt').textContent     = '৳২৫';
-  document.getElementById('grandTotal').textContent = '৳৫৭৫';
-  document.getElementById('nCalorie').textContent   = '৪৮০';
-  document.getElementById('nProtein').textContent   = '২৮g';
-  document.getElementById('nCarbs').textContent     = '৫৫g';
-  document.getElementById('nFiber').textContent     = '১২g';
-  renderItems([
-    {menu_name_bn:'গোল্ডেন কুইনোয়া কনজি',meal_type:'breakfast',quantity:1,unit_price:200,disease_category:'DM'},
-    {menu_name_bn:'মেথি কুইনোয়া বাটি',   meal_type:'lunch',     quantity:1,unit_price:300,disease_category:'DM'},
-  ]);
-  renderMedicine(currentCustomer?.sar_category || 'DM');
-  renderTracker('delivered');
-}
+  // ── Previous orders summary ──────────────────────
+  const prevSummary = prevOrders.length
+    ? prevOrders.map((o,i)=>{
+        const it  = o.items_json?.[0]?.name_bn || o.items_json?.[0]?.name || 'খাবার';
+        const dt  = new Date(o.created_at).toLocaleDateString('bn-BD');
+        const st  = o.status==='delivered'?'✓':'⏳';
+        return `${['১','২','৩'][i]}. ${it} — ${dt} (৳${o.total_amount||0}) ${st}`;
+      }).join('<br>')
+    : 'প্রথম অর্ডার!';
 
-function show() {
-  document.getElementById('loadingState').style.display  = 'none';
-  document.getElementById('receiptContent').style.display = 'block';
-}
+  // ── AI morning advice ────────────────────────────
+  const aiAdvice   = ai.recommendations || ai.analysis_bn || '';
+  const aiGreeting = ai.morning_greeting || '';
 
-function renderItems(items) {
-  if (!items?.length) { document.getElementById('itemsList').innerHTML = '<div style="font-size:.78rem;color:rgba(255,255,255,.3);text-align:center;padding:.5rem">আইটেম পাওয়া যায়নি</div>'; return; }
-  const catEmoji = {DM:'🩺',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤰'};
-  const catBg    = {DM:'rgba(233,30,140,.15)',OB:'rgba(245,158,11,.15)',FL:'rgba(5,150,105,.15)',IB:'rgba(107,33,168,.15)',PR:'rgba(255,107,181,.15)'};
-  const mealBn   = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
-  document.getElementById('itemsList').innerHTML = items.map(it => {
-    const cat = it.disease_category || 'DM';
-    return `<div class="item-row">
-      <div class="item-emoji" style="background:${catBg[cat]||catBg.DM}">${catEmoji[cat]||'🍽️'}</div>
-      <div class="item-info">
-        <div class="item-name">${it.menu_name_bn || it.name || 'আইটেম'}</div>
-        <div class="item-meta">${mealBn[it.meal_type]||''} × ${it.quantity||1}</div>
-      </div>
-      <div class="item-price">৳${((it.unit_price||0)*(it.quantity||1)).toLocaleString()}</div>
-    </div>`;
-  }).join('');
-}
-
-function renderMedicine(cat) {
-  const list = MEDICINE[cat] || MEDICINE.DM;
-  document.getElementById('medList').innerHTML = list.map(m =>
-    `<div class="med-item"><span class="med-dot">•</span><span>${m}</span></div>`
-  ).join('');
-}
-
-function renderTracker(status) {
-  const idx = STATUS_IDX[status] ?? 5;
-  document.getElementById('trackSteps').innerHTML = STEPS_CONFIG.map((s,i) => `
-    <div class="ts-item ${i<idx?'done':i===idx?'active':''}">
-      <div class="ts-dot">${i<=idx?s.icon:'○'}</div>
-      <div class="ts-label">${s.label}</div>
+  // ── Personalized messages ────────────────────────
+  const msgs = buildPersonalizedMsgs(cust, metrics, log, ai, prevOrders);
+  const msgsHtml = msgs.map(m=>`
+    <div class="rcp-msg-box rcp-msg-${m.type}">
+      <div class="rcp-msg-title">${m.title}</div>
+      <div class="rcp-msg-body">${m.body}</div>
     </div>`).join('');
+
+  // ── Build HTML ───────────────────────────────────
+  const html = `
+    <!-- SIDE A: ORDER DETAILS -->
+
+    <!-- Customer + Order Info -->
+    <div class="rcp-info-grid">
+      <div class="rcp-info-cell"><div class="rcp-info-k">গ্রাহকের নাম</div><div class="rcp-info-v">${cust.full_name||CNAME}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">সদস্য আইডি</div><div class="rcp-info-v" style="color:#C2185B">${cust.member_id||CMID}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">ফোন</div><div class="rcp-info-v">${cust.phone||'—'}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">রোগ বিভাগ</div><div class="rcp-info-v">${catLabel}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">অর্ডার নম্বর</div><div class="rcp-info-v" style="font-size:12px">${orderNum}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">তারিখ ও সময়</div><div class="rcp-info-v" style="font-size:11px">${today.toLocaleString('bn-BD')}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">অর্ডারের ধরন</div><div class="rcp-info-v">${{delivery:'ডেলিভারি',dine_in:'ডাইন-ইন',takeaway:'টেকঅ্যাওয়ে'}[orderType]||orderType}</div></div>
+      <div class="rcp-info-cell"><div class="rcp-info-k">পেমেন্ট পদ্ধতি</div><div class="rcp-info-v">${payMethod.toUpperCase()}</div></div>
+      ${orderType==='delivery'?`<div class="rcp-info-cell" style="grid-column:1/-1"><div class="rcp-info-k">ডেলিভারি ঠিকানা</div><div class="rcp-info-v" style="font-size:12px">${addr}</div></div>`:''}
+      ${orderType==='dine_in'?`<div class="rcp-info-cell"><div class="rcp-info-k">টেবিল নম্বর</div><div class="rcp-info-v">${tbl}</div></div>`:''}
+    </div>
+
+    <!-- Total box -->
+    <div class="rcp-total-stripe">
+      <div>
+        <div class="rcp-total-k">মোট পরিশোধযোগ্য</div>
+        <div style="font-size:11px;color:#FFB3D1;margin-top:2px">ETA: ${eta}</div>
+      </div>
+      <div class="rcp-total-v">৳ ${grand.toLocaleString()}</div>
+    </div>
+
+    <!-- Previous Orders -->
+    <div class="rcp-section-head">📦 আগের ৩টি অর্ডার</div>
+    <div style="background:rgba(255,255,255,.65);border:1px solid #FFB3CC;border-radius:8px;
+      padding:10px 14px;margin-bottom:13px;font-size:11.5px;line-height:1.85;color:#444">
+      ${prevSummary}
+    </div>
+
+    <!-- Nutrition Table -->
+    <div class="rcp-section-head">🥗 অর্ডার বিবরণ + পুষ্টিমান</div>
+    <table class="rcp-nutr-table">
+      <thead>
+        <tr>
+          <th>আইটেম · উপকার · Blockchain</th>
+          <th style="text-align:center;width:55px">kcal<br>%DV</th>
+          <th style="text-align:center;width:55px">Protein<br>%DV</th>
+          <th style="text-align:center;width:50px">Carb<br>%DV</th>
+          <th style="text-align:center;width:50px">Fat<br>%DV</th>
+          <th style="text-align:right;width:65px">মূল্য</th>
+        </tr>
+      </thead>
+      <tbody>${nutrRows}</tbody>
+      <tfoot>
+        <tr style="background:#FCE4EC">
+          <td style="font-size:11.5px;font-weight:700;color:#880E4F;padding:8px 9px">
+            📊 মোট পুষ্টি: ${totalKcal} kcal (${pTotalKcal}%DV) · Protein ${totalProtein.toFixed(1)}g
+          </td>
+          <td colspan="4"></td>
+          <td style="text-align:right;font-weight:700;padding:8px 9px;color:#880E4F">৳${grand}</td>
+        </tr>
+        <tr><td colspan="5" style="text-align:right;font-size:12px;padding:7px 9px">Subtotal</td><td style="text-align:right;padding:7px 9px">৳${sub}</td></tr>
+        ${del>0?`<tr><td colspan="5" style="text-align:right;font-size:12px;padding:6px 9px">ডেলিভারি</td><td style="text-align:right;padding:6px 9px">৳${del}</td></tr>`:''}
+        <tr><td colspan="5" style="text-align:right;font-size:12px;padding:6px 9px">VAT (৫%)</td><td style="text-align:right;padding:6px 9px">৳${vat}</td></tr>
+        <tr class="rcp-nutr-total">
+          <td colspan="5" style="text-align:right;font-size:13px;padding:9px">সর্বমোট</td>
+          <td style="text-align:right;font-size:14px;padding:9px">৳${grand}</td>
+        </tr>
+        <tr><td colspan="6" style="text-align:center;font-size:10px;color:#888;padding:5px">*%DV = দৈনিক চাহিদার % (2000 kcal ভিত্তিক) · Oil-free · Sugar-free · Organic · Blockchain-verified</td></tr>
+      </tfoot>
+    </table>
+
+    <!-- Blockchain notice -->
+    <div style="background:#E3F2FD;border:1px solid #BBDEFB;border-radius:8px;padding:10px 13px;margin-bottom:13px;font-size:11px;color:#1565C0">
+      ⛓️ <b>Blockchain Transparency:</b> SAR-এর প্রতিটি উপাদান blockchain-এ রেকর্ড করা।
+      উৎস থেকে রান্নাঘর পর্যন্ত সব ভিডিও যাচাইযোগ্য।
+      <a href="blockchain.html" target="_blank" style="color:#E91E8C;font-weight:700"> → blockchain.html</a>
+    </div>
+
+    <!-- Disclaimer -->
+    <div style="background:#FFF3E0;border:1px solid #FFCC80;border-radius:8px;padding:9px 12px;margin-bottom:13px;font-size:10.5px;color:#E65100;line-height:1.6">
+      ⚕️ <b>গুরুত্বপূর্ণ:</b> SAR চিকিৎসা প্রতিষ্ঠান নয়। সব তথ্য সচেতনতার জন্য।
+      যেকোনো স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন। <b>নিজে ওষুধ সেবন করবেন না।</b>
+    </div>
+
+    <!-- SIDE B: HEALTH ADVICE + MARKETING -->
+    <div class="rcp-page-break">
+      <span class="rcp-page-label">SAR — উল্টো পিঠ · Health Advice & Personal Message</span>
+    </div>
+
+    ${aiGreeting?`<div class="rcp-msg-box rcp-msg-green" style="margin-bottom:9px">
+      <div class="rcp-msg-title">🌅 SAR সুপ্রভাত!</div>
+      <div class="rcp-msg-body">${aiGreeting}</div>
+    </div>`:''}
+
+    ${aiAdvice?`<div class="rcp-msg-box rcp-msg-purple" style="margin-bottom:13px">
+      <div class="rcp-msg-title">🤖 আজকের AI স্বাস্থ্য পরামর্শ</div>
+      <div class="rcp-msg-body">${aiAdvice}</div>
+    </div>`:''}
+
+    <div class="rcp-section-head">💌 আপনার জন্য বিশেষ বার্তা</div>
+    ${msgsHtml}
+
+    <div class="rcp-survey">
+      <div class="rcp-survey-q">😊 SAR-এর খাবার ও সেবা কেমন লাগলো? আপনার পরামর্শ:</div>
+      <hr class="rcp-survey-line">
+      <hr class="rcp-survey-line">
+      <hr class="rcp-survey-line" style="margin-bottom:0">
+    </div>
+
+    <div class="rcp-footer">
+      🌸 SAR She AI Restaurant · Women-Led · Women-Run · For Women Only<br>
+      📞 01346098892 · mindmaxltd@gmail.com · sheairestaurant.com<br>
+      Receipt #${rcpNum} · ${today.toLocaleDateString('bn-BD')}
+    </div>
+  `;
+
+  // Update DOM
+  document.getElementById('rcpNumber').textContent = rcpNum;
+  document.getElementById('rcpOrderBadge').textContent = 'Order: ' + (orderNum||'—');
+  document.getElementById('rcpSucDesc').textContent = `অর্ডার ${orderNum||'—'} — ETA: ${eta}`;
+  document.getElementById('rcpBody').innerHTML = html;
+
+  // Store for WhatsApp/Email
+  _rcpData = { rcpNum, orderNum, grand, today, cust };
+  _custData = cust;
 }
 
-function catNameBn(c){ return {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'}[c]||c; }
-function formatDate(d){ if(!d) return '—'; return new Date(d).toLocaleString('bn-BD'); }
-function showToast(msg,err=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(err?' err':'');
-  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-// ── PDF DOWNLOAD ──
-function downloadPDF() {
-  showToast('⏳ PDF তৈরি হচ্ছে...');
-  const el = document.getElementById('receiptCard');
-  const opt = {
-    margin:      [8,8,8,8],
-    filename:    `SAR-Receipt-${document.getElementById('rcpNum').textContent}.pdf`,
-    image:       {type:'jpeg',quality:.95},
-    html2canvas: {scale:2,useCORS:true,backgroundColor:'#0A0A10'},
-    jsPDF:       {unit:'mm',format:'a4',orientation:'portrait'}
+// ═══════════════════════════════════════════════════
+// PERSONALIZED MESSAGES — same rule engine
+// ═══════════════════════════════════════════════════
+function getDiseasebenefits(cat) {
+  const db = {
+    DM:['রক্তে শর্করা নিয়ন্ত্রণ','ইনসুলিন সংবেদনশীলতা বাড়ায়'],
+    OB:['মেটাবলিজম ত্বরান্বিত করে','দীর্ঘ সময় পেট ভরা রাখে'],
+    FL:['লিভার পরিষ্কার করে','ALT/AST কমাতে সাহায্য করে'],
+    IB:['গাট হেলথ উন্নত করে','পেট ফাঁপা কমায়'],
+    PR:['ফোলেট সমৃদ্ধ','আয়রন শোষণে সাহায্য করে'],
   };
-  html2pdf().set(opt).from(el).save()
-    .then(() => showToast('✅ PDF সেভ হয়েছে!'))
-    .catch(e  => { showToast('❌ PDF error: '+e.message, true); window.print(); });
+  return db[cat] || db.DM;
 }
 
-// ── WHATSAPP ──
-function sendWhatsApp() {
-  const cust   = currentCustomer;
-  const rcpNum = document.getElementById('rcpNum').textContent;
-  const total  = document.getElementById('grandTotal').textContent;
-  const date   = document.getElementById('rcpDate').textContent;
-  const msg = encodeURIComponent(
-`🧾 *SAR রেস্তোরাঁ রিসিট*
+function buildPersonalizedMsgs(cust, m, log, ai, prevOrders) {
+  const msgs = [];
+  const cat  = cust.sar_category || 'DM';
+  const catLabel = CAT_MAP[cat] || cat;
+  const daysSince = cust.created_at
+    ? Math.floor((new Date() - new Date(cust.created_at))/86400000) : 0;
+  const tier = cust.membership_tier || 'Basic';
 
-👤 নাম: ${cust?.full_name || '—'}
-🆔 সদস্য নং: ${cust?.member_id || '—'}
-🧾 রিসিট: ${rcpNum}
-📅 তারিখ: ${date}
-💰 মোট: ${total}
-
-✅ পেমেন্ট সম্পন্ন
-
-SAR — She AI Restaurant
-📞 01346098892`);
-  window.open(`https://wa.me/?text=${msg}`, '_blank');
-  showToast('📱 WhatsApp খুলছে...');
-}
-
-// ── EMAIL ──
-async function sendEmail() {
-  const cust = currentCustomer;
-  if (!cust?.email) {
-    showToast('⚠️ ইমেইল ঠিকানা পাওয়া যায়নি।', true); return;
+  // MSG 1: Happiness
+  if (daysSince < 30) {
+    msgs.push({type:'green', priority:5, title:'🌸 SAR পরিবারে আপনাকে স্বাগতম!',
+      body:`মাত্র ${daysSince} দিন হলো আপনি SAR-এর সাথে আছেন। আজকের খাবার কেমন লাগলো? আপনার মতামত আমাদের কাছে অমূল্য।`});
+  } else if (prevOrders.length > 0) {
+    const lastItem = prevOrders[0].items_json?.[0]?.name_bn || 'আগের খাবার';
+    msgs.push({type:'green', priority:4, title:'😊 SAR কি ভালো লাগছে?',
+      body:`"${lastItem}" কেমন ছিল? স্বাদ, পুষ্টি, ডেলিভারি — সব নিয়ে জানান।`});
   }
-  showToast('📧 ইমেইল পাঠানো হচ্ছে...');
-  try {
-    const r = await fetch(`${SUPA_URL}/functions/v1/send-email`, {
-      method:'POST',
-      headers: {...H, 'Prefer':'return=minimal'},
-      body: JSON.stringify({
-        to_email:   cust.email,
-        to_name:    cust.full_name,
-        template:   'receipt',
-        customer_id: cust.id,
-        template_data: {
-          order_number: document.getElementById('rcpNum').textContent,
-          total: document.getElementById('grandTotal').textContent.replace('৳',''),
-          receipt_url: window.location.href
-        }
-      })
-    });
-    if (r.ok || r.status===200) showToast('✅ রিসিট ইমেইলে পাঠানো হয়েছে!');
-    else showToast('❌ ইমেইল পাঠানো যায়নি।', true);
-  } catch(e) {
-    showToast('❌ Edge Function unavailable. Resend API key সেট করুন।', true);
-  }
-}
 
-// ── AUTO SEND ON ORDER COMPLETE ──
-async function autoSendOnOrderComplete() {
-  const cust = JSON.parse(localStorage.getItem('sar_customer') || '{}');
-  if (!orderId && !rcpId) return;
-
-  // Only auto-send if this is a fresh completion (URL has ?sent=0)
-  const alreadySent = params.get('sent') === '1';
-  if (alreadySent) return;
-
-  // Small delay then auto send
-  setTimeout(async () => {
-    if (cust?.full_name) {
-      // WhatsApp auto-send notification
-      const msg = encodeURIComponent(`✅ SAR অর্ডার সম্পন্ন!\nরিসিট: ${window.location.href.split('?')[0]}?order_id=${orderId}`);
-      // Email auto-send
-      if (cust.email) await sendEmail();
-      showToast('✅ রিসিট Email ও WhatsApp-এ পাঠানো হয়েছে!');
+  // MSG 2: Disease
+  if (cat === 'DM') {
+    const hba1c = parseFloat(m.hba1c) || 0;
+    const coffee = parseInt(log.coffee_cups) || 0;
+    if (hba1c > 7.5) {
+      msgs.push({type:'red', priority:9, title:`🩸 HbA1c ${hba1c}% — মনোযোগ দরকার`,
+        body:`আপনার HbA1c ${hba1c}% — এটা কমাতে SAR-এর মেথি-করলা রুটিন নিয়মিত অনুসরণ করুন। আজই ডাক্তার দেখান।`});
+    } else if (coffee >= 3) {
+      msgs.push({type:'red', priority:7, title:'☕ কফি ও ডায়াবেটিস',
+        body:`গতকাল ${coffee} কাপ কফি পান করেছেন। ডায়াবেটিসে অতিরিক্ত কফি ক্ষতিকর। সর্বোচ্চ ১-২ কাপ রাখুন।`});
+    } else {
+      msgs.push({type:'green', priority:5, title:'💚 ডায়াবেটিস কেমন চলছে?',
+        body:`SAR-এর থেরাপিউটিক মেনু ডায়াবেটিস ম্যানেজমেন্টে বিশেষ কার্যকর। সপ্তাহে একবার FBG পরীক্ষা করুন।`});
     }
-  }, 2000);
+  } else if (cat === 'IB' && log.stomach_upset) {
+    msgs.push({type:'red', priority:8, title:'🌿 গতকাল পেট খারাপ ছিল!',
+      body:`আজ হালকা খাবার রাখুন। SAR-এর Gut Healing বাটি বিশেষ কার্যকর।`});
+  } else if (cat === 'PR') {
+    msgs.push({type:'pink', priority:7, title:'🤱 গর্ভাবস্থার পুষ্টি',
+      body:`গর্ভাবস্থায় ফোলেট ও আয়রন অত্যন্ত জরুরি। SAR-এর Pregnancy মেনু আপনার ও শিশুর পুষ্টি নিশ্চিত করে।`});
+  }
+
+  // MSG 3: PCOS (only if applicable)
+  const pcosStatus = m.pcos_status;
+  if (pcosStatus && pcosStatus !== 'না') {
+    if (pcosStatus === 'সন্দেহজনক') {
+      msgs.push({type:'red', priority:8, title:'⚠️ আপনি কি PCOS চেক করেছেন?',
+        body:`PCOS কী জানেন? এটি একটি হরমোন সমস্যা। এতে অনিচ্ছাকৃতভাবে মোটা হওয়া, পিম্পল, অনিয়মিত মাসিক হতে পারে। SAR-এর PCOS Therapeutic Menu দেখুন।`});
+    } else if (pcosStatus === 'নির্ণয় হয়েছে') {
+      msgs.push({type:'purple', priority:7, title:'🌿 PCOS — মেথি ও দারচিনি',
+        body:`PCOS-এ মেথি ও দারচিনি ইনসুলিন sensitivity বাড়ায়। SAR-এ এই দুটো প্রতিটি মেনুতে ব্যবহার করা হয়।`});
+    }
+  }
+
+  // MSG 4: Family
+  const numChildren = parseInt(m.number_of_children) || 0;
+  if (numChildren > 0) {
+    msgs.push({type:'pink', priority:4, title:'👨‍👩‍👧 পরিবারের স্বাস্থ্য',
+      body:`আপনার ${numChildren}জন সন্তান আছে। তাদের পুষ্টি ঠিক আছে তো? SAR Family Pack-এ সবার জন্য সুষম খাবার।`});
+  }
+
+  // MSG 5: Credibility
+  if (daysSince < 30) {
+    msgs.push({type:'green', priority:3, title:'✦ ১,০০০+ নারী SAR বেছে নিয়েছেন',
+      body:`বাংলাদেশের প্রথম AI Therapeutic Food Platform। Blockchain-verified ingredients। আপনি সঠিক সিদ্ধান্ত নিয়েছেন।`});
+  } else {
+    msgs.push({type:'green', priority:3, title:`🌸 ${daysSince} দিনের SAR যাত্রা`,
+      body:`আপনি ${daysSince} দিন ধরে SAR-এর সাথে আছেন। Tier: ${tier}। সঠিক পুষ্টি আপনার সেরা ওষুধ।`});
+  }
+
+  // MSG 6: Next order
+  if (log.period_today) {
+    msgs.push({type:'pink', priority:9, title:'🌸 মাসিকে আয়রন সমৃদ্ধ মেনু',
+      body:`আজ মাসিক হয়েছে। পালং-ডাল বাটি + আমলকি চাটনি পরের অর্ডারে যোগ করুন।`});
+  } else if (ai.daily_menu_recommendation_json || ai.daily_menu) {
+    const menu = ai.daily_menu_recommendation_json || ai.daily_menu;
+    const breakfast = menu?.breakfast?.name_bn || menu?.breakfast?.name || '';
+    if (breakfast) {
+      msgs.push({type:'purple', priority:6, title:'🤖 AI-এর পরামর্শকৃত পরবর্তী মেনু',
+        body:`"${breakfast}" — আপনার ${catLabel} বিভাগের জন্য আগামীকালের সেরা পছন্দ।`});
+    }
+  }
+
+  // Sort by priority, return top 4
+  return msgs.sort((a,b) => b.priority - a.priority).slice(0, 4);
 }
 
-// INIT
-window.addEventListener('load', () => {
-  init();
-  autoSendOnOrderComplete();
-});
+// ═══════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════
+function sendReceiptWA() {
+  const cust  = _custData;
+  const phone = cust.phone || '';
+  if (!phone) { alert('গ্রাহকের ফোন নম্বর নেই।'); return; }
+  const msg = `🌸 SAR অর্ডার রিসিট\n\nনাম: ${cust.full_name||CNAME}\nঅর্ডার: ${_rcpData.orderNum||'—'}\nরিসিট: ${_rcpData.rcpNum||'—'}\nমোট: ৳${_rcpData.grand||0}\nতারিখ: ${_rcpData.today?.toLocaleDateString('bn-BD')}\n\n✅ অর্ডার নিশ্চিত\n\nসম্পূর্ণ রিসিট: sheairestaurant.com/receipt.html?oid=${new URLSearchParams(window.location.search).get('oid')||''}\n\nSAR — She AI Restaurant\n📞 01346098892`;
+  const clean = phone.replace(/\D/g,'');
+  const intl  = clean.startsWith('0') ? '88'+clean : clean;
+  window.open(`https://wa.me/${intl}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+async function sendReceiptEmail() {
+  const cust = _custData;
+  if (!cust.email) { alert('গ্রাহকের ইমেইল নেই।'); return; }
+  try {
+    await fetch('/.netlify/functions/analyze', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt:`SAR receipt for ${cust.email}: Order ${_rcpData.orderNum}, ৳${_rcpData.grand}`})
+    });
+    alert(`✅ রিসিট ${cust.email}-এ পাঠানো হয়েছে।`);
+  } catch(e) {
+    alert('Email পাঠানো যায়নি। WhatsApp ব্যবহার করুন।');
+  }
+}
+
+function printReceipt() { window.print(); }
+
+// ═══════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════
+function showLoader(txt) {
+  document.getElementById('loadTxt').textContent = txt || 'লোড হচ্ছে...';
+  document.getElementById('loader').classList.add('show');
+}
+function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+
+function showError(msg) {
+  hideLoader();
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'block';
+  document.querySelector('.error-desc').textContent = msg;
+}
 </script>
 </body>
 </html>
