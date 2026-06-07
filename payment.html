@@ -1409,9 +1409,10 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 
   <!-- PAGE HEADER -->
   <div class="page-hd">
-    <div class="page-badge">💳 পেমেন্ট ও সাবস্ক্রিপশন</div>
-    <h1 class="page-title">আপনার SAR সদস্যতা পরিচালনা করুন</h1>
-    <p class="page-sub">নিবন্ধন ফি ও মাসিক সাবস্ক্রিপশন পরিশোধ করুন।<br>প্রথম ১ লাখ গ্রাহকের জন্য ৫০% বিশেষ ছাড়।</p>
+    <div class="page-badge">💎 সদস্যতা পেমেন্ট</div>
+    <h1 class="page-title">নিবন্ধন ও সাবস্ক্রিপশন ফি</h1>
+    <p class="page-sub">এই পেজ শুধুমাত্র <strong style="color:var(--pink2)">নিবন্ধন ফি ও মাসিক সাবস্ক্রিপশন</strong> পরিশোধের জন্য।<br>
+    খাবার অর্ডার করতে → <a href="order.html" style="color:var(--green2);font-weight:700">🛒 order.html</a> &nbsp;|&nbsp; প্রথম ১ লাখ গ্রাহকের জন্য <strong style="color:var(--yellow2)">৫০% বিশেষ ছাড়</strong></p>
   </div>
 
   <!-- MAIN GRID -->
@@ -1786,7 +1787,13 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           চিকিৎসকের পরামর্শ নিন।
         </div>
 
-        <div style="margin-top:1rem">
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.4rem">
+          <a href="order.html" style="display:block;text-align:center;
+            font-size:.82rem;color:var(--green2);text-decoration:none;font-weight:700;
+            background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.2);
+            border-radius:8px;padding:.5rem">
+            🛒 খাবার অর্ডার করুন
+          </a>
           <a href="dashboard.html" style="display:block;text-align:center;
             font-size:.8rem;color:rgba(255,255,255,.35);text-decoration:none;
             transition:color .3s;padding:.5rem" onmouseover="this.style.color='var(--pink2)'"
@@ -2422,8 +2429,9 @@ async function saveSubReceipt(rcpNum, txnId, total, html) {
         transaction_id:  txnId,
         amount:          total,
         package_name:    selPkg.name,
+        receipt_type:    selPkg.type === 'reg' ? 'registration' : 'subscription',
         receipt_html:    html,
-        expires_at:      new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+        expires_at:      new Date(Date.now() + 7*24*60*60*1000).toISOString(),
       })
     });
   } catch(e) { /* non-critical */ }
