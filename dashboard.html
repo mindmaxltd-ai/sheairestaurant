@@ -468,6 +468,112 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   .qa-grid{grid-template-columns:1fr 1fr}
   .metrics-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ══════════════════════════════════════════
+   NEW ADDITIONS — Daily Input, Reports, etc.
+   ══════════════════════════════════════════ */
+
+/* ── INPUT FIELD BASE ── */
+.sar-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;padding:.65rem .9rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.88rem;outline:none;transition:border-color .3s}
+.sar-input:focus{border-color:var(--pink)}
+.sar-textarea{resize:vertical;min-height:70px}
+.sar-select{background:#0F0F1A;cursor:pointer}
+
+/* ── CHECKBOX ROW ── */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.6rem}
+.check-label{display:flex;align-items:center;gap:.55rem;cursor:pointer;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:9px;padding:.5rem .75rem;transition:all .25s;font-size:.83rem;color:rgba(255,255,255,.7)}
+.check-label:hover{border-color:var(--pink);background:rgba(233,30,140,.06)}
+.check-label input[type=checkbox]{width:16px;height:16px;accent-color:var(--pink);cursor:pointer}
+.check-label.checked{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.08);color:#fff}
+
+/* ── RANGE SLIDER ── */
+.range-row{display:flex;align-items:center;gap:.75rem;margin-top:.5rem}
+.range-row input[type=range]{flex:1;accent-color:var(--pink)}
+.range-val{font-family:'Space Mono',monospace;font-size:.88rem;font-weight:700;
+  color:var(--pink2);min-width:24px;text-align:center}
+
+/* ── SECTION HEADER ── */
+.sec-head{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);margin:1rem 0 .5rem}
+
+/* ── MOOD PILLS ── */
+.mood-grid{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem}
+.mood-pill{background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:20px;padding:.3rem .8rem;font-size:.8rem;cursor:pointer;
+  color:rgba(255,255,255,.6);transition:all .25s}
+.mood-pill:hover{border-color:var(--pink);color:var(--pink2)}
+.mood-pill.selected{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
+
+/* ── VOICE BTN ── */
+.voice-btn{display:flex;align-items:center;gap:.7rem;
+  background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.3);
+  border-radius:12px;padding:.9rem 1.1rem;cursor:pointer;width:100%;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;color:var(--pink2);
+  transition:all .3s}
+.voice-btn:hover{background:rgba(233,30,140,.18)}
+.voice-btn.recording{background:rgba(220,38,38,.2);border-color:var(--red2);
+  color:var(--red2);animation:pulse .8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── SAVE LOG BTN ── */
+.save-log-btn{width:100%;padding:1rem;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:1rem;
+  font-weight:700;cursor:pointer;transition:all .3s;margin-top:.5rem}
+.save-log-btn:hover{box-shadow:0 0 24px rgba(233,30,140,.4);transform:translateY(-2px)}
+.save-log-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── REPORT CARD (collapsible) ── */
+.report-item{background:var(--glass);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;margin-bottom:.75rem}
+.report-toggle{display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.25rem;cursor:pointer;transition:background .25s}
+.report-toggle:hover{background:rgba(255,255,255,.04)}
+.report-score-badge{font-family:'Space Mono',monospace;font-size:.85rem;font-weight:700;
+  padding:.25rem .65rem;border-radius:50px}
+.report-body{padding:1.1rem 1.25rem;border-top:1px solid var(--border);
+  font-size:.83rem;color:rgba(255,255,255,.65);line-height:1.75}
+.report-arrow{font-size:.7rem;color:rgba(255,255,255,.3);transition:transform .3s}
+.report-item.open .report-arrow{transform:rotate(180deg)}
+.report-item.open .report-body{display:block}
+.report-item:not(.open) .report-body{display:none}
+.report-pdf-link{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;
+  background:rgba(233,30,140,.12);border:1px solid rgba(233,30,140,.25);
+  border-radius:8px;padding:.35rem .85rem;color:var(--pink2);
+  text-decoration:none;font-size:.78rem;font-weight:600}
+
+/* ── DOCTOR PANEL ── */
+.consult-fee-box{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
+  border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.83rem;
+  color:rgba(255,255,255,.65);line-height:1.75}
+.consult-fee-box strong{color:var(--yellow2)}
+.consult-list{list-style:none;margin:.4rem 0 0;padding:0}
+.consult-list li::before{content:'✦ ';color:var(--yellow2);font-size:.7rem}
+.consult-btn{width:100%;padding:.9rem;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--green),#059669);
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;
+  font-weight:700;cursor:pointer;transition:all .3s;margin-top:.75rem}
+.consult-btn:hover{box-shadow:0 0 24px rgba(5,150,105,.4);transform:translateY(-2px)}
+
+/* ── WRITE TO SAR ── */
+.feedback-type-select{width:100%;padding:.65rem .9rem;background:#0F0F1A;
+  border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer;
+  margin-bottom:.75rem;outline:none}
+.send-feedback-btn{background:linear-gradient(135deg,var(--purple),var(--pink));
+  border:none;border-radius:10px;padding:.7rem 1.5rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
+.send-feedback-btn:hover{opacity:.9}
+
+/* ── PANEL WRAPPER ── */
+.new-panel{max-width:720px}
+.new-panel .dcard{margin-bottom:1.25rem}
+.new-panel .dcard-body{padding:1.2rem 1.4rem}
+
 </style>
 </head>
 <body>
@@ -525,6 +631,25 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </a>
       <a href="payment.html" class="sb-item">
         <span class="sb-item-icon">💳</span>পেমেন্ট ও সাবস্ক্রিপশন
+      </a>
+      <!-- ══ NEW SIDEBAR ITEMS ══ -->
+      <div class="sb-section">আজকের আপডেট</div>
+      <button class="sb-item" onclick="showPanel('daily-input')">
+        <span class="sb-item-icon">📝</span>আজকের অবস্থা লিখুন
+      </button>
+      <button class="sb-item" onclick="showPanel('ai-report')">
+        <span class="sb-item-icon">📋</span>AI রিপোর্ট দেখুন
+      </button>
+
+      <div class="sb-section">সেবা</div>
+      <button class="sb-item" onclick="showPanel('doctor-consult')">
+        <span class="sb-item-icon">👩‍⚕️</span>ডাক্তার পরামর্শ
+      </button>
+      <button class="sb-item" onclick="showPanel('write-sar')">
+        <span class="sb-item-icon">✍️</span>Write to SAR
+      </button>
+      <a href="blockchain.html" target="_blank" class="sb-item">
+        <span class="sb-item-icon">⛓️</span>Blockchain যাচাই
       </a>
     </nav>
 
@@ -784,7 +909,329 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <div id="fullAnalysisContent">
         <div class="dcard"><div class="dcard-body"><div class="empty-state">বিশ্লেষণ লোড হচ্ছে...</div></div></div>
       </div>
-    </div>
+
+
+    <!-- ══════════════════════════════════════
+         NEW PANEL: Daily Health Input
+    ══════════════════════════════════════ -->
+    <div id="panel-daily-input" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">প্রতিরাতে পূরণ করুন</div>
+            <div class="greet-name">আজকের স্বাস্থ্য আপডেট</div>
+            <div class="greet-sub">এটা পূরণ করলে সকাল ৬টার AI বিশ্লেষণ আরও নির্ভুল হবে</div>
+          </div>
+          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+        </div>
+      </div>
+
+      <div class="new-panel">
+
+        <!-- Voice Input -->
+        <div class="dcard">
+          <div class="dcard-body">
+            <button class="voice-btn" id="voiceBtn" onclick="startVoiceInput()">
+              <span style="font-size:1.6rem">🎤</span>
+              <div>
+                <div style="font-weight:700">কণ্ঠে বলুন (বাংলায়)</div>
+                <div style="font-size:.76rem;opacity:.6">বাটনে click করুন তারপর বলুন — Chrome-এ কাজ করে</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- শারীরিক অবস্থা -->
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">💊</span>আজকের শারীরিক অবস্থা</span>
+          </div>
+          <div class="dcard-body">
+            <div class="check-grid">
+              <label class="check-label" id="lbl-fever">
+                <input type="checkbox" id="di_fever" onchange="toggleCheck(this,'lbl-fever')">
+                🌡️ জ্বর আছে
+              </label>
+              <label class="check-label" id="lbl-cold">
+                <input type="checkbox" id="di_cold" onchange="toggleCheck(this,'lbl-cold')">
+                🤧 সর্দি / কাশি
+              </label>
+              <label class="check-label" id="lbl-stomach">
+                <input type="checkbox" id="di_stomach" onchange="toggleCheck(this,'lbl-stomach')">
+                🤢 পেট খারাপ
+              </label>
+              <label class="check-label" id="lbl-motion">
+                <input type="checkbox" id="di_motion" onchange="toggleCheck(this,'lbl-motion')">
+                💧 পাতলা পায়খানা
+              </label>
+              <label class="check-label" id="lbl-head">
+                <input type="checkbox" id="di_head" onchange="toggleCheck(this,'lbl-head')">
+                🤕 মাথাব্যথা
+              </label>
+              <label class="check-label" id="lbl-pain">
+                <input type="checkbox" id="di_pain" onchange="toggleCheck(this,'lbl-pain')">
+                😣 শরীর ব্যথা
+              </label>
+            </div>
+            <div id="feverTempRow" style="display:none;margin-top:.75rem;display:flex;align-items:center;gap:.7rem">
+              <label style="font-size:.82rem;color:rgba(255,255,255,.55)">তাপমাত্রা:</label>
+              <input type="number" id="di_fever_temp" placeholder="98.6" step="0.1"
+                class="sar-input" style="width:110px">
+              <span style="font-size:.8rem;color:rgba(255,255,255,.4)">°F</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- মাসিক চক্র -->
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">🌸</span>মাসিক চক্র</span>
+          </div>
+          <div class="dcard-body">
+            <div class="check-grid">
+              <label class="check-label" id="lbl-period">
+                <input type="checkbox" id="di_period" onchange="toggleCheck(this,'lbl-period')">
+                🌸 আজ মাসিক হয়েছে
+              </label>
+              <label class="check-label" id="lbl-cramp">
+                <input type="checkbox" id="di_cramp" onchange="toggleCheck(this,'lbl-cramp')">
+                😰 ব্যথা / cramping
+              </label>
+            </div>
+            <div style="margin-top:.9rem">
+              <div class="sec-head">ব্যথার মাত্রা</div>
+              <div class="range-row">
+                <input type="range" id="di_cramp_level" min="1" max="10" value="5"
+                  oninput="document.getElementById('crampVal').textContent=this.value">
+                <span class="range-val" id="crampVal">5</span>
+                <span style="font-size:.75rem;color:rgba(255,255,255,.35)">/10</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- মানসিক অবস্থা -->
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">🧠</span>মানসিক অবস্থা</span>
+          </div>
+          <div class="dcard-body">
+            <div class="sec-head">আজকের Mood</div>
+            <div class="mood-grid" id="moodGrid">
+              <button class="mood-pill" onclick="selectMood(this,'😊 ভালো')">😊 ভালো</button>
+              <button class="mood-pill" onclick="selectMood(this,'😐 মাঝারি')">😐 মাঝারি</button>
+              <button class="mood-pill" onclick="selectMood(this,'😔 খারাপ')">😔 খারাপ</button>
+              <button class="mood-pill" onclick="selectMood(this,'😰 দুশ্চিন্তায়')">😰 দুশ্চিন্তায়</button>
+              <button class="mood-pill" onclick="selectMood(this,'😡 রাগান্বিত')">😡 রাগান্বিত</button>
+              <button class="mood-pill" onclick="selectMood(this,'😴 ক্লান্ত')">😴 ক্লান্ত</button>
+            </div>
+            <div style="margin-top:.85rem">
+              <div class="sec-head">মানসিক অবস্থার বিবরণ</div>
+              <textarea id="di_mental" class="sar-input sar-textarea"
+                placeholder="আজকে কেমন লাগছে বলুন..."></textarea>
+            </div>
+            <div style="margin-top:.85rem">
+              <div class="sec-head">চাপের মাত্রা &nbsp;<span class="range-val" id="stressVal">5</span>/10</div>
+              <div class="range-row">
+                <input type="range" id="di_stress" min="1" max="10" value="5"
+                  oninput="document.getElementById('stressVal').textContent=this.value">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- খাবার ও পানীয় -->
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">🍽️</span>খাবার ও পানীয়</span>
+          </div>
+          <div class="dcard-body">
+            <div style="display:grid;gap:.75rem">
+              <div>
+                <div class="sec-head">আজকে কী খেয়েছেন</div>
+                <textarea id="di_food" class="sar-input sar-textarea" rows="2"
+                  placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                <div>
+                  <div class="sec-head">☕ কফি (কাপ)</div>
+                  <input type="number" id="di_coffee" min="0" max="20" value="0" class="sar-input">
+                </div>
+                <div>
+                  <div class="sec-head">💧 পানি (লিটার)</div>
+                  <input type="number" id="di_water" min="0" max="10" step="0.5" value="2" class="sar-input">
+                </div>
+              </div>
+              <div>
+                <div class="sec-head">অন্য পানীয় (চা, জুস, soft drink)</div>
+                <input type="text" id="di_drinks" class="sar-input" placeholder="কী পানীয় পান করেছেন...">
+              </div>
+              <div>
+                <div class="sec-head">আগামীকাল কী খেতে চান</div>
+                <input type="text" id="di_food_pref" class="sar-input" placeholder="পছন্দের খাবার লিখুন...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ঘুম ও কার্যকলাপ -->
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">😴</span>ঘুম ও কার্যকলাপ</span>
+          </div>
+          <div class="dcard-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+              <div>
+                <div class="sec-head">ঘুম (ঘণ্টা)</div>
+                <input type="number" id="di_sleep" min="0" max="24" step="0.5" value="7" class="sar-input">
+              </div>
+              <div>
+                <div class="sec-head">ঘুমের মান</div>
+                <select id="di_sleep_q" class="sar-input sar-select">
+                  <option value="ভালো">ভালো</option>
+                  <option value="মাঝারি" selected>মাঝারি</option>
+                  <option value="খারাপ">খারাপ</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:.75rem">
+              <div class="sec-head">অন্য কোনো তথ্য SAR-কে জানান</div>
+              <textarea id="di_notes" class="sar-input sar-textarea" rows="2"
+                placeholder="আর কিছু জানাতে চান?"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button class="save-log-btn" id="saveLogBtn" onclick="saveDailyLog()">
+          💾 আজকের আপডেট Save করুন
+        </button>
+
+      </div><!-- end new-panel -->
+    </div><!-- end panel-daily-input -->
+
+
+    <!-- ══════════════════════════════════════
+         NEW PANEL: AI Analysis Reports
+    ══════════════════════════════════════ -->
+    <div id="panel-ai-report" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">শেষ ৭ দিনের রিপোর্ট</div>
+            <div class="greet-name">AI বিশ্লেষণ রিপোর্ট</div>
+            <div class="greet-sub">৭ দিনের পুরনো রিপোর্ট স্বয়ংক্রিয়ভাবে মুছে যায়</div>
+          </div>
+          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+        </div>
+      </div>
+      <div class="new-panel">
+        <div id="reportsList">
+          <div class="empty-state" style="padding:3rem">
+            <div style="font-size:2rem;margin-bottom:.75rem">📋</div>
+            রিপোর্ট লোড হচ্ছে...
+          </div>
+        </div>
+      </div>
+    </div><!-- end panel-ai-report -->
+
+
+    <!-- ══════════════════════════════════════
+         NEW PANEL: Doctor Consultation
+    ══════════════════════════════════════ -->
+    <div id="panel-doctor-consult" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">AI-চালিত চিকিৎসা পরামর্শ</div>
+            <div class="greet-name">ডাক্তার পরামর্শ</div>
+          </div>
+          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+        </div>
+      </div>
+      <div class="new-panel">
+
+        <div class="dcard">
+          <div class="dcard-body">
+            <div class="consult-fee-box">
+              <strong>💊 পরামর্শ ফি: ৳৭৫০/বার</strong><br>
+              পেমেন্টের পরে Super Admin approve করলে সক্রিয় হবে। আপনি পাবেন:
+              <ul class="consult-list">
+                <li>প্রচলিত ওষুধ (Generic নাম ও ডোজ)</li>
+                <li>হোমিওপ্যাথিক পরামর্শ</li>
+                <li>আয়ুর্বেদিক পরামর্শ ও herbs</li>
+                <li>ঘরোয়া প্রতিকার / কবিরাজি</li>
+                <li>ইসলামিক চিকিৎসা পরামর্শ</li>
+                <li>চিকিৎসাকালীন বিশেষ খাদ্য নির্দেশিকা</li>
+              </ul>
+            </div>
+
+            <div class="sec-head">আজকের লক্ষণ বিস্তারিত লিখুন</div>
+            <textarea id="consultSymptoms" class="sar-input sar-textarea" rows="4"
+              placeholder="আজকে কী সমস্যা হচ্ছে বিস্তারিত বলুন — যে কারণে বিশেষভাবে পরামর্শ চান..."></textarea>
+
+            <button class="consult-btn" onclick="startConsultation()">
+              👩‍⚕️ পরামর্শ শুরু করুন (৳৭৫০)
+            </button>
+          </div>
+        </div>
+
+        <!-- Prescription area -->
+        <div id="prescriptionOutput" style="display:none" class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">📄</span>AI প্রেসক্রিপশন</span>
+            <button class="dcard-action" onclick="printPrescription()">🖨️ Print</button>
+          </div>
+          <div class="dcard-body" id="prescriptionContent"></div>
+        </div>
+
+      </div>
+    </div><!-- end panel-doctor-consult -->
+
+
+    <!-- ══════════════════════════════════════
+         NEW PANEL: Write to SAR
+    ══════════════════════════════════════ -->
+    <div id="panel-write-sar" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">আপনার মতামত গুরুত্বপূর্ণ</div>
+            <div class="greet-name">Write to SAR</div>
+            <div class="greet-sub">মতামত, পরামর্শ বা যেকোনো কথা আমাদের জানান</div>
+          </div>
+          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+        </div>
+      </div>
+      <div class="new-panel">
+        <div class="dcard">
+          <div class="dcard-body">
+            <div class="sec-head">বিষয়</div>
+            <select id="feedbackType" class="feedback-type-select">
+              <option value="general">সাধারণ মতামত</option>
+              <option value="suggestion">পরামর্শ</option>
+              <option value="complaint">অভিযোগ</option>
+              <option value="appreciation">প্রশংসা</option>
+              <option value="idea">নতুন আইডিয়া</option>
+              <option value="other">অন্যান্য</option>
+            </select>
+
+            <div class="sec-head">আপনার বার্তা</div>
+            <textarea id="feedbackText" class="sar-input sar-textarea" rows="6"
+              placeholder="আপনার কথা লিখুন..."></textarea>
+
+            <div style="margin-top:.9rem;display:flex;gap:.75rem;align-items:center">
+              <button class="send-feedback-btn" onclick="submitFeedback()">
+                📨 পাঠান
+              </button>
+              <button class="voice-btn" style="flex:1" onclick="startVoiceInputFor('feedbackText')">
+                <span>🎤</span><span>কণ্ঠে বলুন</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end panel-write-sar -->
+
 
   </main>
 </div>
@@ -1745,9 +2192,14 @@ function renderSubAlert(c) {
 // PANEL NAVIGATION
 // ═══════════════════════════════════════
 function showPanel(name) {
-  document.getElementById('panel-dashboard').style.display = name === 'dashboard' ? 'block' : 'none';
-  document.getElementById('panel-analysis').style.display = name === 'analysis' ? 'block' : 'none';
+  // All panels — old + new
+  ['dashboard','analysis','daily-input','ai-report','doctor-consult','write-sar'].forEach(p => {
+    const el = document.getElementById('panel-' + p);
+    if (el) el.style.display = name === p ? 'block' : 'none';
+  });
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  // Auto-load reports when switching to report panel
+  if (name === 'ai-report') loadAnalysisReports();
   closeSidebar();
 }
 
@@ -1810,6 +2262,382 @@ const motis = [
   'ছোট ছোট স্বাস্থ্যকর অভ্যাস বড় পরিবর্তন আনে।',
 ];
 document.getElementById('motiText').textContent = `"${motis[Math.floor(Math.random()*motis.length)]}"`;
+
+
+// ═══════════════════════════════════════════════════════
+// ════ NEW FEATURES — Daily Input, Reports, Consult ════
+// ═══════════════════════════════════════════════════════
+
+// ── selected mood tracker ──
+let _selectedMood = '';
+
+function selectMood(btn, mood) {
+  document.querySelectorAll('.mood-pill').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  _selectedMood = mood;
+}
+
+function toggleCheck(input, lblId) {
+  const lbl = document.getElementById(lblId);
+  if (lbl) lbl.classList.toggle('checked', input.checked);
+  // Show/hide fever temp row
+  if (input.id === 'di_fever') {
+    const row = document.getElementById('feverTempRow');
+    if (row) row.style.display = input.checked ? 'flex' : 'none';
+  }
+}
+
+// ── Save Daily Health Log ──────────────────────────────
+async function saveDailyLog() {
+  const btn = document.getElementById('saveLogBtn');
+  if (btn) { btn.textContent = '⏳ সংরক্ষণ হচ্ছে...'; btn.disabled = true; }
+
+  const data = {
+    customer_id:      CID,
+    log_date:         new Date().toISOString().split('T')[0],
+    fever:            document.getElementById('di_fever')?.checked || false,
+    fever_temp:       parseFloat(document.getElementById('di_fever_temp')?.value) || null,
+    cold_cough:       document.getElementById('di_cold')?.checked || false,
+    stomach_upset:    document.getElementById('di_stomach')?.checked || false,
+    loose_motion:     document.getElementById('di_motion')?.checked || false,
+    headache:         document.getElementById('di_head')?.checked || false,
+    body_pain:        document.getElementById('di_pain')?.checked || false,
+    period_today:     document.getElementById('di_period')?.checked || false,
+    cramping:         document.getElementById('di_cramp')?.checked || false,
+    cramping_level:   parseInt(document.getElementById('di_cramp_level')?.value || 5),
+    mood:             _selectedMood,
+    mental_condition: document.getElementById('di_mental')?.value || '',
+    stress_level:     parseInt(document.getElementById('di_stress')?.value || 5),
+    food_eaten:       document.getElementById('di_food')?.value || '',
+    coffee_cups:      parseInt(document.getElementById('di_coffee')?.value || 0),
+    water_intake:     parseFloat(document.getElementById('di_water')?.value || 2),
+    drinks_taken:     document.getElementById('di_drinks')?.value || '',
+    food_preference_today: document.getElementById('di_food_pref')?.value || '',
+    sleep_hours:      parseFloat(document.getElementById('di_sleep')?.value || 7),
+    sleep_quality:    document.getElementById('di_sleep_q')?.value || 'মাঝারি',
+    notes:            document.getElementById('di_notes')?.value || '',
+  };
+
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/daily_health_log`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(data)
+    });
+    if (r.ok || r.status === 201) {
+      toast('✅ আজকের আপডেট সংরক্ষিত হয়েছে! সকালে AI বিশ্লেষণে ব্যবহার হবে।', true);
+      if (btn) { btn.textContent = '✅ Saved!'; btn.disabled = false; }
+    } else {
+      const err = await r.text();
+      throw new Error(err);
+    }
+  } catch(e) {
+    console.error('saveDailyLog error:', e);
+    toast('❌ Save হয়নি। আবার চেষ্টা করুন।', false);
+    if (btn) { btn.textContent = '💾 আজকের আপডেট Save করুন'; btn.disabled = false; }
+  }
+}
+
+// ── Load Analysis Reports ──────────────────────────────
+async function loadAnalysisReports() {
+  const el = document.getElementById('reportsList');
+  if (!el || !CID) return;
+  el.innerHTML = '<div class="empty-state"><div style="font-size:1.5rem">⏳</div>রিপোর্ট লোড হচ্ছে...</div>';
+
+  try {
+    // Try analysis_reports table first, fallback to ai_analysis
+    let reports = [];
+    const r1 = await fetch(
+      `${SUPA}/rest/v1/analysis_reports?customer_id=eq.${CID}&order=created_at.desc&limit=7`,
+      { headers: H }
+    );
+    if (r1.ok) {
+      const d1 = await r1.json();
+      reports = d1 || [];
+    }
+
+    // If empty, try ai_analysis table
+    if (!reports.length) {
+      const r2 = await fetch(
+        `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=7`,
+        { headers: H }
+      );
+      if (r2.ok) {
+        const d2 = await r2.json();
+        reports = (d2 || []).map(a => ({
+          ...a,
+          report_date: a.analysis_date || a.created_at?.split('T')[0],
+          report_json: a,
+        }));
+      }
+    }
+
+    if (!reports.length) {
+      el.innerHTML = `<div class="empty-state" style="padding:3rem">
+        <div style="font-size:2rem;margin-bottom:.75rem">📋</div>
+        এখনো কোনো রিপোর্ট নেই।<br>
+        <span style="font-size:.8rem">সকাল ৬টায় AI বিশ্লেষণের পরে এখানে দেখাবে।</span>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = reports.map((rpt, i) => {
+      const score = rpt.health_score || rpt.report_json?.health_score || '—';
+      const scoreNum = parseInt(score);
+      const scoreColor = scoreNum >= 70 ? '#34D399' : scoreNum >= 40 ? '#FCD34D' : '#F87171';
+      const analysis = rpt.analysis_bn || rpt.report_json?.analysis_bn || 'বিশ্লেষণ পাওয়া যায়নি';
+      const recs = rpt.recommendations || rpt.report_json?.recommendations || '';
+      const date = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
+      const pdfUrl = rpt.pdf_url || '';
+
+      return `<div class="report-item" id="rpt-${i}">
+        <div class="report-toggle" onclick="toggleReport(${i})">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:.85rem;color:rgba(255,255,255,.55)">${date}</span>
+            <span class="report-score-badge"
+              style="background:${scoreColor}20;color:${scoreColor};border:1px solid ${scoreColor}40">
+              স্কোর: ${score}/100
+            </span>
+          </div>
+          <span class="report-arrow">▼</span>
+        </div>
+        <div class="report-body">
+          <p>${analysis}</p>
+          ${recs ? `<p style="margin-top:.75rem;padding:.6rem .9rem;background:rgba(245,200,66,.05);
+            border-left:2px solid rgba(245,200,66,.3);border-radius:0 8px 8px 0;
+            font-size:.8rem;color:rgba(255,255,255,.55)">${recs}</p>` : ''}
+          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="report-pdf-link">📄 PDF ডাউনলোড</a>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('loadAnalysisReports error:', e);
+    el.innerHTML = `<div class="empty-state" style="color:var(--red2)">রিপোর্ট লোড হয়নি।</div>`;
+  }
+}
+
+function toggleReport(i) {
+  const el = document.getElementById('rpt-' + i);
+  if (el) el.classList.toggle('open');
+}
+
+// ── Doctor Consultation ────────────────────────────────
+async function startConsultation() {
+  const approved = localStorage.getItem('sar_admin_approved') === 'true' ||
+    JSON.parse(localStorage.getItem('sar_customer')||'{}')?.admin_approved === true;
+
+  if (!approved) {
+    toast('🔒 ডাক্তার পরামর্শের জন্য Admin অনুমোদন দরকার।', false);
+    return;
+  }
+
+  const symptoms = document.getElementById('consultSymptoms')?.value?.trim();
+  if (!symptoms) { toast('লক্ষণ লিখুন।', false); return; }
+
+  const outDiv = document.getElementById('prescriptionOutput');
+  const outContent = document.getElementById('prescriptionContent');
+  if (!outDiv || !outContent) return;
+
+  outDiv.style.display = 'block';
+  outContent.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(255,255,255,.5)">
+    <div style="width:32px;height:32px;border:3px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
+      border-radius:50%;animation:sp .75s linear infinite;margin:0 auto .75rem"></div>
+    AI প্রেসক্রিপশন তৈরি হচ্ছে...
+  </div>`;
+
+  const cust   = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  const catMap = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+  const cat    = catMap[cust.sar_category] || 'DM';
+
+  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI ডাক্তার।
+
+গ্রাহক: ${cust.full_name || 'SAR গ্রাহক'}
+রোগ বিভাগ: ${cat}
+আজকের লক্ষণ: ${symptoms}
+
+A4 ফরম্যাটে সম্পূর্ণ প্রেসক্রিপশন বাংলায় দাও।
+JSON-এ দাও:
+{
+  "conventional": ["ওষুধ Generic নাম, ডোজ, সময়"],
+  "homeopathic": ["হোমিওপ্যাথিক ওষুধ ও পরামর্শ"],
+  "ayurvedic": ["আয়ুর্বেদিক চিকিৎসা ও herbs"],
+  "home_remedy": ["ঘরোয়া / কবিরাজি প্রতিকার"],
+  "islamic": ["ইসলামিক চিকিৎসা পরামর্শ, দুআ, সুন্নাহ"],
+  "food_guide": ["চিকিৎসাকালীন খাদ্য নির্দেশিকা"],
+  "warnings": ["সতর্কতা ও জরুরি সংকেত"],
+  "follow_up": "পুনরায় দেখানোর পরামর্শ"
+}`;
+
+  try {
+    const r = await fetch('/.netlify/functions/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const raw = (d.text || '{}').replace(/```json|```/g,'').trim();
+    const rx = JSON.parse(raw);
+
+    const renderList = (arr, color) => (arr||[]).map(x =>
+      `<li style="margin-bottom:.4rem">${x}</li>`).join('');
+
+    outContent.innerHTML = `
+      <div style="font-size:.82rem;line-height:1.8">
+        <div style="background:rgba(5,150,105,.08);border-left:3px solid var(--green2);
+          padding:.75rem 1rem;border-radius:0 10px 10px 0;margin-bottom:1rem">
+          <b style="color:var(--green2)">গ্রাহক:</b> ${cust.full_name || '—'} &nbsp;|&nbsp;
+          <b style="color:var(--green2)">রোগ:</b> ${cat} &nbsp;|&nbsp;
+          <b style="color:var(--green2)">লক্ষণ:</b> ${symptoms}
+        </div>
+
+        ${rx.conventional?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">💊 প্রচলিত ওষুধ</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.conventional,'#34D399')}</ul>
+        </div>` : ''}
+
+        ${rx.homeopathic?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">🌿 হোমিওপ্যাথিক</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.homeopathic)}</ul>
+        </div>` : ''}
+
+        ${rx.ayurvedic?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">🌱 আয়ুর্বেদিক</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.ayurvedic)}</ul>
+        </div>` : ''}
+
+        ${rx.home_remedy?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">🏠 ঘরোয়া প্রতিকার</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.home_remedy)}</ul>
+        </div>` : ''}
+
+        ${rx.islamic?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">☪️ ইসলামিক পরামর্শ</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.islamic)}</ul>
+        </div>` : ''}
+
+        ${rx.food_guide?.length ? `<div style="margin-bottom:.9rem">
+          <div class="as-label">🍽️ খাদ্য নির্দেশিকা</div>
+          <ul style="padding-left:1.2rem;color:rgba(255,255,255,.7)">${renderList(rx.food_guide)}</ul>
+        </div>` : ''}
+
+        ${rx.follow_up ? `<div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);
+          border-radius:10px;padding:.75rem 1rem;font-size:.8rem;color:rgba(255,255,255,.6)">
+          📅 <b style="color:var(--yellow2)">পুনরায় দেখানো:</b> ${rx.follow_up}
+        </div>` : ''}
+
+        <div style="margin-top:.75rem;font-size:.72rem;color:rgba(255,255,255,.3);
+          border-top:1px solid rgba(255,255,255,.07);padding-top:.75rem">
+          ⚠️ এটি AI-জেনারেটেড পরামর্শ। অনুগ্রহ করে একজন নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
+        </div>
+      </div>`;
+
+    // Save to Supabase
+    await fetch(`${SUPA}/rest/v1/prescriptions`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        customer_id: CID,
+        symptoms_today: symptoms,
+        prescription_json: rx,
+        payment_status: 'pending',
+        approved_by_admin: false
+      })
+    }).catch(()=>{});
+
+    toast('✅ প্রেসক্রিপশন তৈরি হয়েছে!', true);
+
+  } catch(e) {
+    console.error('startConsultation error:', e);
+    outContent.innerHTML = `<div style="color:var(--red2);padding:1rem">প্রেসক্রিপশন তৈরি হয়নি: ${e.message}</div>`;
+    toast('❌ ' + e.message, false);
+  }
+}
+
+function printPrescription() {
+  const content = document.getElementById('prescriptionContent')?.innerHTML || '';
+  const win = window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>SAR প্রেসক্রিপশন</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <style>body{font-family:'Hind Siliguri',sans-serif;color:#111;padding:2cm;max-width:21cm;margin:0 auto}
+    .as-label{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;
+      color:#666;margin:.8rem 0 .3rem}</style>
+  </head><body>${content}</body></html>`);
+  win.document.close();
+  win.print();
+}
+
+// ── Write to SAR Submit ────────────────────────────────
+async function submitFeedback() {
+  const text = document.getElementById('feedbackText')?.value?.trim();
+  const type = document.getElementById('feedbackType')?.value || 'general';
+  const cust = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+
+  if (!text) { toast('কিছু লিখুন।', false); return; }
+
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/customer_feedback`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        customer_id:   CID,
+        customer_name: cust.full_name || CNAME,
+        feedback_text: text,
+        feedback_type: type
+      })
+    });
+
+    if (r.ok || r.status === 201) {
+      document.getElementById('feedbackText').value = '';
+      toast('✅ আপনার বার্তা SAR-কে পাঠানো হয়েছে। ধন্যবাদ! 🙏', true);
+    } else {
+      throw new Error(await r.text());
+    }
+  } catch(e) {
+    console.error('submitFeedback error:', e);
+    toast('❌ পাঠানো যায়নি।', false);
+  }
+}
+
+// ── Voice Input (Web Speech API — Free) ───────────────
+function startVoiceInput() {
+  startVoiceInputFor('di_notes');
+}
+
+function startVoiceInputFor(targetId) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Voice input Chrome-এ কাজ করে।', false); return; }
+
+  const recognition = new SR();
+  recognition.lang = 'bn-BD';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  const btn = document.getElementById('voiceBtn');
+  if (btn) { btn.classList.add('recording'); btn.querySelector('div')?.firstElementChild && (btn.querySelector('div').children[0].textContent = '🔴 রেকর্ড হচ্ছে...'); }
+
+  recognition.onresult = (event) => {
+    const text = event.results[0][0].transcript;
+    const el = document.getElementById(targetId);
+    if (el) el.value = (el.value ? el.value + '\n' : '') + text;
+    toast('✅ Voice input: ' + text.substring(0,40) + (text.length>40?'...':''), true);
+    if (btn) { btn.classList.remove('recording'); }
+  };
+
+  recognition.onerror = (e) => {
+    toast('❌ Voice error: ' + e.error, false);
+    if (btn) btn.classList.remove('recording');
+  };
+
+  recognition.onend = () => {
+    if (btn) btn.classList.remove('recording');
+  };
+
+  recognition.start();
+}
+
 </script>
 </body>
 </html>
