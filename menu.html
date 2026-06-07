@@ -420,6 +420,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .mcard-herbs{font-size:.67rem;color:var(--purple2);margin-top:.22rem;padding:.15rem .38rem;background:rgba(107,33,168,.06);border-radius:4px}
 .mcard-tops{font-size:.65rem;color:var(--yellow2);margin-top:.16rem}
 .mcard-gi{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(5,150,105,.1);color:var(--green2);border:1px solid rgba(5,150,105,.2)}
+
+.mcard-nutr-dv{font-size:.58rem;color:var(--pink2);font-weight:700;margin-left:.15rem}
 .mcard-src{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(107,33,168,.1);color:var(--purple2);border:1px solid rgba(107,33,168,.2)}
 
 </style>
@@ -604,7 +606,33 @@ window.addEventListener('DOMContentLoaded', async () => {
       fetchMenuItems(), fetchPins(), fetchMetrics()
     ]);
     // Merge Supabase data with static (Supabase takes priority)
-    allMenuItems = supaMenus.length > 10 ? supaMenus : STATIC_MENU;
+    // Merge STATIC_MENU local data into Supabase items (benefits, ingredients, BC IDs etc.)
+    if(supaMenus.length > 10){
+      allMenuItems = supaMenus.map(si=>{
+        const id = si.menu_code||si.id||si.code||'';
+        const loc = STATIC_MENU.find(m=>m.id===id||m.code===id||m.name===si.name_bn||m.name===si.name);
+        if(!loc) return si;
+        return Object.assign({}, loc, si, {
+          // Always use local data for therapeutic fields
+          ingredients: (si.ingredients_json && si.ingredients_json.length) ? si.ingredients_json : loc.ingredients,
+          benefits:   si.benefits || loc.benefits,
+          herbs:      si.herbs      || loc.herbs,
+          toppings:   si.toppings   || loc.toppings,
+          powders:    si.disease_powders_json ? JSON.stringify(si.disease_powders_json) : (si.powders||loc.powders),
+          recipe:     loc.recipe,
+          gi:         si.gi         || loc.gi,
+          kcal:       si.calories   || si.kcal || loc.kcal,
+          protein:    si.protein_g  ? si.protein_g+'g' : (si.protein||loc.protein),
+          fiber:      si.fiber_g    ? si.fiber_g+'g'   : (si.fiber||loc.fiber),
+          iron:       si.iron_mg    ? si.iron_mg+'mg'  : (si.iron||loc.iron),
+          calcium:    si.calcium_mg ? si.calcium_mg+'mg': (si.calcium||loc.calcium),
+          folate:     si.folate_mcg ? si.folate_mcg+'mcg': (si.folate||loc.folate),
+          source:     loc.source,  origin: loc.origin,
+        });
+      });
+    } else {
+      allMenuItems = STATIC_MENU;
+    }
     pinnedItems  = pins;
     customerMetrics = metrics;
     renderPinned();
@@ -753,11 +781,15 @@ function buildCard(m, isPinned, isAiRec){
       </div>
       ${pw?`<div class="mcard-powders">💊 <span>ঔষধি গুঁড়া:</span> ${pw}</div>`:''}
       <div class="nutr-row">
-        <span class="nchip"><span class="ndot" style="background:${catClr}"></span>${kcal} kcal</span>
-        ${prot&&prot!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--purple2)"></span>প্রোটিন ${prot}</span>`:''}
-        ${fib&&fib!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--green2)"></span>ফাইবার ${fib}</span>`:''}
-        ${m.iron||m.iron_mg?`<span class="nchip"><span class="ndot" style="background:var(--red2)"></span>আয়রন ${m.iron||m.iron_mg}</span>`:''}
-        ${m.folate||m.folate_mcg?`<span class="nchip"><span class="ndot" style="background:var(--yellow2)"></span>ফোলেট ${m.folate||m.folate_mcg}</span>`:''}
+        <span class="nchip"><span class="ndot" style="background:${catClr}"></span>${kcal} kcal${m.kcal_dv?`<span class="mcard-nutr-dv"> ${m.kcal_dv}%</span>`:''}</span>
+        ${prot&&prot!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--purple2)"></span>Pro ${prot}${m.protein_dv?`<span class="mcard-nutr-dv"> ${m.protein_dv}%</span>`:''}</span>`:''}
+        ${fib&&fib!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--green2)"></span>Fiber ${fib}</span>`:''}
+        ${m.fat?`<span class="nchip"><span class="ndot" style="background:#F59E0B"></span>Fat ${m.fat}g</span>`:''}
+        ${m.carb?`<span class="nchip"><span class="ndot" style="background:#6B7280"></span>Carb ${m.carb}g</span>`:''}
+        ${m.iron||m.iron_mg?`<span class="nchip"><span class="ndot" style="background:var(--red2)"></span>Fe ${m.iron||m.iron_mg}</span>`:''}
+        ${m.calcium?`<span class="nchip"><span class="ndot" style="background:#60A5FA"></span>Ca ${m.calcium}</span>`:''}
+        ${m.folate||m.folate_mcg?`<span class="nchip"><span class="ndot" style="background:var(--yellow2)"></span>Folate ${m.folate||m.folate_mcg}</span>`:''}
+        ${m.vitC?`<span class="nchip"><span class="ndot" style="background:#F97316"></span>VitC ${m.vitC}</span>`:''}
       </div>
       <div class="tc-row">
         ${cht?`<span class="tc-chip">🍶 ${cht}</span>`:''}
