@@ -621,17 +621,20 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <a href="metrics.html" class="sb-item">
         <span class="sb-item-icon">📊</span>স্বাস্থ্য মেট্রিক্স
       </a>
-      <button class="sb-item" onclick="showPanel('ai-report')">
+      <a href="receipt.html" class="sb-item">
         <span class="sb-item-icon">🧾</span>রিসিট ও পরামর্শ
-      </button>
+      </a>
 
       <div class="sb-section">অ্যাকাউন্ট</div>
-      <a href="metrics.html" class="sb-item">
+      <button class="sb-item" onclick="showPanel('profile')">
         <span class="sb-item-icon">👤</span>আমার প্রোফাইল
-      </a>
+      </button>
       <a href="payment.html" class="sb-item">
         <span class="sb-item-icon">💳</span>পেমেন্ট ও সাবস্ক্রিপশন
       </a>
+      <button class="sb-item" onclick="showPanel('change-password')">
+        <span class="sb-item-icon">🔑</span>পাসওয়ার্ড পরিবর্তন
+      </button>
       <!-- ══ NEW SIDEBAR ITEMS ══ -->
       <div class="sb-section">আজকের আপডেট</div>
       <button class="sb-item" onclick="showPanel('daily-input')">
@@ -642,9 +645,9 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       </button>
 
       <div class="sb-section">সেবা</div>
-      <button class="sb-item" onclick="showPanel('doctor-consult')">
+      <a href="doctor.html" class="sb-item">
         <span class="sb-item-icon">👩‍⚕️</span>ডাক্তার পরামর্শ
-      </button>
+      </a>
       <button class="sb-item" onclick="showPanel('write-sar')">
         <span class="sb-item-icon">✍️</span>Write to SAR
       </button>
@@ -1231,6 +1234,98 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         </div>
       </div>
     </div><!-- end panel-write-sar -->
+
+
+
+    <!-- ══════════════════════════════════════
+         PROFILE PANEL — আমার প্রোফাইল
+    ══════════════════════════════════════ -->
+    <div id="panel-profile" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">আপনার তথ্য</div>
+            <div class="greet-name">আমার প্রোফাইল</div>
+          </div>
+          <div style="display:flex;gap:.6rem">
+            <a href="metrics.html" class="hdr-btn primary">📊 মেট্রিক্স আপডেট</a>
+            <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+          </div>
+        </div>
+      </div>
+      <div class="new-panel">
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">👤</span>ব্যক্তিগত তথ্য</span>
+          </div>
+          <div class="dcard-body" id="profileBasicData">
+            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
+          </div>
+        </div>
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">🏥</span>স্বাস্থ্য তথ্য</span>
+          </div>
+          <div class="dcard-body" id="profileHealthData">
+            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
+          </div>
+        </div>
+        <div class="dcard">
+          <div class="dcard-header">
+            <span class="dcard-title"><span class="dcard-title-icon">📋</span>সদস্যতা তথ্য</span>
+          </div>
+          <div class="dcard-body" id="profileMemberData">
+            <div class="empty-state">তথ্য লোড হচ্ছে...</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end panel-profile -->
+
+
+    <!-- ══════════════════════════════════════
+         CHANGE PASSWORD PANEL
+    ══════════════════════════════════════ -->
+    <div id="panel-change-password" style="display:none">
+      <div class="dash-header">
+        <div class="greet-row">
+          <div class="greet-left">
+            <div class="greet-time">নিরাপত্তা</div>
+            <div class="greet-name">পাসওয়ার্ড পরিবর্তন</div>
+          </div>
+          <button class="hdr-btn" onclick="showPanel('dashboard')">← ড্যাশবোর্ড</button>
+        </div>
+      </div>
+      <div class="new-panel">
+        <div class="dcard">
+          <div class="dcard-body">
+            <div style="display:grid;gap:1rem;max-width:440px">
+              <div>
+                <div class="sec-head">বর্তমান পাসওয়ার্ড</div>
+                <input type="password" id="pwCurrent" class="sar-input"
+                  placeholder="বর্তমান পাসওয়ার্ড দিন">
+              </div>
+              <div>
+                <div class="sec-head">নতুন পাসওয়ার্ড</div>
+                <input type="password" id="pwNew" class="sar-input"
+                  placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
+              </div>
+              <div>
+                <div class="sec-head">নতুন পাসওয়ার্ড নিশ্চিত করুন</div>
+                <input type="password" id="pwConfirm" class="sar-input"
+                  placeholder="আবার নতুন পাসওয়ার্ড দিন">
+              </div>
+              <div id="pwMsg" style="font-size:.82rem;min-height:1.2rem"></div>
+              <button onclick="changePassword()"
+                style="background:linear-gradient(135deg,var(--green),var(--purple));
+                border:none;border-radius:12px;padding:.9rem;color:#fff;
+                font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer">
+                🔑 পাসওয়ার্ড পরিবর্তন করুন
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end panel-change-password -->
 
 
   </main>
@@ -2195,7 +2290,7 @@ function renderSubAlert(c) {
 // ═══════════════════════════════════════
 function showPanel(name) {
   // All panels — old + new
-  ['dashboard','analysis','daily-input','ai-report','doctor-consult','write-sar'].forEach(p => {
+  ['dashboard','analysis','daily-input','ai-report','doctor-consult','write-sar','profile','change-password'].forEach(p => {
     const el = document.getElementById('panel-' + p);
     if (el) el.style.display = name === p ? 'block' : 'none';
   });
@@ -2206,8 +2301,9 @@ function showPanel(name) {
     if (oc.includes("'" + name + "'")) btn.classList.add('active');
   });
   // Auto-load reports when switching to report panel
-  if (name === 'ai-report') loadAnalysisReports();
-  if (name === 'daily-input' || name === 'write-sar') {
+  if (name === 'ai-report')   loadAnalysisReports();
+  if (name === 'profile')      loadAndRenderProfile();
+  if (['daily-input','write-sar','profile','change-password'].includes(name)) {
     setTimeout(() => window.scrollTo({top:0, behavior:'smooth'}), 100);
   }
   closeSidebar();
@@ -2730,6 +2826,181 @@ async function loadTodayLog() {
     if (btn) btn.textContent = '🔄 আজকের আপডেট পরিবর্তন করুন';
 
   } catch(e) { /* silent fail */ }
+}
+
+
+// ═══════════════════════════════════════════════════
+// PROFILE PANEL — রেন্ডার করুন
+// ═══════════════════════════════════════════════════
+function renderProfilePanel(cust, metrics) {
+  const row = (k, v, cls='') => `
+    <div class="mem-row">
+      <span class="mem-k">${k}</span>
+      <span class="mem-v ${cls}">${v || '—'}</span>
+    </div>`;
+
+  const age = cust?.date_of_birth
+    ? Math.floor((new Date() - new Date(cust.date_of_birth)) / 31557600000)
+    : '—';
+
+  const bmi = cust?.bmi
+    ? parseFloat(cust.bmi).toFixed(1)
+    : (metrics?.bmi ? parseFloat(metrics.bmi).toFixed(1) : '—');
+
+  // Basic info
+  const basicEl = document.getElementById('profileBasicData');
+  if (basicEl) basicEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.2rem">
+      <div style="width:64px;height:64px;border-radius:50%;
+        background:linear-gradient(135deg,var(--pink),var(--purple));
+        display:flex;align-items:center;justify-content:center;
+        font-size:1.6rem;font-weight:700;flex-shrink:0">
+        ${(cust?.full_name||'?').charAt(0).toUpperCase()}
+      </div>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700">
+          ${cust?.full_name || '—'}
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--pink2)">
+          ${cust?.member_id || '—'}
+        </div>
+      </div>
+    </div>
+    ${row('পুরো নাম', cust?.full_name)}
+    ${row('ফোন', cust?.phone)}
+    ${row('ইমেইল', cust?.email)}
+    ${row('জন্ম তারিখ', cust?.date_of_birth)}
+    ${row('বয়স', age + ' বছর')}
+    ${row('ঠিকানা', cust?.address)}
+    ${row('বিভাগ/জেলা', [cust?.division, cust?.district].filter(Boolean).join(', '))}
+    ${row('রক্তের গ্রুপ', cust?.blood_group)}`;
+
+  // Health info
+  const healthEl = document.getElementById('profileHealthData');
+  if (healthEl) healthEl.innerHTML = `
+    ${row('রোগ বিভাগ', ({DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'})[cust?.sar_category] || cust?.sar_category)}
+    ${row('উচ্চতা', cust?.height_cm ? cust.height_cm + ' সেমি' : '—')}
+    ${row('ওজন', cust?.weight_kg ? cust.weight_kg + ' কেজি' : '—')}
+    ${row('BMI', bmi)}
+    ${row('BP (সিস্টোলিক)', metrics?.bp_systolic || '—')}
+    ${row('BP (ডায়াস্টোলিক)', metrics?.bp_diastolic || '—')}
+    ${row('ফাস্টিং গ্লুকোজ', metrics?.fasting_glucose || '—')}
+    ${row('HbA1c', metrics?.hba1c ? metrics.hba1c + '%' : '—')}
+    ${row('হিমোগ্লোবিন', metrics?.hemoglobin ? metrics.hemoglobin + ' g/dL' : '—')}
+    ${row('ভিটামিন ডি', metrics?.vitamin_d ? metrics.vitamin_d + ' ng/mL' : '—')}
+    <div style="margin-top:.75rem;text-align:center">
+      <a href="metrics.html" style="background:linear-gradient(135deg,var(--pink),var(--purple));
+        border:none;border-radius:10px;padding:.6rem 1.4rem;color:#fff;
+        font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;
+        text-decoration:none;display:inline-block">
+        📊 সম্পূর্ণ মেট্রিক্স আপডেট করুন →
+      </a>
+    </div>`;
+
+  // Member info
+  const isActive = cust?.monthly_sub_paid &&
+    new Date(cust?.monthly_sub_expiry_date) > new Date();
+  const memberEl = document.getElementById('profileMemberData');
+  if (memberEl) memberEl.innerHTML = `
+    ${row('সদস্য আইডি', cust?.member_id)}
+    ${row('সদস্যতার স্তর', cust?.membership_tier || 'Basic')}
+    ${row('নিবন্ধন ফি', cust?.registration_fee_paid ? '✓ পরিশোধিত' : '✗ বাকি',
+        cust?.registration_fee_paid ? 'active' : 'expired')}
+    ${row('সাবস্ক্রিপশন', isActive ? '✓ সক্রিয়' : '✗ সক্রিয় নেই',
+        isActive ? 'active' : 'expired')}
+    ${row('মেয়াদ শেষ', cust?.monthly_sub_expiry_date || '—')}
+    ${row('লয়্যালটি পয়েন্ট', cust?.loyalty_points || 0)}
+    ${row('অ্যাকাউন্ট স্ট্যাটাস', cust?.account_status || '—',
+        cust?.is_active ? 'active' : 'pending')}
+    <div style="margin-top:.75rem;text-align:center">
+      <button onclick="showPanel('change-password')"
+        style="background:rgba(107,33,168,.15);border:1px solid rgba(107,33,168,.3);
+        border-radius:10px;padding:.55rem 1.2rem;color:var(--purple2);
+        font-family:'Hind Siliguri',sans-serif;font-size:.83rem;cursor:pointer">
+        🔑 পাসওয়ার্ড পরিবর্তন করুন
+      </button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+// CHANGE PASSWORD
+// ═══════════════════════════════════════════════════
+async function changePassword() {
+  const cur  = document.getElementById('pwCurrent')?.value?.trim();
+  const nw   = document.getElementById('pwNew')?.value?.trim();
+  const conf = document.getElementById('pwConfirm')?.value?.trim();
+  const msg  = document.getElementById('pwMsg');
+
+  const show = (txt, ok) => {
+    if (msg) { msg.textContent = txt; msg.style.color = ok ? '#34D399' : '#F87171'; }
+  };
+
+  if (!cur)        { show('বর্তমান পাসওয়ার্ড দিন।', false); return; }
+  if (!nw)         { show('নতুন পাসওয়ার্ড দিন।', false); return; }
+  if (nw.length<6) { show('পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।', false); return; }
+  if (nw !== conf) { show('দুটি পাসওয়ার্ড মিলছে না।', false); return; }
+
+  show('যাচাই করা হচ্ছে...', true);
+
+  try {
+    // Step 1 — verify current password against Supabase
+    const chk = await fetch(
+      `${SUPA}/rest/v1/customers?id=eq.${CID}&select=password_hash,phone`,
+      { headers: H }
+    );
+    const chkData = await chk.json();
+    const storedHash = chkData?.[0]?.password_hash || '';
+
+    // Simple hash check (btoa used in register.html)
+    const curHash = btoa(cur);
+    if (storedHash && storedHash !== curHash) {
+      show('বর্তমান পাসওয়ার্ড ভুল।', false);
+      return;
+    }
+
+    // Step 2 — update password_hash in Supabase
+    const newHash = btoa(nw);
+    const upd = await fetch(
+      `${SUPA}/rest/v1/customers?id=eq.${CID}`,
+      {
+        method: 'PATCH',
+        headers: { ...H, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ password_hash: newHash })
+      }
+    );
+
+    if (upd.ok || upd.status === 204) {
+      show('✅ পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!', true);
+      document.getElementById('pwCurrent').value = '';
+      document.getElementById('pwNew').value = '';
+      document.getElementById('pwConfirm').value = '';
+      toast('✅ পাসওয়ার্ড পরিবর্তন সম্পন্ন!', true);
+    } else {
+      const err = await upd.text();
+      throw new Error(err);
+    }
+  } catch(e) {
+    show('❌ পরিবর্তন ব্যর্থ: ' + e.message, false);
+    toast('❌ পাসওয়ার্ড পরিবর্তন হয়নি।', false);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// showPanel — load profile data when opening
+// ═══════════════════════════════════════════════════
+const _origShowPanel = showPanel;
+
+
+async function loadAndRenderProfile() {
+  try {
+    const [custArr, metricsArr] = await Promise.all([
+      fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}).then(r=>r.json()),
+      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
+    ]);
+    renderProfilePanel(custArr?.[0] || {}, metricsArr?.[0] || {});
+  } catch(e) {
+    console.error('loadAndRenderProfile:', e);
+  }
 }
 
 </script>
