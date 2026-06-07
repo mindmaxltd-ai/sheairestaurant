@@ -1248,6 +1248,140 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   .rcp-page-break{page-break-before:always}
 }
 
+
+/* ══════════════════════════════════════════════════════
+   SUBSCRIPTION ECR RECEIPT MODAL — ECR style
+   ══════════════════════════════════════════════════════ */
+.sub-rcp-overlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(14px);
+  display:none;align-items:flex-start;justify-content:center;
+  padding:1rem;overflow-y:auto;
+}
+.sub-rcp-overlay.open{display:flex}
+
+.sub-rcp-wrap{
+  width:100%;max-width:680px;margin:auto;
+  background:#fff;
+  border-radius:4px;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.7);
+  animation:subRcpIn .3s cubic-bezier(.34,1.56,.64,1);
+  border-top:4px solid #C2185B;
+  font-family:Arial,'Hind Siliguri',sans-serif;
+  font-size:10.5px;color:#111;line-height:1.35;
+}
+@keyframes subRcpIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+
+/* ECR screen action bar */
+.sub-rcp-bar{
+  background:#880E4F;padding:8px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  gap:6px;flex-wrap:wrap;
+}
+.sub-rcp-bar-title{color:#FFD1E8;font-size:12px;font-weight:700;letter-spacing:.04em}
+.sub-rcp-bar-btns{display:flex;gap:6px}
+.srb-btn{padding:5px 13px;border-radius:4px;font-size:11.5px;font-weight:700;
+  cursor:pointer;border:none;font-family:'Hind Siliguri',Arial;transition:opacity .2s}
+.srb-btn:hover{opacity:.88}
+.srb-wa{background:#25D366;color:#fff}
+.srb-em{background:#9C27B0;color:#fff}
+.srb-pr{background:#fff;color:#880E4F}
+.srb-cl{background:rgba(255,255,255,.2);color:#FFD1E8;border:1px solid rgba(255,255,255,.3)}
+
+/* Status inside modal */
+.sub-rcp-status{padding:5px 16px;font-size:11px;font-weight:600;min-height:26px;display:flex;align-items:center;gap:6px}
+.srs-ok{background:#E8F5E9;color:#2E7D32}
+.srs-sending{background:#FFF8E1;color:#F57F17}
+.srs-err{background:#FFEBEE;color:#C62828}
+
+/* ECR paper area */
+.sub-ecr{padding:14px 18px}
+
+/* Separator */
+.sub-sep-d{border:none;border-top:2px double #C2185B;margin:6px 0}
+.sub-sep-s{border:none;border-top:1px solid #ddd;margin:5px 0}
+.sub-sep-dash{border:none;border-top:1px dashed #ccc;margin:4px 0}
+.sub-sep-star{text-align:center;color:#C2185B;font-size:10px;margin:4px 0;letter-spacing:4px}
+
+/* Section heading ECR */
+.sub-sec-h{font-size:8.5px;font-weight:700;color:#C2185B;text-transform:uppercase;
+  letter-spacing:.14em;margin:6px 0 3px;display:flex;align-items:center;gap:6px}
+.sub-sec-h::before,.sub-sec-h::after{content:'';flex:1;height:1px;background:#C2185B;opacity:.3}
+
+/* Receipt ECR header */
+.sub-ecr-hd{text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:8px}
+.sub-ecr-hd-title{font-size:15px;font-weight:700;color:#C2185B;letter-spacing:.04em}
+.sub-ecr-hd-sub{font-size:8.5px;color:#AD1457;letter-spacing:.1em;margin:2px 0}
+.sub-ecr-hd-tag{font-size:8px;color:#555;letter-spacing:.04em}
+.sub-ecr-num{font-family:'Space Mono',Courier New;font-size:11px;font-weight:700;color:#C2185B;margin-top:5px}
+
+/* Info table */
+.sub-info-tbl{width:100%;border-collapse:collapse;margin-bottom:6px}
+.sub-info-tbl td{padding:1.5px 0;vertical-align:top}
+.sub-ik{color:#555;font-size:9.5px;width:32%;white-space:nowrap}
+.sub-iv{font-weight:600;font-size:10.5px}
+
+/* Package box */
+.sub-pkg-box{
+  border:1px solid #C2185B;border-left:4px solid #C2185B;
+  padding:7px 11px;margin:8px 0;border-radius:0 5px 5px 0;
+}
+.sub-pkg-name{font-size:13px;font-weight:700;color:#C2185B;margin-bottom:3px}
+.sub-pkg-row{display:flex;justify-content:space-between;font-size:10px;color:#555;margin-bottom:2px}
+.sub-pkg-total{display:flex;justify-content:space-between;font-size:14px;font-weight:700;
+  color:#C2185B;border-top:1px solid #C2185B;padding-top:5px;margin-top:5px;
+  font-family:'Space Mono',Courier New}
+
+/* Benefits of subscription */
+.sub-ben-row{font-size:9.5px;color:#1B5E20;padding:1px 0}
+
+/* AI advice block */
+.sub-ai-block{border:1px solid #1B5E20;border-left:3px solid #1B5E20;
+  padding:4px 8px;margin:5px 0;font-size:9.5px;color:#1B5E20;line-height:1.45}
+.sub-ai-title{font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px}
+
+/* Msg blocks */
+.sub-msg{border-left:3px solid;padding:3px 8px;margin:3px 0;font-size:9.5px;line-height:1.4}
+.sub-msg-r{border-color:#C62828;background:#FFF5F5}.sub-msg-r .sub-msg-t{color:#C62828}
+.sub-msg-g{border-color:#388E3C;background:#F1F8E9}.sub-msg-g .sub-msg-t{color:#2E7D32}
+.sub-msg-p{border-color:#AD1457;background:#FCE4EC}.sub-msg-p .sub-msg-t{color:#AD1457}
+.sub-msg-v{border-color:#6A1B9A;background:#F3E5F5}.sub-msg-v .sub-msg-t{color:#6A1B9A}
+.sub-msg-t{font-weight:700;font-size:9px;margin-bottom:1px}
+
+/* Next steps */
+.sub-next-row{font-size:9.5px;padding:2px 0;border-bottom:1px dotted #FFB3CC}
+.sub-next-row:last-child{border:none}
+
+/* Disclaimer */
+.sub-disc{border:1px solid #E65100;border-left:3px solid #E65100;padding:3px 8px;
+  margin:5px 0;font-size:8.5px;color:#BF360C;line-height:1.4}
+
+/* QR/code placeholder */
+.sub-qr-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+.sub-qr-box{width:54px;height:54px;border:2px solid #C2185B;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:8px;color:#C2185B;text-align:center;font-weight:700;line-height:1.2}
+.sub-qr-info{font-size:9px;color:#555;line-height:1.5}
+
+/* Survey */
+.sub-survey{border:1px solid #F48FB1;padding:6px 10px;margin:6px 0;font-size:9.5px}
+.sub-survey-q{font-weight:700;color:#880E4F;margin-bottom:5px}
+.sub-survey-line{display:block;border:none;border-bottom:1px solid #FFB3CC;width:100%;margin-bottom:5px;height:12px;background:transparent}
+
+/* Footer */
+.sub-ecr-foot{text-align:center;font-size:8.5px;color:#555;padding-top:6px;
+  border-top:2px double #C2185B;line-height:1.6;margin-top:6px}
+.sub-ecr-foot b{color:#C2185B}
+
+/* Print */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .sub-rcp-overlay{position:static;background:#fff;padding:0;display:block}
+  .sub-rcp-wrap{box-shadow:none;border-radius:0;max-width:100%;border-top:none}
+  .sub-rcp-bar,.sub-rcp-status{display:none!important}
+  @page{size:A4;margin:6mm 8mm}
+}
+
 </style>
 </head>
 <body>
@@ -1757,6 +1891,36 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   </div>
 </div>
 
+
+<!-- ════════════════════════════════════════════════════════
+     SUBSCRIPTION / REGISTRATION PAYMENT RECEIPT MODAL
+     ECR Style — White paper, Pink/Green/Red text
+════════════════════════════════════════════════════════ -->
+<div class="sub-rcp-overlay" id="subRcpOverlay" onclick="if(event.target===this)closeSubRcp()">
+  <div class="sub-rcp-wrap" id="subRcpWrap">
+
+    <!-- Action bar -->
+    <div class="sub-rcp-bar">
+      <span class="sub-rcp-bar-title">🌸 SAR — PAYMENT RECEIPT</span>
+      <div class="sub-rcp-bar-btns">
+        <button class="srb-btn srb-wa"    onclick="subRcpWA()">💬 WhatsApp</button>
+        <button class="srb-btn srb-em"    onclick="subRcpEmail()">📧 Email</button>
+        <button class="srb-btn srb-pr"    onclick="window.print()">🖨️ Print/PDF</button>
+        <button class="srb-btn srb-cl"    onclick="closeSubRcp()">✕</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="sub-rcp-status srs-ok" id="subRcpStatus" style="display:none"></div>
+
+    <!-- ECR Paper -->
+    <div class="sub-ecr" id="subEcr">
+      <!-- Filled by buildSubscriptionReceipt() -->
+    </div>
+
+  </div>
+</div>
+
 </div><!-- /page -->
 
 <script>
@@ -2052,63 +2216,325 @@ async function processPayment(){
 // ═══════════════════════════════
 // AUTO VERIFY (5 seconds)
 // ═══════════════════════════════
-function startAutoVerify(txnId, total, date){
+// ════════════════════════════════════════════════════════════
+// NEW: Auto-verify → Build ECR receipt → Auto-send
+// ════════════════════════════════════════════════════════════
+
+// Global receipt state
+let _subRcpData = {};
+
+function startAutoVerify(txnId, total, date) {
   const vs = document.getElementById('verifyStatus');
   vs.style.display = 'block';
   vs.style.background = 'rgba(245,158,11,.1)';
   vs.style.border = '1px solid rgba(245,158,11,.3)';
   vs.style.color = '#FCD34D';
 
-  let secs = 5;
+  let secs = 3;
   vs.innerHTML = `⏳ পেমেন্ট যাচাই করা হচ্ছে... (${secs} সেকেন্ড)`;
 
   const timer = setInterval(() => {
     secs--;
-    if(secs > 0){
+    if (secs > 0) {
       vs.innerHTML = `⏳ পেমেন্ট যাচাই করা হচ্ছে... (${secs} সেকেন্ড)`;
     } else {
       clearInterval(timer);
-      // Verification success
       vs.style.background = 'rgba(5,150,105,.15)';
-      vs.style.border = '1px solid rgba(52,211,153,.3)';
-      vs.style.color = '#34D399';
-      vs.innerHTML = `✅ পেমেন্ট যাচাই সম্পন্ন! রিসিট পাঠানো হচ্ছে...`;
+      vs.style.border     = '1px solid rgba(52,211,153,.3)';
+      vs.style.color      = '#34D399';
+      vs.innerHTML = '✅ পেমেন্ট যাচাই সম্পন্ন! রিসিট তৈরি হচ্ছে...';
 
-      // Send receipt to email + mobile
-      sendPaymentReceipt(txnId, total, date);
-
-      // Show Pink A4 receipt
-      setTimeout(() => buildAndShowPinkReceipt(txnId, total, date, selPkg.type), 800);
+      // Build and show ECR subscription receipt
+      setTimeout(() => buildSubscriptionReceipt(txnId, total, date), 400);
+      // Notify admin for membership payments
       notifyAdmin(txnId, total, selPkg.type);
     }
   }, 1000);
 }
 
-async function sendPaymentReceipt(txnId, total, date){
-  const customer = JSON.parse(localStorage.getItem('sar_customer') || '{}');
-  const rcpMsg = `🧾 SAR পেমেন্ট রিসিট\n\nনাম: ${CNAME}\nপ্যাকেজ: ${selPkg.name}\nপরিমাণ: ৳${total}\nট্রানজেকশন: ${txnId}\nতারিখ: ${date.toLocaleDateString('bn-BD')}\nপেমেন্ট: ${selMethod.toUpperCase()}\n\n✅ সফলভাবে প্রদানকৃত\n\nSAR — She AI Restaurant\n📞 01346098892`;
+// ── Build ECR Subscription Receipt ───────────────────────
+async function buildSubscriptionReceipt(txnId, total, date) {
+  const cust    = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+  const cat     = cust.sar_category || 'DM';
+  const catMap  = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'};
+  const catL    = catMap[cat] || cat;
+  const vat     = Math.round(selPkg.amount * 0.05);
+  const disc    = selPkg.original - selPkg.amount;
+  const rcpNum  = 'RCP-' + date.toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000+Math.random()*9000);
 
+  // Expiry date
+  let expDate = '—', expDays = 0;
+  if (selPkg.type !== 'reg') {
+    const exp = new Date(date);
+    expDays = selPkg.type === '3month' ? 90 : 30;
+    exp.setDate(exp.getDate() + expDays);
+    expDate = exp.toLocaleDateString('bn-BD');
+  }
+
+  // Store for auto-send
+  _subRcpData = { rcpNum, txnId, total, date, cust, expDate, selPkg: {...selPkg} };
+
+  // Fetch AI analysis (non-blocking)
+  let ai = {};
   try {
-    // WhatsApp — direct wa.me link (no server needed)
-    if(customer.phone){
-      const clean = customer.phone.replace(/\D/g,'');
-      const intlP = clean.startsWith('0') ? '88'+clean : clean;
-      const waUrl = `https://wa.me/${intlP}?text=${encodeURIComponent(rcpMsg)}`;
-      // Store for receipt button
-      localStorage.setItem('sar_receipt_wa_url', waUrl);
-    }
-    // Email — via Netlify function (non-blocking)
-    if(customer.email){
-      fetch('/.netlify/functions/analyze', {
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ prompt: `SAR receipt email to ${customer.email}: ${rcpMsg.substring(0,200)}` })
-      }).catch(()=>{});
-    }
-    document.getElementById('verifyStatus').innerHTML = `✅ পেমেন্ট যাচাই সম্পন্ন! রিসিট তৈরি হচ্ছে...`;
-  } catch(e){
-    document.getElementById('verifyStatus').innerHTML = `✅ পেমেন্ট সম্পন্ন। রিসিট নিচে দেখুন।`;
+    const aiR = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1`, {headers:H});
+    const aiD = await aiR.json();
+    ai = aiD?.[0] || {};
+  } catch(e) {}
+
+  // Package benefits
+  const pkgBenefits = {
+    reg:     ['✓ স্থায়ী SAR সদস্য আইডি','✓ ২৫০ মেট্রিক্স স্বাস্থ্য প্রোফাইল','✓ Health Wall অ্যাক্সেস'],
+    sub:     ['✓ দৈনিক AI স্বাস্থ্য বিশ্লেষণ','✓ ব্যক্তিগত থেরাপিউটিক মেনু','✓ অর্ডার ও ডেলিভারি','✓ AI রিপোর্ট ও পরামর্শ'],
+    '3month':['✓ ৯০ দিন সম্পূর্ণ সুবিধা','✓ দৈনিক AI বিশ্লেষণ ও মেনু','✓ অগ্রাধিকার সাপোর্ট','✓ বিশেষ সাশ্রয় ৳'+disc],
+  };
+  const benefits = pkgBenefits[selPkg.type] || pkgBenefits.sub;
+
+  // Next steps
+  const nextSteps = selPkg.type === 'reg'
+    ? ['১. এখন মাসিক সাবস্ক্রিপশন (৳৫০০) নিন','২. ২৫০ মেট্রিক্স ফর্ম পূরণ করুন','৩. Admin অনুমোদনের পরে সব সুবিধা চালু হবে']
+    : ['১. ড্যাশবোর্ডে যান → AI বিশ্লেষণ করুন','২. মেনু থেকে আজকের খাবার অর্ডার করুন','৩. প্রতিরাতে স্বাস্থ্য লগ আপডেট করুন'];
+
+  // AI health summary
+  const aiScore   = ai.health_score || 0;
+  const aiGreet   = ai.morning_greeting || '';
+  const aiAdvice  = ai.analysis_bn || ai.recommendations || '';
+  const aiEI      = ai.ei_message || '';
+
+  // Personalized messages (reuse logic)
+  const msgs = buildSubMsgs(cust, ai, expDays);
+
+  // Receipt URL for WhatsApp/Email
+  const rcpUrl = `sheairestaurant.com/receipt.html?txn=${txnId}`;
+
+  // ── Build ECR HTML ──
+  const ecrHtml = `
+    <!-- ECR HEADER -->
+    <div class="sub-ecr-hd">
+      <div class="sub-ecr-hd-title">★ SAR-SHE AI RESTAURANT ★</div>
+      <div class="sub-ecr-hd-sub">WOMEN-LED · WOMEN-RUN · AI THERAPEUTIC FOOD</div>
+      <div class="sub-ecr-hd-tag">ঢাকা, বাংলাদেশ · 01346098892 · sheairestaurant.com</div>
+      <div class="sub-ecr-num" style="color:#2E7D32">✅ PAYMENT RECEIPT · ${rcpNum}</div>
+    </div>
+
+    <!-- PAYMENT INFO -->
+    <table class="sub-info-tbl">
+      <tr><td class="sub-ik">গ্রাহক</td><td class="sub-iv" style="color:#C2185B">${cust.full_name||CNAME}</td></tr>
+      <tr><td class="sub-ik">সদস্য আইডি</td><td class="sub-iv">${cust.member_id||CMID}</td></tr>
+      <tr><td class="sub-ik">ফোন</td><td class="sub-iv">${cust.phone||'—'}</td></tr>
+      <tr><td class="sub-ik">রোগ বিভাগ</td><td class="sub-iv" style="color:#1B5E20">${catL}</td></tr>
+      <tr><td class="sub-ik">Tier</td><td class="sub-iv">${cust.membership_tier||'Basic'}</td></tr>
+      <tr><td class="sub-ik">তারিখ</td><td class="sub-iv">${date.toLocaleString('bn-BD')}</td></tr>
+      <tr><td class="sub-ik">পেমেন্ট পদ্ধতি</td><td class="sub-iv">${selMethod.toUpperCase()}</td></tr>
+      <tr><td class="sub-ik">Transaction ID</td><td class="sub-iv" style="font-size:9.5px;font-family:'Space Mono',Courier">${txnId}</td></tr>
+      ${expDate!=='—'?`<tr><td class="sub-ik">সাবস্ক্রিপশন মেয়াদ</td><td class="sub-iv" style="color:#2E7D32">${expDate} পর্যন্ত</td></tr>`:''}
+    </table>
+
+    <hr class="sub-sep-d">
+
+    <!-- PACKAGE DETAILS -->
+    <div class="sub-pkg-box">
+      <div class="sub-pkg-name">${selPkg.name}</div>
+      <div class="sub-pkg-row"><span>সাধারণ মূল্য</span><span>৳${selPkg.original.toLocaleString()}</span></div>
+      ${disc>0?`<div class="sub-pkg-row" style="color:#2E7D32"><span>৫০% ছাড়</span><span>- ৳${disc.toLocaleString()}</span></div>`:''}
+      <div class="sub-pkg-row" style="color:#555"><span>VAT (৫%)</span><span>৳${vat}</span></div>
+      <div class="sub-pkg-total"><span>TOTAL PAID</span><span>৳${total.toLocaleString()}</span></div>
+    </div>
+
+    <!-- PACKAGE BENEFITS -->
+    <div class="sub-sec-h">PACKAGE BENEFITS</div>
+    ${benefits.map(b=>`<div class="sub-ben-row">${b}</div>`).join('')}
+
+    <hr class="sub-sep-s">
+
+    <!-- NEXT STEPS -->
+    <div class="sub-sec-h">NEXT STEPS</div>
+    ${nextSteps.map(s=>`<div class="sub-next-row">${s}</div>`).join('')}
+
+    <!-- QR/Receipt link -->
+    <div class="sub-qr-row">
+      <div class="sub-qr-box">⛓<br>QR<br>CODE</div>
+      <div class="sub-qr-info">
+        <div style="font-weight:700;color:#C2185B;margin-bottom:2px">এই রিসিট অনলাইনে দেখুন:</div>
+        <div style="color:#1565C0;word-break:break-all">${rcpUrl}</div>
+        <div style="color:#555;margin-top:3px;font-size:9px">৩০ দিন পর্যন্ত সংরক্ষিত থাকবে</div>
+      </div>
+    </div>
+
+    <hr class="sub-sep-d">
+
+    <!-- AI HEALTH ADVICE (Side B) -->
+    <div class="sub-sec-h">SAR AI HEALTH REPORT</div>
+    ${aiGreet||aiAdvice ? `<div class="sub-ai-block">
+      <div class="sub-ai-title">🤖 AI ANALYSIS${aiScore?` · স্বাস্থ্য স্কোর: ${aiScore}/100`:''}</div>
+      ${aiGreet?`<div style="font-weight:600;color:#1B5E20;margin-bottom:2px">${aiGreet}</div>`:''}
+      ${aiAdvice?`<div>${aiAdvice}</div>`:''}
+    </div>` : `<div class="sub-ai-block">
+      <div class="sub-ai-title">🤖 AI HEALTH ANALYSIS</div>
+      <div>ড্যাশবোর্ডে AI বিশ্লেষণ শুরু করুন। সকাল ৬টায় স্বয়ংক্রিয় বিশ্লেষণ হবে।</div>
+    </div>`}
+    ${aiEI?`<div class="sub-msg sub-msg-p"><div class="sub-msg-t">💝 আবেগীয় সহায়তা</div>${aiEI}</div>`:''}
+
+    <!-- PERSONALIZED MESSAGES -->
+    <div class="sub-sec-h">YOUR PERSONALIZED MESSAGES</div>
+    ${msgs.map(m=>`<div class="sub-msg sub-msg-${m.t}"><div class="sub-msg-t">${m.title}</div>${m.body}</div>`).join('')}
+
+    <!-- DISCLAIMER -->
+    <div class="sub-disc">⚕️ SAR চিকিৎসা প্রতিষ্ঠান নয়। স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন। নিজে ওষুধ সেবন করবেন না।</div>
+
+    <!-- SURVEY -->
+    <div class="sub-survey">
+      <div class="sub-survey-q">😊 SAR কেমন লাগছে? আপনার পরামর্শ:</div>
+      <hr class="sub-survey-line"><hr class="sub-survey-line"><hr class="sub-survey-line" style="margin-bottom:0">
+    </div>
+
+    <!-- FOOTER -->
+    <div class="sub-ecr-foot">
+      <b>★ SAR-SHE AI RESTAURANT ★</b><br>
+      Women-Led · Women-Run · For Women Only<br>
+      📞 01346098892 · mindmaxltd@gmail.com · sheairestaurant.com<br>
+      Receipt: ${rcpNum} · Membership: ${cust.membership_tier||'Basic'} · ${date.toLocaleDateString('bn-BD')}
+    </div>
+  `;
+
+  document.getElementById('subEcr').innerHTML = ecrHtml;
+
+  // Show modal
+  document.getElementById('subRcpOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Save receipt to Supabase
+  saveSubReceipt(rcpNum, txnId, total, ecrHtml);
+
+  // Auto-send after 1.5 seconds
+  setTimeout(() => autoSendSubReceipt(cust, rcpNum, txnId, total, rcpUrl), 1500);
+}
+
+// ── Save receipt to Supabase (30 days) ───────────────────
+async function saveSubReceipt(rcpNum, txnId, total, html) {
+  try {
+    await fetch(`${SUPA}/rest/v1/payment_receipts`, {
+      method: 'POST',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        customer_id:     CID,
+        receipt_number:  rcpNum,
+        transaction_id:  txnId,
+        amount:          total,
+        package_name:    selPkg.name,
+        receipt_html:    html,
+        expires_at:      new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+      })
+    });
+  } catch(e) { /* non-critical */ }
+}
+
+// ── Auto-send WhatsApp + Email ────────────────────────────
+async function autoSendSubReceipt(cust, rcpNum, txnId, total, rcpUrl) {
+  const phone = cust.phone || '';
+  const email = cust.email || '';
+  if (!phone && !email) return;
+
+  setSubRcpStatus('📤 রিসিট পাঠানো হচ্ছে...', 'srs-sending');
+
+  const msg = `🌸 SAR-SHE AI RESTAURANT\n\nপেমেন্ট রিসিট\nনাম: ${cust.full_name||CNAME}\nপ্যাকেজ: ${selPkg.name}\nমোট: ৳${total}\nTxn: ${txnId}\nরিসিট: ${rcpNum}\n\n✅ পেমেন্ট সম্পন্ন\n\nরিসিট দেখুন:\n${rcpUrl}\n\nSAR · 01346098892`;
+
+  let done = [];
+
+  // WhatsApp — auto open
+  if (phone) {
+    const clean = phone.replace(/\D/g,'');
+    const intl  = clean.startsWith('0') ? '88'+clean : clean;
+    window._subWaUrl = `https://wa.me/${intl}?text=${encodeURIComponent(msg)}`;
+    try { window.open(window._subWaUrl, '_blank'); done.push('WhatsApp'); } catch(e) {}
+  }
+
+  // Email — Netlify function
+  if (email) {
+    try {
+      await fetch('/.netlify/functions/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `SAR payment receipt for ${email}: Name: ${cust.full_name||CNAME}, Package: ${selPkg.name}, Amount: ৳${total}, TxnID: ${txnId}, Receipt URL: ${rcpUrl}`
+        })
+      });
+      done.push('Email');
+    } catch(e) {}
+  }
+
+  if (done.length) {
+    setSubRcpStatus(`✅ রিসিট পাঠানো হয়েছে: ${done.join(' + ')}`, 'srs-ok');
+    document.getElementById('verifyStatus').innerHTML = `✅ পেমেন্ট সম্পন্ন! রিসিট ${done.join(' + ')}-এ পাঠানো হয়েছে।`;
+  } else {
+    setSubRcpStatus('ℹ️ ফোন/ইমেইল নেই। Manual send করুন।', 'srs-ok');
   }
 }
+
+// ── Build personalized messages for subscription ─────────
+function buildSubMsgs(cust, ai, expDays) {
+  const msgs  = [];
+  const cat   = cust.sar_category || 'DM';
+  const catL  = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS',PR:'গর্ভাবস্থা'}[cat]||cat;
+  const ds    = cust.created_at ? Math.floor((Date.now()-new Date(cust.created_at))/86400000) : 0;
+  const aiSc  = ai.health_score || 0;
+  const tier  = cust.membership_tier || 'Basic';
+
+  // Welcome / duration
+  if (ds < 30) msgs.push({t:'g',pr:6,title:'🌸 SAR পরিবারে স্বাগতম!',body:`মাত্র ${ds} দিন হলো আপনি SAR-এর সাথে আছেন। সঠিক পুষ্টিতে ৯০ দিনেই পার্থক্য দেখবেন।`});
+  else msgs.push({t:'g',pr:5,title:`🌟 ${ds} দিনের SAR যাত্রা`,body:`আপনি ${ds} দিন ধরে SAR-এর সাথে আছেন। Tier: ${tier}. নিয়মিত থাকুন।`});
+
+  // Disease specific
+  const disMap = {
+    DM:{t:'g',title:'💚 ডায়াবেটিস — SAR আপনার পাশে',body:'SAR-এর থেরাপিউটিক মেনু রক্তে শর্করা নিয়ন্ত্রণে বিশেষ কার্যকর। মেথি-করলা রুটিন মিস করবেন না।'},
+    OB:{t:'g',title:'⚖️ স্বাস্থ্যকর ওজন — SAR সাথে আছে',body:'SAR-এর কম-ক্যালরি মেনু + নিয়মিত হাঁটা = ওজন কমানোর সেরা রুটিন।'},
+    FL:{t:'g',title:'🫀 ফ্যাটি লিভার — সঠিক পুষ্টি দরকার',body:'SAR-এর হলুদ-আদা ডিটক্স মেনু লিভার পুনরুদ্ধারে সহায়তা করে। তৈলাক্ত খাবার বাদ দিন।'},
+    IB:{t:'g',title:'🌿 IBS/গ্যাস্ট্রিক — শান্তির খাবার',body:'SAR-এর Gut-Friendly মেনু প্রতিদিন খান। মশলাদার খাবার বাদ দিন।'},
+    PR:{t:'p',title:'🤱 গর্ভাবস্থার পুষ্টি',body:'ফোলেট, আয়রন, ক্যালসিয়াম আপনার সবচেয়ে বেশি দরকার। SAR Pregnancy মেনু মা ও শিশুর পুষ্টি নিশ্চিত করে।'},
+  };
+  msgs.push(disMap[cat]||disMap.DM);
+
+  // AI score / credibility
+  if (aiSc > 0) msgs.push({t:'g',pr:4,title:`📊 স্বাস্থ্য স্কোর ${aiSc}/100`,body:`${aiSc>70?'ভালো ✅':aiSc>40?'উন্নতি হচ্ছে':''} নিয়মিত AI বিশ্লেষণ ও SAR মেনু চালিয়ে যান।`});
+  else msgs.push({t:'g',pr:3,title:'✦ ১,০০০+ নারী SAR বেছে নিয়েছেন',body:'Blockchain-verified · Oil-free · Sugar-free · AI-powered personalized menu'});
+
+  // Expiry reminder
+  if (expDays > 0) msgs.push({t:'v',pr:4,title:`📅 ${expDays} দিনের সাবস্ক্রিপশন সক্রিয়`,body:`${expDays === 90?'৩ মাস':'১ মাস'} ধরে SAR-এর সব সুবিধা পাবেন। সময়মতো নবায়ন করুন।`});
+
+  return msgs.sort((a,b)=>b.pr-a.pr).slice(0,3);
+}
+
+// ── Modal controls ────────────────────────────────────────
+function closeSubRcp() {
+  document.getElementById('subRcpOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setSubRcpStatus(msg, cls) {
+  const el = document.getElementById('subRcpStatus');
+  el.textContent = msg;
+  el.className = 'sub-rcp-status ' + cls;
+  el.style.display = 'flex';
+  if (cls === 'srs-ok') setTimeout(() => el.style.display = 'none', 5000);
+}
+function subRcpWA() {
+  if (window._subWaUrl) { window.open(window._subWaUrl, '_blank'); return; }
+  const d = _subRcpData; if (!d.cust) return;
+  const ph = (d.cust.phone||'').replace(/\D/g,'');
+  const msg = `🌸 SAR রিসিট ${d.rcpNum} · ৳${d.total} · sheairestaurant.com/receipt.html?txn=${d.txnId}`;
+  window.open(`https://wa.me/${ph.startsWith('0')?'88'+ph:ph}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+async function subRcpEmail() {
+  const d = _subRcpData; if (!d.cust?.email) { alert('ইমেইল নেই।'); return; }
+  setSubRcpStatus('📧 পাঠানো হচ্ছে...','srs-sending');
+  try {
+    await fetch('/.netlify/functions/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({prompt:`SAR payment receipt for ${d.cust.email}: ${d.rcpNum} ৳${d.total}`})});
+    setSubRcpStatus(`✅ Email: ${d.cust.email}`,'srs-ok');
+  } catch(e){ setSubRcpStatus('❌ ব্যর্থ','srs-err'); }
+}
+
+// ESC closes
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeSubRcp(); });
 
 async function manualVerifyPayment(){
   const inp1 = document.getElementById('trxIdInput');
@@ -2131,34 +2557,10 @@ async function manualVerifyPayment(){
 // ═══════════════════════════════
 // SHOW RECEIPT
 // ═══════════════════════════════
+// showReceipt is now handled by buildSubscriptionReceipt()
+// This is kept as a fallback
 function showReceipt(txnId, total, date){
-  const rcpNum = 'RCP-' + date.toISOString().slice(0,10).replace(/-/g,'') + '-' +
-    Math.floor(1000+Math.random()*9000);
-  const vat = Math.round(selPkg.amount * 0.05);
-
-  let expText = '—';
-  if(selPkg.type !== 'reg'){
-    const exp = new Date(date);
-    exp.setDate(exp.getDate() + (selPkg.type==='3month'?90:30));
-    expText = exp.toLocaleDateString('bn-BD');
-  }
-
-  document.getElementById('rcpNum').textContent = rcpNum;
-  document.getElementById('rcpDate').textContent = date.toLocaleString('bn-BD');
-  document.getElementById('rcpName').textContent = CNAME;
-  document.getElementById('rcpMid').textContent = CMID;
-  document.getElementById('rcpMethod').textContent = selMethod.toUpperCase();
-  document.getElementById('rcpTxn').textContent = txnId;
-  document.getElementById('rcpPkg').textContent = selPkg.name;
-  document.getElementById('rcpExpiry').textContent = expText;
-  document.getElementById('rcpTotal').textContent = '৳ ' + total.toLocaleString('bn-BD');
-  document.getElementById('rcpSuccessDesc').textContent =
-    selPkg.type === 'reg' ? 'আপনার নিবন্ধন সম্পন্ন হয়েছে। এখন সাবস্ক্রিপশন নিন।'
-    : `আপনার সাবস্ক্রিপশন ${expText} পর্যন্ত সক্রিয়।`;
-
-  const box = document.getElementById('receiptBox');
-  box.classList.add('show');
-  box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  buildSubscriptionReceipt(txnId, total, date);
 }
 
 // ═══════════════════════════════
