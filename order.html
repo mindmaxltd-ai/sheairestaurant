@@ -902,7 +902,7 @@ textarea{resize:vertical;min-height:72px}
               <span class="sv total" id="grand3">৳ ০</span>
             </div>
             <div style="margin-top:.9rem;font-size:.72rem;color:rgba(255,255,255,.28);text-align:center">
-              🔐 ShurjoPay SSL এনক্রিপ্টেড
+              🔐 SSLCommerz SSL এনক্রিপ্টেড
             </div>
           </div>
         </div>
@@ -1479,6 +1479,18 @@ async function processOrder() {
     localStorage.setItem('sar_last_order_id', order.id);
     localStorage.setItem('sar_last_order_num', orderNum);
     cart = [];
+
+    // 8. Route to SSLCommerz hosted payment page (non-cash only)
+    if (payMethod !== 'cash') {
+      showLoader('নিরাপদ পেমেন্ট পেজে নিয়ে যাওয়া হচ্ছে...');
+      // Persist context so success/receipt pages work on return from gateway
+      localStorage.setItem('sar_pending_payment', JSON.stringify({
+        order_id: order.id, order_num: orderNum, txn: txnId,
+        amount: grand, method: payMethod, eta: eta, order_type: orderType
+      }));
+      window.location.href = 'https://pay.sslcommerz.com/3a2056256871eec779ebd94ee8bf33a3467108be';
+      return;
+    }
 
     hideLoader();
     btn.disabled = false;
