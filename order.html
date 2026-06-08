@@ -823,7 +823,7 @@ textarea{resize:vertical;min-height:72px}
       <div class="panel-hd">
         <div class="panel-badge pb-payment">💳 ধাপ ৩</div>
         <h1 class="panel-title">পেমেন্ট</h1>
-        <p class="panel-sub">ShurjoPay-এর মাধ্যমে নিরাপদ পেমেন্ট করুন</p>
+        <p class="panel-sub">SSLCommerz-এর মাধ্যমে নিরাপদ পেমেন্ট করুন</p>
       </div>
       <div class="order-grid">
         <div class="order-main">
@@ -832,31 +832,16 @@ textarea{resize:vertical;min-height:72px}
             <div class="ocard-hd"><span class="ocard-title">💳 পেমেন্ট পদ্ধতি</span></div>
             <div class="ocard-body">
               <div class="pm-grid">
-                <div class="pm selected" onclick="selPM(this,'bkash')">
-                  <span class="pm-icon">📱</span><span class="pm-name">bKash</span>
-                </div>
-                <div class="pm" onclick="selPM(this,'nagad')">
-                  <span class="pm-icon">💚</span><span class="pm-name">Nagad</span>
-                </div>
-                <div class="pm" onclick="selPM(this,'rocket')">
-                  <span class="pm-icon">🚀</span><span class="pm-name">Rocket</span>
-                </div>
-                <div class="pm" onclick="selPM(this,'visa')">
-                  <span class="pm-icon">💳</span><span class="pm-name">Visa/Card</span>
-                </div>
-                <div class="pm" onclick="selPM(this,'mastercard')">
-                  <span class="pm-icon">🔴</span><span class="pm-name">Mastercard</span>
+                <div class="pm selected" onclick="selPM(this,'ssl')">
+                  <span class="pm-icon">🔐</span><span class="pm-name">SSLCommerz — অনলাইন পেমেন্ট</span>
                 </div>
                 <div class="pm" onclick="selPM(this,'cash')">
                   <span class="pm-icon">💵</span><span class="pm-name">ক্যাশ অন ডেলিভারি</span>
                 </div>
-                <div class="pm" onclick="selPM(this,'surjopay')">
-                  <span class="pm-icon">🟠</span><span class="pm-name">ShurjoPay</span>
-                </div>
-                <div class="pm" onclick="selPM(this,'ssl')">
-                  <span class="pm-icon">🔐</span><span class="pm-name">SSL Commerce</span>
-                </div>
               </div>
+              <p style="margin:10px 2px 0;font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5">
+                🔐 SSLCommerz পেজে bKash, Nagad, Rocket, Visa/Mastercard সহ সব মাধ্যমে নিরাপদে পেমেন্ট করতে পারবেন।
+              </p>
             </div>
           </div>
 
@@ -1055,7 +1040,7 @@ if(!_orderApproved){
 // State
 let cart        = JSON.parse(localStorage.getItem('sar_cart') || '[]');
 let orderType   = 'dine_in';
-let payMethod   = 'bkash';
+let payMethod   = 'ssl';
 let createdOrderId    = null;
 let currentStep       = 1;
 let _savedOrderItems  = JSON.parse(localStorage.getItem('sar_last_order_items') || '[]');
