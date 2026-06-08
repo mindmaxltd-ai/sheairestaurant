@@ -332,9 +332,27 @@ body{background:
 .cart-item:last-child{border:none}
 .ci-emoji{font-size:1.4rem;flex-shrink:0}
 .ci-info{flex:1}
-.ci-name{font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.15rem}
+.ci-name{font-size:.84rem;font-weight:600;color:var(--ink);margin-bottom:.15rem}
 .ci-meta{font-size:.72rem;color:rgba(36,31,26,.4)}
 .ci-price{font-family:'Space Mono',monospace;font-size:.84rem;color:var(--yellow2);flex-shrink:0}
+
+/* Full menu detail shown inside cart */
+.ci-full{margin-top:.5rem;display:flex;flex-direction:column;gap:.3rem}
+.ci-courses{font-size:.7rem;color:var(--ink-soft);line-height:1.5}
+.ci-courses b{color:var(--ink)}
+.ci-powders{font-size:.68rem;color:#B45309;background:rgba(245,158,11,.1);border-radius:7px;padding:.32rem .5rem;line-height:1.45}
+.ci-nutr{display:flex;flex-wrap:wrap;gap:.25rem}
+.ci-nchip{font-size:.62rem;padding:.08rem .42rem;border-radius:50px;background:rgba(36,31,26,.05);color:var(--ink-soft);border:1px solid rgba(36,31,26,.08)}
+.ci-tags{display:flex;flex-wrap:wrap;gap:.22rem}
+.ci-tag{font-size:.6rem;padding:.06rem .4rem;border-radius:50px}
+.ci-tag-herb{background:rgba(124,58,237,.12);color:#7C3AED}
+.ci-tag-top{background:rgba(5,150,105,.12);color:#059669}
+.ci-tag-cht{background:rgba(37,99,235,.12);color:#2563EB}
+.ci-benefit{font-size:.66rem;color:#059669;background:rgba(5,150,105,.08);border-left:2px solid #059669;border-radius:0 5px 5px 0;padding:.3rem .5rem;line-height:1.45}
+.ci-ings{font-size:.64rem;color:var(--ink-soft);line-height:1.5}
+.ci-ings b{color:#7C3AED}
+.ci-ff{display:flex;flex-wrap:wrap;gap:.18rem;margin-top:.1rem}
+.ci-ff span{font-size:.55rem;padding:.05rem .36rem;border-radius:50px;font-weight:700}
 .ci-qty-row{display:flex;align-items:center;gap:.6rem;margin-top:.45rem}
 .qty-btn{width:24px;height:24px;border-radius:50%;
   background:rgba(36,31,26,.08);border:1px solid rgba(36,31,26,.14);
@@ -437,11 +455,14 @@ body{background:
 .mcard-gi{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(5,150,105,.1);color:var(--green2);border:1px solid rgba(5,150,105,.2)}
 .mcard-src{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(107,33,168,.1);color:var(--purple2);border:1px solid rgba(107,33,168,.2)}
 
-/* FREE-FROM dietary strip (applies to ALL menu items) */
+/* FREE-FROM dietary strip (applies to ALL menu items) — vivid green/blue/red/purple */
 .freefrom-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.7rem}
-.ff-chip{font-size:.6rem;padding:.1rem .42rem;border-radius:50px;
-  background:rgba(5,150,105,.1);color:var(--green2);
-  border:1px solid rgba(5,150,105,.2);white-space:nowrap}
+.ff-chip{font-size:.6rem;padding:.12rem .46rem;border-radius:50px;
+  font-weight:700;white-space:nowrap;border:1px solid transparent}
+.ff-green{background:rgba(5,150,105,.14);color:#059669;border-color:rgba(5,150,105,.45)}
+.ff-blue{background:rgba(37,99,235,.14);color:#2563EB;border-color:rgba(37,99,235,.45)}
+.ff-red{background:rgba(220,38,38,.14);color:#DC2626;border-color:rgba(220,38,38,.45)}
+.ff-purple{background:rgba(124,58,237,.14);color:#7C3AED;border-color:rgba(124,58,237,.45)}
 
 
 </style>
@@ -768,14 +789,14 @@ function buildCard(m, isPinned, isAiRec){
     <div class="mcard-body">
       <div class="mcard-name">${mealEmoji} ${name}</div>
       <div class="freefrom-row">
-        <span class="ff-chip">তেল-মুক্ত</span>
-        <span class="ff-chip">চিনি-মুক্ত</span>
-        <span class="ff-chip">লবণ-মুক্ত</span>
-        <span class="ff-chip">কৃত্রিম রং-মুক্ত</span>
-        <span class="ff-chip">চাল-মুক্ত</span>
-        <span class="ff-chip">গম-মুক্ত</span>
-        <span class="ff-chip">ময়দা-মুক্ত</span>
-        <span class="ff-chip">দুধ-মুক্ত</span>
+        <span class="ff-chip ff-green">তেল-মুক্ত</span>
+        <span class="ff-chip ff-blue">চিনি-মুক্ত</span>
+        <span class="ff-chip ff-red">লবণ-মুক্ত</span>
+        <span class="ff-chip ff-purple">কৃত্রিম রং-মুক্ত</span>
+        <span class="ff-chip ff-green">চাল-মুক্ত</span>
+        <span class="ff-chip ff-blue">গম-মুক্ত</span>
+        <span class="ff-chip ff-red">ময়দা-মুক্ত</span>
+        <span class="ff-chip ff-purple">দুধ-মুক্ত</span>
       </div>
       ${aiReason?`<div class="mcard-ai-reason show">🤖 ${aiReason}</div>`:''}
       <div class="mcard-courses">
@@ -1107,12 +1128,47 @@ function updateCartUI(){
     return;
   }
   const catEmoji = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱'};
-  body.innerHTML = cart.map(item=>`
+  const mealBn = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
+  body.innerHTML = cart.map(item=>{
+    const nutr = [
+      item.kcal?`${item.kcal} kcal`:'',
+      (item.protein&&item.protein!=='0g')?`প্রোটিন ${item.protein}`:'',
+      (item.fiber&&item.fiber!=='0g')?`ফাইবার ${item.fiber}`:'',
+      item.iron?`আয়রন ${item.iron}`:'',
+      item.calcium?`ক্যালসিয়াম ${item.calcium}`:'',
+      item.folate?`ফোলেট ${item.folate}`:'',
+      item.vitC?`ভিটামিন C ${item.vitC}`:'',
+      item.gi?`GI: ${item.gi}`:''
+    ].filter(Boolean);
+    const ings = (item.ingredients||[]).map(ig=>`${ig.n} ${ig.q||''}`.trim()).join(', ');
+    return `
     <div class="cart-item">
       <span class="ci-emoji">${catEmoji[item.cat]||'🍽️'}</span>
       <div class="ci-info">
-        <div class="ci-name">${item.name.substring(0,35)}</div>
-        <div class="ci-meta">${{breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'}[item.meal]||item.meal} • ৳ ${item.price} প্রতিটি</div>
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-meta">${mealBn[item.meal]||item.meal}${item.day?' • '+item.day:''} • ৳ ${item.price} প্রতিটি</div>
+        <div class="ci-full">
+          ${(item.c1||item.c2||item.c3)?`<div class="ci-courses">
+            ${item.c1?`<div><b>১.</b> ${item.c1}</div>`:''}
+            ${item.c2?`<div><b>২.</b> ${item.c2}</div>`:''}
+            ${item.c3?`<div><b>৩.</b> ${item.c3}</div>`:''}
+          </div>`:''}
+          ${item.powders?`<div class="ci-powders">💊 ঔষধি গুঁড়া: ${item.powders}</div>`:''}
+          ${nutr.length?`<div class="ci-nutr">${nutr.map(n=>`<span class="ci-nchip">${n}</span>`).join('')}</div>`:''}
+          <div class="ci-tags">
+            ${item.chutney?`<span class="ci-tag ci-tag-cht">🍶 ${item.chutney}</span>`:''}
+            ${(item.herbs||[]).map(h=>`<span class="ci-tag ci-tag-herb">🌿 ${h}</span>`).join('')}
+            ${(item.toppings||[]).map(t=>`<span class="ci-tag ci-tag-top">🍱 ${t}</span>`).join('')}
+          </div>
+          ${item.benefits?`<div class="ci-benefit">✦ ${item.benefits}</div>`:''}
+          ${ings?`<div class="ci-ings"><b>উপাদান:</b> ${ings}</div>`:''}
+          <div class="ci-ff">
+            <span class="ff-green">তেল-মুক্ত</span><span class="ff-blue">চিনি-মুক্ত</span>
+            <span class="ff-red">লবণ-মুক্ত</span><span class="ff-purple">কৃত্রিম রং-মুক্ত</span>
+            <span class="ff-green">চাল-মুক্ত</span><span class="ff-blue">গম-মুক্ত</span>
+            <span class="ff-red">ময়দা-মুক্ত</span><span class="ff-purple">দুধ-মুক্ত</span>
+          </div>
+        </div>
         <div class="ci-qty-row">
           <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
           <span class="qty-val">${item.qty}</span>
@@ -1123,7 +1179,8 @@ function updateCartUI(){
           onchange="updateNote('${item.id}',this.value)">${item.note||''}</textarea>
       </div>
       <span class="ci-price">৳ ${(item.price*item.qty).toLocaleString('bn-BD')}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function updateNote(id, note){
