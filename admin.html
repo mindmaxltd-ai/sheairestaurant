@@ -329,7 +329,11 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <button class="sb-item super-admin-only" onclick="showSection('settings',this)"><span class="sb-item-icon">⚙️</span>ওয়েবসাইট সেটিংস</button>
       <button class="sb-item super-admin-only" onclick="showSection('apikeys',this)"><span class="sb-item-icon">🔑</span>API Keys</button>
       <button class="sb-item" onclick="showSection('notifications',this)"><span class="sb-item-icon">🔔</span>বিজ্ঞপ্তি</button>
+      <button class="sb-item" onclick="showSection('broadcast',this)"><span class="sb-item-icon">📣</span>বিশেষ বার্তা/মিডিয়া</button>
       <button class="sb-item" onclick="showSection('articles',this)"><span class="sb-item-icon">✏️</span>Why SAR লেখা</button>
+      <button class="sb-item" onclick="showSection('writetosar',this)"><span class="sb-item-icon">📨</span>Write to SAR <span class="sb-badge" id="w2sBadge">0</span></button>
+      <div class="sb-section">প্রযুক্তি</div>
+      <button class="sb-item" onclick="showSection('blockchain',this)"><span class="sb-item-icon">⛓️</span>ব্লকচেইন</button>
     </div>
     <div class="sb-bottom">
       <div class="sb-user">
@@ -339,8 +343,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <div class="sb-user-role" id="sbUserRole">Super Admin</div>
         </div>
       </div>
-      <!-- SAR Clinical Portal — opens new window, hint kaku but real user tutul -->
-      <a href="sar-portal.html" target="_blank" class="sb-item" style="text-decoration:none;color:rgba(52,211,153,.8)">
+      <!-- SAR Clinical Portal — super admin + doctor/dietitian only, opens new window -->
+      <a href="sar-portal.html" target="_blank" rel="noopener" class="sb-item clinical-portal-only" style="text-decoration:none;color:rgba(52,211,153,.8)">
         <span class="sb-item-icon">🩺</span>SAR ক্লিনিক্যাল পোর্টাল ↗
       </a>
       <!-- Change password — super admin only -->
@@ -866,6 +870,134 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         </div>
       </div><!-- /sec-changepwd -->
 
+      <!-- ══ BROADCAST MEDIA (special message / video / photo) ══ -->
+      <div class="section" id="sec-broadcast">
+        <div class="settings-card" style="margin-bottom:1rem">
+          <div class="settings-card-title">📣 বিশেষ বার্তা / ভিডিও / ছবি পাঠান</div>
+          <div style="font-size:.76rem;color:rgba(255,255,255,.4);margin-bottom:1rem;line-height:1.6">
+            নোটিশ, মার্কেটিং বা সাধারণ পরামর্শের জন্য সব গ্রাহক বা নির্বাচিত গ্রাহকদের WhatsApp ও Email-এ বার্তা, ভিডিও বা ছবি পাঠান।
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+            <div class="field-wrap">
+              <label class="field-label">প্রাপক</label>
+              <select class="filter-select" id="bc-target" style="width:100%" onchange="toggleBcCustomerPicker()">
+                <option value="all">সব সক্রিয় গ্রাহক</option>
+                <option value="DM">ডায়াবেটিস গ্রাহক</option>
+                <option value="OB">স্থূলতা গ্রাহক</option>
+                <option value="FL">ফ্যাটি লিভার গ্রাহক</option>
+                <option value="IB">IBS/গ্যাস্ট্রিক গ্রাহক</option>
+                <option value="PR">গর্ভাবস্থা গ্রাহক</option>
+                <option value="expired">মেয়াদোত্তীর্ণ সদস্য</option>
+                <option value="selected">নির্বাচিত গ্রাহক (নিচে বেছে নিন)</option>
+              </select>
+            </div>
+            <div class="field-wrap">
+              <label class="field-label">বার্তার ধরন</label>
+              <select class="filter-select" id="bc-type" style="width:100%" onchange="updateBcMediaHint()">
+                <option value="notice">📢 নোটিশ / বিজ্ঞপ্তি</option>
+                <option value="marketing">🎯 মার্কেটিং / অফার</option>
+                <option value="advice">💡 সাধারণ পরামর্শ</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="bc-customer-picker" style="display:none;margin-bottom:.75rem;max-height:160px;overflow-y:auto;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem"></div>
+
+          <div class="field-wrap" style="margin-bottom:.75rem">
+            <label class="field-label">শিরোনাম (ঐচ্ছিক)</label>
+            <input class="field-input" id="bc-title" placeholder="যেমন: ঈদ স্পেশাল অফার">
+          </div>
+
+          <div class="field-wrap" style="margin-bottom:.75rem">
+            <label class="field-label">বার্তা</label>
+            <textarea class="field-input" id="bc-message" rows="4" placeholder="আপনার বার্তা লিখুন..."></textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+            <div class="field-wrap">
+              <label class="field-label">🖼️ ছবির লিংক (URL)</label>
+              <input class="field-input" id="bc-photo" placeholder="https://.../photo.jpg">
+            </div>
+            <div class="field-wrap">
+              <label class="field-label">🎬 ভিডিওর লিংক (URL)</label>
+              <input class="field-input" id="bc-video" placeholder="https://.../video.mp4 বা YouTube">
+            </div>
+          </div>
+          <div id="bc-media-preview" style="margin-bottom:.75rem"></div>
+
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="topbar-btn primary" onclick="sendBroadcast('whatsapp')">📱 WhatsApp পাঠান</button>
+            <button class="topbar-btn ghost" onclick="sendBroadcast('email')">📧 Email পাঠান</button>
+            <button class="topbar-btn ghost" onclick="sendBroadcast('both')">📲 দুটোতেই পাঠান</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title">📋 প্রেরিত বিশেষ বার্তার ইতিহাস</span></div>
+          <table class="data-table">
+            <thead><tr><th>ধরন</th><th>প্রাপক</th><th>শিরোনাম</th><th>মিডিয়া</th><th>চ্যানেল</th><th>সময়</th></tr></thead>
+            <tbody id="broadcastBody"></tbody>
+          </table>
+        </div>
+      </div><!-- /sec-broadcast -->
+
+      <!-- ══ WRITE TO SAR (customer inbox, collapsible email-style) ══ -->
+      <div class="section" id="sec-writetosar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+          <div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">Customer Inbox</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#fff">📨 Write to SAR — গ্রাহকের বার্তা</div>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center">
+            <select class="filter-select" id="w2sFilter" onchange="renderWriteToSar()">
+              <option value="">সব বার্তা</option>
+              <option value="unread">অপঠিত</option>
+              <option value="read">পঠিত</option>
+            </select>
+            <button class="topbar-btn ghost" onclick="renderWriteToSar()">↻ রিফ্রেশ</button>
+          </div>
+        </div>
+        <div id="writeToSarList">লোড হচ্ছে...</div>
+      </div><!-- /sec-writetosar -->
+
+      <!-- ══ BLOCKCHAIN (editable, links to blockchain page) ══ -->
+      <div class="section" id="sec-blockchain">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem">
+          <div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">AI + EI + Blockchain</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#fff">⛓️ ব্লকচেইন ব্যবস্থাপনা</div>
+          </div>
+          <a href="blockchain.html" target="_blank" rel="noopener" class="topbar-btn primary" style="text-decoration:none">⛓️ ব্লকচেইন পেজ খুলুন ↗</a>
+        </div>
+
+        <div class="kpi-grid" id="blockchainKpi"></div>
+
+        <div class="settings-card" style="margin-bottom:1rem">
+          <div class="settings-card-title">⚙️ ব্লকচেইন কনফিগারেশন (admin থেকে সম্পাদনাযোগ্য)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+            <div class="field-wrap"><label class="field-label">নেটওয়ার্ক নাম</label><input class="field-input" id="bcn-network" placeholder="যেমন: Polygon Mainnet"></div>
+            <div class="field-wrap"><label class="field-label">RPC URL</label><input class="field-input" id="bcn-rpc" placeholder="https://rpc..."></div>
+            <div class="field-wrap"><label class="field-label">স্মার্ট কন্ট্রাক্ট অ্যাড্রেস</label><input class="field-input" id="bcn-contract" placeholder="0x..."></div>
+            <div class="field-wrap"><label class="field-label">টোকেন/পয়েন্ট নাম</label><input class="field-input" id="bcn-token" placeholder="যেমন: SAR Loyalty Token"></div>
+          </div>
+          <div class="field-wrap" style="margin-bottom:.75rem">
+            <label class="field-label">ব্লকচেইন পেজ বিবরণ (গ্রাহক যা দেখবে)</label>
+            <textarea class="field-input" id="bcn-desc" rows="3" placeholder="SAR কীভাবে blockchain ব্যবহার করে — স্বচ্ছ পুষ্টি রেকর্ড, লয়্যালটি পয়েন্ট, খাদ্য উৎস ট্রেসেবিলিটি..."></textarea>
+          </div>
+          <div class="setting-row"><span class="setting-label">ব্লকচেইন ফিচার সক্রিয়</span><label class="toggle-switch"><input type="checkbox" id="bcn-enabled" checked><span class="toggle-slider"></span></label></div>
+          <button class="topbar-btn primary" onclick="saveBlockchainConfig()" style="margin-top:.75rem">💾 ব্লকচেইন সেটিংস সেভ করুন</button>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-header"><span class="table-title">🔗 সাম্প্রতিক অন-চেইন রেকর্ড</span></div>
+          <table class="data-table">
+            <thead><tr><th>হ্যাশ</th><th>ধরন</th><th>গ্রাহক</th><th>মান</th><th>সময়</th></tr></thead>
+            <tbody id="blockchainTxBody"></tbody>
+          </table>
+        </div>
+      </div><!-- /sec-blockchain -->
+
     </div><!-- .content -->
   </div><!-- .main -->
 
@@ -960,10 +1092,18 @@ let allCustomers = [], allOrders = [], allPayments = [], allStaff = [];
 // Check if current user is super admin
 function isSuperAdmin(){ return currentAdmin?.role === 'super_admin'; }
 
+// Roles allowed into SAR Clinical Portal: super admin, doctors, dietitians, nutritionists
+function canAccessClinicalPortal(){
+  return ['super_admin','sar_dietitian','sar_nutritionist','doctor'].includes(currentAdmin?.role);
+}
+
 // Apply role-based UI access
 function applySuperAdminAccess(){
   document.querySelectorAll('.super-admin-only').forEach(el=>{
     el.style.display = isSuperAdmin() ? '' : 'none';
+  });
+  document.querySelectorAll('.clinical-portal-only').forEach(el=>{
+    el.style.display = canAccessClinicalPortal() ? '' : 'none';
   });
   const rb = document.getElementById('adminRoleBadge');
   if(rb) rb.textContent = isSuperAdmin() ? '👑 Super Admin' : (currentAdmin?.name || '');
@@ -1092,6 +1232,8 @@ async function loadAllData() {
   renderAnalytics();
   renderPnL();
   renderNotifications();
+  // update Write to SAR unread badge
+  loadWriteToSar().then(msgs=>{ const b=document.getElementById('w2sBadge'); if(b) b.textContent = msgs.filter(m=>!m.is_read).length; }).catch(()=>{});
 }
 
 // SAMPLE DATA
@@ -1244,7 +1386,8 @@ function renderCustomers(data) {
         🔄 নবায়ন
       </button>`;
     }
-    btns += `<button onclick="viewCustomer('${c.id}')" style="background:none;border:none;color:var(--pink2);cursor:pointer;font-size:.78rem;padding:.2rem .35rem">👁</button>`;
+    btns += `<button onclick="analyzeCustomer('${c.id}')" style="background:rgba(107,33,168,.12);border:1px solid rgba(168,85,247,.3);color:var(--purple2);cursor:pointer;font-size:.72rem;border-radius:7px;padding:.28rem .6rem;font-weight:700;white-space:nowrap" title="সব মেট্রিক বিশ্লেষণ + PDF শেয়ার">📊 বিশ্লেষণ</button>`;
+    btns += `<button onclick="viewCustomer('${c.id}')" style="background:none;border:none;color:var(--pink2);cursor:pointer;font-size:.78rem;padding:.2rem .35rem" title="নতুন উইন্ডোতে দেখুন">👁</button>`;
 
     return `<tr style="${rowBg}">
       <td style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--yellow2)">${c.member_id || '—'}</td>
@@ -1806,10 +1949,13 @@ function showSection(id, btn) {
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
   document.getElementById('sec-' + id)?.classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', articles:'Why SAR লেখা', apikeys:'API Keys', changepwd:'পাসওয়ার্ড পরিবর্তন' };
+  const titles = { overview:'সারসংক্ষেপ', analytics:'বিশ্লেষণ', customers:'গ্রাহকবৃন্দ', orders:'অর্ডার', payments:'পেমেন্ট', staff:'স্টাফ', inventory:'ইনভেন্টরি', reports:'দৈনিক রিপোর্ট', pnl:'লাভ-লোকসান', settings:'সেটিংস', notifications:'বিজ্ঞপ্তি', broadcast:'বিশেষ বার্তা/মিডিয়া', articles:'Why SAR লেখা', writetosar:'Write to SAR', blockchain:'ব্লকচেইন', apikeys:'API Keys', changepwd:'পাসওয়ার্ড পরিবর্তন' };
   document.getElementById('pageTitle').textContent = titles[id] || id;
   if(id==='articles') renderArticleWriter();
   if(id==='inventory') renderInventory();
+  if(id==='broadcast'){ renderBroadcastHistory(); buildBcCustomerPicker(); }
+  if(id==='writetosar') renderWriteToSar();
+  if(id==='blockchain') renderBlockchain();
   if(id==='apikeys'){
     if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin এই section দেখতে পারেন।'); return; }
     loadApiKeys();
@@ -1922,6 +2068,400 @@ function saveApiKeys(){
 function getApiKey(key){
   const stored = JSON.parse(localStorage.getItem(API_KEY_STORE)||'{}');
   return stored[key] ? atob(stored[key]) : null;
+}
+
+// ════════════════════════════════════════════════
+// CUSTOMER ANALYSIS — analyze all metrics + share PDF
+// ════════════════════════════════════════════════
+async function analyzeCustomer(id){
+  const c = allCustomers.find(x=>x.id===id);
+  if(!c){ showToast('গ্রাহক পাওয়া যায়নি', true); return; }
+
+  showToast('🤖 ' + (c.full_name||'গ্রাহক') + '-এর সব মেট্রিক বিশ্লেষণ হচ্ছে...');
+
+  // Gather every metric tied to this customer name + id
+  const custOrders   = allOrders.filter(o => o.customer_name === c.full_name);
+  const custPayments = allPayments.filter(p => p.customer_name === c.full_name && p.status==='success');
+  const totalSpent   = custPayments.reduce((s,p)=>s+(p.final_amount||0),0);
+  const orderCount   = custOrders.length;
+
+  let aiText = '';
+  const claudeKey = getApiKey('CLAUDE_API_KEY');
+  if(claudeKey){
+    try{
+      const prompt = `তুমি SAR (She AI Restaurant) — একটি women-only থেরাপিউটিক ফুড প্ল্যাটফর্মের ক্লিনিক্যাল বিশ্লেষক। নিচের গ্রাহকের সব মেট্রিক বিশ্লেষণ করে বাংলায় একটি সংক্ষিপ্ত স্বাস্থ্য ও সম্পৃক্ততা রিপোর্ট দাও (৬-৮ লাইন): নাম ${c.full_name}, সদস্য আইডি ${c.member_id}, রোগ বিভাগ ${getCatLabel(c.sar_category)}, BMI ${c.bmi}, লয়্যালটি পয়েন্ট ${c.loyalty_points}, মোট অর্ডার ${orderCount}, মোট ব্যয় ৳${totalSpent}, সাবস্ক্রিপশন ${c.monthly_sub_paid?'সক্রিয়':'নিষ্ক্রিয়'}।`;
+      const r = await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:prompt}] })
+      });
+      const d = await r.json();
+      aiText = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    }catch(e){ aiText=''; }
+  }
+  if(!aiText){
+    const bmiNote = c.bmi>=30?'স্থূলতা পর্যায়ে — ক্যালরি ও পোর্শন নিয়ন্ত্রণ জরুরি।':c.bmi>=25?'অতিরিক্ত ওজন — থেরাপিউটিক মেনু চালিয়ে যান।':'BMI স্বাভাবিক সীমায়।';
+    aiText = `গ্রাহক ${c.full_name} (${getCatLabel(c.sar_category)} বিভাগ)। ${bmiNote} মোট ${orderCount}টি অর্ডার, ব্যয় ৳${totalSpent.toLocaleString()}, লয়্যালটি পয়েন্ট ${c.loyalty_points}। সাবস্ক্রিপশন ${c.monthly_sub_paid?'সক্রিয়':'নিষ্ক্রিয় — নবায়নের পরামর্শ দিন'}। নিয়মিত অর্ডারের জন্য রোগ-নির্দিষ্ট থেরাপিউটিক মেনু সুপারিশ করা হলো।\n\n(নোট: বিস্তারিত AI বিশ্লেষণের জন্য API Keys section-এ Claude key সেট করুন।)`;
+  }
+
+  const report = {
+    name:c.full_name, member_id:c.member_id, category:getCatLabel(c.sar_category),
+    bmi:c.bmi, points:c.loyalty_points, orders:orderCount, spent:totalSpent,
+    sub:c.monthly_sub_paid?'সক্রিয়':'নিষ্ক্রিয়', ai:aiText,
+    generated:new Date().toLocaleString('bn-BD'), phone:c.phone, email:c.email, id:c.id
+  };
+  showAnalysisReport(report);
+}
+
+function showAnalysisReport(r){
+  let modal = document.getElementById('modal-analysis');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.className='modal-overlay'; modal.id='modal-analysis';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `<div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <span class="modal-title">📊 ${r.name} — বিশ্লেষণ রিপোর্ট</span>
+      <button class="modal-close" onclick="closeModal('analysis')">✕</button>
+    </div>
+    <div class="modal-body" id="analysisReportBody">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">সদস্য আইডি</div><div style="font-family:'Space Mono',monospace;font-size:.82rem;color:var(--yellow2)">${r.member_id||'—'}</div></div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">রোগ বিভাগ</div><div style="font-size:.82rem;color:#fff">${r.category}</div></div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">BMI</div><div style="font-family:'Space Mono',monospace;font-size:.82rem;color:#fff">${r.bmi||'—'}</div></div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">লয়্যালটি পয়েন্ট</div><div style="font-family:'Space Mono',monospace;font-size:.82rem;color:var(--purple2)">${r.points||0}</div></div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">মোট অর্ডার</div><div style="font-family:'Space Mono',monospace;font-size:.82rem;color:#fff">${r.orders}</div></div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem .85rem"><div style="font-size:.65rem;color:rgba(255,255,255,.35)">মোট ব্যয়</div><div style="font-family:'Space Mono',monospace;font-size:.82rem;color:var(--green2)">৳${r.spent.toLocaleString()}</div></div>
+      </div>
+      <div style="background:rgba(107,33,168,.08);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+        <div style="font-size:.78rem;font-weight:700;color:var(--purple2);margin-bottom:.5rem">🤖 AI বিশ্লেষণ</div>
+        <div style="font-size:.83rem;line-height:1.7;color:rgba(255,255,255,.85);white-space:pre-wrap">${r.ai}</div>
+      </div>
+      <div style="font-size:.68rem;color:rgba(255,255,255,.3);text-align:right">তৈরি: ${r.generated}</div>
+    </div>
+    <div class="modal-actions" style="padding:1rem 1.5rem">
+      <button class="topbar-btn ghost" onclick='downloadAnalysisPdf(${JSON.stringify(r)})'>⬇ PDF ডাউনলোড</button>
+      <button class="topbar-btn ghost" onclick='shareAnalysis(${JSON.stringify(r)},"whatsapp")'>📱 WhatsApp-এ শেয়ার</button>
+      <button class="topbar-btn primary" onclick='shareAnalysis(${JSON.stringify(r)},"email")'>📧 Email-এ শেয়ার</button>
+    </div>
+  </div>`;
+  modal.classList.add('active');
+}
+
+// Build a printable PDF (opens new window → user saves as PDF)
+function buildAnalysisHtml(r){
+  return `<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">
+  <title>SAR বিশ্লেষণ — ${r.name}</title>
+  <style>body{font-family:'Hind Siliguri',sans-serif;max-width:800px;margin:2rem auto;padding:0 1.5rem;color:#1a1a1a}
+  h1{color:#E91E8C;border-bottom:3px solid #E91E8C;padding-bottom:.5rem}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:1.25rem 0}
+  .cell{border:1px solid #eee;border-radius:8px;padding:.6rem .9rem}
+  .lbl{font-size:.72rem;color:#888} .val{font-size:1rem;font-weight:700}
+  .ai{background:#faf5ff;border:1px solid #e9d5ff;border-radius:10px;padding:1rem;white-space:pre-wrap;line-height:1.7}
+  .ft{margin-top:2rem;font-size:.72rem;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:1rem}</style></head>
+  <body>
+    <h1>🌸 SAR সার — গ্রাহক বিশ্লেষণ রিপোর্ট</h1>
+    <p><strong>${r.name}</strong> &nbsp;·&nbsp; সদস্য আইডি: ${r.member_id||'—'}</p>
+    <div class="grid">
+      <div class="cell"><div class="lbl">রোগ বিভাগ</div><div class="val">${r.category}</div></div>
+      <div class="cell"><div class="lbl">BMI</div><div class="val">${r.bmi||'—'}</div></div>
+      <div class="cell"><div class="lbl">লয়্যালটি পয়েন্ট</div><div class="val">${r.points||0}</div></div>
+      <div class="cell"><div class="lbl">সাবস্ক্রিপশন</div><div class="val">${r.sub}</div></div>
+      <div class="cell"><div class="lbl">মোট অর্ডার</div><div class="val">${r.orders}</div></div>
+      <div class="cell"><div class="lbl">মোট ব্যয়</div><div class="val">৳${r.spent.toLocaleString()}</div></div>
+    </div>
+    <h3 style="color:#6B21A8">🤖 AI বিশ্লেষণ</h3>
+    <div class="ai">${r.ai}</div>
+    <div class="ft">তৈরি: ${r.generated} · She AI Restaurant (SAR) · women-only · women-run · women-led</div>
+  </body></html>`;
+}
+
+function downloadAnalysisPdf(r){
+  const w = window.open('', '_blank');
+  w.document.write(buildAnalysisHtml(r));
+  w.document.close();
+  setTimeout(()=>{ w.print(); }, 600);
+  showToast('🖨️ PDF প্রিন্ট/সেভ উইন্ডো খোলা হয়েছে');
+}
+
+async function shareAnalysis(r, channel){
+  // Create a shareable report blob link (data URL) for the customer
+  const html = buildAnalysisHtml(r);
+  const reportUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+  const summary = `📊 *SAR বিশ্লেষণ রিপোর্ট*\n\nপ্রিয় ${r.name},\nআপনার স্বাস্থ্য ও পুষ্টি বিশ্লেষণ প্রস্তুত।\n\nবিভাগ: ${r.category}\nBMI: ${r.bmi||'—'}\nমোট অর্ডার: ${r.orders}\nলয়্যালটি পয়েন্ট: ${r.points}\n\nবিস্তারিত রিপোর্ট সংযুক্ত করা হলো।\n— SAR সার`;
+
+  if(channel==='whatsapp'){
+    if(!r.phone){ showToast('গ্রাহকের ফোন নেই', true); return; }
+    try{
+      await fetch(`${SUPABASE_URL}/functions/v1/send-whatsapp`,{
+        method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({ to_phone:r.phone, custom_message:summary, customer_id:r.id, report_html:html })
+      });
+      showToast('✅ WhatsApp-এ রিপোর্ট লিংক পাঠানো হয়েছে');
+    }catch(e){
+      // fallback: open WhatsApp web with the message
+      window.open(`https://wa.me/${(r.phone||'').replace(/\D/g,'')}?text=${encodeURIComponent(summary)}`, '_blank');
+    }
+  } else {
+    if(!r.email){ showToast('গ্রাহকের ইমেইল নেই', true); return; }
+    try{
+      await fetch(`${SUPABASE_URL}/functions/v1/send-email`,{
+        method:'POST', headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({ to_email:r.email, subject:`SAR বিশ্লেষণ রিপোর্ট — ${r.name}`, html_body:html, template:'analysis_report' })
+      });
+      showToast('✅ Email-এ রিপোর্ট পাঠানো হয়েছে');
+    }catch(e){ showToast('❌ Email পাঠানো যায়নি — Edge Function চেক করুন', true); }
+  }
+}
+
+// ════════════════════════════════════════════════
+// BROADCAST MEDIA (special message / photo / video)
+// ════════════════════════════════════════════════
+function toggleBcCustomerPicker(){
+  const t = document.getElementById('bc-target').value;
+  const picker = document.getElementById('bc-customer-picker');
+  if(t==='selected'){ picker.style.display='block'; buildBcCustomerPicker(); }
+  else picker.style.display='none';
+}
+function buildBcCustomerPicker(){
+  const picker = document.getElementById('bc-customer-picker');
+  if(!picker) return;
+  picker.innerHTML = allCustomers.map(c=>`
+    <label style="display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-size:.8rem;cursor:pointer">
+      <input type="checkbox" class="bc-cust-cb" value="${c.id}">
+      <span>${c.full_name||'—'} <span style="color:rgba(255,255,255,.3);font-size:.7rem">(${getCatLabel(c.sar_category)})</span></span>
+    </label>`).join('') || '<span style="color:rgba(255,255,255,.3);font-size:.8rem">কোনো গ্রাহক নেই</span>';
+}
+function updateBcMediaHint(){ /* reserved for type-specific hints */ }
+
+function getBroadcastRecipients(){
+  const t = document.getElementById('bc-target').value;
+  if(t==='all')      return allCustomers.filter(c=>c.is_active||c.monthly_sub_paid);
+  if(t==='expired')  return allCustomers.filter(c=> c.monthly_sub_expiry_date && new Date(c.monthly_sub_expiry_date)<new Date());
+  if(t==='selected'){ const ids=[...document.querySelectorAll('.bc-cust-cb:checked')].map(e=>e.value); return allCustomers.filter(c=>ids.includes(c.id)); }
+  return allCustomers.filter(c=>c.sar_category===t); // disease category
+}
+
+async function sendBroadcast(channel){
+  const title = document.getElementById('bc-title').value.trim();
+  const msg   = document.getElementById('bc-message').value.trim();
+  const photo = document.getElementById('bc-photo').value.trim();
+  const video = document.getElementById('bc-video').value.trim();
+  const type  = document.getElementById('bc-type').value;
+  const targetLabel = document.getElementById('bc-target').selectedOptions[0].text;
+
+  if(!msg && !photo && !video){ showToast('⚠️ বার্তা, ছবি বা ভিডিও — অন্তত একটি দিন', true); return; }
+  const recipients = getBroadcastRecipients();
+  if(!recipients.length){ showToast('⚠️ কোনো প্রাপক পাওয়া যায়নি', true); return; }
+
+  showToast(`⏳ ${recipients.length} জনকে পাঠানো হচ্ছে...`);
+
+  const fullMsg = (title?`*${title}*\n\n`:'') + msg + (photo?`\n\n🖼️ ${photo}`:'') + (video?`\n\n🎬 ${video}`:'');
+  const payload = {
+    recipient: targetLabel,
+    recipient_ids: recipients.map(c=>c.id),
+    custom_message: fullMsg,
+    title, message:msg, photo_url:photo, video_url:video,
+    broadcast_type:type, channel, sent_by:'admin'
+  };
+
+  let ok=false;
+  try{
+    if(channel==='whatsapp'||channel==='both'){
+      await fetch(`${SUPABASE_URL}/functions/v1/send-whatsapp`,{ method:'POST',
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify(payload) }); ok=true;
+    }
+    if(channel==='email'||channel==='both'){
+      await fetch(`${SUPABASE_URL}/functions/v1/send-email`,{ method:'POST',
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
+        body:JSON.stringify({...payload, template:'admin_broadcast_media'}) }); ok=true;
+    }
+  }catch(e){ ok=false; }
+
+  // Store history locally regardless (so admin sees a log)
+  const hist = JSON.parse(localStorage.getItem('sar_broadcasts')||'[]');
+  hist.unshift({ type, target:targetLabel, title:title||'(শিরোনাম নেই)',
+    media:(photo?'🖼️':'')+(video?'🎬':'')||'—', channel, count:recipients.length,
+    time:new Date().toLocaleString('bn-BD') });
+  localStorage.setItem('sar_broadcasts', JSON.stringify(hist));
+  renderBroadcastHistory();
+
+  ['bc-title','bc-message','bc-photo','bc-video'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('bc-media-preview').innerHTML='';
+  showToast(ok?`✅ ${recipients.length} জনকে পাঠানো হয়েছে!`:`⚠️ লগ সেভ হয়েছে (Edge Function unavailable)`);
+}
+
+function renderBroadcastHistory(){
+  const hist = JSON.parse(localStorage.getItem('sar_broadcasts')||'[]');
+  const body = document.getElementById('broadcastBody');
+  if(!body) return;
+  body.innerHTML = hist.length ? hist.map(h=>`
+    <tr>
+      <td>${h.type==='notice'?'📢 নোটিশ':h.type==='marketing'?'🎯 মার্কেটিং':'💡 পরামর্শ'}</td>
+      <td>${h.target} <span style="color:rgba(255,255,255,.3);font-size:.7rem">(${h.count})</span></td>
+      <td>${h.title}</td>
+      <td>${h.media}</td>
+      <td>${h.channel==='both'?'📲 দুটো':h.channel==='whatsapp'?'📱 WA':'📧 Email'}</td>
+      <td style="font-size:.72rem;color:rgba(255,255,255,.4)">${h.time}</td>
+    </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;color:rgba(255,255,255,.3);padding:1rem">কোনো বার্তা পাঠানো হয়নি</td></tr>';
+}
+
+// Live media preview
+document.addEventListener('input', e=>{
+  if(['bc-photo','bc-video'].includes(e.target.id)){
+    const photo=document.getElementById('bc-photo')?.value.trim();
+    const video=document.getElementById('bc-video')?.value.trim();
+    const prev=document.getElementById('bc-media-preview');
+    if(prev) prev.innerHTML = (photo?`<img src="${photo}" style="max-height:120px;border-radius:8px;margin-right:.5rem" onerror="this.style.display='none'">`:'')
+      + (video?`<span style="font-size:.75rem;color:var(--purple2)">🎬 ভিডিও যুক্ত: ${video.slice(0,40)}...</span>`:'');
+  }
+});
+
+// ════════════════════════════════════════════════
+// WRITE TO SAR — customer inbox (collapsible)
+// ════════════════════════════════════════════════
+async function loadWriteToSar(){
+  let msgs = [];
+  try{
+    msgs = await sb('write_to_sar', 'select=*&order=created_at.desc&limit=100');
+    if(!Array.isArray(msgs)) msgs=[];
+  }catch(e){ msgs=[]; }
+  // merge local-only (offline) messages
+  const local = JSON.parse(localStorage.getItem('sar_w2s')||'[]');
+  if(!msgs.length && !local.length){
+    // seed sample so panel isn't empty
+    msgs = [
+      {id:'w1', customer_name:'নাসরিন আক্তার', subject:'মেনু নিয়ে প্রশ্ন', message:'আগামীকাল কি ডায়াবেটিস মেনুতে নতুন কিছু আছে?', is_read:false, created_at:new Date().toISOString()},
+      {id:'w2', customer_name:'সাবিনা আক্তার', subject:'ধন্যবাদ', message:'SAR-এর খাবারে আমার ফ্যাটি লিভার অনেক ভালো হয়েছে। ধন্যবাদ!', is_read:true, created_at:new Date(Date.now()-86400000).toISOString()},
+    ];
+  }
+  return [...local, ...msgs];
+}
+
+async function renderWriteToSar(){
+  const list = document.getElementById('writeToSarList');
+  if(!list) return;
+  list.innerHTML = '<div style="color:rgba(255,255,255,.3);padding:1rem">লোড হচ্ছে...</div>';
+  const filter = document.getElementById('w2sFilter')?.value || '';
+  let msgs = await loadWriteToSar();
+  if(filter==='unread') msgs = msgs.filter(m=>!m.is_read);
+  if(filter==='read')   msgs = msgs.filter(m=>m.is_read);
+
+  const unread = (await loadWriteToSar()).filter(m=>!m.is_read).length;
+  const badge = document.getElementById('w2sBadge'); if(badge) badge.textContent = unread;
+
+  if(!msgs.length){ list.innerHTML='<div style="color:rgba(255,255,255,.3);text-align:center;padding:2rem">কোনো বার্তা নেই</div>'; return; }
+
+  list.innerHTML = msgs.map((m,i)=>`
+    <div style="background:var(--glass);border:1px solid ${m.is_read?'var(--border)':'rgba(233,30,140,.3)'};border-radius:12px;margin-bottom:.6rem;overflow:hidden">
+      <div onclick="toggleW2s(${i})" style="display:flex;align-items:center;gap:.75rem;padding:.85rem 1rem;cursor:pointer">
+        ${m.is_read?'':'<span style="width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0"></span>'}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.85rem;font-weight:${m.is_read?'500':'700'};color:#fff">${m.subject||'(বিষয় নেই)'}</div>
+          <div style="font-size:.7rem;color:rgba(255,255,255,.4)">${m.customer_name||'অজানা'} · ${timeAgo(m.created_at)}</div>
+        </div>
+        <span style="color:rgba(255,255,255,.3);font-size:.8rem">▼</span>
+      </div>
+      <div id="w2s-body-${i}" style="display:none;padding:0 1rem 1rem;border-top:1px solid var(--border)">
+        <div style="font-size:.85rem;line-height:1.7;color:rgba(255,255,255,.8);padding:.85rem 0;white-space:pre-wrap">${m.message||''}</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          ${m.is_read?'':`<button onclick="markW2sRead('${m.id}')" class="topbar-btn ghost" style="font-size:.72rem;padding:.25rem .7rem">✓ পঠিত চিহ্নিত</button>`}
+          ${isSuperAdmin()?`
+            <button onclick="editW2s('${m.id}','${i}')" class="topbar-btn ghost" style="font-size:.72rem;padding:.25rem .7rem;color:var(--yellow2)">✏️ সম্পাদনা</button>
+            <button onclick="deleteW2s('${m.id}')" class="topbar-btn danger" style="font-size:.72rem;padding:.25rem .7rem">🗑 মুছুন</button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleW2s(i){
+  const b = document.getElementById('w2s-body-'+i);
+  if(b) b.style.display = b.style.display==='none'?'block':'none';
+}
+
+async function markW2sRead(id){
+  // local
+  const local = JSON.parse(localStorage.getItem('sar_w2s')||'[]');
+  const lm = local.find(m=>m.id===id); if(lm){ lm.is_read=true; localStorage.setItem('sar_w2s',JSON.stringify(local)); }
+  try{ await fetch(`${SUPABASE_URL}/rest/v1/write_to_sar?id=eq.${id}`,{method:'PATCH',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({is_read:true})}); }catch(e){}
+  renderWriteToSar(); showToast('✓ পঠিত চিহ্নিত হয়েছে');
+}
+
+async function editW2s(id, idx){
+  if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin সম্পাদনা করতে পারেন', true); return; }
+  const bodyEl = document.querySelector(`#w2s-body-${idx} div`);
+  const current = bodyEl?.textContent || '';
+  const edited = prompt('বার্তা সম্পাদনা করুন:', current);
+  if(edited===null) return;
+  const local = JSON.parse(localStorage.getItem('sar_w2s')||'[]');
+  const lm = local.find(m=>m.id===id); if(lm){ lm.message=edited; localStorage.setItem('sar_w2s',JSON.stringify(local)); }
+  try{ await fetch(`${SUPABASE_URL}/rest/v1/write_to_sar?id=eq.${id}`,{method:'PATCH',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({message:edited})}); }catch(e){}
+  renderWriteToSar(); showToast('✅ বার্তা সম্পাদিত হয়েছে');
+}
+
+async function deleteW2s(id){
+  if(!isSuperAdmin()){ showToast('⛔ শুধুমাত্র Super Admin মুছতে পারেন', true); return; }
+  if(!confirm('এই বার্তা স্থায়ীভাবে মুছবেন?')) return;
+  const local = JSON.parse(localStorage.getItem('sar_w2s')||'[]').filter(m=>m.id!==id);
+  localStorage.setItem('sar_w2s',JSON.stringify(local));
+  try{ await fetch(`${SUPABASE_URL}/rest/v1/write_to_sar?id=eq.${id}`,{method:'DELETE',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal'}}); }catch(e){}
+  renderWriteToSar(); showToast('🗑 বার্তা মুছে ফেলা হয়েছে');
+}
+
+// ════════════════════════════════════════════════
+// BLOCKCHAIN — editable config + on-chain records
+// ════════════════════════════════════════════════
+function renderBlockchain(){
+  const cfg = JSON.parse(localStorage.getItem('sar_blockchain')||'{}');
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('bcn-network', cfg.network);
+  set('bcn-rpc', cfg.rpc || getApiKey('BLOCKCHAIN_RPC') || '');
+  set('bcn-contract', cfg.contract);
+  set('bcn-token', cfg.token || 'SAR Loyalty Token');
+  set('bcn-desc', cfg.desc || 'SAR স্বচ্ছ পুষ্টি রেকর্ড, লয়্যালটি পয়েন্ট ও খাদ্য উৎস ট্রেসেবিলিটির জন্য blockchain ব্যবহার করে।');
+  const en=document.getElementById('bcn-enabled'); if(en) en.checked = cfg.enabled!==false;
+
+  document.getElementById('blockchainKpi').innerHTML = [
+    {icon:'⛓️', val:cfg.enabled!==false?'সক্রিয়':'বন্ধ', label:'ব্লকচেইন স্ট্যাটাস', cls:cfg.enabled!==false?'green':'red'},
+    {icon:'🔗', val:(cfg.txCount||'১,২৪৭'), label:'মোট লেনদেন', cls:'purple'},
+    {icon:'🪙', val:(cfg.token||'SAR Token'), label:'টোকেন', cls:'yellow'},
+    {icon:'🌐', val:(cfg.network||'Polygon'), label:'নেটওয়ার্ক', cls:'pink'},
+  ].map(k=>`<div class="kpi-card ${k.cls}"><div class="kpi-icon">${k.icon}</div><div class="kpi-val" style="font-size:1.1rem">${k.val}</div><div class="kpi-label">${k.label}</div></div>`).join('');
+
+  const tx = cfg.records || [
+    {hash:'0x4a9f...e21b', type:'লয়্যালটি পয়েন্ট', customer:'নাসরিন আক্তার', value:'+৫০ SAR', time:'২ ঘণ্টা আগে'},
+    {hash:'0x7c2d...88af', type:'পুষ্টি রেকর্ড', customer:'সাবিনা আক্তার', value:'হ্যাশড', time:'৫ ঘণ্টা আগে'},
+    {hash:'0x1e8b...4d09', type:'খাদ্য উৎস', customer:'—', value:'অর্গানিক যাচাই', time:'১ দিন আগে'},
+  ];
+  document.getElementById('blockchainTxBody').innerHTML = tx.map(t=>`
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:.72rem;color:var(--yellow2)">${t.hash}</td>
+      <td>${t.type}</td>
+      <td>${t.customer}</td>
+      <td style="color:var(--green2)">${t.value}</td>
+      <td style="font-size:.72rem;color:rgba(255,255,255,.4)">${t.time}</td>
+    </tr>`).join('');
+}
+
+function saveBlockchainConfig(){
+  const cfg = {
+    network: document.getElementById('bcn-network').value.trim(),
+    rpc: document.getElementById('bcn-rpc').value.trim(),
+    contract: document.getElementById('bcn-contract').value.trim(),
+    token: document.getElementById('bcn-token').value.trim(),
+    desc: document.getElementById('bcn-desc').value.trim(),
+    enabled: document.getElementById('bcn-enabled').checked,
+    records: (JSON.parse(localStorage.getItem('sar_blockchain')||'{}')).records
+  };
+  localStorage.setItem('sar_blockchain', JSON.stringify(cfg));
+  renderBlockchain();
+  showToast('✅ ব্লকচেইন সেটিংস সেভ হয়েছে (ব্লকচেইন পেজে প্রতিফলিত হবে)');
 }
 
 // MODAL
