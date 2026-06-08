@@ -6,30 +6,45 @@
 <title>১৯০+ থেরাপিউটিক রেসিপি — SAR She AI Restaurant</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* SolaimanLipi Bangla font */
+@font-face{
+  font-family:'SolaimanLipi';
+  src:url('https://cdn.jsdelivr.net/gh/maateen/bengali-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),
+      url('https://cdn.jsdelivr.net/gh/maateen/bengali-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');
+  font-weight:normal;font-style:normal;font-display:swap;
+}
 :root{
-  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
-  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
-  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
-  --red:#DC2626;--red2:#F87171;
-  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
-  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
-  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
-  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.15);
+  --pink:#E91E8C;--pink2:#C2185B;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#7C3AED;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#B45309;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#DC2626;
+  --green:#059669;--green2:#0E9F6E;--green3:rgba(5,150,105,.12);
+  /* Light theme — EatLove warm cream bg + Noom clean light cards */
+  --dark:#FBF7F0;--dark2:#FFFFFF;--dark3:#F4EEE4;
+  --glass:rgba(0,0,0,.025);--glass2:rgba(0,0,0,.04);
+  --border:rgba(31,28,24,.10);--border2:rgba(31,28,24,.16);
+  --ink:#241F1A;--ink-soft:rgba(36,31,26,.62);--ink-faint:rgba(36,31,26,.42);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
+body{background:
+  radial-gradient(1200px 600px at 15% -5%, #FDEFF6 0%, transparent 55%),
+  radial-gradient(1000px 600px at 110% 10%, #F1ECFB 0%, transparent 55%),
+  radial-gradient(900px 700px at 50% 120%, #EAF7F0 0%, transparent 55%),
+  #FBF7F0;
+  background-attachment:fixed;
+  color:var(--ink);font-family:'SolaimanLipi','Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* BG */
 .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(110px);opacity:.09;animation:orbF 18s ease-in-out infinite}
-.o1{width:600px;height:600px;background:var(--pink);top:-200px;left:-200px}
-.o2{width:500px;height:500px;background:var(--purple);bottom:-150px;right:-150px;animation-delay:7s}
-.o3{width:380px;height:380px;background:var(--yellow);top:40%;left:40%;animation-delay:14s}
-.o4{width:280px;height:280px;background:var(--green);top:20%;right:8%;animation-delay:5s}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.22;animation:orbF 18s ease-in-out infinite}
+.o1{width:600px;height:600px;background:#FAD2E8;top:-200px;left:-200px}
+.o2{width:500px;height:500px;background:#E3D6F7;bottom:-150px;right:-150px;animation-delay:7s}
+.o3{width:380px;height:380px;background:#FDE8C7;top:40%;left:40%;animation-delay:14s}
+.o4{width:280px;height:280px;background:#CFEEDD;top:20%;right:8%;animation-delay:5s}
 @keyframes orbF{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-18px)}}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(233,30,140,.03)1px,transparent 1px),
-  linear-gradient(90deg,rgba(233,30,140,.03)1px,transparent 1px);
+  background-image:linear-gradient(rgba(36,31,26,.022)1px,transparent 1px),
+  linear-gradient(90deg,rgba(36,31,26,.022)1px,transparent 1px);
   background-size:72px 72px}
 
 /* LAYOUT */
@@ -38,7 +53,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 /* NAV */
 .top-nav{width:100%;max-width:1200px;display:flex;justify-content:space-between;align-items:center;
   margin-bottom:1.75rem;padding:.65rem 1.4rem;
-  background:rgba(10,10,20,.7);backdrop-filter:blur(20px);
+  background:rgba(255,255,255,.82);backdrop-filter:blur(20px);
   border:1px solid var(--border);border-radius:50px}
 .logo{display:flex;align-items:center;gap:.6rem;text-decoration:none}
 .logo-icon{width:36px;height:36px;border-radius:10px;
@@ -48,7 +63,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   background:linear-gradient(90deg,var(--pink),var(--purple2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .nav-right{display:flex;align-items:center;gap:1rem}
-.nav-back{font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;transition:color .3s}
+.nav-back{font-size:.82rem;color:rgba(36,31,26,.5);text-decoration:none;transition:color .3s}
 .nav-back:hover{color:var(--pink2)}
 .cart-btn{
   display:flex;align-items:center;gap:.4rem;
@@ -56,10 +71,10 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   background:linear-gradient(135deg,var(--pink),var(--purple));
   color:#fff;font-size:.8rem;font-weight:700;text-decoration:none;
   box-shadow:0 0 14px rgba(233,30,140,.28);transition:all .3s;border:none;cursor:pointer;
-  font-family:'Hind Siliguri',sans-serif;
+  font-family:'SolaimanLipi','Hind Siliguri',sans-serif;
 }
 .cart-btn:hover{transform:translateY(-1px);box-shadow:0 0 22px rgba(233,30,140,.45)}
-.cart-count{background:rgba(255,255,255,.25);border-radius:50px;
+.cart-count{background:rgba(255,255,255,.28);border-radius:50px;
   padding:.05rem .45rem;font-family:'Space Mono',monospace;font-size:.72rem}
 
 /* PAGE HEADER */
@@ -71,14 +86,14 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   border-radius:50px;padding:.28rem .9rem;font-size:.72rem;
   color:var(--purple2);letter-spacing:.07em;margin-bottom:.75rem}
 .hd-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:900;
-  background:linear-gradient(135deg,#fff,rgba(255,255,255,.78));
+  background:linear-gradient(135deg,var(--pink),var(--purple));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
-.hd-sub{font-size:.84rem;color:rgba(255,255,255,.4)}
+.hd-sub{font-size:.84rem;color:rgba(36,31,26,.4)}
 .ai-btn{
   display:flex;align-items:center;gap:.5rem;
   padding:.7rem 1.4rem;border-radius:50px;
   background:linear-gradient(135deg,var(--purple),var(--pink));
-  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;
+  color:#fff;font-family:'SolaimanLipi','Hind Siliguri',sans-serif;font-size:.85rem;font-weight:700;
   border:none;cursor:pointer;box-shadow:0 0 20px rgba(107,33,168,.3);transition:all .3s;
 }
 .ai-btn:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(107,33,168,.5)}
@@ -98,40 +113,40 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .ai-box-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
 .ai-box-title{font-size:.9rem;font-weight:700;color:var(--purple2);
   display:flex;align-items:center;gap:.5rem}
-.ai-box-close{background:none;border:none;color:rgba(255,255,255,.35);
+.ai-box-close{background:none;border:none;color:rgba(36,31,26,.35);
   font-size:1.1rem;cursor:pointer;transition:color .3s;padding:.2rem}
 .ai-box-close:hover{color:#fff}
 .ai-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem}
-.ai-chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+.ai-chip{background:rgba(36,31,26,.05);border:1px solid rgba(36,31,26,.09);
   border-radius:12px;padding:.8rem .95rem}
-.ai-chip-label{font-size:.68rem;color:rgba(255,255,255,.35);
+.ai-chip-label{font-size:.68rem;color:rgba(36,31,26,.35);
   font-family:'Space Mono',monospace;letter-spacing:.08em;margin-bottom:.35rem}
 .ai-chip-val{font-size:.82rem;color:#fff;line-height:1.5}
 .ai-rec-list{display:flex;flex-direction:column;gap:.4rem;margin-top:.9rem}
 .ai-rec-item{display:flex;align-items:flex-start;gap:.6rem;
   background:rgba(107,33,168,.08);border-radius:9px;padding:.6rem .85rem;
-  font-size:.8rem;color:rgba(255,255,255,.72);line-height:1.5}
+  font-size:.8rem;color:rgba(36,31,26,.72);line-height:1.5}
 .ai-rec-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;
   background:var(--purple2);margin-top:.28rem}
 .disclaimer-mini{
   background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.14);
   border-radius:10px;padding:.65rem .85rem;margin-top:.85rem;
-  font-size:.73rem;color:rgba(255,255,255,.42);line-height:1.6}
+  font-size:.73rem;color:rgba(36,31,26,.42);line-height:1.6}
 .disclaimer-mini strong{color:var(--red2)}
 
 /* FILTERS */
 .filter-wrap{width:100%;max-width:1200px;margin-bottom:1.75rem}
 .filter-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.85rem}
 .filter-label{font-family:'Space Mono',monospace;font-size:.68rem;
-  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(36,31,26,.3);
   white-space:nowrap;margin-right:.25rem}
 .ftab{
   padding:.42rem 1rem;border-radius:50px;border:1px solid var(--border2);
-  background:transparent;color:rgba(255,255,255,.5);
-  font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;
+  background:transparent;color:rgba(36,31,26,.5);
+  font-family:'SolaimanLipi','Hind Siliguri',sans-serif;font-size:.8rem;font-weight:600;
   cursor:pointer;transition:all .3s;white-space:nowrap;
 }
-.ftab:hover{color:#fff;border-color:rgba(255,255,255,.28)}
+.ftab:hover{color:#fff;border-color:rgba(36,31,26,.28)}
 .ftab.active{color:#fff;border-color:transparent}
 .ftab.cat-DM.active{background:linear-gradient(135deg,rgba(233,30,140,.8),rgba(107,33,168,.8));box-shadow:0 0 12px rgba(233,30,140,.3)}
 .ftab.cat-OB.active{background:linear-gradient(135deg,rgba(245,158,11,.8),rgba(234,88,12,.8));box-shadow:0 0 12px rgba(245,158,11,.3)}
@@ -149,11 +164,11 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 }
 .search-box input{
   background:none;border:none;outline:none;color:#fff;
-  font-family:'Hind Siliguri',sans-serif;font-size:.84rem;width:100%;
+  font-family:'SolaimanLipi','Hind Siliguri',sans-serif;font-size:.84rem;width:100%;
 }
-.search-box input::placeholder{color:rgba(255,255,255,.25)}
-.search-icon{color:rgba(255,255,255,.3);font-size:.9rem;flex-shrink:0}
-.results-info{font-size:.78rem;color:rgba(255,255,255,.35);
+.search-box input::placeholder{color:rgba(36,31,26,.25)}
+.search-icon{color:rgba(36,31,26,.3);font-size:.9rem;flex-shrink:0}
+.results-info{font-size:.78rem;color:rgba(36,31,26,.35);
   font-family:'Space Mono',monospace;margin-top:.4rem}
 
 /* PINNED SECTION */
@@ -170,12 +185,12 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 
 /* MENU CARD */
 .mcard{
-  background:rgba(14,14,20,.85);backdrop-filter:blur(16px);
+  background:rgba(255,255,255,.92);backdrop-filter:blur(16px);
   border:1px solid var(--border);border-radius:20px;overflow:hidden;
   transition:all .38s;position:relative;
 }
 .mcard:hover{transform:translateY(-5px);border-color:var(--border2);
-  box-shadow:0 16px 48px rgba(0,0,0,.3)}
+  box-shadow:0 16px 40px rgba(36,31,26,.10)}
 .mcard.pinned{border-color:rgba(233,30,140,.3);
   box-shadow:0 0 20px rgba(233,30,140,.1)}
 .mcard.ai-recommended{border-color:rgba(107,33,168,.4);
@@ -209,9 +224,9 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   color:var(--purple2);border:1px solid rgba(107,33,168,.3)}
 .b-pinned{background:linear-gradient(135deg,rgba(233,30,140,.2),rgba(245,158,11,.15));
   color:var(--pink2)}
-.b-locked{background:rgba(255,255,255,.08);color:rgba(255,255,255,.35)}
+.b-locked{background:rgba(36,31,26,.08);color:rgba(36,31,26,.35)}
 .mcard-code{font-family:'Space Mono',monospace;font-size:.65rem;
-  color:rgba(255,255,255,.28);white-space:nowrap}
+  color:rgba(36,31,26,.28);white-space:nowrap}
 
 /* CARD BODY */
 .mcard-body{padding:.4rem 1.1rem .9rem}
@@ -225,47 +240,47 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .mcard-ai-reason.show{display:block}
 .mcard-courses{display:flex;flex-direction:column;gap:.28rem;margin-bottom:.75rem}
 .course-row{display:flex;align-items:flex-start;gap:.5rem;font-size:.76rem;
-  color:rgba(255,255,255,.55);line-height:1.5}
+  color:rgba(36,31,26,.55);line-height:1.5}
 .course-num{font-family:'Space Mono',monospace;font-size:.62rem;
-  color:rgba(255,255,255,.25);width:14px;flex-shrink:0;margin-top:.1rem}
-.mcard-powders{font-size:.72rem;color:rgba(255,255,255,.4);
-  background:rgba(255,255,255,.04);border-radius:8px;
+  color:rgba(36,31,26,.25);width:14px;flex-shrink:0;margin-top:.1rem}
+.mcard-powders{font-size:.72rem;color:rgba(36,31,26,.4);
+  background:rgba(36,31,26,.04);border-radius:8px;
   padding:.4rem .7rem;margin-bottom:.7rem;line-height:1.5}
 .mcard-powders span{color:var(--yellow2)}
 
 /* NUTRITION ROW */
 .nutr-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.85rem}
 .nchip{display:flex;align-items:center;gap:.28rem;
-  background:rgba(255,255,255,.055);border-radius:50px;
-  padding:.18rem .6rem;font-size:.69rem;color:rgba(255,255,255,.65)}
+  background:rgba(36,31,26,.055);border-radius:50px;
+  padding:.18rem .6rem;font-size:.69rem;color:rgba(36,31,26,.65)}
 .ndot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 
 /* TOPPING/CHUTNEY ROW */
 .tc-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.85rem}
 .tc-chip{font-size:.67rem;padding:.14rem .5rem;border-radius:50px;
-  background:rgba(255,255,255,.06);color:rgba(255,255,255,.45);
-  border:1px solid rgba(255,255,255,.08)}
+  background:rgba(36,31,26,.06);color:rgba(36,31,26,.45);
+  border:1px solid rgba(36,31,26,.08)}
 
 /* CARD FOOTER */
 .mcard-ft{
-  padding:.8rem 1.1rem;border-top:1px solid rgba(255,255,255,.06);
+  padding:.8rem 1.1rem;border-top:1px solid rgba(36,31,26,.06);
   display:flex;align-items:center;justify-content:space-between;gap:.75rem;
 }
 .price-col{}
 .price-main{font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--yellow2)}
-.price-up{font-size:.68rem;color:rgba(255,255,255,.32);margin-top:.1rem}
+.price-up{font-size:.68rem;color:rgba(36,31,26,.32);margin-top:.1rem}
 .card-actions{display:flex;gap:.55rem}
 .pin-btn{
   padding:.42rem .75rem;border-radius:50px;
   background:var(--glass2);border:1px solid var(--border2);
-  color:rgba(255,255,255,.55);font-size:.75rem;cursor:pointer;transition:all .3s;
+  color:rgba(36,31,26,.55);font-size:.75rem;cursor:pointer;transition:all .3s;
 }
 .pin-btn:hover{border-color:var(--pink);color:var(--pink2)}
 .pin-btn.pinned{background:var(--pink3);border-color:rgba(233,30,140,.3);color:var(--pink2)}
 .order-btn{
   padding:.42rem 1rem;border-radius:50px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  border:none;color:#fff;font-family:'SolaimanLipi','Hind Siliguri',sans-serif;
   font-size:.78rem;font-weight:700;cursor:pointer;
   box-shadow:0 0 12px rgba(233,30,140,.25);transition:all .3s;
 }
@@ -280,18 +295,18 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   border-radius:20px;
 }
 .lock-overlay-icon{font-size:1.8rem}
-.lock-overlay-txt{font-size:.78rem;color:rgba(255,255,255,.55);text-align:center}
+.lock-overlay-txt{font-size:.78rem;color:rgba(36,31,26,.55);text-align:center}
 .lock-overlay-btn{
   margin-top:.3rem;padding:.42rem 1rem;border-radius:50px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
   color:#fff;font-size:.76rem;font-weight:700;text-decoration:none;
-  font-family:'Hind Siliguri',sans-serif;
+  font-family:'SolaimanLipi','Hind Siliguri',sans-serif;
 }
 
 /* CART DRAWER */
 .cart-drawer{
   position:fixed;right:0;top:0;bottom:0;width:360px;z-index:500;
-  background:rgba(12,12,22,.95);backdrop-filter:blur(24px);
+  background:rgba(255,255,255,.97);backdrop-filter:blur(24px);
   border-left:1px solid var(--border);
   transform:translateX(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);
   display:flex;flex-direction:column;
@@ -306,41 +321,41 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   display:flex;align-items:center;justify-content:space-between}
 .cart-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;
   display:flex;align-items:center;gap:.5rem}
-.cart-close{background:none;border:none;color:rgba(255,255,255,.4);
+.cart-close{background:none;border:none;color:rgba(36,31,26,.4);
   font-size:1.2rem;cursor:pointer;transition:color .3s;padding:.2rem}
 .cart-close:hover{color:#fff}
 .cart-body{flex:1;overflow-y:auto;padding:1rem 1.4rem}
 .cart-item{
   display:flex;align-items:flex-start;gap:.85rem;
-  padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.06);
+  padding:.85rem 0;border-bottom:1px solid rgba(36,31,26,.06);
 }
 .cart-item:last-child{border:none}
 .ci-emoji{font-size:1.4rem;flex-shrink:0}
 .ci-info{flex:1}
 .ci-name{font-size:.84rem;font-weight:600;color:#fff;margin-bottom:.15rem}
-.ci-meta{font-size:.72rem;color:rgba(255,255,255,.4)}
+.ci-meta{font-size:.72rem;color:rgba(36,31,26,.4)}
 .ci-price{font-family:'Space Mono',monospace;font-size:.84rem;color:var(--yellow2);flex-shrink:0}
 .ci-qty-row{display:flex;align-items:center;gap:.6rem;margin-top:.45rem}
 .qty-btn{width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+  background:rgba(36,31,26,.08);border:1px solid rgba(36,31,26,.14);
   color:#fff;font-size.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .3s;font-size:.9rem}
 .qty-btn:hover{background:rgba(233,30,140,.2);border-color:rgba(233,30,140,.3)}
 .qty-val{font-family:'Space Mono',monospace;font-size:.8rem;color:#fff;min-width:18px;text-align:center}
-.ci-del{background:none;border:none;color:rgba(255,255,255,.3);
+.ci-del{background:none;border:none;color:rgba(36,31,26,.3);
   font-size:.8rem;cursor:pointer;margin-left:auto;transition:color .3s}
 .ci-del:hover{color:var(--red2)}
-.cart-empty{text-align:center;padding:3rem 1rem;color:rgba(255,255,255,.28);font-size:.85rem}
+.cart-empty{text-align:center;padding:3rem 1rem;color:rgba(36,31,26,.28);font-size:.85rem}
 .cart-ft{padding:1.2rem 1.4rem;border-top:1px solid var(--border)}
 .cart-total-row{display:flex;justify-content:space-between;margin-bottom:.85rem}
-.cart-total-lbl{font-size:.85rem;color:rgba(255,255,255,.55)}
+.cart-total-lbl{font-size:.85rem;color:rgba(36,31,26,.55)}
 .cart-total-val{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;
   background:linear-gradient(135deg,var(--yellow2),var(--green2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .checkout-btn{
   width:100%;padding:.9rem;border-radius:50px;
   background:linear-gradient(135deg,var(--green),var(--yellow));
-  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  border:none;color:#fff;font-family:'SolaimanLipi','Hind Siliguri',sans-serif;
   font-size:.92rem;font-weight:700;cursor:pointer;
   box-shadow:0 0 20px rgba(5,150,105,.28);transition:all .3s;
 }
@@ -349,24 +364,24 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 
 /* SPECIAL NOTE INPUT */
 .note-input{
-  width:100%;background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);border-radius:9px;
-  padding:.5rem .75rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  width:100%;background:rgba(36,31,26,.05);
+  border:1px solid rgba(36,31,26,.1);border-radius:9px;
+  padding:.5rem .75rem;color:#fff;font-family:'SolaimanLipi','Hind Siliguri',sans-serif;
   font-size:.78rem;outline:none;margin-top:.4rem;resize:none;
 }
 .note-input:focus{border-color:var(--pink);background:rgba(233,30,140,.06)}
-.note-input::placeholder{color:rgba(255,255,255,.22)}
+.note-input::placeholder{color:rgba(36,31,26,.22)}
 
 /* UPGRADE TOGGLE */
 .upgrade-row{display:flex;align-items:center;gap:.6rem;margin-top:.4rem;cursor:pointer}
 .upgrade-chk{width:15px;height:15px;accent-color:var(--pink);cursor:pointer}
-.upgrade-lbl{font-size:.74rem;color:rgba(255,255,255,.55)}
+.upgrade-lbl{font-size:.74rem;color:rgba(36,31,26,.55)}
 .upgrade-price{font-size:.7rem;color:var(--yellow2);font-weight:700}
 
 /* TOAST */
 .toast{
   position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
-  background:rgba(20,20,30,.95);backdrop-filter:blur(16px);
+  background:rgba(255,255,255,.97);backdrop-filter:blur(16px);
   border:1px solid var(--border2);border-radius:14px;
   padding:.85rem 1.2rem;font-size:.83rem;color:#fff;
   display:flex;align-items:center;gap:.65rem;
@@ -377,19 +392,19 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 
 /* LOADER */
 .loader{display:none;position:fixed;inset:0;z-index:9999;
-  background:rgba(10,10,15,.88);backdrop-filter:blur(12px);
+  background:rgba(251,247,240,.85);backdrop-filter:blur(12px);
   flex-direction:column;align-items:center;justify-content:center;gap:.9rem}
 .loader.show{display:flex}
 .spin{width:44px;height:44px;border-radius:50%;
   border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
   animation:sp .75s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.load-txt{font-size:.88rem;color:rgba(255,255,255,.45)}
+.load-txt{font-size:.88rem;color:rgba(36,31,26,.45)}
 
 /* EMPTY STATE */
 .empty-state{
   grid-column:1/-1;text-align:center;padding:4rem 2rem;
-  color:rgba(255,255,255,.28);font-size:.88rem;
+  color:rgba(36,31,26,.28);font-size:.88rem;
 }
 .empty-state-icon{font-size:2.5rem;display:block;margin-bottom:.75rem}
 
@@ -412,17 +427,22 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .mcard-ings-hd{font-size:.63rem;color:var(--purple2);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem}
 .mcard-ings-chips{display:flex;flex-wrap:wrap;gap:.18rem}
 .ing-chip{font-size:.63rem;background:rgba(107,33,168,.08);border:1px solid rgba(107,33,168,.18);
-  border-radius:4px;padding:.1rem .3rem;color:rgba(255,255,255,.62);display:flex;align-items:center;gap:.15rem}
+  border-radius:4px;padding:.1rem .3rem;color:rgba(36,31,26,.62);display:flex;align-items:center;gap:.15rem}
 .bc-link{color:#60A5FA;text-decoration:none;font-size:.58rem;background:rgba(96,165,250,.1);
   padding:.02rem .26rem;border-radius:2px;margin-right:.12rem;border:1px solid rgba(96,165,250,.18)}
 .bc-link:hover{color:#93C5FD}
-.ing-more{background:rgba(255,255,255,.04);color:rgba(255,255,255,.28);font-style:italic}
+.ing-more{background:rgba(36,31,26,.04);color:rgba(36,31,26,.28);font-style:italic}
 .mcard-herbs{font-size:.67rem;color:var(--purple2);margin-top:.22rem;padding:.15rem .38rem;background:rgba(107,33,168,.06);border-radius:4px}
 .mcard-tops{font-size:.65rem;color:var(--yellow2);margin-top:.16rem}
 .mcard-gi{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(5,150,105,.1);color:var(--green2);border:1px solid rgba(5,150,105,.2)}
-
-.mcard-nutr-dv{font-size:.58rem;color:var(--pink2);font-weight:700;margin-left:.15rem}
 .mcard-src{display:inline-block;font-size:.6rem;padding:.06rem .32rem;border-radius:50px;background:rgba(107,33,168,.1);color:var(--purple2);border:1px solid rgba(107,33,168,.2)}
+
+/* FREE-FROM dietary strip (applies to ALL menu items) */
+.freefrom-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.7rem}
+.ff-chip{font-size:.6rem;padding:.1rem .42rem;border-radius:50px;
+  background:rgba(5,150,105,.1);color:var(--green2);
+  border:1px solid rgba(5,150,105,.2);white-space:nowrap}
+
 
 </style>
 </head>
@@ -479,7 +499,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <div class="hd-left">
         <div class="hd-badge">🥗 ১০৫টি থেরাপিউটিক রেসিপি</div>
         <h1 class="hd-title">SAR থেরাপিউটিক মেনু</h1>
-        <p class="hd-sub">গ্লুটেন-মুক্ত · পরিশোধিত তেল-মুক্ত · চিনি-মুক্ত · ১০০% জৈব</p>
+        <p class="hd-sub">তেল-মুক্ত · চিনি-মুক্ত · লবণ-মুক্ত · কৃত্রিম রং-মুক্ত · চাল-মুক্ত · গম-মুক্ত · ময়দা-মুক্ত · দুধ-মুক্ত</p>
       </div>
       <button class="ai-btn" id="aiBtn" onclick="runClaudeAnalysis()">
         🤖 Claude AI — আমার জন্য মেনু বিশ্লেষণ করুন
@@ -564,14 +584,14 @@ if (!CID) { window.location.href = 'login.html'; }
 const _menuApproved = _sc?.admin_approved === true || localStorage.getItem('sar_admin_approved') === 'true';
 if(!_menuApproved){
   document.addEventListener('DOMContentLoaded', () => {
-    document.body.innerHTML = `<div style="min-height:100vh;background:#060608;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:'Hind Siliguri',sans-serif">
+    document.body.innerHTML = `<div style="min-height:100vh;background:radial-gradient(1000px 600px at 20% 0%,#FDEFF6,transparent 55%),radial-gradient(900px 600px at 100% 10%,#F1ECFB,transparent 55%),#FBF7F0;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:'SolaimanLipi','Hind Siliguri',sans-serif">
       <div style="max-width:480px">
         <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;background:linear-gradient(135deg,#F59E0B,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.75rem">মেনু দেখতে অনুমোদন দরকার</h2>
-        <p style="color:rgba(255,255,255,.5);font-size:.88rem;line-height:1.8;margin-bottom:1.5rem">সুপার অ্যাডমিন আপনার অ্যাকাউন্ট সক্রিয় করার পরে মেনু দেখতে ও অর্ডার করতে পারবেন।<br><br>নিবন্ধন ফি পরিশোধ করে WhatsApp-এ স্ক্রিনশট পাঠান:<br><strong style="color:#FCD34D;font-size:1.1rem">01346098892</strong></p>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;background:linear-gradient(135deg,#E91E8C,#6B21A8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.75rem">মেনু দেখতে অনুমোদন দরকার</h2>
+        <p style="color:rgba(36,31,26,.6);font-size:.88rem;line-height:1.8;margin-bottom:1.5rem">সুপার অ্যাডমিন আপনার অ্যাকাউন্ট সক্রিয় করার পরে মেনু দেখতে ও অর্ডার করতে পারবেন।<br><br>নিবন্ধন ফি পরিশোধ করে WhatsApp-এ স্ক্রিনশট পাঠান:<br><strong style="color:#E91E8C;font-size:1.1rem">01346098892</strong></p>
         <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
           <a href="dashboard.html" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:12px;padding:.75rem 1.5rem;color:#fff;text-decoration:none;font-size:.88rem;font-weight:700">← ড্যাশবোর্ডে যান</a>
-          <a href="payment.html" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:.75rem 1.5rem;color:#FCD34D;text-decoration:none;font-size:.88rem;font-weight:700">💳 পেমেন্ট করুন</a>
+          <a href="payment.html" style="background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:.75rem 1.5rem;color:#B45309;text-decoration:none;font-size:.88rem;font-weight:700">💳 পেমেন্ট করুন</a>
         </div>
       </div>
     </div>`;
@@ -606,33 +626,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       fetchMenuItems(), fetchPins(), fetchMetrics()
     ]);
     // Merge Supabase data with static (Supabase takes priority)
-    // Merge STATIC_MENU local data into Supabase items (benefits, ingredients, BC IDs etc.)
-    if(supaMenus.length > 10){
-      allMenuItems = supaMenus.map(si=>{
-        const id = si.menu_code||si.id||si.code||'';
-        const loc = STATIC_MENU.find(m=>m.id===id||m.code===id||m.name===si.name_bn||m.name===si.name);
-        if(!loc) return si;
-        return Object.assign({}, loc, si, {
-          // Always use local data for therapeutic fields
-          ingredients: (si.ingredients_json && si.ingredients_json.length) ? si.ingredients_json : loc.ingredients,
-          benefits:   si.benefits || loc.benefits,
-          herbs:      si.herbs      || loc.herbs,
-          toppings:   si.toppings   || loc.toppings,
-          powders:    si.disease_powders_json ? JSON.stringify(si.disease_powders_json) : (si.powders||loc.powders),
-          recipe:     loc.recipe,
-          gi:         si.gi         || loc.gi,
-          kcal:       si.calories   || si.kcal || loc.kcal,
-          protein:    si.protein_g  ? si.protein_g+'g' : (si.protein||loc.protein),
-          fiber:      si.fiber_g    ? si.fiber_g+'g'   : (si.fiber||loc.fiber),
-          iron:       si.iron_mg    ? si.iron_mg+'mg'  : (si.iron||loc.iron),
-          calcium:    si.calcium_mg ? si.calcium_mg+'mg': (si.calcium||loc.calcium),
-          folate:     si.folate_mcg ? si.folate_mcg+'mcg': (si.folate||loc.folate),
-          source:     loc.source,  origin: loc.origin,
-        });
-      });
-    } else {
-      allMenuItems = STATIC_MENU;
-    }
+    allMenuItems = supaMenus.length > 10 ? supaMenus : STATIC_MENU;
     pinnedItems  = pins;
     customerMetrics = metrics;
     renderPinned();
@@ -741,8 +735,8 @@ function buildCard(m, isPinned, isAiRec){
   const kcal = m.kcal || m.calories || '—';
   const prot = m.protein || m.protein_g ? (m.protein_g ? m.protein_g+'g' : m.protein) : '—';
   const fib  = m.fiber || m.fiber_g ? (m.fiber_g ? m.fiber_g+'g' : m.fiber) : '—';
-  const price = m.price || 200;
-  const upgrade = m.upgrade || m.price_with_upgrade || (price + 50);
+  const price = {breakfast:233,lunch:333,dinner:333}[meal] || 333;
+  const upgrade = price;
   const hasEgg = m.has_egg;
   const hasChk = m.has_chicken;
   const aiReason = m._ai_reason || '';
@@ -773,6 +767,16 @@ function buildCard(m, isPinned, isAiRec){
     </div>
     <div class="mcard-body">
       <div class="mcard-name">${mealEmoji} ${name}</div>
+      <div class="freefrom-row">
+        <span class="ff-chip">তেল-মুক্ত</span>
+        <span class="ff-chip">চিনি-মুক্ত</span>
+        <span class="ff-chip">লবণ-মুক্ত</span>
+        <span class="ff-chip">কৃত্রিম রং-মুক্ত</span>
+        <span class="ff-chip">চাল-মুক্ত</span>
+        <span class="ff-chip">গম-মুক্ত</span>
+        <span class="ff-chip">ময়দা-মুক্ত</span>
+        <span class="ff-chip">দুধ-মুক্ত</span>
+      </div>
       ${aiReason?`<div class="mcard-ai-reason show">🤖 ${aiReason}</div>`:''}
       <div class="mcard-courses">
         ${c1?`<div class="course-row"><span class="course-num">১.</span><span>${c1}</span></div>`:''}
@@ -781,15 +785,11 @@ function buildCard(m, isPinned, isAiRec){
       </div>
       ${pw?`<div class="mcard-powders">💊 <span>ঔষধি গুঁড়া:</span> ${pw}</div>`:''}
       <div class="nutr-row">
-        <span class="nchip"><span class="ndot" style="background:${catClr}"></span>${kcal} kcal${m.kcal_dv?`<span class="mcard-nutr-dv"> ${m.kcal_dv}%</span>`:''}</span>
-        ${prot&&prot!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--purple2)"></span>Pro ${prot}${m.protein_dv?`<span class="mcard-nutr-dv"> ${m.protein_dv}%</span>`:''}</span>`:''}
-        ${fib&&fib!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--green2)"></span>Fiber ${fib}</span>`:''}
-        ${m.fat?`<span class="nchip"><span class="ndot" style="background:#F59E0B"></span>Fat ${m.fat}g</span>`:''}
-        ${m.carb?`<span class="nchip"><span class="ndot" style="background:#6B7280"></span>Carb ${m.carb}g</span>`:''}
-        ${m.iron||m.iron_mg?`<span class="nchip"><span class="ndot" style="background:var(--red2)"></span>Fe ${m.iron||m.iron_mg}</span>`:''}
-        ${m.calcium?`<span class="nchip"><span class="ndot" style="background:#60A5FA"></span>Ca ${m.calcium}</span>`:''}
-        ${m.folate||m.folate_mcg?`<span class="nchip"><span class="ndot" style="background:var(--yellow2)"></span>Folate ${m.folate||m.folate_mcg}</span>`:''}
-        ${m.vitC?`<span class="nchip"><span class="ndot" style="background:#F97316"></span>VitC ${m.vitC}</span>`:''}
+        <span class="nchip"><span class="ndot" style="background:${catClr}"></span>${kcal} kcal</span>
+        ${prot&&prot!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--purple2)"></span>প্রোটিন ${prot}</span>`:''}
+        ${fib&&fib!=='—'?`<span class="nchip"><span class="ndot" style="background:var(--green2)"></span>ফাইবার ${fib}</span>`:''}
+        ${m.iron||m.iron_mg?`<span class="nchip"><span class="ndot" style="background:var(--red2)"></span>আয়রন ${m.iron||m.iron_mg}</span>`:''}
+        ${m.folate||m.folate_mcg?`<span class="nchip"><span class="ndot" style="background:var(--yellow2)"></span>ফোলেট ${m.folate||m.folate_mcg}</span>`:''}
       </div>
       <div class="tc-row">
         ${cht?`<span class="tc-chip">🍶 ${cht}</span>`:''}
@@ -811,7 +811,6 @@ function buildCard(m, isPinned, isAiRec){
     <div class="mcard-ft">
       <div class="price-col">
         <div class="price-main">৳ ${price}</div>
-        ${hasEgg||hasChk?`<div class="price-up">চিকেন/ডিম আপগ্রেড: ৳ ${upgrade}</div>`:''}
       </div>
       <div class="card-actions">
         <button class="pin-btn${isPinned?' pinned':''}" onclick="togglePin('${m.id||code}','${name}')"
@@ -1091,13 +1090,8 @@ function changeQty(id, delta){
 }
 
 function toggleUpgrade(id, checked){
-  const item = cart.find(i=>i.id===id);
-  if(!item) return;
-  item.upgrade = checked;
-  item.price = checked ? (item.basePrice||item.price) + 50 : (item.basePrice||(item.price-50));
-  if(!item.basePrice) item.basePrice = checked ? item.price - 50 : item.price;
-  localStorage.setItem('sar_cart', JSON.stringify(cart));
-  updateCartUI();
+  // Prices are fixed per meal (breakfast 233, lunch/dinner 333) — no upgrade pricing.
+  return;
 }
 
 function updateCartUI(){
