@@ -20,7 +20,7 @@ your-repo/
 |---|---|
 | `SUPABASE_URL` | `https://xlkrggspepnysbouatec.supabase.co` |
 | `SUPABASE_SERVICE_KEY` | Supabase → Settings → API → **service_role** key (গোপন, শুধু সার্ভারে) |
-| `CLAUDE_API_KEY` | আপনার Anthropic (Claude) key (ঐচ্ছিক — না দিলে built-in local ইঞ্জিন চলবে) |
+| `ANTHROPIC_API_KEY` | আপনার Anthropic (Claude) key (ঐচ্ছিক — না দিলে built-in local ইঞ্জিন চলবে) |
 
 > **service_role key কখনো HTML/GitHub-এ রাখবেন না।** এটা শুধু Netlify env var-এ থাকে, ব্রাউজারে কখনো যায় না। তাই RLS নিয়ে আলাদা দুশ্চিন্তার দরকার নেই — ব্রাউজার কখনো Supabase সরাসরি কল করছে না।
 
