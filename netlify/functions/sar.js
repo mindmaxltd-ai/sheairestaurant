@@ -6,12 +6,12 @@
 // Netlify → Site settings → Environment variables:
 //   SUPABASE_URL          https://xlkrggspepnysbouatec.supabase.co
 //   SUPABASE_SERVICE_KEY  service_role key (SECRET, server-only)
-//   CLAUDE_API_KEY        Anthropic key (optional; else local engine)
+//   ANTHROPIC_API_KEY     Anthropic key (optional; else local engine)
 // ─────────────────────────────────────────────────────────────
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xlkrggspepnysbouatec.supabase.co';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
-const CLAUDE_KEY   = process.env.CLAUDE_API_KEY || '';
+const CLAUDE_KEY   = process.env.ANTHROPIC_API_KEY || '';
 
 const SB = {
   apikey: SERVICE_KEY,
@@ -176,7 +176,7 @@ exports.handler = async (event) => {
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: 'claude-haiku-4-5-20251001',
             max_tokens: 1000,
             system: 'তুমি শুধুমাত্র বৈধ JSON অবজেক্ট ফেরত দেবে — কোনো markdown, ব্যাখ্যা বা ```-fence ছাড়া।',
             messages: [{ role: 'user', content: p.prompt }],
