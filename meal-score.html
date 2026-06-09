@@ -3,129 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>আজকের মিল স্কোর — SAR She AI Restaurant</title>
+<title>আজকের মেনু — SAR She AI Restaurant</title>
 <style>
-@font-face{
-  font-family:'SolaimanLipi';
-  src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),
-      url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');
-  font-weight:400;font-style:normal;font-display:swap;
-}
-@font-face{
-  font-family:'SolaimanLipi';
-  src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');
-  font-weight:700;font-style:normal;font-display:swap;
-}
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');font-weight:400;font-display:swap}
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Space+Mono&display=swap');
+
 :root{
-  --coral:#FF5A36;--coral-d:#E8431F;--coral-soft:#FFE6DE;
-  --ink:#1A1A2E;--ink-2:#5A5A6E;
-  --cream:#FFF8F3;--sand:#FBEEE4;--mint:#E4F3EC;--lilac:#EFE7F7;
-  --line:#EFE2D7;--green:#1E9E6A;--card:#FFFFFF;
-  --shadow:0 4px 24px rgba(26,26,46,.06);--shadow-lg:0 12px 40px rgba(255,90,54,.16);
+  --orange:#FF7A1A;--orange-d:#E2620A;--orange-soft:#FFEAD8;
+  --pink:#FFB6CE;--pink-soft:#FFEDF3;--pink-d:#C24E76;
+  --green:#2EA86B;--green-d:#1C7A4B;--green-soft:#E4F6EC;
+  --ink:#23202B;--ink-2:#6B6577;
+  --cream:#FFFBF7;--card:#FFFFFF;--line:#F1E6DC;
+  --shadow:0 6px 28px rgba(60,40,20,.07);
+  --shadow-lg:0 18px 50px rgba(255,122,26,.18);
+  --grad:linear-gradient(120deg,#FF7A1A 0%,#FF9C6B 38%,#FFB6CE 70%,#2EA86B 130%);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
+.num{font-family:'Space Mono',monospace}
+.serif{font-family:'Playfair Display',serif}
 
-.nav{position:sticky;top:0;z-index:50;background:rgba(255,248,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:1140px;margin:0 auto;padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.logo{display:flex;align-items:center;gap:.55rem;text-decoration:none;color:var(--ink)}
-.logo-mark{width:38px;height:38px;border-radius:13px;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.05rem}
-.logo-name{font-weight:700;font-size:1.18rem;letter-spacing:-.01em}
-.logo-name small{display:block;font-weight:400;font-size:.62rem;color:var(--ink-2);letter-spacing:.04em}
-.nav-actions{display:flex;align-items:center;gap:.6rem}
+.topbar{height:4px;background:var(--grad);background-size:200% 100%;animation:slide 8s linear infinite}
+@keyframes slide{to{background-position:200% 0}}
+
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,251,247,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1180px;margin:0 auto;padding:.8rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
+.logo-mark{width:40px;height:40px;border-radius:14px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;box-shadow:var(--shadow)}
+.logo-name{font-weight:700;font-size:1.2rem;letter-spacing:-.01em}
+.logo-name small{display:block;font-weight:400;font-size:.62rem;color:var(--ink-2);letter-spacing:.05em}
+.nav-actions{display:flex;align-items:center;gap:.55rem}
 .nav-link{color:var(--ink-2);text-decoration:none;font-size:.92rem;padding:.4rem .6rem;border-radius:8px}
-.nav-link:hover{color:var(--coral)}
-.cart-btn{border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.5rem;background:var(--ink);color:#fff;padding:.55rem 1.05rem;border-radius:30px;font-weight:700;font-size:.9rem;transition:transform .15s}
+.nav-link:hover{color:var(--orange-d)}
+.cart-btn{border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.5rem;background:var(--ink);color:#fff;padding:.55rem 1.1rem;border-radius:30px;font-weight:700;font-size:.9rem;transition:transform .15s}
 .cart-btn:hover{transform:translateY(-1px)}
-.cart-pill{background:var(--coral);border-radius:20px;padding:.05rem .5rem;font-size:.78rem}
+.cart-pill{background:var(--orange);border-radius:20px;padding:.05rem .5rem;font-size:.78rem}
 
-.hero{max-width:1140px;margin:0 auto;padding:2.4rem 1.25rem 1rem}
-.eyebrow{display:inline-flex;align-items:center;gap:.45rem;background:var(--coral-soft);color:var(--coral-d);font-weight:700;font-size:.78rem;padding:.4rem .9rem;border-radius:30px;margin-bottom:1rem}
-.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--coral);animation:pulse 1.8s ease-in-out infinite}
+.hero{max-width:1180px;margin:0 auto;padding:2.6rem 1.25rem 1rem}
+.eyebrow{display:inline-flex;align-items:center;gap:.45rem;background:var(--orange-soft);color:var(--orange-d);font-weight:700;font-size:.78rem;padding:.4rem .9rem;border-radius:30px;margin-bottom:1rem}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.hero h1{font-size:clamp(1.9rem,5vw,3rem);font-weight:700;line-height:1.12;letter-spacing:-.02em;max-width:18ch}
-.hero h1 em{font-style:normal;color:var(--coral)}
-.hero-sub{margin-top:.9rem;font-size:1.05rem;color:var(--ink-2);max-width:54ch}
+.hero h1{font-size:clamp(2rem,5.5vw,3.3rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;max-width:20ch}
+.hero h1 em{font-style:italic;font-family:'Playfair Display',serif;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{margin-top:.9rem;font-size:1.05rem;color:var(--ink-2);max-width:56ch}
 
-.score-card{max-width:1140px;margin:1.6rem auto 0;padding:0 1.25rem}
-.score-in{background:linear-gradient(135deg,#fff 0%,var(--sand) 100%);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:auto 1fr}
-.score-ring{padding:1.8rem 2rem;display:flex;align-items:center;gap:1.4rem;border-right:1px solid var(--line)}
-.ring{position:relative;width:118px;height:118px;flex-shrink:0}
+.score-card{max-width:1180px;margin:1.6rem auto 0;padding:0 1.25rem}
+.score-in{background:linear-gradient(135deg,#fff 0%,var(--pink-soft) 55%,var(--orange-soft) 130%);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:auto 1fr}
+.score-ring{padding:1.9rem 2rem;display:flex;align-items:center;gap:1.5rem;border-right:1px solid var(--line)}
+.ring{position:relative;width:128px;height:128px;flex-shrink:0}
 .ring svg{transform:rotate(-90deg)}
 .ring-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ring-num b{font-size:2rem;font-weight:700;line-height:1;color:var(--coral)}
-.ring-num span{font-size:.66rem;color:var(--ink-2)}
-.score-meta h3{font-size:1.15rem;font-weight:700}
-.score-meta p{font-size:.9rem;color:var(--ink-2);margin-top:.25rem;max-width:30ch}
-.score-stamp{display:inline-flex;align-items:center;gap:.4rem;margin-top:.7rem;font-size:.78rem;color:var(--green);font-weight:700}
-.score-detail{padding:1.5rem 1.8rem;display:flex;flex-direction:column;gap:.9rem;justify-content:center}
+.ring-num b{font-size:2.3rem;font-weight:700;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.ring-num span{font-size:.66rem;color:var(--ink-2);letter-spacing:.05em}
+.score-meta h3{font-size:1.2rem;font-weight:700}
+.score-meta p{font-size:.9rem;color:var(--ink-2);margin-top:.3rem;max-width:32ch}
+.score-stamp{display:inline-flex;align-items:center;gap:.4rem;margin-top:.7rem;font-size:.78rem;color:var(--green-d);font-weight:700}
+.score-detail{padding:1.6rem 1.9rem;display:flex;flex-direction:column;gap:.9rem;justify-content:center}
 .sd-row{display:flex;gap:.8rem;flex-wrap:wrap}
-.sd-chip{flex:1 1 130px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:.7rem .85rem}
-.sd-chip .k{font-size:.68rem;color:var(--ink-2);text-transform:uppercase}
-.sd-chip .v{font-size:1.05rem;font-weight:700;margin-top:.15rem}
+.sd-chip{flex:1 1 130px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:.7rem .9rem}
+.sd-chip .k{font-size:.66rem;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
+.sd-chip .v{font-size:1.08rem;font-weight:700;margin-top:.15rem}
 .sd-chip .v small{font-weight:400;font-size:.72rem;color:var(--ink-2)}
-.recompute{align-self:flex-start;border:1.5px solid var(--coral);background:#fff;color:var(--coral-d);font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;padding:.55rem 1.1rem;border-radius:24px;transition:all .15s}
-.recompute:hover{background:var(--coral);color:#fff}
+.recompute{align-self:flex-start;border:1.5px solid var(--orange);background:#fff;color:var(--orange-d);font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;padding:.55rem 1.15rem;border-radius:24px;transition:all .15s}
+.recompute:hover{background:var(--orange);color:#fff}
 .recompute:disabled{opacity:.55;cursor:wait}
 
-.catbar{max-width:1140px;margin:1.4rem auto 0;padding:0 1.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.catbar{max-width:1180px;margin:1.5rem auto 0;padding:0 1.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
 .catbar .lbl{font-size:.82rem;color:var(--ink-2);font-weight:700;margin-right:.2rem}
-.cat-tab{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:inherit;font-weight:700;font-size:.84rem;cursor:pointer;padding:.45rem .9rem;border-radius:22px;transition:all .15s}
-.cat-tab:hover{border-color:var(--coral)}
-.cat-tab.active{background:var(--coral);color:#fff;border-color:var(--coral)}
-.cat-auto{font-size:.72rem;color:var(--green);font-weight:700}
+.cat-tab{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:inherit;font-weight:700;font-size:.84rem;cursor:pointer;padding:.5rem .95rem;border-radius:22px;transition:all .15s;position:relative}
+.cat-tab:hover{border-color:var(--orange)}
+.cat-tab.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.cat-tab.mine{border-color:var(--green)}
+.cat-tab.mine.active{background:var(--green);border-color:var(--green)}
+.cat-tab.locked{opacity:.4;cursor:not-allowed;background:#f7f2ec}
+.cat-tab.locked:hover{border-color:var(--line)}
+.cat-tab .lk{font-size:.7rem;margin-left:.2rem}
+.cat-note{font-size:.74rem;color:var(--green-d);font-weight:700;width:100%;margin-top:.2rem}
 
-.sec-head{max-width:1140px;margin:2rem auto .2rem;padding:0 1.25rem}
-.sec-head h2{font-size:1.5rem;font-weight:700;letter-spacing:-.01em}
+.mixbar{max-width:1180px;margin:.8rem auto 0;padding:0 1.25rem}
+.mixbox{background:var(--pink-soft);border:1px solid var(--pink);border-radius:16px;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.86rem;color:var(--pink-d);font-weight:700}
+.mixbox label{display:flex;align-items:center;gap:.5rem;cursor:pointer;user-select:none}
+.mixbox input{width:18px;height:18px;accent-color:var(--pink-d);cursor:pointer}
+
+.sec-head{max-width:1180px;margin:2rem auto .2rem;padding:0 1.25rem}
+.sec-head h2{font-size:1.6rem;font-weight:700;letter-spacing:-.01em}
+.sec-head h2 .serif{font-style:italic}
 .sec-head p{color:var(--ink-2);font-size:.95rem;margin-top:.2rem}
 
-.daybar{max-width:1140px;margin:1rem auto 0;padding:0 1.25rem;display:flex;gap:.5rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.daybar{max-width:1180px;margin:1rem auto 0;padding:0 1.25rem;display:flex;gap:.5rem;overflow-x:auto;scrollbar-width:none}
 .daybar::-webkit-scrollbar{display:none}
 .day-tab{flex-shrink:0;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:inherit;font-weight:700;font-size:.9rem;cursor:pointer;padding:.55rem 1.05rem;border-radius:24px;transition:all .15s;white-space:nowrap}
-.day-tab:hover{border-color:var(--coral)}
-.day-tab.active{background:var(--coral);color:#fff;border-color:var(--coral)}
+.day-tab:hover{border-color:var(--orange)}
+.day-tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .day-tab small{display:block;font-weight:400;font-size:.66rem;opacity:.85}
 
-.meals{max-width:1140px;margin:1.4rem auto 0;padding:0 1.25rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
-.meal-col{display:flex;flex-direction:column;gap:.9rem}
-.meal-label{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1rem;padding:.4rem 0}
-.meal-label .ic{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem}
-.ic.b{background:var(--sand)}.ic.l{background:var(--mint)}.ic.d{background:var(--lilac)}
+.meals{max-width:1180px;margin:1.4rem auto 0;padding:0 1.25rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:1.3rem}
+.meal-group{margin-bottom:.4rem}
+.meal-label{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1.05rem;padding:.4rem 0 .8rem;max-width:1180px}
+.meal-label .ic{width:32px;height:32px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+.ic.b{background:var(--orange-soft)}.ic.l{background:var(--green-soft)}.ic.d{background:var(--pink-soft)}
 
-.mcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:1.1rem 1.15rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.75rem}
-.mcard.rec{border-color:var(--coral);box-shadow:var(--shadow-lg)}
-.mc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem}
-.mc-name{font-weight:700;font-size:1.04rem;line-height:1.35}
-.mc-rec{flex-shrink:0;background:var(--coral-soft);color:var(--coral-d);font-size:.66rem;font-weight:700;padding:.2rem .55rem;border-radius:20px;white-space:nowrap}
-.mc-why{background:var(--mint);color:#16704c;font-size:.8rem;border-radius:12px;padding:.55rem .7rem;line-height:1.5}
-.nutri{display:flex;gap:.5rem;flex-wrap:wrap}
-.n-pill{background:var(--cream);border:1px solid var(--line);border-radius:11px;padding:.4rem .6rem;text-align:center;flex:1 1 60px;min-width:60px}
-.n-pill .nv{font-weight:700;font-size:.95rem}
-.n-pill .nk{font-size:.62rem;color:var(--ink-2)}
-.n-pill.cal .nv{color:var(--coral-d)}
-.tweak{font-size:.7rem;color:var(--green);font-weight:700}
-.courses{display:flex;flex-direction:column;gap:.4rem}
-.course-h{font-size:.74rem;color:var(--ink-2);text-transform:uppercase;font-weight:700}
-.course{display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.45rem .55rem;border:1px solid var(--line);border-radius:11px;font-size:.86rem;transition:all .12s;user-select:none}
-.course:hover{border-color:var(--coral)}
-.course.on{background:var(--coral-soft);border-color:var(--coral)}
-.course .box{width:19px;height:19px;border-radius:6px;border:2px solid #cbb9aa;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#fff}
-.course.on .box{background:var(--coral);border-color:var(--coral)}
-.course .ctxt{flex:1;line-height:1.35}
+.note{max-width:1180px;margin:2.5rem auto 3rem;padding:0 1.25rem;color:var(--ink-2);font-size:.82rem;line-height:1.7}
+.note b{color:var(--orange-d)}
+
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:.75rem 1.3rem;border-radius:30px;font-size:.9rem;font-weight:700;opacity:0;visibility:hidden;transition:.25s;z-index:120;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.loader{position:fixed;inset:0;background:rgba(255,251,247,.92);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:130}
+.loader.show{display:flex}
+.spin{width:48px;height:48px;border:4px solid var(--orange-soft);border-top-color:var(--orange);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loader p{color:var(--ink-2);font-weight:700}
+
+/* ── meal card ── */
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.mcard.rec{border-color:var(--orange)}
+.mcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.mc-head{padding:1.2rem 1.25rem .9rem;background:linear-gradient(135deg,var(--orange-soft) 0%,var(--pink-soft) 100%);position:relative}
+.mc-no{font-size:.7rem;font-weight:700;color:var(--orange-d);letter-spacing:.08em;text-transform:uppercase}
+.mc-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.3rem;line-height:1.25;margin-top:.2rem;color:var(--ink)}
+.mc-name sup{font-size:.6rem;color:var(--orange-d)}
+.mc-rec{position:absolute;top:1.1rem;right:1.1rem;background:#fff;color:var(--orange-d);font-size:.66rem;font-weight:700;padding:.25rem .6rem;border-radius:20px;box-shadow:var(--shadow)}
+.mc-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+.badges{display:flex;flex-wrap:wrap;gap:.35rem}
+.dbadge{font-size:.66rem;font-weight:700;color:var(--green-d);background:var(--green-soft);border:1px solid #cdeedd;padding:.18rem .5rem;border-radius:20px}
+.ings{display:flex;flex-wrap:wrap;gap:.35rem}
+.ing{font-size:.78rem;font-weight:700;color:var(--orange-d);background:var(--orange-soft);padding:.25rem .6rem;border-radius:16px}
+
+.panel-h{font-size:.72rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.panel-h::before{content:'';width:14px;height:2px;border-radius:2px;background:var(--orange)}
+
+.nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem}
+.n-pill{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:.5rem .3rem;text-align:center}
+.n-pill .nv{font-weight:700;font-size:.92rem}
+.n-pill .nk{font-size:.58rem;color:var(--ink-2)}
+.n-pill.cal{background:var(--orange-soft);border-color:transparent}
+.n-pill.cal .nv{color:var(--orange-d)}
+.tweak{font-size:.72rem;color:var(--green-d);font-weight:700;margin-top:.4rem}
+
+.drc{display:flex;flex-direction:column;gap:.4rem}
+.dr-line{display:flex;align-items:center;gap:.5rem;font-size:.82rem}
+.dr-bar{flex:1;height:7px;border-radius:5px;background:var(--green-soft);overflow:hidden}
+.dr-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green),var(--orange))}
+.dr-line .dl{width:84px;color:var(--ink-2)}
+.dr-line .dp{width:38px;text-align:right;font-weight:700;color:var(--green-d)}
+
+.benefits{display:flex;flex-wrap:wrap;gap:.4rem}
+.bchip{background:var(--green-soft);color:var(--green-d);font-size:.78rem;font-weight:700;padding:.3rem .65rem;border-radius:20px}
+
+.med{display:flex;flex-direction:column;gap:.55rem}
+.med-row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:baseline}
+.med-row .ml{font-size:.74rem;color:var(--ink-2);font-weight:700;min-width:96px}
+.pw{font-size:.76rem;font-weight:700;padding:.22rem .55rem;border-radius:16px}
+.pw.dis{background:var(--orange-soft);color:var(--orange-d)}
+.pw.con{background:var(--pink-soft);color:var(--pink-d)}
+.pw.top{background:#FFF3DC;color:#9A6B12}
+.pw.chu{background:var(--green-soft);color:var(--green-d)}
+
+.bchain{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:linear-gradient(135deg,#1d2330,#2a3550);border-radius:14px;padding:.7rem .9rem}
+.bchain .bl{display:flex;align-items:center;gap:.45rem;color:#cfe0ff;font-size:.8rem;font-weight:700}
+.bchain a{color:#9fc6ff;font-size:.78rem;font-weight:700;text-decoration:none;white-space:nowrap}
+.bchain a:hover{text-decoration:underline}
+
+/* course selector */
+.courses{display:flex;flex-direction:column;gap:.4rem;border-top:1px dashed var(--line);padding-top:.9rem}
+.course{display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.5rem .6rem;border:1px solid var(--line);border-radius:13px;font-size:.86rem;transition:all .12s;user-select:none}
+.course:hover{border-color:var(--orange)}
+.course.on{background:var(--orange-soft);border-color:var(--orange)}
+.course .box{width:20px;height:20px;border-radius:7px;border:2px solid #d9c4b3;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fff}
+.course.on .box{background:var(--orange);border-color:var(--orange)}
+.course .ctxt{flex:1;line-height:1.3}
+.course .opt{font-size:.66rem;color:var(--green-d);font-weight:700}
+.course .req{font-size:.66rem;color:var(--orange-d);font-weight:700}
 .course .cprice{font-size:.78rem;color:var(--ink-2);font-weight:700;white-space:nowrap}
-.course.locked{opacity:.45;pointer-events:none}
-.mc-foot{display:flex;align-items:center;justify-content:space-between;gap:.6rem;border-top:1px dashed var(--line);padding-top:.7rem}
-.mc-price .pp{font-size:1.15rem;font-weight:700}
-.mc-price .pp small{font-size:.7rem;color:var(--ink-2);font-weight:400}
-.mc-price .vat{font-size:.66rem;color:var(--ink-2)}
-.add-btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.86rem;background:var(--coral);color:#fff;padding:.55rem 1rem;border-radius:22px;transition:transform .15s,background .15s}
-.add-btn:hover{transform:translateY(-1px);background:var(--coral-d)}
+.course.locked{opacity:.5;pointer-events:none}
 
-.overlay{position:fixed;inset:0;background:rgba(26,26,46,.4);opacity:0;visibility:hidden;transition:.25s;z-index:80}
+.mc-foot{display:flex;align-items:center;justify-content:space-between;gap:.6rem;border-top:1px dashed var(--line);padding-top:.9rem}
+.mc-price .pp{font-size:1.25rem;font-weight:700}
+.mc-price .pp small{font-size:.68rem;color:var(--ink-2);font-weight:400}
+.mc-price .pq{font-size:.66rem;color:var(--ink-2)}
+.order-btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.92rem;background:var(--grad);background-size:160% 100%;color:#fff;padding:.65rem 1.3rem;border-radius:24px;transition:background-position .3s,transform .15s;box-shadow:var(--shadow)}
+.order-btn:hover{background-position:100% 0;transform:translateY(-1px)}
+
+/* drawer */
+.overlay{position:fixed;inset:0;background:rgba(35,32,43,.45);opacity:0;visibility:hidden;transition:.25s;z-index:80}
 .overlay.show{opacity:1;visibility:visible}
-.drawer{position:fixed;top:0;right:0;height:100%;width:min(420px,92vw);background:var(--cream);z-index:90;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.18)}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(430px,92vw);background:var(--cream);z-index:90;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.18)}
 .drawer.open{transform:translateX(0)}
 .dr-head{padding:1.2rem 1.3rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
 .dr-head h3{font-size:1.2rem;font-weight:700}
@@ -134,30 +199,21 @@ img{max-width:100%;display:block}
 .dr-empty{text-align:center;color:var(--ink-2);padding:3rem 1rem}
 .ci{background:#fff;border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem}
 .ci-top{display:flex;justify-content:space-between;gap:.6rem}
-.ci-name{font-weight:700;font-size:.95rem;line-height:1.35}
+.ci-name{font-weight:700;font-size:.95rem;line-height:1.3}
 .ci-meal{font-size:.74rem;color:var(--ink-2)}
 .ci-del{background:none;border:none;color:var(--ink-2);cursor:pointer;font-size:1rem}
 .ci-courses{font-size:.78rem;color:var(--ink-2);margin-top:.4rem;line-height:1.5}
+.ci-mix{font-size:.72rem;color:var(--pink-d);font-weight:700;margin-top:.3rem}
 .ci-line{display:flex;justify-content:space-between;font-size:.82rem;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--line)}
+.ci-line b{font-weight:700}
 .dr-foot{border-top:1px solid var(--line);padding:1.1rem 1.3rem;background:#fff}
 .sum{display:flex;justify-content:space-between;font-size:.9rem;color:var(--ink-2);margin-bottom:.4rem}
 .sum.total{font-size:1.15rem;color:var(--ink);font-weight:700;margin-top:.5rem;padding-top:.6rem;border-top:1px solid var(--line)}
-.checkout{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:1rem;background:var(--coral);color:#fff;padding:.85rem;border-radius:26px;margin-top:.8rem;transition:background .15s}
-.checkout:hover{background:var(--coral-d)}
+.checkout{width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:1rem;background:var(--grad);background-size:160% 100%;color:#fff;padding:.9rem;border-radius:26px;margin-top:.8rem;transition:background-position .3s}
+.checkout:hover{background-position:100% 0}
 .checkout:disabled{background:#e7d6c9;color:#a99;cursor:not-allowed}
 
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:.75rem 1.3rem;border-radius:30px;font-size:.9rem;font-weight:700;opacity:0;visibility:hidden;transition:.25s;z-index:120;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-.loader{position:fixed;inset:0;background:rgba(255,248,243,.9);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:130}
-.loader.show{display:flex}
-.spin{width:46px;height:46px;border:4px solid var(--coral-soft);border-top-color:var(--coral);border-radius:50%;animation:sp .8s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-.loader p{color:var(--ink-2);font-weight:700}
-
-.note{max-width:1140px;margin:2.5rem auto 3rem;padding:0 1.25rem;color:var(--ink-2);font-size:.82rem;line-height:1.7}
-.note b{color:var(--coral-d)}
-
-@media(max-width:880px){
+@media(max-width:820px){
   .score-in{grid-template-columns:1fr}
   .score-ring{border-right:none;border-bottom:1px solid var(--line)}
   .meals{grid-template-columns:1fr}
@@ -165,6 +221,7 @@ img{max-width:100%;display:block}
 </style>
 </head>
 <body>
+<div class="topbar"></div>
 
 <nav class="nav">
   <div class="nav-in">
@@ -173,7 +230,7 @@ img{max-width:100%;display:block}
       <span class="logo-name">SAR<small>She AI Restaurant</small></span>
     </a>
     <div class="nav-actions">
-      <a class="nav-link" href="menu.html">সম্পূর্ণ মেনু</a>
+      <a class="nav-link" href="menu.html">সব রেসিপি</a>
       <a class="nav-link" href="track.html">ট্র্যাক</a>
       <button class="cart-btn" onclick="openCart()">🛒 কার্ট <span class="cart-pill" id="cartCount">০</span></button>
     </div>
@@ -182,17 +239,20 @@ img{max-width:100%;display:block}
 
 <header class="hero">
   <span class="eyebrow"><span class="dot"></span>প্রতিদিন ভোর ৬টায় AI বিশ্লেষণ</span>
-  <h1>আজকের জন্য <em>শুধু আপনার</em> মিল স্কোর</h1>
-  <p class="hero-sub">সকাল, দুপুর ও রাত — ৭ দিনের ২১টি থেরাপিউটিক মিল আপনার BMI, মুড, রোগ, আবহাওয়া ও Google Fit অনুযায়ী আজ সকালে ব্যক্তিগতভাবে হিসাব করা হয়েছে।</p>
+  <h1>আজকের জন্য <em>শুধু আপনার</em> থেরাপিউটিক মেনু</h1>
+  <p class="hero-sub">৭ দিনের ২১টি মিল আপনার রোগ, BMI, মুড ও আবহাওয়া অনুযায়ী আজ সকালে ব্যক্তিগতভাবে তৈরি — প্রতিটি পরিমাণ আপনার নিজস্ব।</p>
 </header>
 
 <section class="score-card">
   <div class="score-in">
     <div class="score-ring">
       <div class="ring">
-        <svg width="118" height="118" viewBox="0 0 118 118">
-          <circle cx="59" cy="59" r="50" fill="none" stroke="#FFE6DE" stroke-width="11"/>
-          <circle id="ringArc" cx="59" cy="59" r="50" fill="none" stroke="#FF5A36" stroke-width="11" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"/>
+        <svg width="128" height="128" viewBox="0 0 128 128">
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FF7A1A"/><stop offset="55%" stop-color="#FFB6CE"/><stop offset="100%" stop-color="#2EA86B"/>
+          </linearGradient></defs>
+          <circle cx="64" cy="64" r="54" fill="none" stroke="#FFEAD8" stroke-width="12"/>
+          <circle id="ringArc" cx="64" cy="64" r="54" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="339"/>
         </svg>
         <div class="ring-num"><b id="scoreVal">—</b><span>মিল স্কোর</span></div>
       </div>
@@ -204,12 +264,12 @@ img{max-width:100%;display:block}
     </div>
     <div class="score-detail">
       <div class="sd-row">
-        <div class="sd-chip"><div class="k">দৈনিক টার্গেট</div><div class="v"><span id="dTarget">—</span> <small>kcal</small></div></div>
-        <div class="sd-chip"><div class="k">প্রোটিন</div><div class="v"><span id="dProtein">—</span><small>g</small></div></div>
+        <div class="sd-chip"><div class="k">দৈনিক টার্গেট</div><div class="v"><span class="num" id="dTarget">—</span> <small>kcal</small></div></div>
+        <div class="sd-chip"><div class="k">প্রোটিন</div><div class="v"><span class="num" id="dProtein">—</span><small>g</small></div></div>
         <div class="sd-chip"><div class="k">আজকের ফোকাস</div><div class="v" style="font-size:.86rem" id="dFocus">—</div></div>
       </div>
       <div class="sd-row">
-        <div class="sd-chip"><div class="k">BMI</div><div class="v" id="dBmi">—</div></div>
+        <div class="sd-chip"><div class="k">BMI</div><div class="v num" id="dBmi">—</div></div>
         <div class="sd-chip"><div class="k">মুড</div><div class="v" style="font-size:.86rem" id="dMood">—</div></div>
         <div class="sd-chip"><div class="k">আবহাওয়া</div><div class="v" style="font-size:.86rem" id="dWeather">—</div></div>
       </div>
@@ -219,28 +279,35 @@ img{max-width:100%;display:block}
 </section>
 
 <div class="catbar" id="catBar"></div>
+<div class="mixbar" id="mixBar" style="display:none">
+  <div class="mixbox">
+    <label><input type="checkbox" id="mixChk" onchange="toggleMix(this.checked)"> দুই রোগের মিল একসাথে মেশান</label>
+    <span style="font-weight:400">— প্রতি মিশ্র মিলে অতিরিক্ত ভেষজ পাউডারের জন্য ২৫% যোগ হবে</span>
+  </div>
+</div>
 
 <div class="sec-head">
-  <h2>আপনার ৭ দিনের প্ল্যান</h2>
-  <p>একটি দিন বেছে নিন · প্রতি বেলায় কোর্স যোগ করুন (২–৪টি) · কার্টে দিন</p>
+  <h2>আপনার <span class="serif">৭ দিনের</span> প্ল্যান</h2>
+  <p>দিন বেছে নিন · প্রতি মিলে ৫টি কোর্স (কমপক্ষে ৩টি) · ৳৮৫/কোর্স · Order চাপলে কার্টে যাবে</p>
 </div>
 
 <div class="daybar" id="dayBar"></div>
 <section class="meals" id="meals"></section>
 
 <p class="note">
-  <b>কীভাবে কাজ করে:</b> প্রতিদিন ভোর ৬:০০টায় SAR-এর AI আপনার সর্বশেষ স্বাস্থ্য মেট্রিক্স, মুড, রোগের অবস্থা, ঢাকার আবহাওয়া ও Google Fit কার্যকলাপ বিশ্লেষণ করে ২১টি মিলের পরিমাণ ব্যক্তিগতভাবে সমন্বয় করে — প্রতিটি পরিমাণ আপনার নিজস্ব, সাধারণ নয়। আপনার রোগ-বিভাগ (ডায়াবেটিস/স্থূলতা/ফ্যাটি লিভার/IBS/গর্ভাবস্থা) মেট্রিক্স থেকে স্বয়ংক্রিয়ভাবে নির্বাচিত হয়; উপরে চাইলে নিজে বদলাতেও পারেন। প্রতিটি কোর্স ৳৮৫; প্রতি বেলায় কমপক্ষে ২টি, সর্বোচ্চ ৪টি কোর্স। সব দামে ৫% ভ্যাট প্রযোজ্য। এটি চিকিৎসা পরামর্শ নয়।
+  <b>কীভাবে কাজ করে:</b> প্রতিদিন ভোর ৬টায় SAR-এর AI আপনার স্বাস্থ্য মেট্রিক্স, মুড, রোগের অবস্থা ও আবহাওয়া বিশ্লেষণ করে ২১টি মিল ব্যক্তিগতভাবে সাজায়। প্রতিটি মিলে ৫টি কোর্স — সকালে কমপক্ষে ২টি, দুপুর ও রাতে কমপক্ষে ৩টি; ৪নং (চাটনি) ও ৫নং (মৌসুমি ফল) ঐচ্ছিক। প্রতি কোর্স ৳৯০, এবং ক্যালরি কোর্স সংখ্যা অনুযায়ী বদলায় (যত কোর্স তত kcal)। সব খাবার চিনিমুক্ত, লবণমুক্ত (পিংক সল্ট), তেলমুক্ত, রংমুক্ত, আয়ুর্বেদিক, অর্গানিক, ভাত/গম/ময়দামুক্ত, দুধমুক্ত এবং আগুন ছাড়া (এয়ার-ফ্রায়ার/স্টিমার) তৈরি। আপনি শুধু আপনার রোগ-বিভাগের মেনু দেখবেন; দুই রোগ থাকলে দুটোই দেখাবে ও মেশালে মিল-প্রতি ২৫% যোগ হয়। এটি চিকিৎসা পরামর্শ নয়।
 </p>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
 <aside class="drawer" id="drawer">
   <div class="dr-head"><h3>আপনার অর্ডার</h3><button class="dr-close" onclick="closeCart()">×</button></div>
-  <div class="dr-body" id="drBody"><div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলে কোর্স বেছে যোগ করুন।</div></div>
+  <div class="dr-body" id="drBody"><div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের Order বোতাম চাপুন।</div></div>
   <div class="dr-foot">
     <div class="sum"><span>সাবটোটাল</span><span id="sub">৳ ০</span></div>
+    <div class="sum" id="mixRow" style="display:none"><span>মিশ্রণ চার্জ (২৫%)</span><span id="mixAmt">৳ ০</span></div>
     <div class="sum"><span>ভ্যাট (৫%)</span><span id="vat">৳ ০</span></div>
     <div class="sum total"><span>সর্বমোট</span><span id="grand">৳ ০</span></div>
-    <button class="checkout" id="checkout" onclick="goCheckout()" disabled>অর্ডার নিশ্চিত করুন →</button>
+    <button class="checkout" id="checkout" onclick="goCheckout()" disabled>Order নিশ্চিত করুন →</button>
   </div>
 </aside>
 
@@ -249,206 +316,229 @@ img{max-width:100%;display:block}
 
 <script>
 // ════════════════════════════════════════════════════
-// CONFIG — NO keys here. All calls go through the Netlify
-// function at /.netlify/functions/sar  (keys live in env vars)
+// SAR 105-MEAL DATABASE (names from final spec) + per-category
+// ingredients, benefits, condition powders, seasonal fruits.
+// 5 disease categories × 21 meals = 105.
 // ════════════════════════════════════════════════════
-const API = '/.netlify/functions/sar';
-async function api(action, body){
-  const r = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(Object.assign({action}, body||{}))});
+const MEAL_DB={
+  DM:{
+    bn:'ডায়াবেটিস',
+    breakfast:['Golden Glucose Harmony Bowl','Cinnamon Sunrise Bowl','Bitter Shield Breakfast','Green Glycemic Balance','Moringa Morning Reset','Diabetic Energy Bloom','Fiber Fortress Breakfast'],
+    lunch:['Metabolic Healing Platter','Insulin Harmony Lunch','Bitter Green Wellness Plate','Glycemic Guardian Meal','Smart Sugar Shield','Pancreatic Support Feast','Herbal Glucose Balance'],
+    dinner:['Night Glucose Calm','Low Glycemic Serenity','Evening Metabolic Reset','Insulin Friendly Supper','Diabetic Recovery Plate','Cellular Sugar Repair','Golden Night Balance'],
+    bn_name:'ডায়াবেটিস থেরাপিউটিক মিল',
+    ingredients:['Pumpkin','Bottle Gourd','Spinach','Chickpea Sprout','Chia Seed','Bitter Gourd','Flax Seed'],
+    disease:['Cinnamon','Fenugreek','Gurmar'],
+    benefits:['Blood Sugar Control','Insulin Sensitivity','Satiety','Anti-inflammatory','Gut Support'],
+  },
+  OB:{
+    bn:'স্থূলতা',
+    breakfast:['Lean Body Sunrise','Metabolic Ignition Bowl','Fat Burning Breakfast','Thermogenic Morning Plate','Slim Start Harmony','Weight Reset Bowl','Morning Metabolic Boost'],
+    lunch:['Satiety Support Lunch','Lean Body Builder','Appetite Control Feast','Calorie Smart Lunch','Fat Loss Fusion','Metabolic Repair Plate','Weight Wellness Meal'],
+    dinner:['Evening Fat Burn','Slim Body Supper','Light Digest Dinner','Lean Metabolism Plate','Fat Reduction Feast','Night Weight Reset','Cellular Fat Repair'],
+    bn_name:'স্থূলতা থেরাপিউটিক মিল',
+    ingredients:['Ash Gourd','Broccoli','Mustard Greens','Green Gram Sprout','Cucumber','Pumpkin Seed','Moringa Leaves'],
+    disease:['Triphala','Garcinia','Green Tea'],
+    benefits:['Fat Burning','Appetite Control','Metabolism Boost','High Satiety','Lean Muscle Support'],
+  },
+  FL:{
+    bn:'ফ্যাটি লিভার',
+    breakfast:['Liver Rescue Breakfast','Hepatic Sunrise Bowl','Detox Morning Plate','Liver Shield Harmony','Fat Flush Breakfast','Green Detox Bowl','Hepatic Wellness Start'],
+    lunch:['Liver Repair Lunch','Detoxification Feast','Fatty Liver Recovery','Hepatic Cleanse Meal','Cellular Detox Plate','Green Liver Support','Herbal Detox Lunch'],
+    dinner:['Evening Liver Calm','Hepatic Repair Supper','Night Detox Feast','Liver Regeneration Plate','Fat Flush Dinner','Hepatic Healing Meal','Cellular Liver Restore'],
+    bn_name:'ফ্যাটি লিভার থেরাপিউটিক মিল',
+    ingredients:['Ridge Gourd','Radish','Water Spinach','Lentil Sprout','Amla','Beetroot','Coriander Leaves'],
+    disease:['Milk Thistle','Bhumyamalaki Powder','Turmeric'],
+    benefits:['Liver Detox','ALT Reduction','Fat Flush','Cellular Repair','Anti-inflammatory'],
+  },
+  IB:{
+    bn:'IBS/গ্যাস্ট্রিক',
+    breakfast:['Gentle Gut Sunrise','Digestive Comfort Bowl','Calm Stomach Breakfast','IBS Harmony Start','Soft Digest Morning','Gut Reset Bowl','Digestive Wellness Start'],
+    lunch:['Gut Healing Lunch','IBS Support Feast','Digestive Calm Plate','Stomach Friendly Meal','Microbiome Balance Lunch','Gentle Digestion Feast','Herbal Gut Repair'],
+    dinner:['Evening Digestive Calm','IBS Recovery Supper','Gut Healing Dinner','Stomach Comfort Plate','Microbiome Support Meal','Digestive Serenity Feast','Night Gut Restore'],
+    bn_name:'গাট হিলিং থেরাপিউটিক মিল',
+    ingredients:['Snake Gourd','Carrot','Bael Pulp','Green Gram Sprout','Mint Leaves','Curry Leaves','Peppermint Powder'],
+    disease:['Lemongrass','Licorice','Ginger'],
+    benefits:['Gut Healing','Microbiome Balance','Digestive Calm','Bloating Relief','Stomach Soothing'],
+  },
+  PR:{
+    bn:'গর্ভাবস্থা',
+    breakfast:['Maternal Sunrise Bowl','Prenatal Nourish Start','Iron Rich Morning','Mother Wellness Bowl','Fetal Growth Breakfast','Pregnancy Vitality Start','Maternal Energy Plate'],
+    lunch:['Prenatal Power Lunch','Mother Support Feast','Iron Boost Lunch','Baby Growth Meal','Maternal Wellness Plate','Prenatal Nourishment Feast','Mother Strength Lunch'],
+    dinner:['Evening Maternal Calm','Prenatal Recovery Supper','Iron Support Dinner','Fetal Development Feast','Mother Wellness Supper','Pregnancy Comfort Meal','Golden Mother Night'],
+    bn_name:'প্রিনেটাল থেরাপিউটিক মিল',
+    ingredients:['Moringa Leaves','Red Spinach','Beetroot','Chickpea Sprout','Almond','Sesame Seed','Dragon Fruit'],
+    disease:['Shatavari','Moringa Powder','Amla Powder'],
+    benefits:['Iron & Folate','Calcium Support','Fetal Growth','Maternal Energy','Hormonal Balance'],
+  },
+};
+// condition powders (AI-selected daily) — shared pool
+const CONDITION_POWDERS=['Ashwagandha','Tulsi','Brahmi'];
+// seasonal fruit course options (disease-aware); yogurt allowed
+const SEASONAL_FRUITS={
+  DM:['Guava','Black Berry','Olive','Green Apple','Pear'],
+  OB:['Water Melon','Guava','Olive','Pear','Yogurt (unsweetened)'],
+  FL:['Amla','Black Berry','Guava','Olive','Apple'],
+  IB:['Banana','Safeda (Sapodilla)','Papaya','Guava','Yogurt (unsweetened)'],
+  PR:['Mango','Jackfruit','Lichi','Pineapple','Dates','Raisin','Banana','Grapes','Orange','Yogurt'],
+};
+// per-meal dietary compliance badges (apply to every SAR meal)
+const DIET_BADGES=['চিনিমুক্ত','লবণমুক্ত (পিংক সল্ট)','তেলমুক্ত','রংমুক্ত','আয়ুর্বেদিক','অর্গানিক','ভাতমুক্ত','গমমুক্ত','ময়দামুক্ত','আগুনমুক্ত (Air-fry/Steam)','দুধমুক্ত'];
+
+// ════════════════════════════════════════════════════
+// CONFIG — NO keys here. All calls via Netlify function.
+// ════════════════════════════════════════════════════
+const API='/.netlify/functions/sar';
+async function api(action,body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action},body||{}))});
   if(!r.ok) throw new Error(action+' '+r.status);
   return r.json();
 }
+const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
+const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
+const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
 
-const _sc   = JSON.parse(localStorage.getItem('sar_customer')||'{}');
-const CID   = _sc.id || localStorage.getItem('sar_customer_id') || 'demo';
-const CNAME = _sc.full_name || localStorage.getItem('sar_customer_name') || 'আপা';
-
-const PRICE_PER_COURSE = 85;
-const VAT_RATE = 0.05;
-const MIN_COURSES = 2, MAX_COURSES = 4;
-
-const DAYS = ['সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার','রবিবার'];
-const DAY_SHORT = ['সোম','মঙ্গল','বুধ','বৃহঃ','শুক্র','শনি','রবি'];
-const MEALS = [
-  {key:'breakfast',bn:'সকাল',ic:'🌅',cls:'b'},
-  {key:'lunch',bn:'দুপুর',ic:'☀️',cls:'l'},
-  {key:'dinner',bn:'রাত',ic:'🌙',cls:'d'},
-];
-const CATS = [
-  {k:'DM',bn:'ডায়াবেটিস'},{k:'OB',bn:'স্থূলতা'},{k:'FL',bn:'ফ্যাটি লিভার'},
-  {k:'IB',bn:'IBS/গ্যাস্ট্রিক'},{k:'PR',bn:'গর্ভাবস্থা'},
-];
-const CAT_INFO = {
-  DM:{bn:'ডায়াবেটিস',powder:'করলা + মেথি + দারুচিনি গুঁড়া',base:420,focus:'রক্তে শর্করা স্থিতিশীল · Low-GI'},
-  OB:{bn:'স্থূলতা',powder:'ত্রিফলা + গার্সিনিয়া + গ্রিন টি',base:400,focus:'ক্যালরি ঘাটতি · উচ্চ প্রোটিন · মেটাবলিজম'},
-  FL:{bn:'ফ্যাটি লিভার',powder:'মিল্ক থিসল + ভৃঙ্গরাজ + হলুদ',base:410,focus:'লিভার ডিটক্স · ALT হ্রাস'},
-  IB:{bn:'IBS/গ্যাস্ট্রিক',powder:'স্লিপারি এলম + পুদিনা + আদা',base:390,focus:'গাট হিলিং · Low-FODMAP'},
-  PR:{bn:'গর্ভাবস্থা',powder:'শতাবরী + মরিঙ্গা + আমলকি',base:470,focus:'আয়রন ও ফোলেট · ক্যালসিয়াম'},
+const PRICE_PER_COURSE=90, VAT_RATE=0.05, MIX_RATE=0.25, MAX_COURSES=5;
+const MIN_BY_MEAL={breakfast:2,lunch:3,dinner:3};   // breakfast min 2, lunch/dinner min 3
+// fixed kcal per course slot (main courses high, fruit/chutney low)
+const COURSE_KCAL=[150,170,130,40,60];   // course 1..5
+const COURSE_PROT=[7,9,6,1,2];           // protein g per course
+const DAYS=['সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার','রবিবার'];
+const DAY_SHORT=['সোম','মঙ্গল','বুধ','বৃহঃ','শুক্র','শনি','রবি'];
+const MEALS=[{key:'breakfast',bn:'সকাল',ic:'🌅',cls:'b'},{key:'lunch',bn:'দুপুর',ic:'☀️',cls:'l'},{key:'dinner',bn:'রাত',ic:'🌙',cls:'d'}];
+const CATS=[{k:'DM',bn:'ডায়াবেটিস'},{k:'OB',bn:'স্থূলতা'},{k:'FL',bn:'ফ্যাটি লিভার'},{k:'IB',bn:'IBS/গ্যাস্ট্রিক'},{k:'PR',bn:'গর্ভাবস্থা'}];
+const CAT_INFO={
+  DM:{bn:'ডায়াবেটিস',dis:['দারুচিনি','মেথি','গুরমার'],base:420,focus:'রক্তে শর্করা স্থিতিশীল · Low-GI'},
+  OB:{bn:'স্থূলতা',dis:['ত্রিফলা','গার্সিনিয়া','গ্রিন টি'],base:400,focus:'ক্যালরি ঘাটতি · উচ্চ প্রোটিন'},
+  FL:{bn:'ফ্যাটি লিভার',dis:['মিল্ক থিসল','ভৃঙ্গরাজ','হলুদ'],base:410,focus:'লিভার ডিটক্স · ALT হ্রাস'},
+  IB:{bn:'IBS/গ্যাস্ট্রিক',dis:['স্লিপারি এলম','পুদিনা','আদা'],base:390,focus:'গাট হিলিং · Low-FODMAP'},
+  PR:{bn:'গর্ভাবস্থা',dis:['শতাবরী','মরিঙ্গা','আমলকি'],base:470,focus:'আয়রন · ফোলেট · ক্যালসিয়াম'},
 };
-const bn = n => (n==null?0:n).toLocaleString('bn-BD');
+const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
 
 // ── state ──
 let metrics={}, allMenu=[], myWeek={}, cardSel={};
-let activeDay=0, activeCat='DM', autoCat='DM';
-let cart = JSON.parse(localStorage.getItem('sar_ms_cart')||'[]');
+let activeDay=0, myCats=['DM'], activeCat='DM', mixOn=false;
+let cart=JSON.parse(localStorage.getItem('sar_ms_cart')||'[]');
 let analysis=null;
 
-// ════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', async () => {
-  showLoader('আপনার মিল স্কোর তৈরি হচ্ছে…');
-  try{ const m = await api('metrics',{customer_id:CID}); metrics = m.metrics||{}; }
-  catch(e){ console.warn('metrics',e); metrics={}; }
-  autoCat = pickCategory(metrics);
-  activeCat = autoCat;
+window.addEventListener('DOMContentLoaded',async()=>{
+  showLoader('আপনার মেনু তৈরি হচ্ছে…');
+  try{const m=await api('metrics',{customer_id:CID});metrics=m.metrics||{};}catch(e){metrics={};}
+  myCats=detectCats(metrics);
+  activeCat=myCats[0];
   renderCatBar();
-  await loadCategory(activeCat, true);
+  document.getElementById('mixBar').style.display = myCats.length>1?'block':'none';
+  await loadCategory(activeCat,true);
   hideLoader();
 });
 
-// disease category from metrics (auto)
-function pickCategory(m){
-  if(m.sar_category_interest && CAT_INFO[m.sar_category_interest]) return m.sar_category_interest;
-  if(m.pregnancy_status && m.pregnancy_status!=='না') return 'PR';
-  if(m.diabetes_type && m.diabetes_type!=='না') return 'DM';
-  if(m.fatty_liver_grade && m.fatty_liver_grade!=='না') return 'FL';
-  if(m.ibs_type && m.ibs_type!=='না') return 'IB';
-  if(m.bmi && +m.bmi >= 25) return 'OB';
-  return 'DM';
+// detect ONE or TWO disease categories from metrics
+function detectCats(m){
+  const found=[];
+  const push=c=>{if(CAT_INFO[c]&&!found.includes(c))found.push(c);};
+  if(m.sar_category_interest) String(m.sar_category_interest).split(/[,\s]+/).forEach(push);
+  if(m.sar_category_interest_2) push(m.sar_category_interest_2);
+  if(m.pregnancy_status&&m.pregnancy_status!=='না') push('PR');
+  if(m.diabetes_type&&m.diabetes_type!=='না') push('DM');
+  if(m.fatty_liver_grade&&m.fatty_liver_grade!=='না') push('FL');
+  if(m.ibs_type&&m.ibs_type!=='না') push('IB');
+  if(m.bmi&&+m.bmi>=25) push('OB');
+  if(!found.length) found.push('DM');
+  return found.slice(0,2);   // max two
 }
 
-// load menu for a category → rebuild 21-meal week → re-analyze
-async function loadCategory(cat, silent){
-  activeCat = cat;
+async function loadCategory(cat,silent){
+  activeCat=cat;
   showLoader(CAT_INFO[cat].bn+' মেনু লোড হচ্ছে…');
-  try{ const r = await api('menu',{cat}); allMenu = (r.items||[]).map(normalize); }
-  catch(e){ console.warn('menu',e); allMenu=[]; }
-  cardSel = {};
+  try{const r=await api('menu',{cat});allMenu=(r.items||[]).map(normalize);}catch(e){allMenu=[];}
+  cardSel={};
   buildWeek(cat);
   await runAnalysis(true);
-  renderCatBar(); renderDayBar(); renderMeals(); updateCart();
+  renderCatBar();renderDayBar();renderMeals();updateCart();
   hideLoader();
 }
-
 function normalize(m){
-  return {
-    id:m.id, code:m.menu_code, cat:m.disease_category, meal:m.meal_type, day:m.day||'',
-    name:m.name_bn, c1:m.course_1_bn, c2:m.course_2_bn, c3:m.course_3_bn,
-    chutney:m.chutney_name||'', kcal:m.calories||0,
-    protein:parseInt(m.protein_g||0)||0, fiber:parseInt(m.fiber_g||0)||0, benefits:m.benefits||'',
-  };
+  return {id:m.id,code:m.menu_code,cat:m.disease_category,meal:m.meal_type,day:m.day||'',
+    name:m.name_bn,c1:m.course_1_bn,c2:m.course_2_bn,c3:m.course_3_bn,chutney:m.chutney_name||'',
+    kcal:m.calories||0,protein:parseInt(m.protein_g||0)||0,fiber:parseInt(m.fiber_g||0)||0,benefits:m.benefits||''};
 }
 
-// build 21 menus (7 days × 3 meals) for this category
 function buildWeek(cat){
   myWeek={};
   DAYS.forEach((day,di)=>{
     myWeek[di]={};
     MEALS.forEach(meal=>{
-      const pool = allMenu.filter(x=>x.meal===meal.key);
-      let pick = pool.find(x=>x.day===day)
-              || (pool.length ? pool[di % pool.length] : null)
-              || FALLBACK(cat,meal.key,day,di);
+      const pool=allMenu.filter(x=>x.meal===meal.key);
+      let pick=pool.find(x=>x.day===day)||(pool.length?pool[di%pool.length]:null)||FALLBACK(cat,meal.key,di);
       myWeek[di][meal.key]=pick;
     });
   });
 }
-function FALLBACK(cat,meal,day,di){
-  const info=CAT_INFO[cat]||CAT_INFO.DM;
-  const mn={breakfast:'সকালের থেরাপিউটিক বাউল',lunch:'দুপুরের পুষ্টি প্লেটার',dinner:'রাতের হালকা বাউল'}[meal];
-  return {id:cat+'-'+meal+'-'+di,code:cat+'-'+(di+1),cat,meal,day,
-    name:info.bn+' — '+mn,c1:info.bn+'-বান্ধব ভেষজ স্যুপ',
-    c2:'থেরাপিউটিক মেইন — '+info.powder,c3:'মৌসুমি সালাদ ও চাটনি',
-    chutney:'চাটনি ও '+info.powder,kcal:info.base+di*6,protein:16+di,fiber:9,
-    benefits:info.bn+' নিয়ন্ত্রণে সহায়ক'};
+function FALLBACK(cat,meal,di){
+  const db=MEAL_DB[cat]||MEAL_DB.DM;
+  const idx=di%7;
+  const ename=(db[meal]&&db[meal][idx])||db[meal][0];
+  return {id:cat+'-'+meal+'-'+di,code:cat+'-'+meal.slice(0,2).toUpperCase()+'-'+(di+1),cat,meal,day:'',
+    name:db.bn_name,ename:ename,
+    ingredients:db.ingredients,chutney:'স্ট্রেস রিলিফ গ্রিন চাটনি',
+    kcal:0,protein:0,fiber:11,benefits:db.benefits.join(' · ')};
 }
 
-// ════════════════════════════════════════════════════
-// AI ANALYSIS — 6AM daily personalization
-// (BMI, mood, disease, condition, weather, Google Fit)
-// ════════════════════════════════════════════════════
+// ── AI analysis (6AM personalization) ──
 async function runAnalysis(silent){
   const btn=document.getElementById('recomputeBtn');
   if(!silent){btn.disabled=true;btn.textContent='↻ বিশ্লেষণ চলছে…';}
-
   let result=null;
   try{
-    const r = await api('analyze',{prompt:buildPrompt(activeCat)});
-    if(r.ai){ result = Object.assign({cat:activeCat,bmi:(metrics.bmi||'—'),source:'OpenAI'}, JSON.parse(r.ai)); }
-  }catch(e){ console.warn('analyze fallback',e); }
-  if(!result) result = localEngine(activeCat);
-
+    const r=await api('analyze',{prompt:buildPrompt(activeCat)});
+    if(r.ai) result=Object.assign({cat:activeCat,bmi:(metrics.bmi||'—'),source:'Claude AI'},JSON.parse(r.ai));
+  }catch(e){}
+  if(!result) result=localEngine(activeCat);
   analysis=result;
   applyPersonalization(result);
   paintScore(result);
-
-  // store today's score in Supabase (ai_analysis table)
-  try{
-    await api('saveScore',{
-      customer_id:CID, category:activeCat, meal_score:result.score,
-      daily_kcal:result.target, daily_protein:result.protein,
-      focus:result.focus, analysis:result,
-    });
-  }catch(e){ console.warn('saveScore',e); }
-
-  if(!silent){btn.disabled=false;btn.textContent='↻ এখনই পুনঃবিশ্লেষণ করুন';toast('✓ মিল স্কোর আপডেট হয়েছে');}
+  try{await api('saveScore',{customer_id:CID,category:activeCat,meal_score:result.score,daily_kcal:result.target,daily_protein:result.protein,focus:result.focus,analysis:result});}catch(e){}
+  if(!silent){btn.disabled=false;btn.textContent='↻ এখনই পুনঃবিশ্লেষণ করুন';toast('✓ মেনু আপডেট হয়েছে');}
 }
-
 function buildPrompt(cat){
   const m=metrics;
   return 'তুমি SAR She AI Restaurant-এর পুষ্টি AI। নিচের বাংলাদেশি নারীর তথ্য বিশ্লেষণ করে আজকের ব্যক্তিগত মিল প্ল্যান হিসাব করো।\n'+
-    'নাম:'+CNAME+' | BMI:'+(m.bmi||'?')+' | রোগ-বিভাগ:'+cat+' | স্ট্রেস:'+(m.stress_level||'?')+'/১০ | কার্যকলাপ:'+(m.activity_level||'?')+' | গর্ভাবস্থা:'+(m.pregnancy_status||'না')+' | আবহাওয়া:ঢাকা উষ্ণ\n'+
-    'শুধু JSON দাও:\n'+
-    '{"score":<৫৫-৯৮>,"target":<দৈনিক kcal>,"protein":<g>,"split":{"breakfast":0.3,"lunch":0.4,"dinner":0.3},"focus":"<বাংলায়>","mood":"<বাংলায়>","weather":"<বাংলায়>","note":"<২ বাক্য বাংলায়>"}';
+    'নাম:'+CNAME+' | BMI:'+(m.bmi||'?')+' | রোগ:'+cat+' | স্ট্রেস:'+(m.stress_level||'?')+'/১০ | কার্যকলাপ:'+(m.activity_level||'?')+' | গর্ভাবস্থা:'+(m.pregnancy_status||'না')+'\n'+
+    'শুধু JSON দাও:\n{"score":<৫৫-৯৮>,"target":<kcal>,"protein":<g>,"split":{"breakfast":0.3,"lunch":0.4,"dinner":0.3},"focus":"<বাংলায়>","mood":"<বাংলায়>","weather":"<বাংলায়>","note":"<২ বাক্য বাংলায়>"}';
 }
-
-// deterministic local engine (explainable fallback)
 function localEngine(cat){
-  const m=metrics;
-  const bmi=+m.bmi||23;
-  const mood=(m.stress_level!=null)?(10-+m.stress_level):7;
+  const m=metrics, bmi=+m.bmi||23, mood=(m.stress_level!=null)?(10-+m.stress_level):7;
   const act=(m.activity_level||'').toString();
   const actF=/high|active|বেশি/i.test(act)?1.12:/low|কম|sedentary/i.test(act)?0.9:1.0;
-  let target=1650;
-  if(bmi>=30)target=1350;else if(bmi>=25)target=1450;else if(bmi<18.5)target=1750;
+  let target=1650; if(bmi>=30)target=1350;else if(bmi>=25)target=1450;else if(bmi<18.5)target=1750;
   target=Math.round(target*actF/10)*10;
   let protein=60; if(cat==='PR')protein=75;else if(cat==='OB')protein=80;else if(cat==='FL')protein=65;
-  let split={breakfast:0.30,lunch:0.40,dinner:0.30};
-  if(cat==='OB')split={breakfast:0.32,lunch:0.42,dinner:0.26};
-  if(cat==='PR')split={breakfast:0.33,lunch:0.37,dinner:0.30};
-  let score=72;
-  if(bmi>=18.5&&bmi<25)score+=10;
-  score+=Math.round((mood-5)*1.5);
-  score+=actF>1?6:(actF<1?-4:0);
+  let split={breakfast:.3,lunch:.4,dinner:.3};
+  if(cat==='OB')split={breakfast:.32,lunch:.42,dinner:.26};
+  if(cat==='PR')split={breakfast:.33,lunch:.37,dinner:.3};
+  let score=72; if(bmi>=18.5&&bmi<25)score+=10; score+=Math.round((mood-5)*1.5); score+=actF>1?6:(actF<1?-4:0);
   score=Math.max(55,Math.min(98,score));
   const moodNote=mood>=7?'চাঙা 😊':(mood>=4?'মাঝারি 😐':'ক্লান্ত 😔');
-  return {cat,score,target,protein,split,
-    bmi:bmi.toFixed(1),mood:moodNote,weather:'উষ্ণ ৩১°C · হাইড্রেটিং',
-    focus:CAT_INFO[cat].focus,
-    note:'আপনার BMI '+bmi.toFixed(1)+', মুড '+moodNote+' ও আজকের আবহাওয়া অনুযায়ী '+CAT_INFO[cat].bn+' প্ল্যান সমন্বয় করা হয়েছে।',
-    source:'SAR ইঞ্জিন'};
+  return {cat,score,target,protein,split,bmi:bmi.toFixed(1),mood:moodNote,weather:'উষ্ণ ৩১°C · হাইড্রেটিং',
+    focus:CAT_INFO[cat].focus,note:'আপনার BMI '+bmi.toFixed(1)+', মুড '+moodNote+' ও আবহাওয়া অনুযায়ী '+CAT_INFO[cat].bn+' প্ল্যান সমন্বয় করা হয়েছে।',source:'SAR ইঞ্জিন'};
 }
-
 function applyPersonalization(a){
-  const split=a.split||{breakfast:0.3,lunch:0.4,dinner:0.3};
+  const split=a.split||{breakfast:.3,lunch:.4,dinner:.3};
+  // store a per-customer kcal factor so course kcal scales to her target
+  const baseDaily=1500;
+  window._kcalFactor=Math.max(0.8,Math.min(1.3,(a.target||1500)/baseDaily));
   Object.values(myWeek).forEach(day=>{
     MEALS.forEach(meal=>{
-      const item=day[meal.key]; const share=split[meal.key]||0.33;
-      item._kcal=Math.round((a.target*share)/5)*5;
-      item._protein=Math.round((a.protein||60)*share);
-      const base=item.kcal||450, diff=item._kcal-base;
-      item._tweak=Math.abs(diff)<25?'আপনার জন্য মানানসই পরিমাণ'
-        :(diff>0?'আপনার জন্য +'+bn(diff)+' kcal বাড়ানো':'আপনার জন্য −'+bn(-diff)+' kcal কমানো');
+      const item=day[meal.key];
+      item._share=split[meal.key]||.33;
+      item._tweak=window._kcalFactor>1.02?'আপনার জন্য পরিমাণ বাড়ানো':(window._kcalFactor<0.98?'আপনার জন্য পরিমাণ কমানো':'আপনার জন্য মানানসই পরিমাণ');
     });
   });
 }
-
 function paintScore(a){
   document.getElementById('scoreVal').textContent=bn(a.score);
-  const C=2*Math.PI*50;
-  document.getElementById('ringArc').style.strokeDashoffset=C*(1-a.score/100);
+  document.getElementById('ringArc').style.strokeDashoffset=(2*Math.PI*54)*(1-a.score/100);
   const hr=new Date().getHours();
   document.getElementById('scoreGreet').textContent=(hr<12?'শুভ সকাল':(hr<17?'শুভ অপরাহ্ণ':'শুভ সন্ধ্যা'))+', '+CNAME+'!';
   document.getElementById('scoreNote').textContent=a.note;
@@ -461,147 +551,206 @@ function paintScore(a){
   document.getElementById('scoreStamp').textContent='আজ ভোর ৬:০০-এ '+a.source+' দ্বারা আপডেট';
 }
 
-// ════════════════════════════════════════════════════
-// RENDER
-// ════════════════════════════════════════════════════
+// ── category bar: only MY cats active, rest locked ──
 function renderCatBar(){
-  const auto = CAT_INFO[autoCat].bn;
-  document.getElementById('catBar').innerHTML =
-    '<span class="lbl">আপনার বিভাগ:</span>'+
-    CATS.map(c=>'<button class="cat-tab '+(c.k===activeCat?'active':'')+'" onclick="switchCat(\''+c.k+'\')">'+c.bn+'</button>').join('')+
-    '<span class="cat-auto">⭐ মেট্রিক্স থেকে: '+auto+'</span>';
+  const html=['<span class="lbl">আপনার বিভাগ:</span>'];
+  CATS.forEach(c=>{
+    const mine=myCats.includes(c.k);
+    const cls='cat-tab'+(mine?' mine':' locked')+(c.k===activeCat?' active':'');
+    const onclick=mine?'switchCat(\''+c.k+'\')':'lockedMsg()';
+    html.push('<button class="'+cls+'" onclick="'+onclick+'">'+c.bn+(mine?'':' <span class="lk">🔒</span>')+'</button>');
+  });
+  if(myCats.length>1) html.push('<span class="cat-note">⭐ আপনার মেট্রিক্সে '+myCats.map(k=>CAT_INFO[k].bn).join(' ও ')+' — দুটোই দেখানো হচ্ছে</span>');
+  else html.push('<span class="cat-note">⭐ মেট্রিক্স থেকে নির্বাচিত: '+CAT_INFO[myCats[0]].bn+'</span>');
+  document.getElementById('catBar').innerHTML=html.join('');
 }
-async function switchCat(k){ if(k===activeCat)return; activeDay=0; await loadCategory(k,false); }
+function lockedMsg(){toast('এই বিভাগ আপনার জন্য সক্রিয় নয় — মেট্রিক্সে রোগ যোগ করলে খুলবে');}
+async function switchCat(k){if(k===activeCat)return;activeDay=0;await loadCategory(k,false);}
+function toggleMix(on){mixOn=on;updateCart();toast(on?'মিশ্রণ চালু — মিল-প্রতি ২৫% যোগ হবে':'মিশ্রণ বন্ধ');}
 
 function renderDayBar(){
-  document.getElementById('dayBar').innerHTML = DAYS.map((d,i)=>
-    '<button class="day-tab '+(i===activeDay?'active':'')+'" onclick="setDay('+i+')">'+DAY_SHORT[i]+'<small>দিন '+bn(i+1)+'</small></button>').join('');
+  document.getElementById('dayBar').innerHTML=DAYS.map((d,i)=>'<button class="day-tab '+(i===activeDay?'active':'')+'" onclick="setDay('+i+')">'+DAY_SHORT[i]+'<small>দিন '+bn(i+1)+'</small></button>').join('');
 }
 function setDay(i){activeDay=i;renderDayBar();renderMeals();}
 
 function renderMeals(){
   const day=myWeek[activeDay]||{};
-  document.getElementById('meals').innerHTML = MEALS.map(meal=>{
+  document.getElementById('meals').innerHTML=MEALS.map(meal=>{
     const item=day[meal.key]; if(!item)return '';
-    return '<div class="meal-col"><div class="meal-label"><span class="ic '+meal.cls+'">'+meal.ic+'</span>'+meal.bn+'</div>'+card(item,meal)+'</div>';
+    return '<div class="meal-group"><div class="meal-label"><span class="ic '+meal.cls+'">'+meal.ic+'</span>'+meal.bn+'</div>'+card(item,meal)+'</div>';
   }).join('');
 }
 
+// 5 courses; NO soup. Course 4 (chutney) + 5 (seasonal fruit) optional.
+// min courses depend on meal (breakfast 2, lunch/dinner 3)
 function coursesFor(item){
+  const cat=item.cat, info=MEAL_DB[cat]||MEAL_DB.DM;
+  const ings=info.ingredients||[];
+  const fruits=SEASONAL_FRUITS[cat]||SEASONAL_FRUITS.DM;
+  const mainIngs=ings.slice(0,4).join(', ');
+  const sideIngs=ings.slice(4).join(', ');
   return [
-    {n:item.c1||'স্যুপ কোর্স',req:true},
-    {n:item.c2||'প্রধান কোর্স',req:true},
-    {n:item.c3||'সাইড ও চাটনি',req:false},
-    {n:'ঔষধি টপিং: '+(item.chutney||'চাটনি ও ভেষজ গুঁড়া'),req:false},
+    {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs,req:true},
+    {n:'প্রোটিন ও স্প্রাউট কোর্স',sub:'Chickpea / Green Gram Sprout, '+(ings[3]||'Pumpkin Seed'),req:true},
+    {n:'স্টিমড / এয়ার-ফ্রায়েড সবজি কোর্স',sub:sideIngs||'মৌসুমি সবজি',req:true},
+    {n:'ইমোশনাল চাটনি কোর্স',sub:(item.chutney||'AI Green Chutney'),req:false,opt:true},
+    {n:'মৌসুমি ফল কোর্স',sub:fruits.join(' / '),req:false,opt:true},
   ];
 }
+function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
+function mealNo(meal,di){const idx={breakfast:1,lunch:2,dinner:3}[meal];return (di*3+idx);}
+
 function card(item,meal){
-  const isRec = analysis && analysis.cat===item.cat;
-  const courses=coursesFor(item);
-  const uid=activeDay+'_'+meal.key;
-  const sel=(cardSel[uid]||(cardSel[uid]=[0,1]));
-  const cnt=sel.length, price=cnt*PRICE_PER_COURSE, withVat=Math.round(price*(1+VAT_RATE));
-  const cHtml=courses.map(function(c,ci){
+  const di=activeDay, courses=coursesFor(item), uid=di+'_'+meal.key;
+  const minC=minCoursesFor(meal.key);
+  const defSel=minC>=3?[0,1,2]:[0,1];
+  const sel=(cardSel[uid]||(cardSel[uid]=defSel.slice()));
+  const cnt=sel.length, base=cnt*PRICE_PER_COURSE;
+  const mixExtra=mixOn?Math.round(base*MIX_RATE):0;
+  const withVat=Math.round((base+mixExtra)*(1+VAT_RATE));
+  const f=window._kcalFactor||1;
+  // kcal/protein = SUM of selected courses' fixed values × personal factor
+  let kcal=0,prot=0;
+  sel.forEach(ci=>{kcal+=COURSE_KCAL[ci]||120;prot+=COURSE_PROT[ci]||5;});
+  kcal=Math.round(kcal*f/5)*5; prot=Math.round(prot*f);
+  const fat=Math.round(kcal*0.25/9), carb=Math.round(kcal*0.4/4), fib=Math.max(6,Math.round(cnt*3.2));
+  const dr=[['প্রোটিন',Math.min(99,Math.round(prot/0.6))],['আয়রন',Math.min(99,22+cnt*4)],['ফাইবার',Math.min(99,Math.round(fib/0.25))],['ভিটামিন C',Math.min(99,30+cnt*5)]];
+  const db=MEAL_DB[item.cat]||MEAL_DB.DM;
+  const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
+  while(benList.length<3) benList.push(db.benefits[benList.length]||'সুষম পুষ্টি');
+  const dis=db.disease;
+  const allIngs=(item.ingredients&&item.ingredients.length?item.ingredients:db.ingredients);
+  const cHtml=courses.map((c,ci)=>{
     const on=sel.indexOf(ci)>-1;
-    const atMin=cnt<=MIN_COURSES&&on&&c.req;
+    const atMin=cnt<=minC&&on&&c.req;
     return '<div class="course '+(on?'on':'')+' '+(atMin?'locked':'')+'" onclick="toggleCourse(\''+uid+'\','+ci+')">'+
       '<span class="box">'+(on?'✓':'')+'</span>'+
-      '<span class="ctxt">'+(ci+1)+'. '+c.n+(c.req?' <small style="color:var(--coral-d)">(আবশ্যক)</small>':'')+'</span>'+
-      '<span class="cprice">৳'+bn(PRICE_PER_COURSE)+'</span></div>';
+      '<span class="ctxt">'+(ci+1)+'. '+c.n+' '+(c.req?'<span class="req">(আবশ্যক)</span>':'<span class="opt">(ঐচ্ছিক)</span>')+
+        (c.sub?'<br><span style="font-size:.72rem;color:var(--ink-2)">'+c.sub+'</span>':'')+'</span>'+
+      '<span class="cprice num">৳'+bn(PRICE_PER_COURSE)+'</span></div>';
   }).join('');
+  const isRec=analysis&&analysis.cat===item.cat;
   return '<div class="mcard '+(isRec?'rec':'')+'">'+
-    '<div class="mc-top"><div class="mc-name">'+item.name+'</div>'+(isRec?'<span class="mc-rec">⭐ আপনার জন্য</span>':'')+'</div>'+
-    (item.benefits?'<div class="mc-why">✦ '+item.benefits+'</div>':'')+
-    '<div class="nutri">'+
-      '<div class="n-pill cal"><div class="nv">'+bn(item._kcal||item.kcal)+'</div><div class="nk">kcal</div></div>'+
-      '<div class="n-pill"><div class="nv">'+bn(item._protein||item.protein)+'g</div><div class="nk">প্রোটিন</div></div>'+
-      '<div class="n-pill"><div class="nv">'+bn(item.fiber||9)+'g</div><div class="nk">ফাইবার</div></div>'+
+    '<div class="mc-head">'+(isRec?'<span class="mc-rec">⭐ আপনার জন্য</span>':'')+
+      '<div class="mc-no">'+meal.bn+' · মিল '+bn(mealNo(meal.key,di))+'</div>'+
+      '<div class="mc-name">'+(item.ename||item.name)+'<sup>™</sup></div>'+
+      '<div style="font-size:.84rem;color:var(--ink-2);margin-top:.15rem">'+item.name+'</div>'+
     '</div>'+
-    (item._tweak?'<div class="tweak">🤖 '+item._tweak+'</div>':'')+
-    '<div class="courses"><div class="course-h">কোর্স বেছে নিন · ২–৪টি · ৳'+bn(PRICE_PER_COURSE)+'/কোর্স</div>'+cHtml+'</div>'+
-    '<div class="mc-foot">'+
-      '<div class="mc-price"><div class="pp">৳ '+bn(withVat)+' <small>(৫% ভ্যাটসহ)</small></div>'+
-        '<div class="vat">'+bn(cnt)+'টি কোর্স × ৳'+bn(PRICE_PER_COURSE)+' = ৳'+bn(price)+' + ভ্যাট</div></div>'+
-      '<button class="add-btn" onclick="addToCart(\''+uid+'\')">কার্টে দিন +</button>'+
+    '<div class="mc-body">'+
+      '<div class="badges">'+DIET_BADGES.map(b=>'<span class="dbadge">'+b+'</span>').join('')+'</div>'+
+      '<div><div class="panel-h">প্রধান কোর্সের উপাদান</div><div class="ings">'+
+        allIngs.map(i=>'<span class="ing">'+i+'</span>').join('')+'</div></div>'+
+      '<div><div class="panel-h">Nutrition Panel · নির্বাচিত কোর্স অনুযায়ী</div>'+
+        '<div class="nutri">'+
+          '<div class="n-pill cal"><div class="nv num">'+bn(kcal)+'</div><div class="nk">kcal</div></div>'+
+          '<div class="n-pill"><div class="nv num">'+bn(prot)+'g</div><div class="nk">প্রোটিন</div></div>'+
+          '<div class="n-pill"><div class="nv num">'+bn(fat)+'g</div><div class="nk">ফ্যাট</div></div>'+
+          '<div class="n-pill"><div class="nv num">'+bn(carb)+'g</div><div class="nk">নেট কার্ব</div></div>'+
+          '<div class="n-pill"><div class="nv num">'+bn(fib)+'g</div><div class="nk">ফাইবার</div></div>'+
+        '</div>'+(item._tweak?'<div class="tweak">🤖 '+item._tweak+' · কোর্স বাড়ালে kcal বাড়বে</div>':'')+'</div>'+
+      '<div><div class="panel-h">Daily Requirement Coverage</div><div class="drc">'+
+        dr.map(d=>'<div class="dr-line"><span class="dl">'+d[0]+'</span><span class="dr-bar"><i style="width:'+d[1]+'%"></i></span><span class="dp num">'+bn(d[1])+'%</span></div>').join('')+
+      '</div></div>'+
+      '<div><div class="panel-h">Benefits ('+bn(benList.length)+'টি)</div><div class="benefits">'+benList.map(b=>'<span class="bchip">✓ '+b+'</span>').join('')+'</div></div>'+
+      '<div><div class="panel-h">Medicinal Layer</div><div class="med">'+
+        '<div class="med-row"><span class="ml">Disease Powders</span>'+dis.map(p=>'<span class="pw dis">'+p+'</span>').join('')+'</div>'+
+        '<div class="med-row"><span class="ml">Condition Powders</span>'+CONDITION_POWDERS.map(p=>'<span class="pw con">'+p+'</span>').join('')+'</div>'+
+        '<div class="med-row"><span class="ml">Topping</span><span class="pw top">Roasted Pumpkin Seed</span></div>'+
+        '<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+(item.chutney||'Stress Relief Green Chutney')+'</span></div>'+
+      '</div></div>'+
+      '<div class="bchain"><span class="bl">⛓ Blockchain Verified Ingredients</span>'+
+        '<a href="blockchain.html?meal='+encodeURIComponent(item.code||item.id)+'">View Traceability →</a></div>'+
+      '<div class="courses"><div class="panel-h" style="margin-bottom:0">৫টি কোর্স · '+meal.bn+'-এ কমপক্ষে '+bn(minC)+'টি · ৳'+bn(PRICE_PER_COURSE)+'/কোর্স</div>'+cHtml+'</div>'+
+      '<div class="mc-foot"><div class="mc-price">'+
+        '<div class="pp num">৳ '+bn(withVat)+' <small>(ভ্যাটসহ)</small></div>'+
+        '<div class="pq">'+bn(cnt)+' কোর্স × ৳'+bn(PRICE_PER_COURSE)+(mixExtra?' + ২৫% মিশ্রণ':'')+'</div>'+
+      '</div><button class="order-btn" onclick="orderMeal(\''+uid+'\')">Order →</button></div>'+
     '</div></div>';
 }
 function currentItem(uid){const p=uid.split('_');return myWeek[p[0]][p[1]];}
 function toggleCourse(uid,ci){
-  const sel=cardSel[uid]||(cardSel[uid]=[0,1]);
+  const item=currentItem(uid), mealKey=uid.split('_')[1], minC=minCoursesFor(mealKey);
+  const def=minC>=3?[0,1,2]:[0,1];
+  const sel=cardSel[uid]||(cardSel[uid]=def.slice());
   if(sel.indexOf(ci)>-1){
-    if(sel.length<=MIN_COURSES){toast('কমপক্ষে ২টি কোর্স রাখতে হবে');return;}
-    cardSel[uid]=sel.filter(function(x){return x!==ci;});
+    if(sel.length<=minC){toast('এই বেলায় কমপক্ষে '+bn(minC)+'টি কোর্স রাখতে হবে');return;}
+    cardSel[uid]=sel.filter(x=>x!==ci);
   }else{
-    if(sel.length>=MAX_COURSES){toast('সর্বোচ্চ ৪টি কোর্স');return;}
-    cardSel[uid]=sel.concat(ci).sort(function(a,b){return a-b;});
+    if(sel.length>=MAX_COURSES){toast('সর্বোচ্চ ৫টি কোর্স');return;}
+    cardSel[uid]=sel.concat(ci).sort((a,b)=>a-b);
   }
   renderMeals();
 }
 
-// ════════════════════════════════════════════════════
-// CART  (price = courses × ৳85, +5% VAT)
-// ════════════════════════════════════════════════════
-function addToCart(uid){
-  const item=currentItem(uid), sel=cardSel[uid]||[0,1];
-  if(sel.length<MIN_COURSES){toast('কমপক্ষে ২টি কোর্স নিন');return;}
-  const courses=coursesFor(item).filter(function(c,i){return sel.indexOf(i)>-1;}).map(function(c){return c.n;});
+// ── Order: add to cart, open drawer ──
+function orderMeal(uid){
+  const item=currentItem(uid), mealKey=uid.split('_')[1], minC=minCoursesFor(mealKey);
+  const def=minC>=3?[0,1,2]:[0,1];
+  const sel=cardSel[uid]||def;
+  if(sel.length<minC){toast('এই বেলায় কমপক্ষে '+bn(minC)+'টি কোর্স নিন');return;}
+  const courses=coursesFor(item).filter((c,i)=>sel.indexOf(i)>-1).map(c=>c.n);
+  const f=window._kcalFactor||1;
+  let kc=0,pr=0; sel.forEach(ci=>{kc+=COURSE_KCAL[ci]||120;pr+=COURSE_PROT[ci]||5;});
+  kc=Math.round(kc*f/5)*5; pr=Math.round(pr*f);
   const p=uid.split('_');
-  cart=cart.filter(function(c){return c.uid!==uid;});
-  cart.push({uid:uid, menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,
-    code:item.code,name:item.name,meal:p[1],mealBn:MEALS.find(function(m){return m.key===p[1];}).bn,
-    day:DAYS[p[0]],courses:courses,courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
-    kcal:item._kcal||item.kcal,protein:item._protein||item.protein});
+  cart=cart.filter(c=>c.uid!==uid);
+  cart.push({uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,
+    name:item.ename||item.name,name_bn:item.name,meal:p[1],mealBn:MEALS.find(m=>m.key===p[1]).bn,
+    day:DAYS[p[0]],cat:item.cat,courses,courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
+    kcal:kc,protein:pr});
   localStorage.setItem('sar_ms_cart',JSON.stringify(cart));
-  updateCart(); toast('✓ "'+item.name.slice(0,22)+'" কার্টে যোগ হয়েছে');
+  updateCart(); openCart(); toast('✓ "'+(item.name).slice(0,20)+'" Order-এ যোগ হয়েছে');
 }
-function removeFromCart(uid){cart=cart.filter(function(c){return c.uid!==uid;});localStorage.setItem('sar_ms_cart',JSON.stringify(cart));updateCart();}
+function removeFromCart(uid){cart=cart.filter(c=>c.uid!==uid);localStorage.setItem('sar_ms_cart',JSON.stringify(cart));updateCart();}
 function updateCart(){
-  const count=cart.reduce(function(s,c){return s+c.courseCount;},0);
-  const sub=cart.reduce(function(s,c){return s+c.price;},0);
-  const vat=Math.round(sub*VAT_RATE), grand=sub+vat;
+  const count=cart.reduce((s,c)=>s+c.courseCount,0);
+  const sub=cart.reduce((s,c)=>s+c.price,0);
+  const mixExtra=mixOn?Math.round(sub*MIX_RATE):0;
+  const vat=Math.round((sub+mixExtra)*VAT_RATE), grand=sub+mixExtra+vat;
   document.getElementById('cartCount').textContent=bn(count);
   document.getElementById('sub').textContent='৳ '+bn(sub);
   document.getElementById('vat').textContent='৳ '+bn(vat);
   document.getElementById('grand').textContent='৳ '+bn(grand);
+  document.getElementById('mixRow').style.display=mixExtra?'flex':'none';
+  document.getElementById('mixAmt').textContent='৳ '+bn(mixExtra);
   document.getElementById('checkout').disabled=!cart.length;
   const body=document.getElementById('drBody');
-  if(!cart.length){body.innerHTML='<div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলে কোর্স বেছে যোগ করুন।</div>';return;}
-  body.innerHTML=cart.map(function(c){return '<div class="ci">'+
-    '<div class="ci-top"><div><div class="ci-name">'+c.name+'</div><div class="ci-meal">'+c.day+' · '+c.mealBn+'</div></div>'+
-      '<button class="ci-del" onclick="removeFromCart(\''+c.uid+'\')">🗑️</button></div>'+
-    '<div class="ci-courses">'+c.courses.map(function(n,i){return bn(i+1)+'. '+n;}).join('<br>')+'</div>'+
-    '<div class="ci-line"><span>'+bn(c.courseCount)+' কোর্স × ৳'+bn(PRICE_PER_COURSE)+'</span><b>৳ '+bn(c.price)+'</b></div></div>';}).join('');
+  if(!cart.length){body.innerHTML='<div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের Order বোতাম চাপুন।</div>';return;}
+  body.innerHTML=cart.map(c=>'<div class="ci"><div class="ci-top"><div><div class="ci-name">'+c.name+'</div><div class="ci-meal">'+c.day+' · '+c.mealBn+'</div></div>'+
+    '<button class="ci-del" onclick="removeFromCart(\''+c.uid+'\')">🗑️</button></div>'+
+    '<div class="ci-courses">'+c.courses.map((n,i)=>bn(i+1)+'. '+n).join('<br>')+'</div>'+
+    (mixOn?'<div class="ci-mix">+ ২৫% মিশ্রণ (অতিরিক্ত ভেষজ পাউডার)</div>':'')+
+    '<div class="ci-line"><span>'+bn(c.courseCount)+' কোর্স × ৳'+bn(PRICE_PER_COURSE)+'</span><b class="num">৳ '+bn(c.price)+'</b></div></div>').join('');
 }
 function openCart(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('show');}
 function closeCart(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 
+// Order confirm → save order → order.html → track.html
 async function goCheckout(){
   if(!cart.length)return;
-  const sub=cart.reduce(function(s,c){return s+c.price;},0), vat=Math.round(sub*VAT_RATE), total=sub+vat;
-  const btn=document.getElementById('checkout'); btn.disabled=true; btn.textContent='অর্ডার সংরক্ষণ হচ্ছে…';
+  const sub=cart.reduce((s,c)=>s+c.price,0);
+  const mixExtra=mixOn?Math.round(sub*MIX_RATE):0;
+  const vat=Math.round((sub+mixExtra)*VAT_RATE), total=sub+mixExtra+vat;
+  const btn=document.getElementById('checkout');btn.disabled=true;btn.textContent='Order সংরক্ষণ হচ্ছে…';
+  const payload={customer_id:CID,items:cart.map(c=>Object.assign({},c,{mix:mixOn})),subtotal:sub+mixExtra,vat,total,
+    meal_date:new Date().toISOString().slice(0,10),note:'Meal Score Order'+(mixOn?' · দুই রোগ মিশ্রণ':'')+' · '+myCats.join('+')};
+  // hand off to order.html as well (it may re-confirm), and save now
+  localStorage.setItem('sar_cart',JSON.stringify(cart));
+  localStorage.setItem('sar_order_payload',JSON.stringify(payload));
   try{
-    const r=await api('placeOrder',{
-      customer_id:CID, items:cart, subtotal:sub, vat:vat, total:total,
-      meal_date:new Date().toISOString().slice(0,10),
-      note:'Meal Score অর্ডার · বিভাগ '+activeCat,
-    });
-    if(r.ok && r.order){
-      localStorage.setItem('sar_last_order_id', r.order.id);
-      localStorage.removeItem('sar_ms_cart');
-      cart=[]; updateCart(); closeCart();
-      toast('✓ অর্ডার সংরক্ষিত হয়েছে');
-      setTimeout(function(){window.location.href='track.html';},900);
-    }else{ throw new Error('order failed'); }
-  }catch(e){
-    console.error(e); toast('⚠️ অর্ডার সংরক্ষণে সমস্যা — আবার চেষ্টা করুন');
-    btn.disabled=false; btn.textContent='অর্ডার নিশ্চিত করুন →';
-  }
+    const r=await api('placeOrder',payload);
+    if(r.ok&&r.order){localStorage.setItem('sar_last_order_id',r.order.id);}
+  }catch(e){}
+  localStorage.removeItem('sar_ms_cart'); cart=[]; updateCart(); closeCart();
+  toast('✓ Order সংরক্ষিত — confirm পেজে নিয়ে যাচ্ছি');
+  setTimeout(()=>window.location.href='order.html',800);
 }
 
-// ── helpers ──
-function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show');},2600);}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600);}
 function showLoader(t){document.getElementById('loadTxt').textContent=t;document.getElementById('loader').classList.add('show');}
 function hideLoader(){document.getElementById('loader').classList.remove('show');}
+
+
 </script>
 </body>
 </html>
