@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAR রান্নাঘর · Kitchen Board</title>
+<style>
+/* ── SAR Kitchen Board — 3-column kanban ─────────────────────
+   Subject: a fire-free therapeutic kitchen. Flow left→right:
+   নতুন অর্ডার → রান্না হচ্ছে → প্রস্তুত. Newest card sits on top of
+   each column. Station colour-chips (steam/air-fry/cold) carry the
+   workflow since the appliance IS the method in a fire-free kitchen. */
+:root{
+  --bg:#11161c; --panel:#1a222c; --panel-2:#212c38; --line:#2c3a49;
+  --ink:#eef3f8; --ink-2:#9fb0c0; --ink-3:#6b7c8c;
+  --steam:#4aa3df; --airfry:#e8893b; --cold:#46c08a;
+  --amber:#f5b73c; --green:#46c08a; --red:#e2604f; --blue:#4aa3df;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:"SolaimanLipi","Hind Siliguri",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.num{font-variant-numeric:tabular-nums}
+
+header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
+  background:linear-gradient(180deg,#141b22,#11161c);border-bottom:1px solid var(--line);flex:none}
+.brand{display:flex;align-items:baseline;gap:.5rem}
+.brand b{font-size:1.2rem}.brand span{color:var(--ink-3);font-size:.78rem}
+.live{display:flex;align-items:center;gap:.4rem;font-size:.74rem;color:var(--ink-2);margin-left:.5rem}
+.dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,192,138,.5)}70%{box-shadow:0 0 0 8px rgba(70,192,138,0)}100%{box-shadow:0 0 0 0 rgba(70,192,138,0)}}
+.spacer{flex:1}
+.hbtn{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);
+  border-radius:.55rem;padding:.5rem .85rem;font-size:.82rem;cursor:pointer;font-family:inherit}
+.hbtn:hover{background:#28384a}
+
+/* board: 3 columns */
+.board{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);overflow:hidden}
+.col{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.col-head{padding:.7rem 1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;flex:none}
+.col-head .ic{width:.7rem;height:.7rem;border-radius:50%}
+.col-head b{font-size:.95rem}
+.col-head .n{margin-left:auto;font-size:.8rem;color:var(--ink-3);background:var(--panel-2);
+  border-radius:1rem;padding:.1rem .55rem}
+.col.pending .ic{background:var(--amber)}
+.col.cooking .ic{background:var(--airfry)}
+.col.ready .ic{background:var(--green)}
+.col-body{flex:1;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:.8rem}
+.col-empty{color:var(--ink-3);text-align:center;padding:2.5rem .5rem;font-size:.85rem}
+
+/* card */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.7rem;overflow:hidden;
+  box-shadow:0 4px 14px rgba(0,0,0,.22)}
+.card.flash{animation:flash .8s ease}
+@keyframes flash{0%{border-color:var(--amber)}100%{border-color:var(--line)}}
+.c-head{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;background:var(--panel-2);
+  border-bottom:1px solid var(--line);cursor:pointer}
+.c-head:hover{background:#28384a}
+.c-no{font-weight:700;font-size:.92rem}
+.c-link{font-size:.68rem;color:var(--blue);border:1px solid rgba(74,163,223,.4);
+  border-radius:.35rem;padding:.05rem .4rem}
+.c-meta{margin-left:auto;text-align:right;font-size:.72rem;color:var(--ink-2);line-height:1.3}
+.age{font-size:.7rem;padding:.12rem .45rem;border-radius:.4rem;background:#2a3543;color:var(--ink-2)}
+.age.warn{background:rgba(245,183,60,.18);color:var(--amber)}
+.age.late{background:rgba(226,96,79,.2);color:var(--red)}
+.c-sum{padding:.55rem .8rem;display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{font-size:.7rem;border:1px solid var(--line);border-radius:.4rem;padding:.1rem .45rem;color:var(--ink-2)}
+.chip.kcal{color:var(--amber);border-color:rgba(245,183,60,.35)}
+.stations{display:flex;gap:.25rem;padding:0 .8rem .55rem}
+.sdot{width:1.5rem;height:1.5rem;border-radius:.35rem;display:grid;place-items:center;
+  font-size:.72rem;font-weight:700;color:#0c1116}
+.c-foot{display:flex;gap:.5rem;padding:.6rem .8rem;border-top:1px solid var(--line)}
+.act{flex:1;border:none;border-radius:.55rem;padding:.6rem;font-size:.82rem;font-weight:700;
+  cursor:pointer;font-family:inherit;color:#0c1116}
+.act:hover{filter:brightness(1.08)}
+.act.cook{background:var(--airfry)}
+.act.decline{background:transparent;color:var(--red);border:1px solid rgba(226,96,79,.5);flex:0 0 auto;padding:.6rem .8rem}
+.act.rdy{background:var(--green)}
+.act.deliver{background:var(--blue);color:#fff}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(8,11,15,.7);display:none;z-index:50;
+  align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:.9rem;
+  max-width:560px;width:100%;overflow:hidden}
+.m-head{display:flex;align-items:center;gap:.6rem;padding:.9rem 1.1rem;background:var(--panel-2);border-bottom:1px solid var(--line)}
+.m-head b{font-size:1.05rem}
+.m-close{margin-left:auto;background:none;border:none;color:var(--ink-2);font-size:1.3rem;cursor:pointer}
+.m-body{padding:1rem 1.1rem;max-height:70vh;overflow-y:auto}
+.course{border-top:1px dashed var(--line);padding:.7rem 0}
+.course:first-child{border-top:none}
+.co-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.co-slot{width:1.5rem;height:1.5rem;border-radius:.35rem;display:grid;place-items:center;font-size:.78rem;font-weight:700;color:#0c1116}
+.co-name{font-size:.9rem;font-weight:600}
+.co-kcal{margin-left:auto;font-size:.74rem;color:var(--ink-3)}
+.ings{display:flex;flex-wrap:wrap;gap:.3rem;margin:.2rem 0 .45rem}
+.ing{background:var(--panel-2);border:1px solid var(--line);border-radius:.4rem;padding:.12rem .45rem;font-size:.76rem}
+.ing b{color:var(--steam)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:.28rem}
+.steps li{font-size:.8rem;color:var(--ink-2);line-height:1.5;padding-left:1rem;position:relative}
+.steps li:before{content:"›";position:absolute;left:0;color:var(--ink-3)}
+
+@media print{
+  body{background:#fff;color:#000;height:auto;overflow:visible}
+  header,.col-foot,.hbtn,.live,.c-foot{display:none!important}
+  .board{display:block}.col{display:block}
+  .card{break-inside:avoid;border:1px solid #999;margin-bottom:10px;background:#fff;color:#000}
+}
+@media (max-width:760px){
+  body{height:auto;overflow:auto}
+  .board{grid-template-columns:1fr;gap:1px}
+  .col-body{max-height:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><b>SAR রান্নাঘর</b><span>Kitchen Board</span></div>
+  <div class="live"><span class="dot"></span> লাইভ · <span id="qcount" class="num">০</span> সক্রিয়</div>
+  <div class="spacer"></div>
+  <button class="hbtn" onclick="window.print()">🖨️ প্রিন্ট</button>
+  <button class="hbtn" onclick="load()">↻ রিফ্রেশ</button>
+</header>
+
+<div class="board">
+  <section class="col pending">
+    <div class="col-head"><span class="ic"></span><b>নতুন অর্ডার</b><span class="n num" id="n-q">০</span></div>
+    <div class="col-body" id="col-queued"></div>
+  </section>
+  <section class="col cooking">
+    <div class="col-head"><span class="ic"></span><b>রান্না হচ্ছে</b><span class="n num" id="n-p">০</span></div>
+    <div class="col-body" id="col-preparing"></div>
+  </section>
+  <section class="col ready">
+    <div class="col-head"><span class="ic"></span><b>প্রস্তুত</b><span class="n num" id="n-r">০</span></div>
+    <div class="col-body" id="col-ready"></div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="m-head"><b id="m-title">অর্ডার</b>
+      <button class="m-close" onclick="closeModal()">×</button></div>
+    <div class="m-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const API='/.netlify/functions/sar';
+async function api(action,body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(Object.assign({action},body||{}))});
+  if(!r.ok) throw new Error(action+' '+r.status);
+  return r.json();
+}
+const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
+const MEAL={breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
+const STATION=['steam','airfry','airfry','cold','cold'];
+const STCOLOR={steam:'var(--steam)',airfry:'var(--airfry)',cold:'var(--cold)'};
+let TICKETS={};  // id -> ticket (for modal)
+
+function ageOf(iso){return Math.max(0,Math.round((Date.now()-new Date(iso).getTime())/60000));}
+function ageClass(m){return m>=20?'late':m>=10?'warn':'';}
+
+function card(t){
+  const age=ageOf(t.created_at), courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
+  const stations=courses.map(c=>{
+    const st=STATION[(c.slot||1)-1]||'steam';
+    return '<span class="sdot" style="background:'+STCOLOR[st]+'">'+bn(c.slot||1)+'</span>';
+  }).join('');
+  // column-specific footer buttons
+  let foot='';
+  if(t.status==='queued'){
+    foot='<button class="act cook" onclick="adv('+t.id+',\'preparing\')">🍳 রান্না শুরু</button>'+
+         '<button class="act decline" onclick="adv('+t.id+',\'declined\')">✕ বাতিল</button>';
+  }else if(t.status==='preparing'){
+    foot='<button class="act rdy" onclick="adv('+t.id+',\'ready\')">✓ খাবার প্রস্তুত</button>';
+  }else if(t.status==='ready'){
+    foot='<button class="act deliver" onclick="adv('+t.id+',\'served\')">🛵 ডেলিভারি</button>';
+  }
+  return '<div class="card" data-id="'+t.id+'">'+
+    '<div class="c-head" onclick="openModal('+t.id+')">'+
+      '<span class="c-no">#'+bn(t.order_id||t.id)+'</span>'+
+      '<span class="c-link">'+(t.menu_code||'মেনু')+' ↗</span>'+
+      '<span class="c-meta">'+(MEAL[t.meal_type]||t.meal_type||'')+' · '+(t.day||'')+
+        '<br><span class="age '+ageClass(age)+'">'+bn(age)+' মিন</span></span>'+
+    '</div>'+
+    '<div class="c-sum">'+
+      '<span class="chip kcal">'+bn(t.total_kcal||0)+' kcal</span>'+
+      '<span class="chip">প্রোটিন '+bn(t.total_protein||0)+'g</span>'+
+      '<span class="chip">'+bn(courses.length)+' কোর্স</span>'+
+    '</div>'+
+    '<div class="stations">'+stations+'</div>'+
+    '<div class="c-foot">'+foot+'</div>'+
+  '</div>';
+}
+
+function openModal(id){
+  const t=TICKETS[id]; if(!t)return;
+  const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
+  document.getElementById('m-title').textContent='অর্ডার #'+bn(t.order_id||t.id)+' · '+(t.menu_code||'');
+  document.getElementById('m-body').innerHTML=courses.map(c=>{
+    const st=STATION[(c.slot||1)-1]||'steam';
+    const ings=(c.ingredients||[]).map(g=>'<span class="ing">'+g.item+' <b>'+bn(g.grams)+'g</b></span>').join('');
+    const steps=(c.steps||[]).map(s=>'<li>'+s+'</li>').join('');
+    return '<div class="course"><div class="co-top">'+
+      '<span class="co-slot" style="background:'+STCOLOR[st]+'">'+bn(c.slot||1)+'</span>'+
+      '<span class="co-name">'+(c.name_bn||'কোর্স '+(c.slot||1))+'</span>'+
+      (c.kcal?'<span class="co-kcal">'+bn(c.kcal)+' kcal</span>':'')+'</div>'+
+      '<div class="ings">'+ings+'</div><ul class="steps">'+steps+'</ul></div>';
+  }).join('')||'<div class="col-empty">কোর্স তথ্য নেই</div>';
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+
+function fill(colId,list,nId){
+  const el=document.getElementById(colId);
+  document.getElementById(nId).textContent=bn(list.length);
+  if(!list.length){el.innerHTML='<div class="col-empty">কোনো অর্ডার নেই</div>';return;}
+  // newest first
+  list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  el.innerHTML=list.map(card).join('');
+}
+
+async function load(){
+  try{
+    const r=await api('kitchenQueue',{statuses:['queued','preparing','ready']});
+    const tk=r.tickets||[]; TICKETS={};
+    tk.forEach(t=>TICKETS[t.id]=t);
+    const q=tk.filter(t=>t.status==='queued');
+    const p=tk.filter(t=>t.status==='preparing');
+    const rd=tk.filter(t=>t.status==='ready');
+    fill('col-queued',q,'n-q'); fill('col-preparing',p,'n-p'); fill('col-ready',rd,'n-r');
+    document.getElementById('qcount').textContent=bn(tk.length);
+  }catch(e){
+    document.getElementById('col-queued').innerHTML=
+      '<div class="col-empty">কিউ লোড হয়নি। sar.js ডিপ্লয় ও kitchen_display টেবিল আছে কিনা দেখুন।<br><small>'+e.message+'</small></div>';
+  }
+}
+async function adv(id,to){
+  // served/declined leave the board but stay in DB (record kept)
+  try{await api('kitchenStatus',{id,status:to});}catch(e){}
+  closeModal(); load();
+}
+load();
+setInterval(load,15000);
+</script>
+</body>
+</html>
