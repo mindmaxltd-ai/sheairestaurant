@@ -696,8 +696,7 @@ function orderMeal(uid){
   cart=cart.filter(c=>c.uid!==uid);
   cart.push({uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,
     name:item.ename||item.name,name_bn:item.name,meal:p[1],mealBn:MEALS.find(m=>m.key===p[1]).bn,
-    day:DAYS[p[0]],cat:item.cat,courses,courseIdx:sel.slice().sort((a,b)=>a-b),
-    courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
+    day:DAYS[p[0]],cat:item.cat,courses,courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
     kcal:kc,protein:pr});
   localStorage.setItem('sar_ms_cart',JSON.stringify(cart));
   updateCart(); openCart(); toast('✓ "'+(item.name).slice(0,20)+'" Order-এ যোগ হয়েছে');
