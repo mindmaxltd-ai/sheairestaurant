@@ -631,19 +631,41 @@ async function storeReceiptAudit(order, items, cust, oid){
   }catch(e){ /* audit is best-effort, never blocks the receipt */ }
 }
 
-// ── Generate the receipt PDF, upload to Supabase Storage, and save the
-//    public link to the `receipts` row (and audit). The dashboard "রিসিট"
-//    button reads these links as a date-sorted list. Non-blocking. ──
+// ── Ensure a receipts row exists for this order (always), then best-effort
+//    generate + upload the PDF and attach its public link. The dashboard
+//    lists from orders and shows the PDF link when present. Non-blocking. ──
 async function savePdfToSupabase(order, oid){
+  const d = window._rcp || {};
+  const cid = d.cid || localStorage.getItem('sar_customer_id');
+  const rcpNum = d.rcpNum || ('RCP-'+Date.now());
+  const oidv = (order && order.id) || oid;
+
+  // 1) ALWAYS make sure a receipts row exists (so the dashboard has a record),
+  //    independent of whether PDF generation/upload works.
+  if(oidv){
+    try{
+      const chk = await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}&select=id`, {headers:H});
+      const exists = await chk.json();
+      if(Array.isArray(exists) && exists.length){
+        await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}`, {
+          method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
+          body: JSON.stringify({ receipt_number:rcpNum })
+        }).catch(()=>{});
+      }else{
+        await fetch(`${SUPA}/rest/v1/receipts`, {
+          method:'POST', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
+          body: JSON.stringify({ order_id:oidv, customer_id:cid, customer_name:d.name, receipt_number:rcpNum })
+        }).catch(()=>{});
+      }
+    }catch(e){ /* keep going */ }
+  }
+
+  // 2) Best-effort: render PDF → upload to Storage → attach pdf_url.
   try{
-    if(typeof html2pdf === 'undefined') return;            // lib not loaded → skip silently
-    const d = window._rcp || {};
-    const cid = d.cid || localStorage.getItem('sar_customer_id');
-    const rcpNum = d.rcpNum || ('RCP-'+Date.now());
+    if(typeof html2pdf === 'undefined') return;            // lib not loaded → row already saved above
     const sheet = document.getElementById('sheet');
     if(!sheet) return;
 
-    // render the A4 receipt to a PDF blob
     const opt = {
       margin:0, filename:`${rcpNum}.pdf`,
       image:{type:'jpeg', quality:0.96},
@@ -652,37 +674,25 @@ async function savePdfToSupabase(order, oid){
     };
     const blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
 
-    // upload to Storage bucket "receipts": <customer_id>/<rcpNum>.pdf
     const path = `${cid||'guest'}/${rcpNum}.pdf`;
     const up = await fetch(`${SUPA}/storage/v1/object/receipts/${encodeURIComponent(path)}`, {
       method:'POST',
       headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/pdf', 'x-upsert':'true' },
       body: blob
     });
-    if(!up.ok) return;
+    if(!up.ok) return;                                      // row stays without pdf_url; dashboard still lists it
     const pdfUrl = `${SUPA}/storage/v1/object/public/receipts/${path}`;
 
-    // save link on the receipts row (match by order_id; else insert minimal row)
-    const oidv = (order && order.id) || oid;
     if(oidv){
-      const patch = await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}`, {
-        method:'PATCH',
-        headers:{...H, 'Content-Type':'application/json', Prefer:'return=minimal'},
+      await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}`, {
+        method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
         body: JSON.stringify({ pdf_url:pdfUrl, receipt_number:rcpNum })
-      });
-      // if no receipts row existed to patch, insert one
-      if(patch.status === 404 || patch.status === 400){
-        await fetch(`${SUPA}/rest/v1/receipts`, {
-          method:'POST', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-          body: JSON.stringify({ order_id:oidv, customer_id:cid, customer_name:d.name, receipt_number:rcpNum, pdf_url:pdfUrl })
-        }).catch(()=>{});
-      }
+      }).catch(()=>{});
+      await fetch(`${SUPA}/rest/v1/receipt_audit?order_id=eq.${oidv}`, {
+        method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
+        body: JSON.stringify({ pdf_url:pdfUrl })
+      }).catch(()=>{});
     }
-    // also stamp the audit row with the link
-    await fetch(`${SUPA}/rest/v1/receipt_audit?receipt_number=eq.${encodeURIComponent(rcpNum)}`, {
-      method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-      body: JSON.stringify({ pdf_url:pdfUrl })
-    }).catch(()=>{});
   }catch(e){ /* pdf storage is best-effort */ }
 }
 
