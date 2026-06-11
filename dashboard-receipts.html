@@ -64,29 +64,48 @@ async function load(){
   const id = cid();
   const list = document.getElementById('list');
   if(!id){ list.innerHTML = `<div class="empty">লগইন করুন রিসিট দেখতে।</div>`; return; }
-  let rows = [];
-  try{
-    // date-sorted, only receipts that have a stored PDF link
-    const r = await fetch(`${SUPA}/rest/v1/receipts?customer_id=eq.${id}&pdf_url=not.is.null&order=created_at.desc&select=receipt_number,order_id,pdf_url,total_calories,created_at`, {headers:H});
-    rows = await r.json() || [];
-  }catch(e){ rows = []; }
 
-  if(!rows.length){
-    list.innerHTML = `<div class="empty">এখনও কোনো সংরক্ষিত রিসিট নেই।<br><a href="order.html">প্রথম অর্ডার করুন →</a></div>`;
+  // Source of truth = the customer's orders (always exist after checkout).
+  // We attach a stored PDF link when one exists; otherwise the row links to
+  // receipt.html?oid=… which renders (and re-saves) the PDF on open.
+  let orders = [], receipts = [];
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/orders?customer_id=eq.${id}&order=created_at.desc&select=id,order_number,total_amount,created_at`, {headers:H});
+    orders = await r.json() || [];
+  }catch(e){ orders = []; }
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/receipts?customer_id=eq.${id}&select=order_id,receipt_number,pdf_url,total_calories`, {headers:H});
+    receipts = await r.json() || [];
+  }catch(e){ receipts = []; }
+
+  // index receipts by order_id
+  const recByOrder = {};
+  (Array.isArray(receipts)?receipts:[]).forEach(rc=>{ if(rc.order_id) recByOrder[rc.order_id] = rc; });
+
+  if(!Array.isArray(orders) || !orders.length){
+    list.innerHTML = `<div class="empty">এখনও কোনো রিসিট নেই।<br><a href="order.html">প্রথম অর্ডার করুন →</a></div>`;
     return;
   }
-  list.innerHTML = rows.map(r=>`
+
+  list.innerHTML = orders.map(o=>{
+    const rc = recByOrder[o.id] || {};
+    const rnum = rc.receipt_number || o.order_number || 'রিসিট';
+    const hasPdf = !!rc.pdf_url;
+    const viewHref = hasPdf ? rc.pdf_url : `receipt.html?oid=${o.id}`;
+    const cals = rc.total_calories;
+    return `
     <div class="rcard">
       <div class="rinfo">
-        <div class="rnum">${r.receipt_number||'রিসিট'}</div>
-        <div class="rdate">${fmtDate(r.created_at)}</div>
-        ${r.total_calories?`<div class="rcal">🔥 ${r.total_calories} kcal</div>`:''}
+        <div class="rnum">${rnum}</div>
+        <div class="rdate">${fmtDate(o.created_at)}${o.total_amount?` · ৳${o.total_amount}`:''}</div>
+        ${cals?`<div class="rcal">🔥 ${cals} kcal</div>`:''}
       </div>
       <div class="ract">
-        <a class="btn btn-view" href="${r.pdf_url}" target="_blank">দেখুন</a>
-        <a class="btn btn-dl" href="${r.pdf_url}" download>ডাউনলোড</a>
+        <a class="btn btn-view" href="${viewHref}" target="_blank">${hasPdf?'PDF দেখুন':'রিসিট খুলুন'}</a>
+        ${hasPdf?`<a class="btn btn-dl" href="${rc.pdf_url}" download>ডাউনলোড</a>`:''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 load();
 </script>
