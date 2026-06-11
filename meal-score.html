@@ -626,9 +626,35 @@ async function loadCategory(cat,silent){
   hideLoader();
 }
 function normalize(m){
-  return {id:m.id,code:m.menu_code,cat:m.disease_category,meal:m.meal_type,day:m.day||'',
-    name:m.name_bn,c1:m.course_1_bn,c2:m.course_2_bn,c3:m.course_3_bn,chutney:m.chutney_name||'',
+  // map DB values to internal keys robustly (handles casing / Bengali / codes)
+  const cat=mapCat(m.disease_category||m.category||m.cat);
+  const meal=mapMeal(m.meal_type||m.meal);
+  const db=MEAL_DB[cat]||MEAL_DB.DM;
+  const di=DAYS.indexOf(m.day||'');  const dayIdx=di>=0?di:0;
+  const idx=((dayIdx%7)+WEEK_SEED)%7;
+  // Prefer an explicit English name from the DB; otherwise use the SAME weekly
+  // rotating title pool the local FALLBACK uses. Only use the Bengali name as a
+  // last resort if even the rotation pool is missing.
+  const rotated=(aiTitles&&aiTitles[meal]&&aiTitles[meal][idx])||(db[meal]&&db[meal][idx])||(db[meal]&&db[meal][0]);
+  const ename=(m.name_en&&m.name_en.trim())||(m.menu_name&&m.menu_name.trim())||rotated||m.name_bn;
+  return {id:m.id,code:m.menu_code,cat,meal,day:m.day||'',ename:ename,
+    name:m.name_bn||db.bn_name,c1:m.course_1_bn,c2:m.course_2_bn,c3:m.course_3_bn,chutney:m.chutney_name||'',
     kcal:m.calories||0,protein:parseInt(m.protein_g||0)||0,fiber:parseInt(m.fiber_g||0)||0,benefits:m.benefits||''};
+}
+// normalize DB category/meal values to internal keys
+function mapCat(v){
+  if(!v)return 'DM';
+  const s=String(v).trim().toUpperCase();
+  if(['DM','OB','FL','IB','PR'].includes(s))return s;
+  const map={'DIABETES':'DM','ডায়াবেটিস':'DM','OBESITY':'OB','স্থূলতা':'OB','FATTY LIVER':'FL','ফ্যাটি লিভার':'FL','IBS':'IB','GASTRIC':'IB','গ্যাস্ট্রিক':'IB','PREGNANCY':'PR','গর্ভাবস্থা':'PR','PRENATAL':'PR'};
+  return map[s]||map[String(v).trim()]||'DM';
+}
+function mapMeal(v){
+  if(!v)return 'breakfast';
+  const s=String(v).trim().toLowerCase();
+  if(['breakfast','lunch','dinner'].includes(s))return s;
+  const map={'সকাল':'breakfast','দুপুর':'lunch','রাত':'dinner','morning':'breakfast','noon':'lunch','night':'dinner','b':'breakfast','l':'lunch','d':'dinner'};
+  return map[s]||map[String(v).trim()]||'breakfast';
 }
 
 function buildWeek(cat){
