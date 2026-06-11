@@ -91,14 +91,24 @@ exports.handler = async (event) => {
         return reply(200, { items: Array.isArray(d) ? d : [] });
       }
 
-      // ── 2. customer_metrics (250 fields) ────────────────────
+      // ── 2. customer_metrics + customers (sar_category সহ) ────
       case 'metrics': {
         const cid = encodeURIComponent(p.customer_id);
-        const url = `${SUPABASE_URL}/rest/v1/customer_metrics`
-          + `?customer_id=eq.${cid}&select=*&limit=1`;
-        const r = await fetch(url, { headers: SB });
-        const d = await r.json();
-        return reply(200, { metrics: (Array.isArray(d) && d[0]) || {} });
+        const [mRes, cRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/customer_metrics?customer_id=eq.${cid}&select=*&limit=1`, { headers: SB }),
+          fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${cid}&select=sar_category,bmi,height_cm,weight_kg&limit=1`, { headers: SB }),
+        ]);
+        const mArr = await mRes.json();
+        const cArr = await cRes.json();
+        const m = (Array.isArray(mArr) && mArr[0]) || {};
+        const c = (Array.isArray(cArr) && cArr[0]) || {};
+        // customers টেবিলের sar_category meal-score যেসব নামে খোঁজে সেগুলোতে বসিয়ে দিই
+        if (c.sar_category) {
+          m.disease_category = m.disease_category || c.sar_category;
+          m.sar_category_interest = m.sar_category_interest || c.sar_category;
+        }
+        if (c.bmi != null && m.bmi == null) m.bmi = c.bmi;
+        return reply(200, { metrics: m });
       }
 
       // ── 3. save meal score → ai_analysis table ──────────────
