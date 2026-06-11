@@ -1685,22 +1685,30 @@ async function saveAllMetrics() {
 
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.message || 'মেট্রিক্স সেভ করতে সমস্যা হয়েছে');
+      // পুরো error তথ্য দেখাই — কোন constraint, কোন details
+      const full = `[customer_metrics] code:${err.code||'?'} | constraint:${err.message||''} | details:${err.details||''} | hint:${err.hint||''}`;
+      throw new Error(full);
     }
 
     lt.textContent = 'AI বিশ্লেষণ অনুরোধ পাঠানো হচ্ছে...';
 
-    // Log notification for admin to run analysis
-    await fetch(`${SUPA_URL}/rest/v1/notifications_log`, {
-      method: 'POST', headers: H,
-      body: JSON.stringify({
-        customer_id: CID,
-        notification_type: 'whatsapp',
-        trigger_event: 'registration',
-        message_preview: `${CNAME}-এর স্বাস্থ্য মেট্রিক্স আপডেট হয়েছে। AI বিশ্লেষণের জন্য অ্যাডমিন প্যানেলে যান।`,
-        status: 'pending'
-      })
-    });
+    // Log notification for admin to run analysis (duplicate হলেও submit আটকাবে না)
+    try {
+      const nres = await fetch(`${SUPA_URL}/rest/v1/notifications_log`, {
+        method: 'POST', headers: H,
+        body: JSON.stringify({
+          customer_id: CID,
+          notification_type: 'whatsapp',
+          trigger_event: 'registration',
+          message_preview: `${CNAME}-এর স্বাস্থ্য মেট্রিক্স আপডেট হয়েছে। AI বিশ্লেষণের জন্য অ্যাডমিন প্যানেলে যান।`,
+          status: 'pending'
+        })
+      });
+      if (!nres.ok) {
+        const ne = await nres.json();
+        console.error('notifications_log সমস্যা (উপেক্ষা করা হলো):', ne);
+      }
+    } catch(ne) { console.error('notifications_log ব্যর্থ (উপেক্ষা করা হলো):', ne); }
 
     loader.classList.remove('show');
 
@@ -1794,8 +1802,8 @@ async function saveDailyLog() {
   };
 
   try {
-    // Use upsert — same day won't duplicate
-    const r = await fetch(`${SUPA_URL}/rest/v1/daily_health_log`, {
+    // Upsert — on_conflict স্পষ্ট করে দিচ্ছি, যাতে একই দিনে duplicate না হয়ে আপডেট হয়
+    const r = await fetch(`${SUPA_URL}/rest/v1/daily_health_log?on_conflict=customer_id,log_date`, {
       method:  'POST',
       headers: {
         ...H,
@@ -1809,7 +1817,7 @@ async function saveDailyLog() {
     }
     if (!r.ok && r.status !== 204) {
       const errText = await r.text();
-      throw new Error('HTTP ' + r.status + ': ' + errText.substring(0, 80));
+      throw new Error('HTTP ' + r.status + ': ' + errText.substring(0, 200));
     }
 
     // Success
