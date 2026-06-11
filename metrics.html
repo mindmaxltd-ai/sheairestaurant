@@ -1662,26 +1662,24 @@ async function saveAllMetrics() {
 
   try {
     const data = collectAll();
+    data.customer_id = CID;   // customer_id সবসময় থাকা নিশ্চিত করি
 
-    // Check if metrics already exist for this customer
-    const chkRes = await fetch(
-      `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=id`,
-      { headers: H }
+    // UPSERT — থাকলে আপডেট, না থাকলে নতুন। Supabase নিজেই বুঝে নেয়।
+    // আগের "চেক করে তারপর insert" পদ্ধতি duplicate error দিচ্ছিল, তাই এটা ব্যবহার করছি।
+    let res = await fetch(
+      `${SUPA_URL}/rest/v1/customer_metrics?on_conflict=customer_id`,
+      {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(data)
+      }
     );
-    const existing = await chkRes.json();
 
-    let res;
-    if (existing && existing.length > 0) {
-      // UPDATE existing record
+    // যদি কোনো কারণে upsert না হয়, পুরোনো row সরাসরি আপডেট করি (নিরাপত্তা জাল)
+    if (!res.ok) {
       res = await fetch(
         `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}`,
         { method: 'PATCH', headers: { ...H, 'Prefer': 'return=minimal' }, body: JSON.stringify(data) }
-      );
-    } else {
-      // INSERT new record
-      res = await fetch(
-        `${SUPA_URL}/rest/v1/customer_metrics`,
-        { method: 'POST', headers: H, body: JSON.stringify(data) }
       );
     }
 
