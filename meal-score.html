@@ -10,48 +10,59 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Space+Mono&display=swap');
 
 :root{
-  --orange:#FF7A1A;--orange-d:#E2620A;--orange-soft:#FFEAD8;
-  --pink:#FFB6CE;--pink-soft:#FFEDF3;--pink-d:#C24E76;
-  --green:#2EA86B;--green-d:#1C7A4B;--green-soft:#E4F6EC;
-  --ink:#23202B;--ink-2:#6B6577;
-  --cream:#FFFBF7;--card:#FFFFFF;--line:#F1E6DC;
-  --shadow:0 6px 28px rgba(60,40,20,.07);
-  --shadow-lg:0 18px 50px rgba(255,122,26,.18);
-  --grad:linear-gradient(120deg,#FF7A1A 0%,#FF9C6B 38%,#FFB6CE 70%,#2EA86B 130%);
+  /* Posh jewel-tone system — saffron gold, rose, emerald on warm ivory */
+  --orange:#E8821E;--orange-d:#B85C0C;--orange-soft:#FBEBD6;
+  --gold:#C9A24B;--gold-d:#9C7A2E;--gold-soft:#F6EEDC;
+  --pink:#E9A7B8;--pink-soft:#FBEEF1;--pink-d:#A84E68;
+  --green:#2C8C63;--green-d:#1A6645;--green-soft:#E2F2EA;
+  --plum:#3A2E3F;
+  --ink:#231E27;--ink-2:#6E6675;
+  --cream:#FCFAF6;--card:#FFFFFF;--line:#EDE5DA;--line-2:#E3D8C9;
+  --shadow:0 2px 8px rgba(58,46,40,.04),0 10px 34px rgba(58,46,40,.07);
+  --shadow-lg:0 24px 70px rgba(184,92,12,.16),0 8px 24px rgba(58,46,40,.10);
+  --grad:linear-gradient(125deg,#B85C0C 0%,#E8821E 30%,#C9A24B 55%,#E9A7B8 80%,#2C8C63 130%);
+  --grad-soft:linear-gradient(135deg,#FBEBD6 0%,#FBEEF1 55%,#F6EEDC 120%);
+  --gold-line:linear-gradient(90deg,transparent,#C9A24B,transparent);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(900px 500px at 85% -5%,rgba(201,162,75,.10),transparent 60%),
+  radial-gradient(700px 480px at -5% 8%,rgba(233,167,184,.10),transparent 55%),
+  radial-gradient(800px 600px at 50% 110%,rgba(44,140,99,.07),transparent 60%);}
 img{max-width:100%;display:block}
 .num{font-family:'Space Mono',monospace}
 .serif{font-family:'Playfair Display',serif}
 
-.topbar{height:4px;background:var(--grad);background-size:200% 100%;animation:slide 8s linear infinite}
+.topbar{height:3px;background:var(--grad);background-size:200% 100%;animation:slide 9s linear infinite}
 @keyframes slide{to{background-position:200% 0}}
 
 .nav{position:sticky;top:0;z-index:50;background:rgba(255,251,247,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .nav-in{max-width:1180px;margin:0 auto;padding:.8rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
-.logo-mark{width:40px;height:40px;border-radius:14px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;box-shadow:var(--shadow)}
+.logo-mark{width:42px;height:42px;border-radius:13px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;box-shadow:var(--shadow);position:relative}
+.logo-mark::after{content:'';position:absolute;inset:0;border-radius:13px;border:1px solid rgba(255,255,255,.35)}
 .logo-name{font-weight:700;font-size:1.2rem;letter-spacing:-.01em}
-.logo-name small{display:block;font-weight:400;font-size:.62rem;color:var(--ink-2);letter-spacing:.05em}
+.logo-name small{display:block;font-weight:400;font-size:.6rem;color:var(--gold-d);letter-spacing:.16em;text-transform:uppercase;margin-top:1px}
 .nav-actions{display:flex;align-items:center;gap:.55rem}
-.nav-link{color:var(--ink-2);text-decoration:none;font-size:.92rem;padding:.4rem .6rem;border-radius:8px}
+.nav-link{color:var(--ink-2);text-decoration:none;font-size:.92rem;padding:.4rem .6rem;border-radius:8px;transition:color .15s}
 .nav-link:hover{color:var(--orange-d)}
-.cart-btn{border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.5rem;background:var(--ink);color:#fff;padding:.55rem 1.1rem;border-radius:30px;font-weight:700;font-size:.9rem;transition:transform .15s}
-.cart-btn:hover{transform:translateY(-1px)}
+.cart-btn{border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:.5rem;background:var(--plum);color:#fff;padding:.55rem 1.15rem;border-radius:30px;font-weight:700;font-size:.9rem;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(58,46,63,.25)}
+.cart-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(58,46,63,.3)}
 .cart-pill{background:var(--orange);border-radius:20px;padding:.05rem .5rem;font-size:.78rem}
 
-.hero{max-width:1180px;margin:0 auto;padding:2.6rem 1.25rem 1rem}
-.eyebrow{display:inline-flex;align-items:center;gap:.45rem;background:var(--orange-soft);color:var(--orange-d);font-weight:700;font-size:.78rem;padding:.4rem .9rem;border-radius:30px;margin-bottom:1rem}
-.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:pulse 1.8s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.hero h1{font-size:clamp(2rem,5.5vw,3.3rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;max-width:20ch}
-.hero h1 em{font-style:italic;font-family:'Playfair Display',serif;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{margin-top:.9rem;font-size:1.05rem;color:var(--ink-2);max-width:56ch}
+.hero{max-width:1180px;margin:0 auto;padding:3.2rem 1.25rem 1rem;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--gold-soft);color:var(--gold-d);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.45rem 1rem;border-radius:30px;margin-bottom:1.3rem;box-shadow:var(--shadow)}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.85)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.3rem,6vw,4rem);font-weight:600;line-height:1.06;letter-spacing:-.015em;max-width:18ch;color:var(--plum)}
+.hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{margin-top:1.1rem;font-size:1.08rem;color:var(--ink-2);max-width:54ch;line-height:1.7}
 
-.score-card{max-width:1180px;margin:1.6rem auto 0;padding:0 1.25rem}
-.score-in{background:linear-gradient(135deg,#fff 0%,var(--pink-soft) 55%,var(--orange-soft) 130%);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:auto 1fr}
+.score-card{max-width:1180px;margin:1.9rem auto 0;padding:0 1.25rem}
+.score-in{background:linear-gradient(135deg,#fff 0%,#fff 40%,var(--gold-soft) 130%);border:1px solid var(--line-2);border-radius:26px;box-shadow:var(--shadow-lg);overflow:hidden;display:grid;grid-template-columns:auto 1fr;position:relative}
+.score-in::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--gold-line)}
 .score-ring{padding:1.9rem 2rem;display:flex;align-items:center;gap:1.5rem;border-right:1px solid var(--line)}
 .ring{position:relative;width:128px;height:128px;flex-shrink:0}
 .ring svg{transform:rotate(-90deg)}
@@ -118,22 +129,28 @@ img{max-width:100%;display:block}
 .loader p{color:var(--ink-2);font-weight:700}
 
 /* ── meal card ── */
-.mcard{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
-.mcard.rec{border-color:var(--orange)}
-.mcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-.mc-head{padding:1.2rem 1.25rem .9rem;background:linear-gradient(135deg,var(--orange-soft) 0%,var(--pink-soft) 100%);position:relative}
-.mc-no{font-size:.7rem;font-weight:700;color:var(--orange-d);letter-spacing:.08em;text-transform:uppercase}
-.mc-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.3rem;line-height:1.25;margin-top:.2rem;color:var(--ink)}
-.mc-name sup{font-size:.6rem;color:var(--orange-d)}
-.mc-rec{position:absolute;top:1.1rem;right:1.1rem;background:#fff;color:var(--orange-d);font-size:.66rem;font-weight:700;padding:.25rem .6rem;border-radius:20px;box-shadow:var(--shadow)}
-.mc-body{padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s;position:relative}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);opacity:0;transition:opacity .25s;z-index:2}
+.mcard:hover::before{opacity:1}
+.mcard.rec{border-color:var(--gold)}
+.mcard.rec::before{opacity:1;background:linear-gradient(90deg,var(--gold),var(--orange))}
+.mcard:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.mc-head{padding:1.3rem 1.3rem 1rem;background:var(--grad-soft);position:relative;border-bottom:1px solid var(--line)}
+.mc-no{font-size:.66rem;font-weight:700;color:var(--gold-d);letter-spacing:.14em;text-transform:uppercase}
+.mc-name{font-family:'Playfair Display',serif;font-weight:600;font-size:1.42rem;line-height:1.2;margin-top:.25rem;color:var(--plum);letter-spacing:-.01em}
+.mc-name sup{font-size:.58rem;color:var(--gold-d)}
+.mc-rec{position:absolute;top:1.1rem;right:1.1rem;background:var(--plum);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:.3rem .7rem;border-radius:20px;box-shadow:var(--shadow);text-transform:uppercase}
+.mc-body{padding:1.2rem 1.3rem;display:flex;flex-direction:column;gap:1.05rem}
 .badges{display:flex;flex-wrap:wrap;gap:.35rem}
-.dbadge{font-size:.66rem;font-weight:700;color:var(--green-d);background:var(--green-soft);border:1px solid #cdeedd;padding:.18rem .5rem;border-radius:20px}
+.dbadge{font-size:.65rem;font-weight:700;color:var(--green-d);background:var(--green-soft);border:1px solid #cce6da;padding:.2rem .55rem;border-radius:20px}
 .ings{display:flex;flex-wrap:wrap;gap:.35rem}
-.ing{font-size:.78rem;font-weight:700;color:var(--orange-d);background:var(--orange-soft);padding:.25rem .6rem;border-radius:16px}
+.ing{font-size:.78rem;font-weight:700;color:var(--orange-d);background:var(--orange-soft);padding:.28rem .65rem;border-radius:16px;border:1px solid #f3e1cb}
+.adds{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.adds-l{font-size:.7rem;font-weight:700;color:var(--ink-2)}
+.addchip{font-size:.72rem;font-weight:700;color:var(--pink-d);background:var(--pink-soft);border:1px solid #f0d2da;padding:.2rem .55rem;border-radius:16px}
 
-.panel-h{font-size:.72rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
-.panel-h::before{content:'';width:14px;height:2px;border-radius:2px;background:var(--orange)}
+.panel-h{font-size:.7rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;display:flex;align-items:center;gap:.45rem}
+.panel-h::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--orange))}
 
 .nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem}
 .n-pill{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:.5rem .3rem;text-align:center}
@@ -184,7 +201,11 @@ img{max-width:100%;display:block}
 .mc-price .pp{font-size:1.25rem;font-weight:700}
 .mc-price .pp small{font-size:.68rem;color:var(--ink-2);font-weight:400}
 .mc-price .pq{font-size:.66rem;color:var(--ink-2)}
-.order-btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.92rem;background:var(--grad);background-size:160% 100%;color:#fff;padding:.65rem 1.3rem;border-radius:24px;transition:background-position .3s,transform .15s;box-shadow:var(--shadow)}
+.mc-btns{display:flex;gap:.5rem;align-items:center}
+.cart-add{border:1.5px solid var(--orange);background:#fff;color:var(--orange-d);cursor:pointer;font-family:inherit;font-weight:700;font-size:.86rem;padding:.6rem 1rem;border-radius:24px;transition:all .15s;white-space:nowrap}
+.cart-add:hover{background:var(--orange-soft)}
+.cart-add.added{background:var(--green);border-color:var(--green);color:#fff}
+.order-btn{border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:.9rem;background:var(--grad);background-size:160% 100%;color:#fff;padding:.65rem 1.2rem;border-radius:24px;transition:background-position .3s,transform .15s;box-shadow:var(--shadow);white-space:nowrap}
 .order-btn:hover{background-position:100% 0;transform:translateY(-1px)}
 
 /* drawer */
@@ -295,13 +316,13 @@ img{max-width:100%;display:block}
 <section class="meals" id="meals"></section>
 
 <p class="note">
-  <b>কীভাবে কাজ করে:</b> প্রতিদিন ভোর ৬টায় SAR-এর AI আপনার স্বাস্থ্য মেট্রিক্স, মুড, রোগের অবস্থা ও আবহাওয়া বিশ্লেষণ করে ২১টি মিল ব্যক্তিগতভাবে সাজায়। প্রতিটি মিলে ৫টি কোর্স — সকালে কমপক্ষে ২টি, দুপুর ও রাতে কমপক্ষে ৩টি; ৪নং (চাটনি) ও ৫নং (মৌসুমি ফল) ঐচ্ছিক। প্রতি কোর্স ৳৯০, এবং ক্যালরি কোর্স সংখ্যা অনুযায়ী বদলায় (যত কোর্স তত kcal)। সব খাবার চিনিমুক্ত, লবণমুক্ত (পিংক সল্ট), তেলমুক্ত, রংমুক্ত, আয়ুর্বেদিক, অর্গানিক, ভাত/গম/ময়দামুক্ত, দুধমুক্ত এবং আগুন ছাড়া (এয়ার-ফ্রায়ার/স্টিমার) তৈরি। আপনি শুধু আপনার রোগ-বিভাগের মেনু দেখবেন; দুই রোগ থাকলে দুটোই দেখাবে ও মেশালে মিল-প্রতি ২৫% যোগ হয়। এটি চিকিৎসা পরামর্শ নয়।
+  <b>কীভাবে কাজ করে:</b> প্রতিদিন ভোর ৬টায় SAR-এর AI আপনার স্বাস্থ্য মেট্রিক্স, মুড, রোগের অবস্থা, গত রাতের ডেটা ও আবহাওয়া বিশ্লেষণ করে আজকের ৩ বেলার মিল ব্যক্তিগতভাবে সাজায় — উপাদান, পরিমাণ, ক্যালরি ও পুষ্টি আপনার নিজস্ব। প্রতিটি মিলে ৫টি কোর্স — সকালে কমপক্ষে ২টি, দুপুর ও রাতে কমপক্ষে ৩টি; ৪নং (চাটনি) ও ৫নং (মৌসুমি ফল) ঐচ্ছিক। সব খাবার <b>তেলমুক্ত, চিনিমুক্ত, রংমুক্ত, দুধমুক্ত, আগুনমুক্ত (steam/bake/air-fry), অর্গানিক ও আয়ুর্বেদিক</b>; অনুমোদিত যোগ — মাখন, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম ও মৌসুমি ফল। প্রতিটি মিল একটি অনুমোদিত <b>১০০-উপাদানের মাস্টার তালিকা</b> থেকে তৈরি (মৌসুমি ফল ব্যতিক্রম)। মিলের নাম প্রতি সপ্তাহে Claude AI স্বয়ংক্রিয়ভাবে বদলে দেয়। <b>আপনি এখানে শুধু মেনু কার্ড দেখছেন — পুষ্টি, উপকারিতা ও দৈনিক চাহিদা; রেসিপি (রান্নার প্রণালী ও সঠিক পরিমাণ) শুধু রান্নাঘরে প্রতিটি অর্ডারের সাথে পাঠানো হয়।</b> এটি চিকিৎসা পরামর্শ নয়।
 </p>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
 <aside class="drawer" id="drawer">
   <div class="dr-head"><h3>আপনার অর্ডার</h3><button class="dr-close" onclick="closeCart()">×</button></div>
-  <div class="dr-body" id="drBody"><div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের Order বোতাম চাপুন।</div></div>
+  <div class="dr-body" id="drBody"><div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের "কার্টে যোগ" বা "এখনই অর্ডার" চাপুন।</div></div>
   <div class="dr-foot">
     <div class="sum"><span>সাবটোটাল</span><span id="sub">৳ ০</span></div>
     <div class="sum" id="mixRow" style="display:none"><span>মিশ্রণ চার্জ (২৫%)</span><span id="mixAmt">৳ ০</span></div>
@@ -372,8 +393,145 @@ const MEAL_DB={
     benefits:['Iron & Folate','Calcium Support','Fetal Growth','Maternal Energy','Hormonal Balance'],
   },
 };
-// condition powders (AI-selected daily) — shared pool
+// ════════════════════════════════════════════════════
+// MEDICINAL LAYER POOLS — rotated daily by (day + conditionOffset),
+// AI may override via the 6AM analysis. Topping stays fixed.
+// ════════════════════════════════════════════════════
+// Disease powders: a wider therapeutic pool per category (was fixed 3).
+const DISEASE_POWDER_POOLS={
+  DM:['Cinnamon','Fenugreek','Gurmar','Bitter Melon Powder','Berberine','Jamun Seed Powder','Bay Leaf Powder'],
+  OB:['Triphala','Garcinia','Green Tea Extract','Guggul','Cumin Powder','Ginger Powder','Black Pepper Powder'],
+  FL:['Milk Thistle','Bhumyamalaki Powder','Turmeric','Kutki Powder','Dandelion Root','Amla Powder','Punarnava'],
+  IB:['Lemongrass','Licorice','Ginger','Fennel Powder','Carom (Ajwain)','Triphala','Peppermint Powder'],
+  PR:['Shatavari','Moringa Powder','Amla Powder','Dates Powder','Sesame Powder','Fennel Powder','Ginger Powder'],
+};
+// Condition powders: chosen by the customer's daily STATE, not the disease.
+// The rotation start shifts with stress/sleep/mood so a calm day differs from a tense one.
+const CONDITION_POWDER_POOLS={
+  calm:   ['Ashwagandha','Brahmi','Jatamansi'],      // high stress / poor sleep
+  energy: ['Tulsi','Shatavari','Amla'],              // low energy / tired mood
+  gut:    ['Triphala','Fennel','Ginger'],            // bloating
+  balance:['Ashwagandha','Tulsi','Brahmi'],          // default balanced state
+};
+// AI Chutney pool — emotional/therapeutic chutneys rotated daily.
+const CHUTNEY_POOLS={
+  DM:['Stress Relief Green Chutney','Cinnamon Mint Chutney','Bitter Greens Chutney','Coriander Amla Chutney'],
+  OB:['Metabolic Mint Chutney','Green Detox Chutney','Spiced Coriander Chutney','Lemon Herb Chutney'],
+  FL:['Liver Cleanse Coriander Chutney','Amla Mint Chutney','Beetroot Detox Chutney','Green Herb Chutney'],
+  IB:['Soothing Mint Chutney','Fennel Calm Chutney','Curry Leaf Chutney','Ginger Mint Chutney'],
+  PR:['Iron-Rich Moringa Chutney','Amla Sesame Chutney','Mint Coriander Chutney','Date Tamarind Chutney'],
+};
+// fallback global pool kept for backward compatibility
 const CONDITION_POWDERS=['Ashwagandha','Tulsi','Brahmi'];
+
+// Resolve the day's medicinal layer (AI-first, condition-rotation fallback).
+// di = day index, mealKey = breakfast|lunch|dinner, cat = disease.
+function medicinalFor(cat,di,mealKey){
+  const ai=aiDaily&&aiDaily[di]&&aiDaily[di][mealKey]&&aiDaily[di][mealKey].medicinal;
+  const off=conditionOffset(metrics);
+  const mShift={breakfast:0,lunch:1,dinner:2}[mealKey]||0;
+  const seed=di+off+mShift;
+
+  // Disease powders — rotate 3 from the disease pool
+  const dpool=DISEASE_POWDER_POOLS[cat]||DISEASE_POWDER_POOLS.DM;
+  const disease=(ai&&ai.disease)||rotPick(dpool,seed,0,3);
+
+  // Condition powders — pick the STATE bucket from the customer's metrics, then rotate
+  let stateKey='balance';
+  const stress=+(metrics.stress_level||0), sleep=+(metrics.sleep_hours||metrics.sleep||7), mood=(metrics.mood||'').toString();
+  if(stress>=6||sleep<6) stateKey='calm';
+  else if(/low|tired|ক্লান্ত|খারাপ/i.test(mood)) stateKey='energy';
+  else if(metrics.bloating&&/yes|হ্যাঁ/i.test(String(metrics.bloating))) stateKey='gut';
+  const cpool=CONDITION_POWDER_POOLS[stateKey]||CONDITION_POWDER_POOLS.balance;
+  const condition=(ai&&ai.condition)||rotPick(cpool,seed,0,3);
+
+  // AI Chutney — rotate 1 from the disease chutney pool
+  const chpool=CHUTNEY_POOLS[cat]||CHUTNEY_POOLS.DM;
+  const chutney=(ai&&ai.chutney)||chpool[(seed)%chpool.length];
+
+  return {disease,condition,chutney,state:stateKey};
+}
+
+
+// ════════════════════════════════════════════════════
+// MASTER 100 — the highest-100 approved ingredient list.
+// EVERY meal is built ONLY from this set (+ seasonal fruit, which is exempt).
+// Allowed proteins/fat: butter, boneless fish, boneless indigenous chicken,
+// indigenous egg. Strictly: oil-free, sugar-free, colour-free, milk-free, fire-free.
+// ════════════════════════════════════════════════════
+const MASTER_100=[
+  // Gourds & squashes (1-10)
+  'Pumpkin','Bottle Gourd','Bitter Gourd','Ash Gourd','Ridge Gourd','Snake Gourd','Pointed Gourd','Cucumber','Zucchini','Chayote',
+  // Leafy greens (11-22)
+  'Spinach','Red Spinach','Water Spinach','Malabar Spinach','Mustard Greens','Moringa Leaves','Fenugreek Leaves','Coriander Leaves','Mint Leaves','Curry Leaves','Amaranth Leaves','Taro Leaves',
+  // Other vegetables (23-38)
+  'Broccoli','Cauliflower','Cabbage','Carrot','Beetroot','Radish','Tomato','Green Papaya','Raw Banana','Drumstick','Okra','Brinjal','Green Beans','Capsicum','Turnip','Sweet Potato',
+  // Sprouts & legumes (39-50)
+  'Chickpea Sprout','Green Gram Sprout','Lentil Sprout','Mung Bean','Black Gram','Red Lentil','Yellow Lentil','Kidney Bean','Black Chickpea','Field Pea','Soybean','Cowpea',
+  // Seeds & nuts (51-62)
+  'Chia Seed','Flax Seed','Pumpkin Seed','Sunflower Seed','Sesame Seed','Almond','Walnut','Pistachio','Cashew','Peanut','Watermelon Seed','Basil Seed',
+  // Allowed proteins (63-67)
+  'Boneless Fish','Boneless Indigenous Chicken','Indigenous Egg','Butter (Makhon)','Greek Yogurt (unsweetened)',
+  // Whole grains / pseudo-grains (68-76)
+  'Red Rice','Brown Rice','Oats','Quinoa','Buckwheat','Millet (Kaon)','Foxtail Millet','Barley','Amaranth Grain',
+  // Spices, herbs & aromatics (77-92)
+  'Turmeric','Cumin','Coriander Seed','Black Pepper','Ginger','Garlic','Green Chili','Bay Leaf','Cinnamon','Cardamom','Clove','Fennel','Carom (Ajwain)','Nigella (Kalojira)','Mustard Seed','Asafoetida',
+  // Functional / ayurvedic powders & extras (93-100)
+  'Amla','Lemon','Tamarind','Pink Salt','Coconut (fresh)','Bael Pulp','Pomegranate','Rose Water',
+];
+
+// ════════════════════════════════════════════════════
+// DAILY VARIATION POOLS — each course role has a POOL (all from MASTER_100).
+// The rotation engine picks a different slice each day so no two days are
+// identical. AI may override with daily picks; otherwise rotation runs.
+// ════════════════════════════════════════════════════
+const COURSE_POOLS={
+  DM:{ main:['Bitter Gourd','Bottle Gourd','Pumpkin','Ash Gourd','Ridge Gourd','Snake Gourd','Pointed Gourd'],
+       prot:['Chickpea Sprout','Green Gram Sprout','Boneless Fish','Indigenous Egg','Greek Yogurt (unsweetened)','Black Chickpea','Lentil Sprout'],
+       steam:['Broccoli','Cauliflower','Green Beans','Okra','Cabbage','Capsicum','Turnip'],
+       leafy:['Spinach','Mustard Greens','Fenugreek Leaves','Moringa Leaves','Amaranth Leaves'],
+       seed:['Chia Seed','Flax Seed','Pumpkin Seed','Sunflower Seed'] },
+  OB:{ main:['Ash Gourd','Bottle Gourd','Cucumber','Zucchini','Ridge Gourd','Chayote','Pumpkin'],
+       prot:['Green Gram Sprout','Indigenous Egg','Greek Yogurt (unsweetened)','Boneless Indigenous Chicken','Mung Bean','Soybean','Lentil Sprout'],
+       steam:['Broccoli','Cauliflower','Cabbage','Green Beans','Capsicum','Okra','Carrot'],
+       leafy:['Mustard Greens','Moringa Leaves','Spinach','Water Spinach','Malabar Spinach'],
+       seed:['Pumpkin Seed','Flax Seed','Sunflower Seed','Watermelon Seed'] },
+  FL:{ main:['Ridge Gourd','Bottle Gourd','Snake Gourd','Pointed Gourd','Ash Gourd','Bitter Gourd','Radish'],
+       prot:['Lentil Sprout','Boneless Fish','Green Gram Sprout','Red Lentil','Mung Bean','Chickpea Sprout','Indigenous Egg'],
+       steam:['Beetroot','Radish','Carrot','Broccoli','Cauliflower','Green Papaya','Turnip'],
+       leafy:['Water Spinach','Coriander Leaves','Spinach','Amaranth Leaves','Mint Leaves'],
+       seed:['Flax Seed','Sunflower Seed','Pumpkin Seed','Basil Seed'] },
+  IB:{ main:['Snake Gourd','Bottle Gourd','Pointed Gourd','Ridge Gourd','Green Papaya','Carrot','Ash Gourd'],
+       prot:['Greek Yogurt (unsweetened)','Green Gram Sprout','Boneless Indigenous Chicken','Mung Bean','Lentil Sprout','Indigenous Egg','Boneless Fish'],
+       steam:['Carrot','Green Papaya','Raw Banana','Sweet Potato','Turnip','Green Beans','Drumstick'],
+       leafy:['Mint Leaves','Curry Leaves','Coriander Leaves','Spinach','Malabar Spinach'],
+       seed:['Flax Seed','Basil Seed','Sunflower Seed','Pumpkin Seed'] },
+  PR:{ main:['Pumpkin','Bottle Gourd','Drumstick','Sweet Potato','Green Papaya','Carrot','Beetroot'],
+       prot:['Chickpea Sprout','Indigenous Egg','Greek Yogurt (unsweetened)','Boneless Fish','Almond','Lentil Sprout','Mung Bean'],
+       steam:['Beetroot','Carrot','Broccoli','Green Beans','Drumstick','Sweet Potato','Capsicum'],
+       leafy:['Moringa Leaves','Red Spinach','Spinach','Amaranth Leaves','Fenugreek Leaves'],
+       seed:['Sesame Seed','Almond','Sunflower Seed','Watermelon Seed'] },
+};
+// Condition-driven swap: last night's data nudges the rotation start.
+function conditionOffset(m){
+  let o=0;
+  const stress=+(m.stress_level||0), sleep=+(m.sleep_hours||m.sleep||7), mood=(m.mood||'').toString();
+  if(stress>=7)o+=2; else if(stress>=4)o+=1;
+  if(sleep<6)o+=1;
+  if(/low|tired|ক্লান্ত|খারাপ/i.test(mood))o+=1;
+  if(m.bloating&&/yes|হ্যাঁ/i.test(String(m.bloating)))o+=1;
+  return o;
+}
+// Pick `count` distinct items from a pool, rotated by (day + conditionOffset + mealShift).
+function rotPick(pool,day,off,count){
+  if(!pool||!pool.length)return [];
+  const out=[],n=pool.length;
+  for(let i=0;i<count;i++)out.push(pool[(day+off+i)%n]);
+  return out;
+}
+// AI may supply per-day picks: aiDaily[di][mealKey] = {main:[],prot:[],steam:[]}
+let aiDaily=null;
+
 // seasonal fruit course options (disease-aware); yogurt allowed
 const SEASONAL_FRUITS={
   DM:['Guava','Black Berry','Olive','Green Apple','Pear'],
@@ -383,7 +541,11 @@ const SEASONAL_FRUITS={
   PR:['Mango','Jackfruit','Lichi','Pineapple','Dates','Raisin','Banana','Grapes','Orange','Yogurt'],
 };
 // per-meal dietary compliance badges (apply to every SAR meal)
-const DIET_BADGES=['চিনিমুক্ত','লবণমুক্ত (পিংক সল্ট)','তেলমুক্ত','রংমুক্ত','আয়ুর্বেদিক','অর্গানিক','ভাতমুক্ত','গমমুক্ত','ময়দামুক্ত','আগুনমুক্ত (Air-fry/Steam)','দুধমুক্ত'];
+// Mandate: oil-free, sugar-free, colour-free, organic, ayurvedic, FIRE-FREE (steam/air-fry/bake only), MILK-FREE.
+// Allowed: butter/মাখন, seasonal fruit, boneless fish (steam/bake), boneless indigenous chicken, indigenous egg.
+const DIET_BADGES=['তেলমুক্ত','চিনিমুক্ত','রংমুক্ত','অর্গানিক','আয়ুর্বেদিক','আগুনমুক্ত (Steam/Bake)','দুধমুক্ত','লবণমুক্ত (পিংক সল্ট)'];
+// allowed protein/fat additions surfaced to the customer (NOT oil, NOT milk)
+const ALLOWED_ADDS=['মাখন (Butter)','টক দই (Yogurt)','বোনলেস মাছ','দেশি মুরগি (Boneless)','দেশি ডিম','মৌসুমি ফল'];
 
 // ════════════════════════════════════════════════════
 // CONFIG — NO keys here. All calls via Netlify function.
@@ -415,6 +577,11 @@ const CAT_INFO={
   PR:{bn:'গর্ভাবস্থা',dis:['শতাবরী','মরিঙ্গা','আমলকি'],base:470,focus:'আয়রন · ফোলেট · ক্যালসিয়াম'},
 };
 const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
+// ISO week number — used to auto-rotate meal titles every week.
+// Claude AI may override with fresh weekly names via the analyze action.
+function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-ys)/86400000+1)/7);}
+const WEEK_SEED=isoWeek(new Date());
+let aiTitles=null; // {breakfast:[...7], lunch:[...7], dinner:[...7]} from Claude, optional
 
 // ── state ──
 let metrics={}, allMenu=[], myWeek={}, cardSel={};
@@ -477,8 +644,9 @@ function buildWeek(cat){
 }
 function FALLBACK(cat,meal,di){
   const db=MEAL_DB[cat]||MEAL_DB.DM;
-  const idx=di%7;
-  const ename=(db[meal]&&db[meal][idx])||db[meal][0];
+  // weekly auto-rotation: shift the 7 names by the ISO week so titles change every week
+  const idx=((di%7)+WEEK_SEED)%7;
+  const ename=(aiTitles&&aiTitles[meal]&&aiTitles[meal][idx])||(db[meal]&&db[meal][idx])||db[meal][0];
   return {id:cat+'-'+meal+'-'+di,code:cat+'-'+meal.slice(0,2).toUpperCase()+'-'+(di+1),cat,meal,day:'',
     name:db.bn_name,ename:ename,
     ingredients:db.ingredients,chutney:'স্ট্রেস রিলিফ গ্রিন চাটনি',
@@ -495,6 +663,9 @@ async function runAnalysis(silent){
     if(r.ai) result=Object.assign({cat:activeCat,bmi:(metrics.bmi||'—'),source:'Claude AI'},JSON.parse(r.ai));
   }catch(e){}
   if(!result) result=localEngine(activeCat);
+  // adopt fresh weekly titles from Claude if provided, then rebuild the week
+  if(result.titles&&result.titles.breakfast){aiTitles=result.titles;buildWeek(activeCat);}
+  if(result.daily){aiDaily=result.daily;}   // AI per-day ingredient picks (optional)
   analysis=result;
   applyPersonalization(result);
   paintScore(result);
@@ -504,8 +675,13 @@ async function runAnalysis(silent){
 function buildPrompt(cat){
   const m=metrics;
   return 'তুমি SAR She AI Restaurant-এর পুষ্টি AI। নিচের বাংলাদেশি নারীর তথ্য বিশ্লেষণ করে আজকের ব্যক্তিগত মিল প্ল্যান হিসাব করো।\n'+
-    'নাম:'+CNAME+' | BMI:'+(m.bmi||'?')+' | রোগ:'+cat+' | স্ট্রেস:'+(m.stress_level||'?')+'/১০ | কার্যকলাপ:'+(m.activity_level||'?')+' | গর্ভাবস্থা:'+(m.pregnancy_status||'না')+'\n'+
-    'শুধু JSON দাও:\n{"score":<৫৫-৯৮>,"target":<kcal>,"protein":<g>,"split":{"breakfast":0.3,"lunch":0.4,"dinner":0.3},"focus":"<বাংলায়>","mood":"<বাংলায়>","weather":"<বাংলায়>","note":"<২ বাক্য বাংলায়>"}';
+    'সব খাবার তেলমুক্ত, চিনিমুক্ত, রংমুক্ত, দুধমুক্ত, আগুনমুক্ত (steam/bake/air-fry), অর্গানিক, আয়ুর্বেদিক। অনুমোদিত: মাখন, টক দই, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম, মৌসুমি ফল।\n'+
+    'নাম:'+CNAME+' | BMI:'+(m.bmi||'?')+' | রোগ:'+cat+' | স্ট্রেস:'+(m.stress_level||'?')+'/১০ | ঘুম:'+(m.sleep_hours||m.sleep||'?')+'ঘ | মুড:'+(m.mood||'?')+' | কার্যকলাপ:'+(m.activity_level||'?')+' | গর্ভাবস্থা:'+(m.pregnancy_status||'না')+' | সপ্তাহ:'+WEEK_SEED+'\n'+
+    'রোগ ও আজকের কন্ডিশন (স্ট্রেস/ঘুম/মুড) অনুযায়ী থেরাপিউটিক পাউডার, কন্ডিশন পাউডার ও চাটনি বেছে দাও।\n'+
+    'শুধু JSON দাও (titles=এই সপ্তাহের ৭টি ইংরেজি মিল-নাম প্রতি বেলায়; daily=ঐচ্ছিক, প্রতিদিনের মেডিসিনাল লেয়ার):\n'+
+    '{"score":<৫৫-৯৮>,"target":<kcal>,"protein":<g>,"split":{"breakfast":0.3,"lunch":0.4,"dinner":0.3},"focus":"<বাংলায়>","mood":"<বাংলায়>","weather":"<বাংলায়>","note":"<২ বাক্য বাংলায়>",'+
+    '"titles":{"breakfast":["..7টি.."],"lunch":["..7টি.."],"dinner":["..7টি.."]},'+
+    '"daily":{"0":{"breakfast":{"medicinal":{"disease":["..3টি.."],"condition":["..3টি.."],"chutney":"<একটি>"}}}}}';
 }
 function localEngine(cat){
   const m=metrics, bmi=+m.bmi||23, mood=(m.stress_level!=null)?(10-+m.stress_level):7;
@@ -582,26 +758,39 @@ function renderMeals(){
 }
 
 // 5 courses; NO soup. Course 4 (chutney) + 5 (seasonal fruit) optional.
-// min courses depend on meal (breakfast 2, lunch/dinner 3)
-function coursesFor(item){
-  const cat=item.cat, info=MEAL_DB[cat]||MEAL_DB.DM;
-  const ings=info.ingredients||[];
+// Each day/meal gets a UNIQUE ingredient set: AI daily picks if available,
+// else deterministic rotation by (day + conditionOffset + meal shift).
+function coursesFor(item,di,mealKey){
+  const cat=item.cat;
+  di=(di==null?activeDay:di);
+  mealKey=mealKey||item.meal||'lunch';
+  const pools=COURSE_POOLS[cat]||COURSE_POOLS.DM;
   const fruits=SEASONAL_FRUITS[cat]||SEASONAL_FRUITS.DM;
-  const mainIngs=ings.slice(0,4).join(', ');
-  const sideIngs=ings.slice(4).join(', ');
+  const off=conditionOffset(metrics);
+  const mShift={breakfast:0,lunch:2,dinner:4}[mealKey]||0;   // meals differ within a day
+  const seed=di+off+mShift;
+
+  // AI daily override if provided for this day+meal
+  const ai=aiDaily&&aiDaily[di]&&aiDaily[di][mealKey];
+  const mainIngs = (ai&&ai.main)||rotPick(pools.main,seed,0,2).concat(rotPick(pools.leafy,seed,0,1));
+  const protIngs = (ai&&ai.prot)||rotPick(pools.prot,seed,0,2);
+  const steamIngs= (ai&&ai.steam)||rotPick(pools.steam,seed,0,2);
+  const seedTop  = rotPick(pools.seed,seed,0,1)[0]||'Pumpkin Seed';
+  const fruitPick= fruits[(seed)%fruits.length];
+
   return [
-    {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs,req:true},
-    {n:'প্রোটিন ও স্প্রাউট কোর্স',sub:'Chickpea / Green Gram Sprout, '+(ings[3]||'Pumpkin Seed'),req:true},
-    {n:'স্টিমড / এয়ার-ফ্রায়েড সবজি কোর্স',sub:sideIngs||'মৌসুমি সবজি',req:true},
+    {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs.join(', '),items:mainIngs,req:true},
+    {n:'প্রোটিন ও স্প্রাউট কোর্স',sub:protIngs.concat(seedTop).join(', '),items:protIngs.concat(seedTop),req:true},
+    {n:'স্টিমড / এয়ার-ফ্রায়েড সবজি কোর্স',sub:steamIngs.join(', '),items:steamIngs,req:true},
     {n:'ইমোশনাল চাটনি কোর্স',sub:(item.chutney||'AI Green Chutney'),req:false,opt:true},
-    {n:'মৌসুমি ফল কোর্স',sub:fruits.join(' / '),req:false,opt:true},
+    {n:'মৌসুমি ফল কোর্স',sub:fruitPick+' (আজকের)',items:[fruitPick],req:false,opt:true},
   ];
 }
 function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
 function mealNo(meal,di){const idx={breakfast:1,lunch:2,dinner:3}[meal];return (di*3+idx);}
 
 function card(item,meal){
-  const di=activeDay, courses=coursesFor(item), uid=di+'_'+meal.key;
+  const di=activeDay, courses=coursesFor(item,di,meal.key), uid=di+'_'+meal.key;
   const minC=minCoursesFor(meal.key);
   const defSel=minC>=3?[0,1,2]:[0,1];
   const sel=(cardSel[uid]||(cardSel[uid]=defSel.slice()));
@@ -619,7 +808,10 @@ function card(item,meal){
   const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
   while(benList.length<3) benList.push(db.benefits[benList.length]||'সুষম পুষ্টি');
   const dis=db.disease;
-  const allIngs=(item.ingredients&&item.ingredients.length?item.ingredients:db.ingredients);
+  // medicinal layer — AI/condition driven per day & meal (topping stays fixed)
+  const medic=medicinalFor(item.cat,di,meal.key);
+  // today's actual ingredients = union of the required courses' items (unique)
+  const allIngs=[].concat(...courses.slice(0,3).map(c=>c.items||[])).filter((v,i,a)=>v&&a.indexOf(v)===i);
   const cHtml=courses.map((c,ci)=>{
     const on=sel.indexOf(ci)>-1;
     const atMin=cnt<=minC&&on&&c.req;
@@ -638,6 +830,7 @@ function card(item,meal){
     '</div>'+
     '<div class="mc-body">'+
       '<div class="badges">'+DIET_BADGES.map(b=>'<span class="dbadge">'+b+'</span>').join('')+'</div>'+
+      '<div class="adds"><span class="adds-l">অনুমোদিত:</span>'+ALLOWED_ADDS.map(a=>'<span class="addchip">'+a+'</span>').join('')+'</div>'+
       '<div><div class="panel-h">প্রধান কোর্সের উপাদান</div><div class="ings">'+
         allIngs.map(i=>'<span class="ing">'+i+'</span>').join('')+'</div></div>'+
       '<div><div class="panel-h">Nutrition Panel · নির্বাচিত কোর্স অনুযায়ী</div>'+
@@ -653,10 +846,10 @@ function card(item,meal){
       '</div></div>'+
       '<div><div class="panel-h">Benefits ('+bn(benList.length)+'টি)</div><div class="benefits">'+benList.map(b=>'<span class="bchip">✓ '+b+'</span>').join('')+'</div></div>'+
       '<div><div class="panel-h">Medicinal Layer</div><div class="med">'+
-        '<div class="med-row"><span class="ml">Disease Powders</span>'+dis.map(p=>'<span class="pw dis">'+p+'</span>').join('')+'</div>'+
-        '<div class="med-row"><span class="ml">Condition Powders</span>'+CONDITION_POWDERS.map(p=>'<span class="pw con">'+p+'</span>').join('')+'</div>'+
+        '<div class="med-row"><span class="ml">Disease Powders</span>'+medic.disease.map(p=>'<span class="pw dis">'+p+'</span>').join('')+'</div>'+
+        '<div class="med-row"><span class="ml">Condition Powders</span>'+medic.condition.map(p=>'<span class="pw con">'+p+'</span>').join('')+'</div>'+
         '<div class="med-row"><span class="ml">Topping</span><span class="pw top">Roasted Pumpkin Seed</span></div>'+
-        '<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+(item.chutney||'Stress Relief Green Chutney')+'</span></div>'+
+        '<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+medic.chutney+'</span></div>'+
       '</div></div>'+
       '<div class="bchain"><span class="bl">⛓ Blockchain Verified Ingredients</span>'+
         '<a href="blockchain.html?meal='+encodeURIComponent(item.code||item.id)+'">View Traceability →</a></div>'+
@@ -664,7 +857,10 @@ function card(item,meal){
       '<div class="mc-foot"><div class="mc-price">'+
         '<div class="pp num">৳ '+bn(withVat)+' <small>(ভ্যাটসহ)</small></div>'+
         '<div class="pq">'+bn(cnt)+' কোর্স × ৳'+bn(PRICE_PER_COURSE)+(mixExtra?' + ২৫% মিশ্রণ':'')+'</div>'+
-      '</div><button class="order-btn" onclick="orderMeal(\''+uid+'\')">Order →</button></div>'+
+      '</div><div class="mc-btns">'+
+        '<button class="cart-add" onclick="addToCart(\''+uid+'\')">＋ কার্টে যোগ</button>'+
+        '<button class="order-btn" onclick="orderNow(\''+uid+'\')">এখনই অর্ডার →</button>'+
+      '</div></div>'+
     '</div></div>';
 }
 function currentItem(uid){const p=uid.split('_');return myWeek[p[0]][p[1]];}
@@ -682,25 +878,47 @@ function toggleCourse(uid,ci){
   renderMeals();
 }
 
-// ── Order: add to cart, open drawer ──
-function orderMeal(uid){
-  const item=currentItem(uid), mealKey=uid.split('_')[1], minC=minCoursesFor(mealKey);
+// ── build a cart line item from a card (shared by both buttons) ──
+function buildCartItem(uid){
+  const item=currentItem(uid), p0=uid.split('_'), di=+p0[0], mealKey=p0[1], minC=minCoursesFor(mealKey);
   const def=minC>=3?[0,1,2]:[0,1];
   const sel=cardSel[uid]||def;
-  if(sel.length<minC){toast('এই বেলায় কমপক্ষে '+bn(minC)+'টি কোর্স নিন');return;}
-  const courses=coursesFor(item).filter((c,i)=>sel.indexOf(i)>-1).map(c=>c.n);
+  if(sel.length<minC){toast('এই বেলায় কমপক্ষে '+bn(minC)+'টি কোর্স নিন');return null;}
+  const fullCourses=coursesFor(item,di,mealKey);
+  const courses=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>c.n);
+  // store the actual day ingredients so kitchen.html receives THIS day's recipe
+  const courseDetail=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>({name:c.n,items:c.items||[]}));
   const f=window._kcalFactor||1;
   let kc=0,pr=0; sel.forEach(ci=>{kc+=COURSE_KCAL[ci]||120;pr+=COURSE_PROT[ci]||5;});
   kc=Math.round(kc*f/5)*5; pr=Math.round(pr*f);
-  const p=uid.split('_');
-  cart=cart.filter(c=>c.uid!==uid);
-  cart.push({uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,
-    name:item.ename||item.name,name_bn:item.name,meal:p[1],mealBn:MEALS.find(m=>m.key===p[1]).bn,
-    day:DAYS[p[0]],cat:item.cat,courses,courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
-    kcal:kc,protein:pr});
-  localStorage.setItem('sar_ms_cart',JSON.stringify(cart));
-  updateCart(); openCart(); toast('✓ "'+(item.name).slice(0,20)+'" Order-এ যোগ হয়েছে');
+  const medic=medicinalFor(item.cat,di,mealKey);  // day/condition/AI medicinal layer
+  return {uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,day_index:di,courseDetail,kcalFactor:f,
+    name:item.ename||item.name,name_bn:item.name,meal:mealKey,mealBn:MEALS.find(m=>m.key===mealKey).bn,
+    day:DAYS[di],cat:item.cat,courses,courseCount:sel.length,price:sel.length*PRICE_PER_COURSE,
+    diseasePowders:medic.disease,conditionPowders:medic.condition,chutney:medic.chutney,topping:'Roasted Pumpkin Seed',
+    mix:mixOn,kcal:kc,protein:pr};
 }
+
+// ── Add to Cart: full details saved, stays on page, cart count updates ──
+function addToCart(uid){
+  const ci=buildCartItem(uid); if(!ci)return;
+  cart=cart.filter(c=>c.uid!==uid); cart.push(ci);
+  localStorage.setItem('sar_ms_cart',JSON.stringify(cart));
+  updateCart();
+  const btn=event&&event.target; if(btn){btn.textContent='✓ যোগ হয়েছে';btn.classList.add('added');setTimeout(()=>{btn.textContent='＋ কার্টে যোগ';btn.classList.remove('added');},1600);}
+  toast('✓ "'+(ci.name).slice(0,22)+'" কার্টে যোগ হয়েছে');
+}
+
+// ── Order Now: add (if needed) and open cart for immediate checkout ──
+function orderNow(uid){
+  const ci=buildCartItem(uid); if(!ci)return;
+  cart=cart.filter(c=>c.uid!==uid); cart.push(ci);
+  localStorage.setItem('sar_ms_cart',JSON.stringify(cart));
+  updateCart(); openCart();
+  toast('✓ অর্ডারে যোগ — নিচে "অর্ডার নিশ্চিত করুন" চাপুন');
+}
+// keep old name working if referenced elsewhere
+function orderMeal(uid){orderNow(uid);}
 function removeFromCart(uid){cart=cart.filter(c=>c.uid!==uid);localStorage.setItem('sar_ms_cart',JSON.stringify(cart));updateCart();}
 function updateCart(){
   const count=cart.reduce((s,c)=>s+c.courseCount,0);
@@ -715,7 +933,7 @@ function updateCart(){
   document.getElementById('mixAmt').textContent='৳ '+bn(mixExtra);
   document.getElementById('checkout').disabled=!cart.length;
   const body=document.getElementById('drBody');
-  if(!cart.length){body.innerHTML='<div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের Order বোতাম চাপুন।</div>';return;}
+  if(!cart.length){body.innerHTML='<div class="dr-empty">কার্ট এখনও খালি।<br>একটি মিলের "কার্টে যোগ" বা "এখনই অর্ডার" চাপুন।</div>';return;}
   body.innerHTML=cart.map(c=>'<div class="ci"><div class="ci-top"><div><div class="ci-name">'+c.name+'</div><div class="ci-meal">'+c.day+' · '+c.mealBn+'</div></div>'+
     '<button class="ci-del" onclick="removeFromCart(\''+c.uid+'\')">🗑️</button></div>'+
     '<div class="ci-courses">'+c.courses.map((n,i)=>bn(i+1)+'. '+n).join('<br>')+'</div>'+
