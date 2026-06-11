@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>আমার রিসিট — SAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Playfair+Display:wght@700;900&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--rose:#E91E8C;--plum:#880E4F;--purple:#6B21A8;--paper:#FFF4FA;--line:#EBA9C6;--ink:#241018;--ink2:#7A6068}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Hind Siliguri',sans-serif;background:#15101A;color:#fff;min-height:100vh;padding:1.4rem 1rem 4rem;
+  display:flex;flex-direction:column;align-items:center}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 12% -5%,rgba(233,30,140,.10),transparent 60%)}
+.wrap{position:relative;z-index:2;width:100%;max-width:680px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;flex-wrap:wrap;gap:.6rem}
+.title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;
+  background:linear-gradient(90deg,var(--rose),#A855F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.back{color:rgba(255,255,255,.6);text-decoration:none;font-size:.85rem;border:1px solid rgba(255,255,255,.15);
+  padding:.45rem .9rem;border-radius:30px}
+.list{display:flex;flex-direction:column;gap:.6rem}
+.rcard{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem 1.1rem;
+  transition:border-color .2s}
+.rcard:hover{border-color:var(--rose)}
+.rinfo .rnum{font-family:'Space Mono',monospace;font-size:.86rem;font-weight:700;color:#fff}
+.rinfo .rdate{font-size:.76rem;color:rgba(255,255,255,.45);margin-top:2px}
+.rinfo .rcal{font-size:.72rem;color:#34D399;margin-top:2px}
+.ract{display:flex;gap:.4rem;flex-shrink:0}
+.btn{text-decoration:none;font-size:.78rem;font-weight:700;padding:.45rem .9rem;border-radius:8px;white-space:nowrap}
+.btn-view{background:linear-gradient(135deg,var(--rose),var(--purple));color:#fff}
+.btn-dl{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.15)}
+.empty{text-align:center;color:rgba(255,255,255,.4);padding:3rem 1rem;font-size:.9rem}
+.empty a{color:var(--rose);font-weight:700;text-decoration:none}
+.spin{width:34px;height:34px;border:3px solid rgba(233,30,140,.2);border-top-color:var(--rose);
+  border-radius:50%;animation:sp 1s linear infinite;margin:2.5rem auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title">🧾 আমার রিসিট</div>
+    <a class="back" href="dashboard.html">← ড্যাশবোর্ড</a>
+  </div>
+  <div id="list" class="list"><div class="spin"></div></div>
+</div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H = {apikey:KEY, Authorization:'Bearer '+KEY};
+
+function cid(){
+  try{ const c=JSON.parse(localStorage.getItem('sar_customer')||'{}'); return c.id||localStorage.getItem('sar_customer_id'); }
+  catch(e){ return localStorage.getItem('sar_customer_id'); }
+}
+function fmtDate(iso){
+  try{ return new Date(iso).toLocaleString('bn-BD',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ return iso||''; }
+}
+
+async function load(){
+  const id = cid();
+  const list = document.getElementById('list');
+  if(!id){ list.innerHTML = `<div class="empty">লগইন করুন রিসিট দেখতে।</div>`; return; }
+  let rows = [];
+  try{
+    // date-sorted, only receipts that have a stored PDF link
+    const r = await fetch(`${SUPA}/rest/v1/receipts?customer_id=eq.${id}&pdf_url=not.is.null&order=created_at.desc&select=receipt_number,order_id,pdf_url,total_calories,created_at`, {headers:H});
+    rows = await r.json() || [];
+  }catch(e){ rows = []; }
+
+  if(!rows.length){
+    list.innerHTML = `<div class="empty">এখনও কোনো সংরক্ষিত রিসিট নেই।<br><a href="order.html">প্রথম অর্ডার করুন →</a></div>`;
+    return;
+  }
+  list.innerHTML = rows.map(r=>`
+    <div class="rcard">
+      <div class="rinfo">
+        <div class="rnum">${r.receipt_number||'রিসিট'}</div>
+        <div class="rdate">${fmtDate(r.created_at)}</div>
+        ${r.total_calories?`<div class="rcal">🔥 ${r.total_calories} kcal</div>`:''}
+      </div>
+      <div class="ract">
+        <a class="btn btn-view" href="${r.pdf_url}" target="_blank">দেখুন</a>
+        <a class="btn btn-dl" href="${r.pdf_url}" download>ডাউনলোড</a>
+      </div>
+    </div>`).join('');
+}
+load();
+</script>
+</body>
+</html>
