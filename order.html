@@ -1037,16 +1037,122 @@ if(!_orderApproved){
   });
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CART NORMALIZATION LAYER  (fixes meal-score → cart → order → receipt data loss)
+// ───────────────────────────────────────────────────────────────
+// meal-score.html writes a RICH object (courses, courseDetail, ingredients,
+// disease/condition powders, chutney, topping, blockchain code, %DV, benefits).
+// The legacy menu.html wrote a FLAT object (name, price, qty, kcal…).
+// This layer maps BOTH into ONE canonical schema so every downstream consumer —
+// cart render, Supabase order/order_items/receipts, invoice & receipt.html —
+// receives the full structured menu information. Nothing is dropped.
+// ═══════════════════════════════════════════════════════════════
+const MEAL_LBL  = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
+const CAT_EMOJI = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱',AI:'🤖'};
+const CAT_BN    = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+
+// Approx per-ingredient nutrition is unknown at item level; daily reference values:
+const DAILY_REF = { kcal:2000, protein:50, carb:260, fat:65, fiber:25, iron:18 };
+
+function normalizeCartItem(raw){
+  if(!raw || typeof raw!=='object') return null;
+  const isRich = ('courses' in raw) || ('courseDetail' in raw) || ('courseCount' in raw)
+              || ('diseasePowders' in raw) || ('mealBn' in raw);
+
+  // ---- name fields ----
+  const name    = raw.name || raw.name_en || raw.menu_name || raw.name_bn || 'SAR মেনু';
+  const name_bn = raw.name_bn || raw.name || name;
+
+  // ---- meal / category / day ----
+  const meal  = raw.meal || raw.meal_type || 'lunch';
+  const mealBn= raw.mealBn || MEAL_LBL[meal] || meal;
+  const cat   = raw.cat || raw.disease_category || raw.category || 'DM';
+  const day   = raw.day || raw.meal_day || '';
+
+  // ---- structured courses ----
+  // courseDetail: [{name, items:[ingredient,…]}]  (the authoritative day recipe)
+  // courses:      [courseName,…]                  (display fallback)
+  let courseDetail = Array.isArray(raw.courseDetail) ? raw.courseDetail : [];
+  if(!courseDetail.length && Array.isArray(raw.courses)){
+    courseDetail = raw.courses.map(c => (typeof c==='string') ? {name:c, items:[]} : c);
+  }
+  const courses = Array.isArray(raw.courses) ? raw.courses
+                : courseDetail.map(c=>c.name);
+  const courseCount = raw.courseCount || courses.length || 1;
+
+  // ---- flatten unique ingredient list (for blockchain links + kitchen) ----
+  const ingredients = Array.isArray(raw.ingredients) ? raw.ingredients
+    : [].concat(...courseDetail.map(c => Array.isArray(c.items)?c.items:[]))
+        .filter((v,i,a)=> v && a.indexOf(v)===i);
+
+  // ---- medicinal layer ----
+  const diseasePowders   = raw.diseasePowders   || raw.disease_powders   || [];
+  const conditionPowders = raw.conditionPowders || raw.condition_powders || [];
+  const chutney = raw.chutney || raw.chutney_name || '';
+  const topping = raw.topping || 'Roasted Pumpkin Seed';
+
+  // ---- nutrition ----
+  const kcal    = parseInt(raw.kcal||raw.calories||0)||0;
+  const protein = parseFloat(String(raw.protein||raw.protein_g||0))||0;
+  const fiber   = parseFloat(String(raw.fiber||raw.fiber_g||0))||0;
+  const fat     = parseFloat(String(raw.fat||0))||Math.round(kcal*0.25/9);
+  const carb    = parseFloat(String(raw.carb||0))||Math.round(kcal*0.40/4);
+
+  // ---- benefits ----
+  let benefits = raw.benefits || raw.desc || '';
+  if(Array.isArray(benefits)) benefits = benefits.join(' · ');
+
+  // ---- price / qty ----
+  const price = (typeof raw.price==='number') ? raw.price
+              : (courseCount * (raw.pricePerCourse||200));
+  const qty   = raw.qty || 1;
+
+  // ---- blockchain reference code ----
+  const code = raw.code || raw.menu_code || raw.menu_item_id || null;
+
+  return {
+    // identity
+    uid: raw.uid || null,
+    id: raw.id || raw.menu_item_id || null,
+    menu_item_id: (raw.menu_item_id && String(raw.menu_item_id).length>20) ? raw.menu_item_id : null,
+    code,
+    // display
+    name, name_bn, meal, mealBn, cat, day,
+    // structured detail (preserved end-to-end)
+    courses, courseDetail, courseCount, ingredients,
+    diseasePowders, conditionPowders, chutney, topping,
+    mix: !!raw.mix,
+    // nutrition
+    kcal, protein, fiber, fat, carb,
+    // benefits + commerce
+    benefits, price, basePrice: raw.basePrice || price, qty,
+    upgrade: !!raw.upgrade, note: raw.note || '',
+    has_egg: !!raw.has_egg, has_chicken: !!raw.has_chicken,
+    // legacy compat
+    powders: (diseasePowders.concat(conditionPowders)).join(', ') || raw.powders || ''
+  };
+}
+
+function loadCart(){
+  // meal-score "Order now" route writes BOTH sar_cart and sar_ms_cart.
+  let raw = [];
+  try { raw = JSON.parse(localStorage.getItem('sar_cart') || 'null'); } catch(e){}
+  if(!Array.isArray(raw) || !raw.length){
+    try { raw = JSON.parse(localStorage.getItem('sar_ms_cart') || '[]'); } catch(e){ raw=[]; }
+  }
+  const norm = (raw||[]).map(normalizeCartItem).filter(Boolean);
+  // persist back in canonical shape so all subsequent reads are consistent
+  localStorage.setItem('sar_cart', JSON.stringify(norm));
+  return norm;
+}
+
 // State
-let cart        = JSON.parse(localStorage.getItem('sar_cart') || '[]');
+let cart        = loadCart();
 let orderType   = 'dine_in';
 let payMethod   = 'ssl';
 let createdOrderId    = null;
 let currentStep       = 1;
 let _savedOrderItems  = JSON.parse(localStorage.getItem('sar_last_order_items') || '[]');
-
-const CAT_EMOJI = {DM:'🩸',OB:'⚖️',FL:'🫀',IB:'🌿',PR:'🤱'};
-const MEAL_LBL  = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
 
 // ═══════════════════════════════════════
 // INIT
@@ -1114,23 +1220,52 @@ function renderCartStep() {
     return;
   }
   document.getElementById('nextBtn1').disabled = false;
-  list.innerHTML = cart.map((item, idx) => `
+  list.innerHTML = cart.map((item, idx) => {
+    // structured courses (numbered) carried from meal-score
+    const courseHTML = (item.courses && item.courses.length) ? `
+      <div style="margin:.35rem 0;display:flex;flex-direction:column;gap:.2rem">
+        ${item.courseDetail.map((c,i)=>`
+          <div style="font-size:.74rem;color:rgba(255,255,255,.62)">
+            <span style="color:var(--pink2);font-weight:600">${i+1}.</span> ${c.name}
+            ${(c.items&&c.items.length)?`<span style="color:rgba(255,255,255,.38)"> — ${c.items.join(', ')}</span>`:''}
+          </div>`).join('')}
+      </div>` : '';
+    // medicinal layer chips
+    const dPow = (item.diseasePowders||[]);
+    const cPow = (item.conditionPowders||[]);
+    const medHTML = (dPow.length||cPow.length||item.chutney) ? `
+      <div class="nutr-chips" style="margin-top:.25rem">
+        ${dPow.map(p=>`<span class="nc" style="color:#F87171">🌿 ${p}</span>`).join('')}
+        ${cPow.map(p=>`<span class="nc" style="color:#A855F7">✦ ${p}</span>`).join('')}
+        ${item.chutney?`<span class="nc" style="color:var(--green2)">🥄 ${item.chutney}</span>`:''}
+        ${item.topping?`<span class="nc" style="color:var(--yellow2)">🎯 ${item.topping}</span>`:''}
+      </div>` : '';
+    // per-item blockchain link (by code or name)
+    const bcRef = item.code || item.name;
+    const bcHTML = `<a href="blockchain.html?meal=${encodeURIComponent(bcRef)}" target="_blank"
+        style="font-size:.68rem;color:#7CC3FF;text-decoration:none;display:inline-block;margin-top:.3rem">
+        ⛓ Blockchain যাচাই →</a>`;
+  return `
     <div class="ci" id="ci-${idx}">
       <span class="ci-emoji">${CAT_EMOJI[item.cat] || '🍽️'}</span>
       <div class="ci-body">
-        <div class="ci-name">${item.name}</div>
+        <div class="ci-name">${item.name}${item.day?` <span style="font-size:.7rem;color:rgba(255,255,255,.4)">· ${item.day}</span>`:''}</div>
         <div class="ci-meta">
-          <span>${MEAL_LBL[item.meal] || item.meal}</span>
+          <span>${MEAL_LBL[item.meal] || item.mealBn || item.meal}</span>
           <span style="color:var(--yellow2)">৳ ${item.price}</span>
+          ${item.courseCount?`<span>${item.courseCount} কোর্স</span>`:''}
           ${item.cat?`<span style="font-size:.67rem;padding:.1rem .4rem;border-radius:50px;
-            background:rgba(233,30,140,.12);color:var(--pink2)">${item.cat}</span>`:''}
+            background:rgba(233,30,140,.12);color:var(--pink2)">${CAT_BN[item.cat]||item.cat}</span>`:''}
         </div>
+        ${courseHTML}
         <div class="nutr-chips">
           ${item.kcal?`<span class="nc">🔥 ${item.kcal} kcal</span>`:''}
-          ${item.protein?`<span class="nc">💪 ${item.protein}</span>`:''}
-          ${item.has_egg?`<span class="nc" style="color:var(--yellow2)">🥚 ডিম</span>`:''}
-          ${item.has_chicken?`<span class="nc" style="color:var(--green2)">🐓 চিকেন ঘি</span>`:''}
+          ${item.protein?`<span class="nc">💪 ${item.protein}g প্রোটিন</span>`:''}
+          ${item.fiber?`<span class="nc">🌾 ${item.fiber}g ফাইবার</span>`:''}
+          ${item.mix?`<span class="nc" style="color:var(--pink2)">➕ ২৫% মিশ্রণ</span>`:''}
         </div>
+        ${medHTML}
+        ${bcHTML}
         <div class="ci-qty-row">
           <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
           <span class="qty-val">${item.qty}</span>
@@ -1150,7 +1285,8 @@ function renderCartStep() {
         </label>`:''}
       </div>
       <span class="ci-price">৳ ${(item.price * item.qty).toLocaleString('bn-BD')}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   updateAllSummaries();
 }
 
@@ -1320,12 +1456,18 @@ async function processOrder() {
   const tbl    = orderType==='dine_in'  ? document.getElementById('tableNumber')?.value : null;
   const eta    = orderType==='delivery' ? 45 : orderType==='dine_in' ? 25 : 20;
 
-  // Build items_json
+  // Build items_json — FULL structured detail (courses, ingredients, powders,
+  // chutney, topping, blockchain code, %DV) so receipt.html can render everything.
   const itemsJson = cart.map(i => ({
-    id: i.id, name_bn: i.name, cat: i.cat, meal: i.meal,
-    qty: i.qty||1, unit_price: i.price,
+    id: i.id, code: i.code, menu_item_id: i.menu_item_id,
+    name: i.name, name_bn: i.name_bn, cat: i.cat, meal: i.meal, meal_bn: i.mealBn, day: i.day,
+    qty: i.qty||1, unit_price: i.price, course_count: i.courseCount,
+    courses: i.courses, course_detail: i.courseDetail, ingredients: i.ingredients,
+    disease_powders: i.diseasePowders, condition_powders: i.conditionPowders,
+    chutney: i.chutney, topping: i.topping, mix: !!i.mix,
+    benefits: i.benefits,
     upgrade: !!i.upgrade, note: i.note||'',
-    kcal: i.kcal, protein: i.protein,
+    kcal: i.kcal, protein: i.protein, fiber: i.fiber, fat: i.fat, carb: i.carb,
     has_egg: i.has_egg, has_chicken: i.has_chicken
   }));
 
@@ -1368,13 +1510,19 @@ async function processOrder() {
     showLoader('আইটেম সংরক্ষণ হচ্ছে...');
     const oiData = cart.map(i => ({
       order_id: order.id,
-      menu_item_id: i.id || null,
-      menu_name_bn: i.name,
+      menu_item_id: i.menu_item_id || null,
+      menu_name_bn: i.name_bn || i.name,
       quantity: i.qty || 1,
       unit_price: i.price,
       upgrade_selected: !!i.upgrade,
       special_note: i.note || null,
-      nutrition_json: {kcal:i.kcal, protein:i.protein, has_egg:i.has_egg, has_chicken:i.has_chicken}
+      nutrition_json: {
+        kcal:i.kcal, protein:i.protein, fiber:i.fiber, fat:i.fat, carb:i.carb,
+        courses:i.courses, course_detail:i.courseDetail, ingredients:i.ingredients,
+        disease_powders:i.diseasePowders, condition_powders:i.conditionPowders,
+        chutney:i.chutney, topping:i.topping, blockchain_code:i.code,
+        benefits:i.benefits, has_egg:i.has_egg, has_chicken:i.has_chicken
+      }
     }));
     await fetch(`${SUPA}/rest/v1/order_items`, {
       method: 'POST', headers: H, body: JSON.stringify(oiData)
@@ -1452,8 +1600,10 @@ async function processOrder() {
         nutrition_summary_json: totalNutr,
         total_calories: totalNutr.kcal,
         total_protein: totalNutr.protein,
-        health_benefits_bn: 'SAR থেরাপিউটিক মেনু — গ্লুটেন-মুক্ত, পরিশোধিত তেল-মুক্ত, চিনি-মুক্ত।',
-        disease_powders_used: cart.map(i=>i.powders||'').filter(Boolean).join('; ') || null,
+        health_benefits_bn: 'SAR থেরাপিউটিক মেনু — তেলমুক্ত, চিনিমুক্ত, লবণমুক্ত (পিংক সল্ট), রংমুক্ত, দুধমুক্ত, আয়ুর্বেদিক ও অর্গানিক।',
+        disease_powders_used: [...new Set([].concat(
+          ...cart.map(i => (i.diseasePowders||[]).concat(i.conditionPowders||[]))
+        ).filter(Boolean))].join('; ') || null,
       })
     });
 
@@ -1752,12 +1902,21 @@ function buildInvoiceHTML(invNum, items, mode) {
 
     // Benefits
     const itemBenefits = item.benefits || item.desc || catInfo.benefits.slice(0,2).join(' · ');
-    const herbs   = item.powders || item.herbs || '';
+    const dPow = (item.diseasePowders||[]); const cPow = (item.conditionPowders||[]);
+    const herbs = [...dPow,...cPow].join(', ') || item.powders || item.herbs || '';
+    const ings  = Array.isArray(item.ingredients)?item.ingredients:[];
     const mealMap = {breakfast:'🌅 সকাল', lunch:'☀️ দুপুর', dinner:'🌙 রাত'};
     const mealLbl = mealMap[item.meal] || '';
 
-    // Blockchain verification URL
-    const bcUrl   = `blockchain.html?item=${encodeURIComponent(item.name || '')}`;
+    // Blockchain verification URL (by traceable meal code, falls back to name)
+    const bcUrl   = `blockchain.html?meal=${encodeURIComponent(item.code || item.name || '')}`;
+    const ingChips = ings.length ? `<div style="margin:4px 0;display:flex;flex-wrap:wrap;gap:4px">${
+      ings.map(g=>`<a href="blockchain.html?ing=${encodeURIComponent(g)}" target="_blank"
+        style="font-size:9.5px;color:#005BAA;background:#e8f0fe;padding:1px 7px;border-radius:4px;border:1px solid #c5d6f5;text-decoration:none">⛓ ${g}</a>`).join('')}</div>` : '';
+    const courseLines = (Array.isArray(item.courseDetail)&&item.courseDetail.length) ?
+      `<div style="margin:4px 0">${item.courseDetail.map((c,i)=>
+        `<div style="font-size:10.5px;color:#444"><b style="color:#006A4E">${i+1}.</b> ${c.name}${
+          (c.items&&c.items.length)?`<span style="color:#888"> — ${c.items.join(', ')}</span>`:''}</div>`).join('')}</div>` : '';
 
     return `
     <tr>
@@ -1765,7 +1924,10 @@ function buildInvoiceHTML(invNum, items, mode) {
         <div style="font-weight:700;color:#111;font-size:13px;margin-bottom:3px">
           ${item.name || '—'}
           ${mealLbl ? `<span style="font-size:10px;color:#006A4E;font-weight:400;margin-left:6px">${mealLbl}</span>` : ''}
+          ${item.courseCount ? `<span style="font-size:10px;color:#880E4F;font-weight:400;margin-left:4px">· ${item.courseCount} কোর্স</span>` : ''}
         </div>
+        ${courseLines}
+        ${ingChips}
 
         <!-- Nutrition Facts Mini Table -->
         <table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:10.5px">
@@ -2090,8 +2252,15 @@ async function triggerInvoiceWebhook(orderData) {
     invoice_number: invNum,
     items: cart.map(i => ({
       name:       i.name,
+      name_bn:    i.name_bn,
+      meal:       i.mealBn || i.meal,
       qty:        i.qty || 1,
       price:      i.price,
+      courses:    i.courses,
+      ingredients:i.ingredients,
+      powders:    [].concat(i.diseasePowders||[], i.conditionPowders||[]),
+      chutney:    i.chutney,
+      topping:    i.topping,
       calories:   i.kcal   || 0,
       protein:    i.protein || 0,
       benefits:   i.benefits || '',
@@ -2153,23 +2322,43 @@ async function showOrderPinkReceipt() {
     const price   = item.price*qty;
     const kcal    = parseInt(item.kcal)||0;
     const protein = parseFloat(item.protein)||Math.round(kcal*.15/4);
-    const carb    = parseFloat(item.carb)||Math.round(kcal*.5/4);
-    const fat     = parseFloat(item.fat)||Math.round(kcal*.3/9);
     totalKcal    += kcal*qty;
     const pKcal   = kcal?Math.min(99,Math.round(kcal/DAILY.kcal*100)):0;
     const pProt   = protein?Math.min(99,Math.round(protein/DAILY.protein*100)):0;
     const benefits= item.benefits||item.desc||'থেরাপিউটিক ফুড';
-    const herbs   = item.powders||item.herbs||'';
-    const bcUrl   = `blockchain.html?item=${encodeURIComponent(name)}`;
+    const cdetail = Array.isArray(item.courseDetail)?item.courseDetail:[];
+    const ings    = Array.isArray(item.ingredients)?item.ingredients:[];
+    const dPow    = (item.diseasePowders||[]);
+    const cPow    = (item.conditionPowders||[]);
+
+    // numbered courses
+    const courseLines = cdetail.length ? `<div style="margin:3px 0 4px">${cdetail.map((c,i)=>
+      `<div style="font-size:10px;color:#444"><b style="color:#880E4F">${i+1}.</b> ${c.name}${
+        (c.items&&c.items.length)?`<span style="color:#777"> — ${c.items.join(', ')}</span>`:''}</div>`).join('')}</div>` : '';
+
+    // per-ingredient blockchain chips
+    const ingChips = ings.length ? `<div style="margin:3px 0;display:flex;flex-wrap:wrap;gap:3px">${
+      ings.map(ing=>`<a href="blockchain.html?ing=${encodeURIComponent(ing)}" target="_blank"
+        style="font-size:9px;color:#005BAA;background:#E3F2FD;padding:1px 6px;border-radius:4px;border:1px solid #BBDEFB;text-decoration:none">⛓ ${ing}</a>`).join('')}</div>` : '';
+
+    // medicinal layer
+    const medLine = (dPow.length||cPow.length||item.chutney||item.topping) ?
+      `<div style="font-size:9.5px;color:#6A1B9A;margin-top:2px">🌿 ${
+        [...dPow,...cPow].join(', ')}${item.chutney?` · 🥄 ${item.chutney}`:''}${item.topping?` · 🎯 ${item.topping}`:''}</div>` : '';
+
+    const bcUrl = `blockchain.html?meal=${encodeURIComponent(item.code||name)}`;
     nutrRows += `<tr>
-      <td><b>${name}</b>${qty>1?` ×${qty}`:''}
-        <div style="font-size:10.5px;color:#006A4E;margin-top:2px">✦ ${benefits}</div>
-        ${herbs?`<div style="font-size:9.5px;color:#7B1FA2">🌿 ${herbs}</div>`:''}
-        <a href="${bcUrl}" target="_blank" style="font-size:10px;color:#005BAA;background:#E3F2FD;padding:2px 7px;border-radius:4px;border:1px solid #BBDEFB;text-decoration:none;display:inline-block;margin-top:3px">⛓️ Blockchain →</a>
+      <td style="padding:7px 9px;vertical-align:top">
+        <b>${name}</b>${qty>1?` ×${qty}`:''} ${item.mealBn?`<span style="font-size:9px;color:#006A4E">· ${item.mealBn}${item.day?' · '+item.day:''}</span>`:''}
+        ${courseLines}
+        ${ingChips}
+        <div style="font-size:10px;color:#006A4E;margin-top:2px">✦ ${benefits}</div>
+        ${medLine}
+        <a href="${bcUrl}" target="_blank" style="font-size:9.5px;color:#005BAA;background:#E3F2FD;padding:2px 7px;border-radius:4px;border:1px solid #BBDEFB;text-decoration:none;display:inline-block;margin-top:3px">⛓️ সম্পূর্ণ Traceability →</a>
       </td>
-      <td style="text-align:center;font-size:11px">${kcal}<br><small style="color:#AD1457">${pKcal}%</small></td>
-      <td style="text-align:center;font-size:11px">${protein}g<br><small style="color:#AD1457">${pProt}%</small></td>
-      <td style="text-align:right;font-weight:700;font-size:11px">৳${price}</td>
+      <td style="text-align:center;font-size:11px;vertical-align:top">${kcal}<br><small style="color:#AD1457">${pKcal}% DV</small></td>
+      <td style="text-align:center;font-size:11px;vertical-align:top">${protein}g<br><small style="color:#AD1457">${pProt}% DV</small></td>
+      <td style="text-align:right;font-weight:700;font-size:11px;vertical-align:top">৳${price}</td>
     </tr>`;
   });
 
