@@ -1665,7 +1665,7 @@ async function saveAllMetrics() {
 
     // Check if metrics already exist for this customer
     const chkRes = await fetch(
-      `${SUPA_URL}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=id`,
+      `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=id`,
       { headers: H }
     );
     const existing = await chkRes.json();
@@ -1674,13 +1674,13 @@ async function saveAllMetrics() {
     if (existing && existing.length > 0) {
       // UPDATE existing record
       res = await fetch(
-        `${SUPA_URL}/rest/v1/customer-metrics?customer_id=eq.${CID}`,
+        `${SUPA_URL}/rest/v1/customer_metrics?customer_id=eq.${CID}`,
         { method: 'PATCH', headers: { ...H, 'Prefer': 'return=minimal' }, body: JSON.stringify(data) }
       );
     } else {
       // INSERT new record
       res = await fetch(
-        `${SUPA_URL}/rest/v1/customer-metrics`,
+        `${SUPA_URL}/rest/v1/customer_metrics`,
         { method: 'POST', headers: H, body: JSON.stringify(data) }
       );
     }
