@@ -1,0 +1,55 @@
+<!-- ════════════════════════════════════════════════════════════════════════
+     dashboard.html এ "আজকের রিপোর্ট (PDF)" বোতাম দেখানোর কোড
+     ════════════════════════════════════════════════════════════════════════
+
+     এই কোডটি dashboard এ আপার সর্বশেষ PDF রিপোর্টের লিংক দেখাবে।
+
+     কোথায় বসাবেন:
+     dashboard.html এর <script> অংশে, যেখানে অন্য fetch ফাংশনগুলো আছে
+     (যেমন fetchMetrics, fetchAnalysis) — তার পাশে এই ফাংশন যোগ করুন,
+     আর পেজ লোড হওয়ার সময় loadLatestReport() একবার ডাকুন।
+-->
+
+<!-- ── ১. HTML: যেখানে বোতামটা দেখাতে চান সেখানে এটা বসান ── -->
+<div id="reportCard" style="display:none;margin:14px 0;padding:16px;
+     background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.25);
+     border-radius:12px;text-align:center">
+  <div style="font-weight:600;color:#34D399;margin-bottom:8px">📄 আজকের স্বাস্থ্য রিপোর্ট</div>
+  <a id="reportLink" href="#" target="_blank"
+     style="display:inline-block;background:#059669;color:#fff;padding:9px 18px;
+            border-radius:9px;text-decoration:none;font-weight:600">
+     পূর্ণ রিপোর্ট (PDF) দেখুন →
+  </a>
+  <div id="reportDate" style="font-size:.72rem;color:#888;margin-top:8px"></div>
+</div>
+
+
+<!-- ── ২. JavaScript: <script> অংশে এই ফাংশন যোগ করুন ── -->
+<script>
+async function loadLatestReport() {
+  try {
+    if (!CID) return; // CID = লগইন করা আপার আইডি (dashboard এ আগে থেকেই আছে)
+
+    // reports টেবিল থেকে সর্বশেষ রিপোর্ট আনা
+    const r = await fetch(
+      `${SUPA}/rest/v1/reports?customer_id=eq.${CID}&order=report_date.desc&limit=1&select=*`,
+      { headers: H }   // H = dashboard এ আগে থেকেই থাকা header object
+    );
+    if (!r.ok) return;
+    const data = await r.json();
+    const rep = data && data[0];
+    if (!rep || !rep.pdf_url) return;
+
+    // লিংক বসিয়ে কার্ডটা দেখানো
+    document.getElementById('reportLink').href = rep.pdf_url;
+    document.getElementById('reportDate').textContent =
+      'তারিখ: ' + rep.report_date + ' · স্কোর: ' + (rep.meal_score ?? '—') + '/100';
+    document.getElementById('reportCard').style.display = 'block';
+  } catch (e) {
+    console.warn('রিপোর্ট লোড হয়নি:', e);
+  }
+}
+
+// পেজ লোড হলে একবার ডাকুন (অন্য load ফাংশনের পাশে)
+loadLatestReport();
+</script>
