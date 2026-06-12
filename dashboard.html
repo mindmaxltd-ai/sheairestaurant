@@ -1693,7 +1693,7 @@ async function fetchMetrics() {
   try {
     if (!CID) return {};
     console.log('🔄 Fetching metrics, customer_id=', CID);
-    const r = await fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
     console.log('fetchMetrics response:', r.status);
     if (!r.ok) { console.warn('fetchMetrics error:', r.status); return {}; }
     const d = await r.json();
