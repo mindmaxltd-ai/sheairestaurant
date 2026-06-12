@@ -55,6 +55,18 @@ header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
 .c-title .code{color:var(--blue);font-size:.74rem}
 .c-collapse{display:none;padding:0 .8rem .3rem}
 .card.open .c-collapse{display:block}
+.c-cust{font-size:.8rem;color:var(--steam);font-weight:600;margin-left:.3rem}
+.kc-list{margin-top:.4rem;display:flex;flex-direction:column;gap:.35rem}
+.kc-row{display:flex;gap:.5rem;align-items:flex-start}
+.kc-slot{flex:0 0 auto;width:1.3rem;height:1.3rem;border-radius:.3rem;background:var(--steam);
+  color:#0c1116;display:grid;place-items:center;font-size:.7rem;font-weight:700;margin-top:.1rem}
+.kc-body{flex:1}
+.kc-name{font-size:.8rem;font-weight:600;color:var(--ink)}
+.kc-ing{font-size:.72rem;color:var(--ink-2);line-height:1.4}
+.kc-med{margin-top:.45rem;font-size:.74rem;color:var(--airfry);
+  background:rgba(232,137,59,.1);border-radius:.4rem;padding:.3rem .5rem}
+.chip.pay-paid{color:var(--green);border-color:rgba(70,192,138,.4)}
+.chip.pay-cod{color:var(--amber);border-color:rgba(245,183,60,.4)}
 .c-sum{display:flex;flex-wrap:wrap;gap:.3rem;padding:.2rem 0 .5rem}
 .chip{font-size:.7rem;border:1px solid var(--line);border-radius:.4rem;padding:.1rem .45rem;color:var(--ink-2)}
 .chip.kcal{color:var(--amber);border-color:rgba(245,183,60,.35)}
@@ -243,20 +255,43 @@ function ageClass(m){return m>=20?'late':m>=10?'warn':'';}
 function card(t){
   const age=ageOf(t.created_at);
   const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
-  // collapsible summary
+
+  // পেমেন্ট ব্যাজ
+  const payTxt = (t.payment_status==='paid')
+    ? '✓ পরিশোধিত' + (t.payment_method && t.payment_method!=='COD' ? ' ('+t.payment_method+')':'')
+    : (t.payment_method==='COD' ? '💵 ক্যাশ অন ডেলিভারি' : 'বাকি');
+  const payCls = (t.payment_status==='paid') ? 'pay-paid' : 'pay-cod';
+
+  // উপরের সারাংশ চিপ
   const sum='<div class="c-sum">'+
     '<span class="chip kcal">'+bn(t.total_kcal||0)+' kcal</span>'+
     '<span class="chip">প্রোটিন '+bn(t.total_protein||0)+'g</span>'+
-    '<span class="chip">'+bn(courses.length)+' কোর্স</span></div>';
+    '<span class="chip">'+bn(t.course_count||courses.length)+' কোর্স</span>'+
+    '<span class="chip '+payCls+'">'+payTxt+'</span></div>';
 
-  // column-specific footer
+  // কোর্স + উপকরণ (collapsible এ)
+  const courseList = courses.map(c=>{
+    const ings=(c.ingredients||[]).map(g=>(g.item||g)).filter(Boolean).join(', ');
+    return '<div class="kc-row"><span class="kc-slot">'+bn(c.slot||1)+'</span>'+
+      '<div class="kc-body"><div class="kc-name">'+(c.name_bn||'কোর্স')+'</div>'+
+      (ings?'<div class="kc-ing">'+ings+'</div>':'')+'</div></div>';
+  }).join('');
+
+  // মেডিসিনাল পাউডার ও চাটনি
+  const meds=(t.medicinals||[]).filter(Boolean);
+  const medLine = (meds.length||t.chutney)
+    ? '<div class="kc-med">💊 ঔষধি: '+
+        (meds.length?meds.join(', '):'')+
+        (t.chutney?(meds.length?' · ':'')+'চাটনি: '+t.chutney:'')+'</div>'
+    : '';
+
+  // কলাম-নির্দিষ্ট বোতাম
   let foot='';
   if(t.status==='queued'){
     foot='<button class="act recipe" onclick="event.stopPropagation();openRecipe(\''+t.id+'\')">📖 রেসিপি</button>'+
          '<button class="act cook" onclick="event.stopPropagation();claim(\''+t.id+'\')">🍳 রান্না শুরু</button>'+
          '<button class="act decline" onclick="event.stopPropagation();adv(\''+t.id+'\',\'declined\')">✕</button>';
   }else if(t.status==='preparing'){
-    // বোতাম লক: যে ধরেছে শুধু সে "প্রস্তুত" দেখবে; অন্যরা লক-বার্তা
     if(t.claimed_by && t.claimed_by!==STAFF_NAME){
       foot='<button class="act recipe" onclick="event.stopPropagation();openRecipe(\''+t.id+'\')">📖 রেসিপি</button>'+
            '<span class="lockmsg">🔒 '+t.claimed_by+' রান্না করছেন</span>';
@@ -275,14 +310,16 @@ function card(t){
   return '<div class="card" data-id="'+t.id+'">'+
     '<div class="c-head" onclick="toggleCard(this)">'+
       '<span class="c-no">#'+bn(t.order_id)+'</span>'+
-      '<span class="c-meta">'+(MEAL[t.meal_type]||t.meal_type||'')+' · '+(t.day||'')+
+      '<span class="c-cust">'+(t.customer_name||'গ্রাহক')+'</span>'+
+      '<span class="c-meta">'+(MEAL[t.meal_type]||t.meal_type||'')+
         ' <span class="age '+ageClass(age)+'">'+bn(age)+' মিন</span></span>'+
       '<span class="c-toggle">▾</span>'+
     '</div>'+
     '<div class="c-title">'+
       (t.menu_name || (courses[0]?courses[0].name_bn:'থেরাপিউটিক মিল'))+
       (t.menu_code?' <span class="code">'+t.menu_code+'</span>':'')+'</div>'+
-    '<div class="c-collapse">'+sum+claimedLine+'</div>'+
+    '<div class="c-collapse">'+sum+
+      '<div class="kc-list">'+courseList+'</div>'+medLine+claimedLine+'</div>'+
     '<div class="c-foot">'+foot+'</div>'+
   '</div>';
 }
@@ -293,23 +330,38 @@ function toggleCard(head){ head.parentElement.classList.toggle('open'); }
 function openRecipe(id){
   const t=TICKETS[id]; if(!t)return;
   const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
-  const body=courses.map(c=>{
+  let body=courses.map(c=>{
     const ings=(c.ingredients||[]).map(g=>'<span class="ing">'+(g.item||g)+
-      (g.grams?' <b>'+bn(g.grams)+'g</b>':'')+'</span>').join('');
+      (g.grams?' <b>'+bn(g.grams)+'g</b>':'')+'</span>').join('')||'<span class="ing">উপকরণ তালিকা নেই</span>';
     const steps=(c.steps||[]).map(s=>'<li>'+s+'</li>').join('')||
-      '<li>তেলমুক্ত পদ্ধতিতে রান্না করুন (স্টিম/এয়ার-ফ্রাই)। গোলাপি লবণ ব্যবহার করুন।</li>';
+      '<li>তেলমুক্ত পদ্ধতিতে রান্না করুন (স্টিম/এয়ার-ফ্রাই)।</li>'+
+      '<li>গোলাপি লবণ ব্যবহার করুন · চিনি/তেল নয়।</li>';
     return '<div class="course"><div class="co-top">'+
       '<span class="co-slot">'+bn(c.slot||1)+'</span>'+
       '<span class="co-name">'+(c.name_bn||'কোর্স')+'</span>'+
       (c.kcal?'<span class="co-kcal">'+bn(c.kcal)+' kcal</span>':'')+'</div>'+
       '<div class="ings">'+ings+'</div><ul class="steps">'+steps+'</ul></div>';
-  }).join('')||'<div class="col-empty">কোর্স তথ্য নেই</div>';
+  }).join('');
 
-  const w=window.open('','recipe','width=620,height=720,scrollbars=yes');
+  // মেডিসিনাল অংশ
+  const meds=(t.medicinals||[]).filter(Boolean);
+  if(meds.length||t.chutney){
+    body+='<div class="course"><div class="co-top"><span class="co-slot" style="background:#e8893b">💊</span>'+
+      '<span class="co-name">ঔষধি সংযোজন</span></div><div class="ings">'+
+      meds.map(m=>'<span class="ing">'+m+'</span>').join('')+
+      (t.chutney?'<span class="ing">চাটনি: '+t.chutney+'</span>':'')+
+      (t.topping?'<span class="ing">টপিং: '+t.topping+'</span>':'')+'</div></div>';
+  }
+
+  if(!body) body='<div style="color:#9fb0c0">এই অর্ডারে বিস্তারিত রেসিপি তথ্য নেই।<br>'+
+    '(নতুন অর্ডারে স্বয়ংক্রিয়ভাবে আসবে।)</div>';
+
+  const w=window.open('','recipe','width=640,height=740,scrollbars=yes');
   w.document.write('<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">'+
-    '<title>রেসিপি · '+(t.menu_code||'')+'</title><style>'+
+    '<title>রেসিপি · '+(t.menu_name||'')+'</title><style>'+
     'body{font-family:"Hind Siliguri",system-ui,sans-serif;background:#11161c;color:#eef3f8;padding:1.2rem;margin:0}'+
-    'h2{color:#f5b73c;margin:0 0 1rem}.course{border-top:1px dashed #2c3a49;padding:.8rem 0}'+
+    'h2{color:#f5b73c;margin:0 0 .3rem}.sub{color:#9fb0c0;font-size:.85rem;margin-bottom:1rem}'+
+    '.course{border-top:1px dashed #2c3a49;padding:.8rem 0}'+
     '.course:first-child{border-top:none}.co-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}'+
     '.co-slot{width:1.6rem;height:1.6rem;border-radius:.35rem;background:#4aa3df;color:#0c1116;display:grid;place-items:center;font-weight:700}'+
     '.co-name{font-size:1rem;font-weight:600}.co-kcal{margin-left:auto;color:#6b7c8c;font-size:.8rem}'+
@@ -319,7 +371,9 @@ function openRecipe(id){
     '.pbtn{background:#4aa3df;color:#0c1116;border:none;border-radius:.5rem;padding:.6rem 1.2rem;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:1rem}'+
     '</style></head><body>'+
     '<button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট</button>'+
-    '<h2>📖 রেসিপি · অর্ডার #'+bn(t.order_id)+' · '+(t.menu_code||'')+'</h2>'+
+    '<h2>📖 '+(t.menu_name||'রেসিপি')+'</h2>'+
+    '<div class="sub">অর্ডার #'+bn(t.order_id)+' · '+(t.customer_name||'')+' · '+
+      (MEAL[t.meal_type]||t.meal_type||'')+(t.menu_code?' · '+t.menu_code:'')+'</div>'+
     body+'</body></html>');
   w.document.close();
 }
