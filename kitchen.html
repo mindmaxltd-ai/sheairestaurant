@@ -279,8 +279,9 @@ function card(t){
         ' <span class="age '+ageClass(age)+'">'+bn(age)+' মিন</span></span>'+
       '<span class="c-toggle">▾</span>'+
     '</div>'+
-    '<div class="c-title">'+(t.menu_code?'<span class="code">'+t.menu_code+'</span> · ':'')+
-      (courses[0]?courses[0].name_bn:'থেরাপিউটিক মিল')+'</div>'+
+    '<div class="c-title">'+
+      (t.menu_name || (courses[0]?courses[0].name_bn:'থেরাপিউটিক মিল'))+
+      (t.menu_code?' <span class="code">'+t.menu_code+'</span>':'')+'</div>'+
     '<div class="c-collapse">'+sum+claimedLine+'</div>'+
     '<div class="c-foot">'+foot+'</div>'+
   '</div>';
@@ -295,7 +296,8 @@ function openRecipe(id){
   const body=courses.map(c=>{
     const ings=(c.ingredients||[]).map(g=>'<span class="ing">'+(g.item||g)+
       (g.grams?' <b>'+bn(g.grams)+'g</b>':'')+'</span>').join('');
-    const steps=(c.steps||[]).map(s=>'<li>'+s+'</li>').join('')||'<li>ধাপ তথ্য নেই</li>';
+    const steps=(c.steps||[]).map(s=>'<li>'+s+'</li>').join('')||
+      '<li>তেলমুক্ত পদ্ধতিতে রান্না করুন (স্টিম/এয়ার-ফ্রাই)। গোলাপি লবণ ব্যবহার করুন।</li>';
     return '<div class="course"><div class="co-top">'+
       '<span class="co-slot">'+bn(c.slot||1)+'</span>'+
       '<span class="co-name">'+(c.name_bn||'কোর্স')+'</span>'+
