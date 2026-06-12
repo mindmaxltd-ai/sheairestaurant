@@ -170,14 +170,21 @@ exports.handler = async (event) => {
       case 'kitchenQueue': {
         const wanted = Array.isArray(p.statuses) && p.statuses.length
           ? p.statuses : ['queued', 'preparing', 'ready'];
-        const inList = wanted.map(encodeURIComponent).join(',');
+        // paid অর্ডার আনি, ক্রম: নতুন আগে (desc)
+        // kitchen_status এখানে ফিল্টার করি না — কারণ নতুন paid অর্ডারে
+        // এটা সেট নাও থাকতে পারে। নিচে কোডে বাছাই করব।
         const url = `${SUPABASE_URL}/rest/v1/orders`
           + `?payment_status=eq.paid`
-          + `&kitchen_status=in.(${inList})`
-          + `&select=*&order=created_at.asc`;
+          + `&select=*&order=created_at.desc`;
         const r = await fetch(url, { headers: SB });
-        const rows = await r.json();
+        let rows = await r.json();
         if (!Array.isArray(rows)) return reply(200, { tickets: [] });
+
+        // kitchen_status সেট না থাকলে 'queued' ধরি; তারপর wanted তালিকায় ফিল্টার
+        rows = rows.filter(o => {
+          const ks = o.kitchen_status || 'queued';
+          return wanted.includes(ks);
+        });
 
         // সব গ্রাহকের নাম এক ডাকে আনা (অর্ডারে customer_id থাকে)
         const custIds = [...new Set(rows.map(o => o.customer_id).filter(Boolean))];
