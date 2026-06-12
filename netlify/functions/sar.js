@@ -6,12 +6,12 @@
 // Netlify → Site settings → Environment variables:
 //   SUPABASE_URL          https://xlkrggspepnysbouatec.supabase.co
 //   SUPABASE_SERVICE_KEY  service_role key (SECRET, server-only)
-//   ANTHROPIC_API_KEY     Anthropic key (optional; else local engine)
+//   CLAUDE_API_KEY        Anthropic key (optional; else local engine)
 // ─────────────────────────────────────────────────────────────
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xlkrggspepnysbouatec.supabase.co';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
-const CLAUDE_KEY   = process.env.ANTHROPIC_API_KEY || '';
+const CLAUDE_KEY   = process.env.CLAUDE_API_KEY || '';
 
 const SB = {
   apikey: SERVICE_KEY,
@@ -91,24 +91,14 @@ exports.handler = async (event) => {
         return reply(200, { items: Array.isArray(d) ? d : [] });
       }
 
-      // ── 2. customer_metrics + customers (sar_category সহ) ────
+      // ── 2. customer_metrics (250 fields) ────────────────────
       case 'metrics': {
         const cid = encodeURIComponent(p.customer_id);
-        const [mRes, cRes] = await Promise.all([
-          fetch(`${SUPABASE_URL}/rest/v1/customer_metrics?customer_id=eq.${cid}&select=*&limit=1`, { headers: SB }),
-          fetch(`${SUPABASE_URL}/rest/v1/customers?id=eq.${cid}&select=sar_category,bmi,height_cm,weight_kg&limit=1`, { headers: SB }),
-        ]);
-        const mArr = await mRes.json();
-        const cArr = await cRes.json();
-        const m = (Array.isArray(mArr) && mArr[0]) || {};
-        const c = (Array.isArray(cArr) && cArr[0]) || {};
-        // customers টেবিলের sar_category meal-score যেসব নামে খোঁজে সেগুলোতে বসিয়ে দিই
-        if (c.sar_category) {
-          m.disease_category = m.disease_category || c.sar_category;
-          m.sar_category_interest = m.sar_category_interest || c.sar_category;
-        }
-        if (c.bmi != null && m.bmi == null) m.bmi = c.bmi;
-        return reply(200, { metrics: m });
+        const url = `${SUPABASE_URL}/rest/v1/customer_metrics`
+          + `?customer_id=eq.${cid}&select=*&limit=1`;
+        const r = await fetch(url, { headers: SB });
+        const d = await r.json();
+        return reply(200, { metrics: (Array.isArray(d) && d[0]) || {} });
       }
 
       // ── 3. save meal score → ai_analysis table ──────────────
@@ -175,6 +165,124 @@ exports.handler = async (event) => {
         return reply(200, { ok: true, order });
       }
 
+
+      // ═══ রান্নাঘর + স্টাফ লগইন (যোগ করা) ═══
+      case 'kitchenQueue': {
+        const wanted = Array.isArray(p.statuses) && p.statuses.length
+          ? p.statuses : ['queued', 'preparing', 'ready'];
+        // PostgREST in.(...) ফিল্টার
+        const inList = wanted.map(encodeURIComponent).join(',');
+        const url = `${SUPABASE_URL}/rest/v1/orders`
+          + `?payment_status=eq.paid`
+          + `&kitchen_status=in.(${inList})`
+          + `&select=*&order=created_at.asc`;
+        const r = await fetch(url, { headers: SB });
+        const rows = await r.json();
+        if (!Array.isArray(rows)) return reply(200, { tickets: [] });
+
+        // প্রতিটা অর্ডারকে kitchen-এর টিকিট আকারে রূপান্তর
+        const tickets = [];
+        for (const o of rows) {
+          const items = Array.isArray(o.items_json) ? o.items_json : [];
+          // একটা অর্ডারে একাধিক মিল থাকতে পারে — প্রতিটা মিল একটা টিকিট
+          items.forEach((it, idx) => {
+            // রেসিপির কোর্স সাজানো (kitchen modal এ দেখাবে)
+            const detail = Array.isArray(it.courseDetail) ? it.courseDetail : [];
+            const selected_courses = detail.map((c, i) => ({
+              slot:       i + 1,
+              name_bn:    c.name || ('কোর্স ' + (i + 1)),
+              kcal:       c.kcal || null,
+              ingredients:(c.items || []).map(g =>
+                            typeof g === 'string' ? { item: g, grams: '' } : g),
+              steps:      c.steps || [],
+            }));
+            tickets.push({
+              id:               `${o.id}_${idx}`,   // টিকিটের আলাদা আইডি
+              order_id:         o.order_number || o.id,
+              real_order_id:    o.id,                // status বদলাতে আসল id
+              menu_code:        it.code || it.menu_code || 'মেনু',
+              meal_type:        it.meal || '',
+              day:              it.day || '',
+              total_kcal:       it.kcal || 0,
+              total_protein:    it.protein || 0,
+              selected_courses,
+              status:           o.kitchen_status || 'queued',
+              claimed_by:       o.claimed_by || null,
+              created_at:       o.created_at,
+            });
+          });
+        }
+        return reply(200, { tickets });
+      }
+
+      // ── রান্নাঘরের স্ট্যাটাস বদলানো (+ বোতাম লক) ───────────────
+      // kitchen.html "রান্না শুরু/প্রস্তুত/ডেলিভারি/বাতিল" চাপলে এটা ডাকে।
+      case 'kitchenStatus': {
+        // id আসে "orderid_index" আকারে — আসল order id বের করি
+        const realId = String(p.id || '').split('_')[0];
+        if (!realId) return reply(400, { ok: false, error: 'no id' });
+
+        const patch = { kitchen_status: p.status };
+        // রান্না ধরলে কে ধরল রেকর্ড করি (বোতাম লক)
+        if (p.status === 'preparing' && p.claimed_by) {
+          patch.claimed_by = p.claimed_by;
+          patch.claimed_at = new Date().toISOString();
+        }
+
+        // লক যাচাই: অন্য কেউ আগে ধরে ফেললে আটকে দাও
+        if (p.status === 'preparing' && p.claimed_by) {
+          const chk = await fetch(
+            `${SUPABASE_URL}/rest/v1/orders?id=eq.${realId}&select=claimed_by,kitchen_status`,
+            { headers: SB });
+          const cur = (await chk.json())[0];
+          if (cur && cur.claimed_by && cur.claimed_by !== p.claimed_by) {
+            return reply(200, { ok: false, locked: true, by: cur.claimed_by });
+          }
+        }
+
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${realId}`, {
+          method: 'PATCH',
+          headers: { ...SB, Prefer: 'return=minimal' },
+          body: JSON.stringify(patch),
+        });
+        return reply(r.ok ? 200 : 400, { ok: r.ok });
+      }
+
+
+      case 'staffLogin': {
+        const user = String(p.user || '').trim();
+        const pass = String(p.pass || '');
+        if (!user || !pass) return reply(200, { ok: false, error: 'missing' });
+
+        // staff টেবিলে ইউজার খোঁজা (email বা phone বা name যেকোনোটা দিয়ে)
+        // আপনার staff টেবিলে লগইন আইডি হিসেবে কোন কলাম, সেটা নিচে মেলান।
+        // ধরা হচ্ছে: email কে ইউজার আইডি হিসেবে ব্যবহার করা হয়।
+        const url = `${SUPABASE_URL}/rest/v1/staff`
+          + `?or=(email.eq.${encodeURIComponent(user)},phone.eq.${encodeURIComponent(user)})`
+          + `&select=id,name,email,phone,role,password,is_active&limit=1`;
+        const r = await fetch(url, { headers: SB });
+        const rows = await r.json();
+        const s = Array.isArray(rows) ? rows[0] : null;
+
+        if (!s)                       return reply(200, { ok: false, error: 'notfound' });
+        if (s.is_active === false)    return reply(200, { ok: false, error: 'inactive' });
+        if (s.password !== pass)      return reply(200, { ok: false, error: 'wrongpass' });
+
+        // কোন role রান্নাঘরে ঢুকতে পারবে
+        const kitchenRoles = ['kitchen_manager', 'super_admin', 'admin', 'floor_manager'];
+        if (!kitchenRoles.includes(s.role)) {
+          return reply(200, { ok: false, error: 'noaccess', role: s.role });
+        }
+
+        // সফল — পাসওয়ার্ড ছাড়া তথ্য ফেরত
+        return reply(200, {
+          ok: true,
+          staff: { id: s.id, name: s.name, role: s.role,
+                   is_super: s.role === 'super_admin' },
+        });
+      }
+
+
       // ── 5. Claude personalization (optional) ────────────────
       case 'analyze': {
         if (!CLAUDE_KEY) return reply(200, { ai: null });   // client falls back to local engine
@@ -186,7 +294,7 @@ exports.handler = async (event) => {
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
+            model: 'claude-sonnet-4-20250514',
             max_tokens: 1000,
             system: 'তুমি শুধুমাত্র বৈধ JSON অবজেক্ট ফেরত দেবে — কোনো markdown, ব্যাখ্যা বা ```-fence ছাড়া।',
             messages: [{ role: 'user', content: p.prompt }],
