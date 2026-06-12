@@ -2,392 +2,391 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>রান্নাঘর — Kitchen Recipe Ticket · SAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAR রান্নাঘর · Kitchen Board</title>
 <style>
-@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');font-weight:400;font-display:swap}
-@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Space+Mono:wght@400;700&display=swap');
-
 :root{
-  /* kitchen = steel/ticket palette: cooler, higher-contrast, print-friendly */
-  --steel:#1C2230;--steel-2:#2C3346;--slate:#3D4660;
-  --paper:#F6F4EF;--ticket:#FFFFFF;--line:#E2DDD2;--line-d:#CFC8BA;
-  --ink:#1A1D26;--ink-2:#5A5566;
-  --amber:#E2620A;--amber-soft:#FFEAD8;
-  --green:#1C7A4B;--green-soft:#E4F6EC;
-  --red:#C2334E;--red-soft:#FDE7EC;
-  --blue:#2456A6;--blue-soft:#E4EDFA;
-  --mono:'Space Mono',monospace;
-  --shadow:0 4px 22px rgba(28,34,48,.08);
+  --bg:#11161c; --panel:#1a222c; --panel-2:#212c38; --line:#2c3a49;
+  --ink:#eef3f8; --ink-2:#9fb0c0; --ink-3:#6b7c8c;
+  --steam:#4aa3df; --airfry:#e8893b; --cold:#46c08a;
+  --amber:#f5b73c; --green:#46c08a; --red:#e2604f; --blue:#4aa3df;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
-.num{font-family:var(--mono)}
-.serif{font-family:'Playfair Display',serif}
-
-/* top steel bar */
-.kbar{background:var(--steel);color:#fff;position:sticky;top:0;z-index:40}
-.kbar-in{max-width:1100px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.kbrand{display:flex;align-items:center;gap:.7rem}
-.kmark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#FF7A1A,#2EA86B);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
-.kbrand b{font-size:1.05rem;letter-spacing:-.01em}
-.kbrand small{display:block;font-size:.64rem;opacity:.7;letter-spacing:.06em;font-weight:400}
-.kbadge{font-size:.66rem;font-weight:700;background:var(--red);padding:.2rem .55rem;border-radius:6px;letter-spacing:.05em;margin-left:.4rem}
-.kclock{font-family:var(--mono);font-size:.85rem;opacity:.85}
-.kactions{display:flex;gap:.5rem}
-.kbtn{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;padding:.45rem .9rem;border-radius:8px;transition:.15s}
-.kbtn:hover{background:rgba(255,255,255,.16)}
-.kbtn.print{background:#fff;color:var(--steel);border-color:#fff}
-
-.wrap{max-width:1100px;margin:0 auto;padding:1.4rem 1.25rem 3rem}
-
-/* order header / ticket meta */
-.ohead{background:var(--steel-2);color:#fff;border-radius:16px 16px 0 0;padding:1.1rem 1.3rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.ohead .oid{font-family:var(--mono);font-size:.78rem;opacity:.7;letter-spacing:.04em}
-.ohead h1{font-size:1.45rem;font-weight:700;margin-top:.15rem}
-.ohead .ometa{display:flex;gap:1.3rem;flex-wrap:wrap;margin-top:.55rem;font-size:.82rem;opacity:.92}
-.ohead .ometa b{font-family:var(--mono)}
-.ostamp{text-align:right;font-size:.74rem;opacity:.8}
-.ostamp .big{font-family:var(--mono);font-size:1.5rem;font-weight:700;opacity:1;display:block;line-height:1}
-
-/* diet compliance strip — what the kitchen MUST honor */
-.compliance{background:var(--steel);color:#dfe6f2;padding:.7rem 1.3rem;display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;font-size:.74rem}
-.compliance .cl{font-weight:700;opacity:.7;margin-right:.3rem}
-.ctag{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:.15rem .5rem;border-radius:14px;font-weight:700}
-.ctag.allow{background:var(--green-soft);color:var(--green);border-color:transparent}
-
-/* per-meal recipe ticket */
-.ticket{background:var(--ticket);border:1px solid var(--line);border-top:none;box-shadow:var(--shadow)}
-.ticket:last-of-type{border-radius:0 0 16px 16px}
-.t-head{display:flex;align-items:center;gap:.7rem;padding:1rem 1.3rem;border-bottom:1px dashed var(--line-d);background:var(--paper)}
-.t-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
-.t-ic.b{background:var(--amber-soft)}.t-ic.l{background:var(--green-soft)}.t-ic.d{background:var(--red-soft)}
-.t-h-txt{flex:1}
-.t-meal{font-size:.7rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
-.t-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700}
-.t-name small{font-family:'SolaimanLipi';font-size:.8rem;color:var(--ink-2);font-weight:400}
-.t-portion{text-align:right;font-size:.72rem;color:var(--ink-2)}
-.t-portion b{font-family:var(--mono);font-size:1.1rem;color:var(--amber);display:block}
-
-.t-body{padding:1.1rem 1.3rem;display:grid;grid-template-columns:1.15fr 1fr;gap:1.4rem}
-@media(max-width:760px){.t-body{grid-template-columns:1fr}}
-
-.blk-h{font-size:.72rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
-.blk-h::before{content:'';width:14px;height:2px;background:var(--amber);border-radius:2px}
-
-/* ingredient + amount table (KITCHEN ONLY) */
-.ing-tbl{width:100%;border-collapse:collapse;font-size:.84rem}
-.ing-tbl th{text-align:left;font-size:.66rem;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;padding:.3rem .4rem;border-bottom:1px solid var(--line)}
-.ing-tbl th.r,.ing-tbl td.r{text-align:right}
-.ing-tbl td{padding:.4rem .4rem;border-bottom:1px solid var(--line)}
-.ing-tbl tr:last-child td{border-bottom:none}
-.ing-tbl .amt{font-family:var(--mono);font-weight:700;color:var(--steel)}
-.ing-tbl .course-row td{background:var(--paper);font-weight:700;font-size:.72rem;color:var(--amber);text-transform:uppercase;letter-spacing:.04em}
-.med-tag{font-size:.62rem;font-weight:700;color:var(--green);background:var(--green-soft);padding:.05rem .35rem;border-radius:10px;margin-left:.3rem}
-
-/* cooking process steps */
-.steps{counter-reset:s;display:flex;flex-direction:column;gap:.6rem}
-.step{display:flex;gap:.7rem;font-size:.86rem}
-.step::before{counter-increment:s;content:counter(s);flex-shrink:0;width:24px;height:24px;border-radius:8px;background:var(--steel);color:#fff;font-family:var(--mono);font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center}
-.step b{color:var(--steel)}
-.method-note{margin-top:.7rem;background:var(--blue-soft);border:1px solid #cfe;border-radius:10px;padding:.55rem .7rem;font-size:.76rem;color:var(--blue);font-weight:700;display:flex;gap:.45rem}
-
-/* powders / chutney to add (the therapeutic layer the kitchen doses) */
-.dose{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
-.dchip{font-size:.74rem;font-weight:700;padding:.22rem .55rem;border-radius:14px}
-.dchip.dis{background:var(--amber-soft);color:var(--amber)}
-.dchip.con{background:var(--red-soft);color:var(--red)}
-.dchip.chu{background:var(--green-soft);color:var(--green)}
-
-/* plating / handoff footer */
-.t-foot{border-top:1px dashed var(--line-d);padding:.8rem 1.3rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2)}
-.t-foot .chk{display:flex;align-items:center;gap:.45rem;font-weight:700;color:var(--steel)}
-.t-foot .chk input{width:18px;height:18px;accent-color:var(--green)}
-
-.empty{background:#fff;border:1px dashed var(--line-d);border-radius:16px;padding:3rem 1.5rem;text-align:center;color:var(--ink-2)}
-.empty b{color:var(--steel);display:block;font-size:1.1rem;margin-bottom:.4rem}
-
-.loader{position:fixed;inset:0;background:rgba(246,244,239,.93);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:90}
-.loader.show{display:flex}
-.spin{width:46px;height:46px;border:4px solid var(--line);border-top-color:var(--amber);border-radius:50%;animation:sp .8s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-.footnote{margin-top:1.5rem;font-size:.76rem;color:var(--ink-2);line-height:1.7}
-.footnote b{color:var(--amber)}
-
-@media print{
-  .kbar,.kactions,.loader,.footnote,.t-foot .chk input{display:none!important}
-  body{background:#fff}
-  .ticket{box-shadow:none;break-inside:avoid}
-  .ohead,.compliance{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:"SolaimanLipi","Hind Siliguri",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.num{font-variant-numeric:tabular-nums}
+header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
+  background:linear-gradient(180deg,#141b22,#11161c);border-bottom:1px solid var(--line);flex:none}
+.brand{display:flex;align-items:baseline;gap:.5rem}
+.brand b{font-size:1.2rem}.brand span{color:var(--ink-3);font-size:.78rem}
+.live{display:flex;align-items:center;gap:.4rem;font-size:.74rem;color:var(--ink-2);margin-left:.5rem}
+.dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,192,138,.5)}70%{box-shadow:0 0 0 8px rgba(70,192,138,0)}100%{box-shadow:0 0 0 0 rgba(70,192,138,0)}}
+.spacer{flex:1}
+.who{font-size:.76rem;color:var(--ink-2);background:var(--panel-2);border:1px solid var(--line);
+  border-radius:.5rem;padding:.35rem .7rem}
+.who b{color:var(--amber)}
+.hbtn{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);
+  border-radius:.55rem;padding:.5rem .85rem;font-size:.82rem;cursor:pointer;font-family:inherit}
+.hbtn:hover{background:#28384a}
+.board{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);overflow:hidden}
+.col{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.col-head{padding:.7rem 1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.5rem;flex:none}
+.col-head .ic{width:.7rem;height:.7rem;border-radius:50%}
+.col-head b{font-size:.95rem}
+.col-head .n{margin-left:auto;font-size:.8rem;color:var(--ink-3);background:var(--panel-2);border-radius:1rem;padding:.1rem .55rem}
+.col.pending .ic{background:var(--amber)}
+.col.cooking .ic{background:var(--airfry)}
+.col.ready .ic{background:var(--green)}
+.col-body{flex:1;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:.8rem}
+.col-empty{color:var(--ink-3);text-align:center;padding:2.5rem .5rem;font-size:.85rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.7rem;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+.c-head{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;background:var(--panel-2);border-bottom:1px solid var(--line);cursor:pointer}
+.c-head:hover{background:#28384a}
+.c-no{font-weight:700;font-size:.92rem}
+.c-toggle{margin-left:auto;color:var(--ink-3);font-size:.9rem;transition:transform .2s}
+.card.open .c-toggle{transform:rotate(180deg)}
+.c-meta{text-align:right;font-size:.72rem;color:var(--ink-2);line-height:1.3}
+.age{font-size:.7rem;padding:.12rem .45rem;border-radius:.4rem;background:#2a3543;color:var(--ink-2)}
+.age.warn{background:rgba(245,183,60,.18);color:var(--amber)}
+.age.late{background:rgba(226,96,79,.2);color:var(--red)}
+.c-title{padding:.55rem .8rem;font-size:.9rem;font-weight:600;color:var(--ink)}
+.c-title .code{color:var(--blue);font-size:.74rem}
+.c-collapse{display:none;padding:0 .8rem .3rem}
+.card.open .c-collapse{display:block}
+.c-sum{display:flex;flex-wrap:wrap;gap:.3rem;padding:.2rem 0 .5rem}
+.chip{font-size:.7rem;border:1px solid var(--line);border-radius:.4rem;padding:.1rem .45rem;color:var(--ink-2)}
+.chip.kcal{color:var(--amber);border-color:rgba(245,183,60,.35)}
+.claimed{font-size:.72rem;color:var(--airfry);padding:.2rem 0}
+.c-foot{display:flex;gap:.5rem;padding:.6rem .8rem;border-top:1px solid var(--line)}
+.act{flex:1;border:none;border-radius:.55rem;padding:.6rem;font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;color:#0c1116}
+.act:hover{filter:brightness(1.08)}
+.act.recipe{background:var(--steam);color:#0c1116;flex:0 0 auto;padding:.6rem .8rem}
+.act.cook{background:var(--airfry)}
+.act.decline{background:transparent;color:var(--red);border:1px solid rgba(226,96,79,.5);flex:0 0 auto;padding:.6rem .8rem}
+.act.rdy{background:var(--green)}
+.act.check{background:var(--blue);color:#fff;flex:0 0 auto;padding:.6rem .8rem}
+.act.deliver{background:var(--green)}
+.lockmsg{flex:1;text-align:center;font-size:.78rem;color:var(--ink-3);padding:.6rem}
+.overlay{position:fixed;inset:0;background:rgba(8,11,15,.7);display:none;z-index:50;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:.9rem;max-width:560px;width:100%;overflow:hidden}
+.modal.mid{max-width:680px}
+.m-head{display:flex;align-items:center;gap:.6rem;padding:.9rem 1.1rem;background:var(--panel-2);border-bottom:1px solid var(--line)}
+.m-head b{font-size:1.05rem}
+.m-close{margin-left:auto;background:none;border:none;color:var(--ink-2);font-size:1.3rem;cursor:pointer}
+.m-body{padding:1rem 1.1rem;max-height:70vh;overflow-y:auto}
+.course{border-top:1px dashed var(--line);padding:.7rem 0}
+.course:first-child{border-top:none}
+.co-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.co-slot{width:1.5rem;height:1.5rem;border-radius:.35rem;display:grid;place-items:center;font-size:.78rem;font-weight:700;color:#0c1116;background:var(--steam)}
+.co-name{font-size:.9rem;font-weight:600}
+.co-kcal{margin-left:auto;font-size:.74rem;color:var(--ink-3)}
+.ings{display:flex;flex-wrap:wrap;gap:.3rem;margin:.2rem 0 .45rem}
+.ing{background:var(--panel-2);border:1px solid var(--line);border-radius:.4rem;padding:.12rem .45rem;font-size:.76rem}
+.ing b{color:var(--steam)}
+.steps{list-style:none;display:flex;flex-direction:column;gap:.28rem}
+.steps li{font-size:.8rem;color:var(--ink-2);line-height:1.5;padding-left:1rem;position:relative}
+.steps li:before{content:"›";position:absolute;left:0;color:var(--ink-3)}
+.check-row{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-top:1px solid var(--line)}
+.check-row input{width:1.1rem;height:1.1rem}
+.check-foot{padding:1rem 1.1rem;border-top:1px solid var(--line)}
+@media (max-width:760px){body{height:auto;overflow:auto}.board{grid-template-columns:1fr}.col-body{max-height:none}}
+/* login */
+.login-wrap{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.login-wrap.hidden{display:none}
+.login-card{background:var(--panel);border:1px solid var(--line);border-radius:1rem;padding:2rem;max-width:380px;width:100%}
+.login-card h2{font-size:1.3rem;margin-bottom:.3rem;text-align:center}
+.login-card .sub{color:var(--ink-3);font-size:.82rem;text-align:center;margin-bottom:1.5rem}
+.login-field{margin-bottom:1rem}
+.login-field label{display:block;font-size:.78rem;color:var(--ink-2);margin-bottom:.35rem}
+.login-field input{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:.55rem;
+  padding:.7rem .85rem;color:var(--ink);font-family:inherit;font-size:.9rem}
+.login-btn{width:100%;background:var(--airfry);color:#0c1116;border:none;border-radius:.55rem;
+  padding:.8rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem}
+.login-btn:hover{filter:brightness(1.08)}
+.login-err{background:rgba(226,96,79,.15);border:1px solid rgba(226,96,79,.3);color:var(--red);
+  border-radius:.5rem;padding:.6rem;font-size:.8rem;margin-top:.8rem;display:none;text-align:center}
+.login-err.show{display:block}
+.logout-btn{background:transparent;color:var(--ink-3);border:1px solid var(--line);
+  border-radius:.5rem;padding:.5rem .7rem;font-size:.78rem;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
 
-<div class="kbar">
-  <div class="kbar-in">
-    <div class="kbrand">
-      <span class="kmark">সা</span>
-      <div><b>SAR Kitchen<span class="kbadge">RECIPE TICKET</span></b><small>রান্নাঘর · গোপনীয় — গ্রাহক দেখেন না</small></div>
+<!-- লগইন পর্দা -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h2>🍳 SAR রান্নাঘর</h2>
+    <div class="sub">স্টাফ লগইন</div>
+    <div class="login-field">
+      <label>ইউজার আইডি (ইমেইল বা ফোন)</label>
+      <input id="loginUser" type="text" placeholder="email@example.com বা 01XXXXXXXXX"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <span class="kclock" id="clock">—</span>
-    <div class="kactions">
-      <button class="kbtn" onclick="loadTicket()">↻ রিফ্রেশ</button>
-      <button class="kbtn print" onclick="window.print()">🖨 প্রিন্ট</button>
+    <div class="login-field">
+      <label>পাসওয়ার্ড</label>
+      <input id="loginPass" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
+    <button class="login-btn" onclick="doLogin()">লগইন করুন →</button>
+    <div class="login-err" id="loginErr"></div>
   </div>
 </div>
 
-<div class="wrap">
-  <div id="ticketRoot">
-    <div class="empty"><b>কোনো অর্ডার লোড হয়নি</b>অর্ডার আইডি দিয়ে লিংক খুলুন — যেমন <span class="num">kitchen.html?order=SAR-1042</span><br>অথবা গ্রাহকের সর্বশেষ অর্ডার স্বয়ংক্রিয়ভাবে লোড হবে।</div>
-  </div>
+<header>
+  <div class="brand"><b>SAR রান্নাঘর</b><span>Kitchen Board</span></div>
+  <div class="live"><span class="dot"></span> লাইভ · <span id="qcount" class="num">০</span> সক্রিয়</div>
+  <div class="spacer"></div>
+  <span class="who" id="whoBox">স্টাফ: <b id="whoName">—</b></span>
+  <button class="hbtn" onclick="load()">↻ রিফ্রেশ</button>
+  <button class="logout-btn" onclick="doLogout()">লগআউট</button>
+</header>
 
-  <p class="footnote">
-    <b>রান্নাঘরের নিয়ম:</b> এই টিকিট প্রতিটি অর্ডারের সাথে স্বয়ংক্রিয়ভাবে তৈরি — শুধুমাত্র অনুমোদিত <b>১০০-উপাদানের মাস্টার তালিকা</b> (+ মৌসুমি ফল) থেকে। সব রান্না <b>আগুনমুক্ত</b> — শুধু স্টিম, বেক বা এয়ার-ফ্রাই; তেল, চিনি, কৃত্রিম রং ও দুধ সম্পূর্ণ নিষিদ্ধ। লবণের বদলে শুধু পিংক সল্ট। অনুমোদিত প্রোটিন/ফ্যাট: মাখন, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম। উপাদানের পরিমাণ গ্রাহকের ভোর ৬টার AI বিশ্লেষণ (BMI, রোগ, গত রাতের ডেটা) অনুযায়ী স্কেল করা — <b>পরিমাণ হুবহু অনুসরণ করুন</b>। থেরাপিউটিক পাউডার ও চাটনি প্লেটিংয়ের ঠিক আগে যোগ করুন, রান্নায় নয়।
-  </p>
+<div class="board">
+  <section class="col pending">
+    <div class="col-head"><span class="ic"></span><b>নতুন অর্ডার</b><span class="n num" id="n-q">০</span></div>
+    <div class="col-body" id="col-queued"></div>
+  </section>
+  <section class="col cooking">
+    <div class="col-head"><span class="ic"></span><b>রান্না হচ্ছে</b><span class="n num" id="n-p">০</span></div>
+    <div class="col-body" id="col-preparing"></div>
+  </section>
+  <section class="col ready">
+    <div class="col-head"><span class="ic"></span><b>প্রস্তুত</b><span class="n num" id="n-r">০</span></div>
+    <div class="col-body" id="col-ready"></div>
+  </section>
 </div>
 
-<div class="loader" id="loader"><div class="spin"></div><p>রেসিপি টিকিট লোড হচ্ছে…</p></div>
+<!-- check modal (medium window) -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal mid">
+    <div class="m-head"><b id="m-title">চূড়ান্ত যাচাই</b>
+      <button class="m-close" onclick="closeModal()">×</button></div>
+    <div class="m-body" id="m-body"></div>
+    <div class="check-foot" id="m-foot"></div>
+  </div>
+</div>
 
 <script>
-// ════════════════════════════════════════════════════
-// SAR KITCHEN — recipe ticket generator.
-// Mirrors meal-score.html data model but exposes the RECIPE
-// (ingredients + exact amounts + fire-free cooking process)
-// that the customer never sees. Personalized amounts come from
-// the same 6AM AI factor saved with the order / customer metrics.
-// ════════════════════════════════════════════════════
 const API='/.netlify/functions/sar';
 async function api(action,body){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action},body||{}))});
-  if(!r.ok) throw new Error(action+' '+r.status); return r.json();
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(Object.assign({action},body||{}))});
+  if(!r.ok) throw new Error(action+' '+r.status);
+  return r.json();
 }
-
-// ---- shared therapeutic data (same source of truth as meal-score) ----
-const MEAL_DB={
-  DM:{bn:'ডায়াবেটিস',ingredients:['Pumpkin','Bottle Gourd','Spinach','Chickpea Sprout','Chia Seed','Bitter Gourd','Flax Seed'],
-      protein:'Boneless Fish',disease:['Cinnamon','Fenugreek','Gurmar'],benefits:['Blood Sugar Control','Insulin Sensitivity','Satiety']},
-  OB:{bn:'স্থূলতা',ingredients:['Ash Gourd','Broccoli','Mustard Greens','Green Gram Sprout','Cucumber','Pumpkin Seed','Moringa Leaves'],
-      protein:'Indigenous Egg',disease:['Triphala','Garcinia','Green Tea'],benefits:['Fat Burning','Appetite Control','Metabolism Boost']},
-  FL:{bn:'ফ্যাটি লিভার',ingredients:['Ridge Gourd','Radish','Water Spinach','Lentil Sprout','Amla','Beetroot','Coriander Leaves'],
-      protein:'Boneless Fish',disease:['Milk Thistle','Bhumyamalaki Powder','Turmeric'],benefits:['Liver Detox','ALT Reduction','Fat Flush']},
-  IB:{bn:'IBS/গ্যাস্ট্রিক',ingredients:['Snake Gourd','Carrot','Bael Pulp','Green Gram Sprout','Mint Leaves','Curry Leaves','Peppermint Powder'],
-      protein:'Boneless Indigenous Chicken',disease:['Lemongrass','Licorice','Ginger'],benefits:['Gut Healing','Microbiome Balance','Bloating Relief']},
-  PR:{bn:'গর্ভাবস্থা',ingredients:['Moringa Leaves','Red Spinach','Beetroot','Chickpea Sprout','Almond','Sesame Seed','Dragon Fruit'],
-      protein:'Indigenous Egg',disease:['Shatavari','Moringa Powder','Amla Powder'],benefits:['Iron & Folate','Calcium Support','Fetal Growth']},
-};
-const CONDITION_POWDERS=['Ashwagandha','Tulsi','Brahmi'];
-const SEASONAL_FRUITS={
-  DM:['Guava','Black Berry','Green Apple','Pear'],OB:['Water Melon','Guava','Pear'],
-  FL:['Amla','Black Berry','Guava','Apple'],IB:['Banana','Papaya','Guava'],
-  PR:['Mango','Jackfruit','Pineapple','Banana','Orange'],
-};
-const MEALS=[{key:'breakfast',bn:'সকাল',en:'BREAKFAST',ic:'🌅',cls:'b'},
-             {key:'lunch',bn:'দুপুর',en:'LUNCH',ic:'☀️',cls:'l'},
-             {key:'dinner',bn:'রাত',en:'DINNER',ic:'🌙',cls:'d'}];
-const CAT_BN={DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
-
-// base ingredient grams per course slot @ factor 1.0 (kitchen reference weights)
-// course 1 main, 2 protein+sprout, 3 steamed veg, 4 chutney, 5 fruit
-const COURSE_BASE_G={
-  0:[['main veg A',90],['main veg B',70],['therapeutic veg',55]],
-  1:[['sprout/legume',60],['allowed protein',75],['seed',12]],
-  2:[['steamed veg A',80],['steamed veg B',70],['leafy green',40]],
-  3:[['chutney base (herb+amla)',45],['lemon',8],['pink salt',1]],
-  4:[['seasonal fruit',120]],
-};
-const COURSE_LABEL=['থেরাপিউটিক মেইন কোর্স','প্রোটিন ও স্প্রাউট কোর্স','স্টিমড/বেকড সবজি কোর্স','ইমোশনাল চাটনি কোর্স','মৌসুমি ফল কোর্স'];
-
-// SAME rotation pools as meal-score.html (fallback when order has no courseDetail)
-const COURSE_POOLS={
-  DM:{ main:['Bitter Gourd','Bottle Gourd','Pumpkin','Ash Gourd','Ridge Gourd','Snake Gourd','Pointed Gourd'],prot:['Chickpea Sprout','Green Gram Sprout','Boneless Fish','Indigenous Egg','Black Chickpea','Field Pea','Lentil Sprout'],steam:['Broccoli','Cauliflower','Green Beans','Okra','Cabbage','Capsicum','Turnip'],leafy:['Spinach','Mustard Greens','Fenugreek Leaves','Moringa Leaves','Amaranth Leaves'],seed:['Chia Seed','Flax Seed','Pumpkin Seed','Sunflower Seed'] },
-  OB:{ main:['Ash Gourd','Bottle Gourd','Cucumber','Zucchini','Ridge Gourd','Chayote','Pumpkin'],prot:['Green Gram Sprout','Indigenous Egg','Boneless Indigenous Chicken','Mung Bean','Soybean','Cowpea','Lentil Sprout'],steam:['Broccoli','Cauliflower','Cabbage','Green Beans','Capsicum','Okra','Carrot'],leafy:['Mustard Greens','Moringa Leaves','Spinach','Water Spinach','Malabar Spinach'],seed:['Pumpkin Seed','Flax Seed','Sunflower Seed','Watermelon Seed'] },
-  FL:{ main:['Ridge Gourd','Bottle Gourd','Snake Gourd','Pointed Gourd','Ash Gourd','Bitter Gourd','Radish'],prot:['Lentil Sprout','Boneless Fish','Green Gram Sprout','Red Lentil','Mung Bean','Chickpea Sprout','Indigenous Egg'],steam:['Beetroot','Radish','Carrot','Broccoli','Cauliflower','Green Papaya','Turnip'],leafy:['Water Spinach','Coriander Leaves','Spinach','Amaranth Leaves','Mint Leaves'],seed:['Flax Seed','Sunflower Seed','Pumpkin Seed','Basil Seed'] },
-  IB:{ main:['Snake Gourd','Bottle Gourd','Pointed Gourd','Ridge Gourd','Green Papaya','Carrot','Ash Gourd'],prot:['Green Gram Sprout','Boneless Indigenous Chicken','Mung Bean','Lentil Sprout','Indigenous Egg','Red Lentil','Boneless Fish'],steam:['Carrot','Green Papaya','Raw Banana','Sweet Potato','Turnip','Green Beans','Drumstick'],leafy:['Mint Leaves','Curry Leaves','Coriander Leaves','Spinach','Malabar Spinach'],seed:['Flax Seed','Basil Seed','Sunflower Seed','Pumpkin Seed'] },
-  PR:{ main:['Pumpkin','Bottle Gourd','Drumstick','Sweet Potato','Green Papaya','Carrot','Beetroot'],prot:['Chickpea Sprout','Indigenous Egg','Boneless Fish','Almond','Lentil Sprout','Mung Bean','Black Chickpea'],steam:['Beetroot','Carrot','Broccoli','Green Beans','Drumstick','Sweet Potato','Capsicum'],leafy:['Moringa Leaves','Red Spinach','Spinach','Amaranth Leaves','Fenugreek Leaves'],seed:['Sesame Seed','Almond','Sunflower Seed','Watermelon Seed'] },
-};
-function conditionOffset(m){let o=0;const stress=+(m.stress_level||0),sleep=+(m.sleep_hours||m.sleep||7),mood=(m.mood||'').toString();if(stress>=7)o+=2;else if(stress>=4)o+=1;if(sleep<6)o+=1;if(/low|tired|ক্লান্ত|খারাপ/i.test(mood))o+=1;if(m.bloating&&/yes|হ্যাঁ/i.test(String(m.bloating)))o+=1;return o;}
-function rotPick(pool,day,off,count){if(!pool||!pool.length)return[];const out=[],n=pool.length;for(let i=0;i<count;i++)out.push(pool[(day+off+i)%n]);return out;}
-// rebuild this day's courses if the order didn't carry courseDetail
-function rebuildCourses(cat,di,mealKey){
-  const pools=COURSE_POOLS[cat]||COURSE_POOLS.DM;
-  const off=conditionOffset(metrics), mShift={breakfast:0,lunch:2,dinner:4}[mealKey]||0, seed=di+off+mShift;
-  const fruits=SEASONAL_FRUITS[cat]||SEASONAL_FRUITS.DM;
-  return [
-    {name:'থেরাপিউটিক মেইন কোর্স',items:rotPick(pools.main,seed,0,2).concat(rotPick(pools.leafy,seed,0,1))},
-    {name:'প্রোটিন ও স্প্রাউট কোর্স',items:rotPick(pools.prot,seed,0,2).concat(rotPick(pools.seed,seed,0,1))},
-    {name:'স্টিমড/বেকড সবজি কোর্স',items:rotPick(pools.steam,seed,0,2)},
-    {name:'ইমোশনাল চাটনি কোর্স',items:['Herb + Amla চাটনি','Lemon','Pink Salt']},
-    {name:'মৌসুমি ফল কোর্স',items:[fruits[seed%fruits.length]]},
-  ];
-}
-// per-item base grams (factor-scaled), matched positionally to course items
-const SLOT_G=[ [90,70,55], [60,75,12], [80,70], [45,8,1], [120] ];
-
 const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
-function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-ys)/86400000+1)/7);}
+const MEAL={breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
 
-// fire-free cooking method per meal type — STEAM / BAKE / AIR-FRY only
-function methodFor(mealKey,cat){
-  const db=MEAL_DB[cat]||MEAL_DB.DM;
-  const prot=db.protein;
-  const base=[
-    {t:'সব সবজি ধুয়ে সমান টুকরা করুন — গ্রামে ওজন মেপে নিন (নিচের পরিমাণ অনুযায়ী)।'},
-    {t:'<b>স্টিমার</b>-এ মেইন ও স্টিমড কোর্সের সবজি ৮–১০ মিনিট ভাপে সিদ্ধ করুন। তেল ব্যবহার নিষিদ্ধ।'},
-  ];
-  if(/Fish/i.test(prot)) base.push({t:'<b>বোনলেস মাছ</b> হলুদ+পিংক সল্ট মাখিয়ে <b>স্টিম বা বেক</b> করুন (১৮০°C, ১২ মিনিট) — ভাজা নয়।'});
-  else if(/Chicken/i.test(prot)) base.push({t:'<b>দেশি মুরগি (boneless)</b> স্টিম-ম্যারিনেট করে <b>এয়ার-ফ্রাই/বেক</b> করুন (১৮০°C, ১৪ মিনিট)।'});
-  else base.push({t:'<b>দেশি ডিম</b> সিদ্ধ বা স্টিম করুন (তেল ছাড়া)।'});
-  base.push({t:'স্প্রাউট/ডাল হালকা ভাপ দিন; বীজ শুকনো টেলে (টেলা যাবে, তেল ছাড়া) উপরে ছড়িয়ে দিন।'});
-  base.push({t:'চাটনি কোর্স — ভেষজ, আমলকি, লেবু ও পিংক সল্ট ঠান্ডা ব্লেন্ড করুন। রান্না নয়।'});
-  base.push({t:'<b>থেরাপিউটিক ও কন্ডিশন পাউডার এবং চাটনি প্লেটিংয়ের ঠিক আগে যোগ করুন</b> — তাপে নয়, যাতে গুণ নষ্ট না হয়।'});
-  return base;
-}
+// ── স্টাফ লগইন (admin এর staff টেবিল ব্যবহার করে) ──
+let STAFF_NAME = localStorage.getItem('sar_kitchen_name') || '';
+let STAFF_ROLE = localStorage.getItem('sar_kitchen_role') || '';
+let IS_SUPER   = localStorage.getItem('sar_kitchen_super') === 'true';
 
-let order=null, metrics={}, factor=1;
+async function doLogin(){
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.className = 'login-err';
+  if(!user || !pass){ errEl.textContent='আইডি ও পাসওয়ার্ড দিন।'; errEl.className='login-err show'; return; }
 
-window.addEventListener('DOMContentLoaded',()=>{tick();setInterval(tick,1000);loadTicket();});
-function tick(){const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('bn-BD');}
-function showLoader(b){document.getElementById('loader').classList.toggle('show',b);}
-
-async function loadTicket(){
-  showLoader(true);
-  const qs=new URLSearchParams(location.search);
-  const orderId=qs.get('order')||localStorage.getItem('sar_last_order_id');
-  const sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
-  const cid=qs.get('customer')||sc.id||localStorage.getItem('sar_customer_id')||'demo';
-
-  // 1) pull the order (items + saved analysis factor); fall back to local cart
   try{
-    if(orderId){const r=await api('getOrder',{order_id:orderId});if(r&&r.order)order=r.order;}
-  }catch(e){}
-  if(!order){
-    const localCart=JSON.parse(localStorage.getItem('sar_cart')||localStorage.getItem('sar_ms_cart')||'[]');
-    const payload=JSON.parse(localStorage.getItem('sar_order_payload')||'null');
-    if(payload){order={id:orderId||'LOCAL-DRAFT',customer_id:cid,items:payload.items,total:payload.total,meal_date:payload.meal_date,note:payload.note};}
-    else if(localCart.length){order={id:'LOCAL-DRAFT',customer_id:cid,items:localCart,meal_date:new Date().toISOString().slice(0,10),note:'Local draft'};}
+    const res = await api('staffLogin', { user, pass });
+    if(!res.ok){
+      const msg = {
+        notfound:'এই আইডি খুঁজে পাওয়া যায়নি।',
+        wrongpass:'পাসওয়ার্ড ভুল।',
+        inactive:'এই অ্যাকাউন্ট নিষ্ক্রিয়।',
+        noaccess:'আপনার রান্নাঘরে ঢোকার অনুমতি নেই।',
+        missing:'আইডি ও পাসওয়ার্ড দিন।'
+      }[res.error] || 'লগইন ব্যর্থ।';
+      errEl.textContent = msg; errEl.className='login-err show';
+      return;
+    }
+    // সফল
+    STAFF_NAME = res.staff.name;
+    STAFF_ROLE = res.staff.role;
+    IS_SUPER   = res.staff.is_super;
+    localStorage.setItem('sar_kitchen_name', STAFF_NAME);
+    localStorage.setItem('sar_kitchen_role', STAFF_ROLE);
+    localStorage.setItem('sar_kitchen_super', IS_SUPER ? 'true':'false');
+    showBoard();
+  }catch(e){
+    errEl.textContent='সংযোগ সমস্যা — sar.js এ staffLogin action আছে কিনা দেখুন।';
+    errEl.className='login-err show';
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem('sar_kitchen_name');
+  localStorage.removeItem('sar_kitchen_role');
+  localStorage.removeItem('sar_kitchen_super');
+  STAFF_NAME=''; STAFF_ROLE=''; IS_SUPER=false;
+  document.getElementById('loginWrap').classList.remove('hidden');
+}
+
+function showBoard(){
+  document.getElementById('loginWrap').classList.add('hidden');
+  document.getElementById('whoName').textContent = STAFF_NAME + (IS_SUPER?' 👑':'');
+  load();
+}
+
+// STAFF = বোতাম-লক এ ব্যবহৃত নাম (এখন আসল লগইন নাম)
+function staffName(){ return STAFF_NAME; }
+
+let TICKETS={};
+function ageOf(iso){return Math.max(0,Math.round((Date.now()-new Date(iso).getTime())/60000));}
+function ageClass(m){return m>=20?'late':m>=10?'warn':'';}
+
+function card(t){
+  const age=ageOf(t.created_at);
+  const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
+  // collapsible summary
+  const sum='<div class="c-sum">'+
+    '<span class="chip kcal">'+bn(t.total_kcal||0)+' kcal</span>'+
+    '<span class="chip">প্রোটিন '+bn(t.total_protein||0)+'g</span>'+
+    '<span class="chip">'+bn(courses.length)+' কোর্স</span></div>';
+
+  // column-specific footer
+  let foot='';
+  if(t.status==='queued'){
+    foot='<button class="act recipe" onclick="event.stopPropagation();openRecipe(\''+t.id+'\')">📖 রেসিপি</button>'+
+         '<button class="act cook" onclick="event.stopPropagation();claim(\''+t.id+'\')">🍳 রান্না শুরু</button>'+
+         '<button class="act decline" onclick="event.stopPropagation();adv(\''+t.id+'\',\'declined\')">✕</button>';
+  }else if(t.status==='preparing'){
+    // বোতাম লক: যে ধরেছে শুধু সে "প্রস্তুত" দেখবে; অন্যরা লক-বার্তা
+    if(t.claimed_by && t.claimed_by!==STAFF_NAME){
+      foot='<button class="act recipe" onclick="event.stopPropagation();openRecipe(\''+t.id+'\')">📖 রেসিপি</button>'+
+           '<span class="lockmsg">🔒 '+t.claimed_by+' রান্না করছেন</span>';
+    }else{
+      foot='<button class="act recipe" onclick="event.stopPropagation();openRecipe(\''+t.id+'\')">📖 রেসিপি</button>'+
+           '<button class="act rdy" onclick="event.stopPropagation();adv(\''+t.id+'\',\'ready\')">✓ খাবার প্রস্তুত</button>';
+    }
+  }else if(t.status==='ready'){
+    foot='<button class="act check" onclick="event.stopPropagation();openCheck(\''+t.id+'\')">🔍 যাচাই</button>'+
+         '<button class="act deliver" onclick="event.stopPropagation();adv(\''+t.id+'\',\'served\')">🛵 ডেলিভারি</button>';
   }
 
-  // 2) pull metrics + saved 6AM score to recover the personalization factor
-  try{const m=await api('metrics',{customer_id:cid});metrics=m.metrics||{};}catch(e){metrics={};}
-  try{const s=await api('getScore',{customer_id:cid});if(s&&s.score){const t=s.score.daily_kcal||1500;factor=Math.max(0.8,Math.min(1.3,t/1500));}}
-  catch(e){const t=estimateTarget(metrics);factor=Math.max(0.8,Math.min(1.3,t/1500));}
+  const claimedLine = (t.status==='preparing'&&t.claimed_by)
+    ? '<div class="claimed">👨‍🍳 '+t.claimed_by+' ধরেছেন</div>' : '';
 
-  render();
-  showLoader(false);
-}
-function estimateTarget(m){const bmi=+m.bmi||23;let t=1650;if(bmi>=30)t=1350;else if(bmi>=25)t=1450;else if(bmi<18.5)t=1750;return t;}
-
-function render(){
-  const root=document.getElementById('ticketRoot');
-  if(!order||!order.items||!order.items.length){
-    root.innerHTML='<div class="empty"><b>কোনো অর্ডার পাওয়া যায়নি</b>অর্ডার আইডি দিয়ে খুলুন: <span class="num">kitchen.html?order=SAR-XXXX</span></div>';
-    return;
-  }
-  const cat=(order.items[0]&&order.items[0].cat)||detectCat(metrics);
-  const wk=isoWeek(new Date());
-  const date=order.meal_date||new Date().toISOString().slice(0,10);
-  const cname=metrics.full_name||(JSON.parse(localStorage.getItem('sar_customer')||'{}').full_name)||'গ্রাহক';
-
-  let html='<div class="ohead">'+
-    '<div><div class="oid">ORDER # '+(order.id||'—')+' · সপ্তাহ '+bn(wk)+'</div>'+
-      '<h1>'+cname+' — '+(CAT_BN[cat]||cat)+' প্ল্যান</h1>'+
-      '<div class="ometa"><span>তারিখ <b>'+date+'</b></span>'+
-        '<span>BMI <b>'+(metrics.bmi||'—')+'</b></span>'+
-        '<span>পরিমাণ ফ্যাক্টর <b>×'+factor.toFixed(2)+'</b></span>'+
-        '<span>আইটেম <b>'+bn(order.items.length)+'</b></span></div></div>'+
-    '<div class="ostamp">ভোর ৬:০০ AI স্কেলড<span class="big">×'+factor.toFixed(2)+'</span>পরিমাণ গ্রাহক-নির্দিষ্ট</div>'+
-  '</div>';
-
-  // compliance strip — non-negotiable kitchen rules
-  html+='<div class="compliance"><span class="cl">আবশ্যক:</span>'+
-    ['তেলমুক্ত','চিনিমুক্ত','রংমুক্ত','দুধমুক্ত','আগুনমুক্ত (Steam/Bake/Air-fry)','অর্গানিক','আয়ুর্বেদিক','পিংক সল্ট']
-      .map(c=>'<span class="ctag">'+c+'</span>').join('')+
-    '<span class="cl" style="margin-left:.6rem">অনুমোদিত:</span>'+
-    ['মাখন','বোনলেস মাছ','দেশি মুরগি','দেশি ডিম','মৌসুমি ফল']
-      .map(c=>'<span class="ctag allow">'+c+'</span>').join('')+
-  '</div>';
-
-  // one ticket per ordered item
-  order.items.forEach((it,ix)=>{html+=ticket(it,cat,ix);});
-  root.innerHTML=html;
-}
-
-function detectCat(m){
-  if(m.pregnancy_status&&m.pregnancy_status!=='না')return 'PR';
-  if(m.diabetes_type&&m.diabetes_type!=='না')return 'DM';
-  if(m.fatty_liver_grade&&m.fatty_liver_grade!=='না')return 'FL';
-  if(m.ibs_type&&m.ibs_type!=='না')return 'IB';
-  if(m.bmi&&+m.bmi>=25)return 'OB';
-  return 'DM';
-}
-
-function ticket(it,fallbackCat,ix){
-  const cat=it.cat||fallbackCat;
-  const db=MEAL_DB[cat]||MEAL_DB.DM;
-  const mealKey=it.meal||'lunch';
-  const meal=MEALS.find(m=>m.key===mealKey)||MEALS[1];
-  const courseCount=it.courseCount||(it.courses?it.courses.length:3);
-  const di=(it.day_index!=null?it.day_index:ix);
-  const f=it.kcalFactor||factor;
-
-  // PREFER the exact day ingredients the customer ordered; else rebuild this day
-  let courseSrc=it.courseDetail&&it.courseDetail.length?it.courseDetail:rebuildCourses(cat,di,mealKey).slice(0,courseCount);
-  const selected=[]; for(let i=0;i<courseSrc.length&&i<5;i++)selected.push(i);
-
-  // build ingredient rows with AI-scaled grams (seasonal fruit exempt)
-  let rows='';
-  courseSrc.forEach((co,idx)=>{
-    // figure out which of the 5 canonical courses this is (by label match) for gram weights
-    const ci=COURSE_LABEL.findIndex(L=>L.replace(/\//g,'')===(co.name||'').replace(/\//g,''));
-    const cIdx=ci>=0?ci:idx;
-    const grams=SLOT_G[cIdx]||SLOT_G[0];
-    const items=(co.items&&co.items.length)?co.items:[(co.name||'উপাদান')];
-    rows+='<tr class="course-row"><td colspan="3">'+(cIdx+1)+'. '+(co.name||COURSE_LABEL[cIdx])+'</td></tr>';
-    items.forEach((name,si)=>{
-      const exempt=(cIdx===4); // seasonal fruit not scaled
-      const isProt=/Fish|Chicken|Egg|Sprout|Lentil|Gram|Bean|Chickpea|Pea|Soybean|Cowpea|Almond/i.test(name)&&cIdx===1;
-      const baseG=grams[si]!=null?grams[si]:(grams[grams.length-1]||50);
-      const g=exempt?baseG:Math.round(baseG*f);
-      rows+='<tr><td>'+name+(isProt?'<span class="med-tag">PROTEIN</span>':'')+(exempt?'<span class="med-tag">ফল·exempt</span>':'')+'</td>'+
-        '<td class="r amt">'+bn(g)+' g</td>'+
-        '<td class="r" style="font-size:.7rem;color:var(--ink-2)">'+(exempt?'fixed':'×'+f.toFixed(2))+'</td></tr>';
-    });
-  });
-
-  const steps=methodFor(mealKey,cat).map(s=>'<div class="step">'+s.t+'</div>').join('');
-  // medicinal layer = the day's AI/condition-driven powders from the order (fallback to disease defaults)
-  const dis=(it.diseasePowders&&it.diseasePowders.length)?it.diseasePowders:db.disease;
-  const con=(it.conditionPowders&&it.conditionPowders.length)?it.conditionPowders:CONDITION_POWDERS;
-  const chut=it.chutney||'Stress Relief Green Chutney';
-  const topping=it.topping||'Roasted Pumpkin Seed';
-
-  return '<div class="ticket">'+
-    '<div class="t-head"><span class="t-ic '+meal.cls+'">'+meal.ic+'</span>'+
-      '<div class="t-h-txt"><div class="t-meal">'+meal.en+' · '+meal.bn+'</div>'+
-        '<div class="t-name">'+(it.name||it.name_bn||db.bn+' Meal')+(it.name_bn&&it.name?' <small>('+it.name_bn+')</small>':'')+'</div></div>'+
-      '<div class="t-portion">কোর্স<b>'+bn(courseCount)+'</b></div></div>'+
-    '<div class="t-body">'+
-      '<div><div class="blk-h">উপাদান ও পরিমাণ (Kitchen only)</div>'+
-        '<table class="ing-tbl"><thead><tr><th>উপাদান</th><th class="r">পরিমাণ</th><th class="r">স্কেল</th></tr></thead>'+
-        '<tbody>'+rows+'</tbody></table>'+
-        '<div class="dose">'+
-          dis.map(p=>'<span class="dchip dis">Disease: '+p+'</span>').join('')+
-          con.map(p=>'<span class="dchip con">Condition: '+p+'</span>').join('')+
-          '<span class="dchip chu">Chutney: '+chut+'</span>'+
-          '<span class="dchip chu">Topping: '+topping+'</span>'+
-        '</div></div>'+
-      '<div><div class="blk-h">রান্নার প্রণালী · আগুনমুক্ত</div>'+
-        '<div class="steps">'+steps+'</div>'+
-        '<div class="method-note">❄ তেল/দুধ/চিনি/রং নিষিদ্ধ · শুধু Steam · Bake · Air-fry · লবণ = পিংক সল্ট</div>'+
-      '</div>'+
+  return '<div class="card" data-id="'+t.id+'">'+
+    '<div class="c-head" onclick="toggleCard(this)">'+
+      '<span class="c-no">#'+bn(t.order_id)+'</span>'+
+      '<span class="c-meta">'+(MEAL[t.meal_type]||t.meal_type||'')+' · '+(t.day||'')+
+        ' <span class="age '+ageClass(age)+'">'+bn(age)+' মিন</span></span>'+
+      '<span class="c-toggle">▾</span>'+
     '</div>'+
-    '<div class="t-foot"><span>ব্যাচ স্কেল ×'+f.toFixed(2)+' · মাস্টার-১০০ তালিকা থেকে · দিন '+bn(di+1)+'</span>'+
-      '<label class="chk"><input type="checkbox"> প্রস্তুত ও প্যাকড</label></div>'+
+    '<div class="c-title">'+(t.menu_code?'<span class="code">'+t.menu_code+'</span> · ':'')+
+      (courses[0]?courses[0].name_bn:'থেরাপিউটিক মিল')+'</div>'+
+    '<div class="c-collapse">'+sum+claimedLine+'</div>'+
+    '<div class="c-foot">'+foot+'</div>'+
   '</div>';
+}
+
+function toggleCard(head){ head.parentElement.classList.toggle('open'); }
+
+// ── রেসিপি আলাদা উইন্ডোতে ──
+function openRecipe(id){
+  const t=TICKETS[id]; if(!t)return;
+  const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
+  const body=courses.map(c=>{
+    const ings=(c.ingredients||[]).map(g=>'<span class="ing">'+(g.item||g)+
+      (g.grams?' <b>'+bn(g.grams)+'g</b>':'')+'</span>').join('');
+    const steps=(c.steps||[]).map(s=>'<li>'+s+'</li>').join('')||'<li>ধাপ তথ্য নেই</li>';
+    return '<div class="course"><div class="co-top">'+
+      '<span class="co-slot">'+bn(c.slot||1)+'</span>'+
+      '<span class="co-name">'+(c.name_bn||'কোর্স')+'</span>'+
+      (c.kcal?'<span class="co-kcal">'+bn(c.kcal)+' kcal</span>':'')+'</div>'+
+      '<div class="ings">'+ings+'</div><ul class="steps">'+steps+'</ul></div>';
+  }).join('')||'<div class="col-empty">কোর্স তথ্য নেই</div>';
+
+  const w=window.open('','recipe','width=620,height=720,scrollbars=yes');
+  w.document.write('<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">'+
+    '<title>রেসিপি · '+(t.menu_code||'')+'</title><style>'+
+    'body{font-family:"Hind Siliguri",system-ui,sans-serif;background:#11161c;color:#eef3f8;padding:1.2rem;margin:0}'+
+    'h2{color:#f5b73c;margin:0 0 1rem}.course{border-top:1px dashed #2c3a49;padding:.8rem 0}'+
+    '.course:first-child{border-top:none}.co-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}'+
+    '.co-slot{width:1.6rem;height:1.6rem;border-radius:.35rem;background:#4aa3df;color:#0c1116;display:grid;place-items:center;font-weight:700}'+
+    '.co-name{font-size:1rem;font-weight:600}.co-kcal{margin-left:auto;color:#6b7c8c;font-size:.8rem}'+
+    '.ings{display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0 .5rem}'+
+    '.ing{background:#212c38;border:1px solid #2c3a49;border-radius:.4rem;padding:.15rem .5rem;font-size:.8rem}'+
+    '.ing b{color:#4aa3df}.steps{padding-left:1.2rem}.steps li{margin:.3rem 0;line-height:1.5;color:#9fb0c0}'+
+    '.pbtn{background:#4aa3df;color:#0c1116;border:none;border-radius:.5rem;padding:.6rem 1.2rem;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:1rem}'+
+    '</style></head><body>'+
+    '<button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট</button>'+
+    '<h2>📖 রেসিপি · অর্ডার #'+bn(t.order_id)+' · '+(t.menu_code||'')+'</h2>'+
+    body+'</body></html>');
+  w.document.close();
+}
+
+// ── রান্না শুরু (claim — বোতাম লক) ──
+async function claim(id){
+  if(!STAFF_NAME){ alert('আগে লগইন করুন।'); return; }
+  const t=TICKETS[id]; if(!t)return;
+  try{
+    const res=await api('kitchenStatus',{id:t.real_order_id||id,status:'preparing',claimed_by:STAFF_NAME});
+    if(res && res.locked){
+      alert('🔒 এই অর্ডারটি ইতিমধ্যে '+res.by+' ধরেছেন।');
+    }
+  }catch(e){}
+  load();
+}
+
+// ── status এগিয়ে নেওয়া ──
+async function adv(id,to){
+  const t=TICKETS[id];
+  try{await api('kitchenStatus',{id:(t&&t.real_order_id)||id,status:to});}catch(e){}
+  closeModal(); load();
+}
+
+// ── চূড়ান্ত যাচাই (মিডিয়াম উইন্ডো) ──
+function openCheck(id){
+  const t=TICKETS[id]; if(!t)return;
+  const courses=Array.isArray(t.selected_courses)?t.selected_courses:[];
+  document.getElementById('m-title').textContent='চূড়ান্ত যাচাই · অর্ডার #'+bn(t.order_id);
+  document.getElementById('m-body').innerHTML=courses.map(c=>
+    '<div class="check-row"><input type="checkbox"> <span>'+
+    '<b>'+(c.name_bn||'কোর্স')+'</b>'+(c.kcal?' · '+bn(c.kcal)+' kcal':'')+'</span></div>'
+  ).join('')||'<div class="col-empty">কোর্স নেই</div>';
+  document.getElementById('m-foot').innerHTML=
+    '<button class="act deliver" style="width:100%" onclick="adv(\''+t.id+'\',\'served\')">'+
+    '✓ যাচাই সম্পন্ন · 🛵 ডেলিভারিতে পাঠান</button>';
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){document.getElementById('overlay').classList.remove('show');}
+
+function fill(colId,list,nId){
+  const el=document.getElementById(colId);
+  document.getElementById(nId).textContent=bn(list.length);
+  if(!list.length){el.innerHTML='<div class="col-empty">কোনো অর্ডার নেই</div>';return;}
+  list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  el.innerHTML=list.map(card).join('');
+}
+
+async function load(){
+  try{
+    const r=await api('kitchenQueue',{statuses:['queued','preparing','ready']});
+    const tk=r.tickets||[]; TICKETS={};
+    tk.forEach(t=>TICKETS[t.id]=t);
+    fill('col-queued',  tk.filter(t=>t.status==='queued'),   'n-q');
+    fill('col-preparing',tk.filter(t=>t.status==='preparing'),'n-p');
+    fill('col-ready',   tk.filter(t=>t.status==='ready'),    'n-r');
+    document.getElementById('qcount').textContent=bn(tk.length);
+  }catch(e){
+    document.getElementById('col-queued').innerHTML=
+      '<div class="col-empty">কিউ লোড হয়নি।<br>sar.js এ kitchenQueue action ও kitchen-setup.sql চালানো হয়েছে কিনা দেখুন।<br><small>'+e.message+'</small></div>';
+  }
+}
+
+// শুরুতে: লগইন করা থাকলে বোর্ড দেখাও, নাহলে লগইন পর্দা
+if(STAFF_NAME){
+  showBoard();
+  setInterval(()=>{ if(STAFF_NAME) load(); },15000);
+}else{
+  setInterval(()=>{ if(STAFF_NAME) load(); },15000);
 }
 </script>
 </body>
