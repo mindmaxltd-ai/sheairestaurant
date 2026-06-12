@@ -259,14 +259,14 @@ exports.handler = async (event) => {
         // ধরা হচ্ছে: email কে ইউজার আইডি হিসেবে ব্যবহার করা হয়।
         const url = `${SUPABASE_URL}/rest/v1/staff`
           + `?or=(email.eq.${encodeURIComponent(user)},phone.eq.${encodeURIComponent(user)})`
-          + `&select=id,name,email,phone,role,password,is_active&limit=1`;
+          + `&select=id,name,email,phone,role,password_hash,is_active&limit=1`;
         const r = await fetch(url, { headers: SB });
         const rows = await r.json();
         const s = Array.isArray(rows) ? rows[0] : null;
 
         if (!s)                       return reply(200, { ok: false, error: 'notfound' });
         if (s.is_active === false)    return reply(200, { ok: false, error: 'inactive' });
-        if (s.password !== pass)      return reply(200, { ok: false, error: 'wrongpass' });
+        if (s.password_hash !== pass)      return reply(200, { ok: false, error: 'wrongpass' });
 
         // কোন role রান্নাঘরে ঢুকতে পারবে
         const kitchenRoles = ['kitchen_manager', 'super_admin', 'admin', 'floor_manager'];
