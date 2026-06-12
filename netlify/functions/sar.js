@@ -200,7 +200,8 @@ exports.handler = async (event) => {
               id:               `${o.id}_${idx}`,   // টিকিটের আলাদা আইডি
               order_id:         o.order_number || o.id,
               real_order_id:    o.id,                // status বদলাতে আসল id
-              menu_code:        it.code || it.menu_code || 'মেনু',
+              menu_name:        it.name_bn || it.name || 'থেরাপিউটিক মিল',
+              menu_code:        it.code || it.menu_code || '',
               meal_type:        it.meal || '',
               day:              it.day || '',
               total_kcal:       it.kcal || 0,
