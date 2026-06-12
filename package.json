@@ -1,0 +1,10 @@
+{
+  "name": "sar-platform",
+  "version": "1.0.0",
+  "description": "She AI Revolution — women's food & nutrition platform",
+  "private": true,
+  "dependencies": {
+    "@sparticuz/chromium": "^123.0.0",
+    "puppeteer-core": "^22.0.0"
+  }
+}
