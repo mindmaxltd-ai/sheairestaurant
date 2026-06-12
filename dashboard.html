@@ -1025,6 +1025,19 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             </div>
           </div>
 
+          <!-- TODAY'S PDF REPORT (auto-added) -->
+          <div id="reportCard" style="display:none;margin:0 0 1.25rem;padding:16px;
+               background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.25);
+               border-radius:12px;text-align:center">
+            <div style="font-weight:600;color:#34D399;margin-bottom:8px">📄 আজকের স্বাস্থ্য রিপোর্ট</div>
+            <a id="reportLink" href="#" target="_blank"
+               style="display:inline-block;background:#059669;color:#fff;padding:9px 18px;
+                      border-radius:9px;text-decoration:none;font-weight:600">
+               পূর্ণ রিপোর্ট (PDF) দেখুন →
+            </a>
+            <div id="reportDate" style="font-size:.72rem;color:#888;margin-top:8px"></div>
+          </div>
+
           <!-- LOYALTY -->
           <div class="dcard loyalty-card">
             <div class="dcard-header">
@@ -1411,6 +1424,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const [cust, metrics, analysis, orders, notes] = await Promise.all([
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
+    loadLatestReport();
 
     // Update UI with fresh Supabase data
     fillBasicUI(cust);
@@ -1700,6 +1714,24 @@ async function fetchMetrics() {
     console.log('fetchMetrics data:', d);
     return d?.[0] || {};
   } catch(e) { console.error('fetchMetrics exception:', e); return {}; }
+}
+
+// ── আজকের PDF রিপোর্টের লিংক আনা (auto-added) ──
+async function loadLatestReport() {
+  try {
+    if (!CID) return;
+    const r = await fetch(
+      `${SUPA}/rest/v1/reports?customer_id=eq.${CID}&order=report_date.desc&limit=1&select=*`,
+      { headers: H });
+    if (!r.ok) return;
+    const data = await r.json();
+    const rep = data && data[0];
+    if (!rep || !rep.pdf_url) return;
+    document.getElementById('reportLink').href = rep.pdf_url;
+    document.getElementById('reportDate').textContent =
+      'তারিখ: ' + rep.report_date + ' · স্কোর: ' + (rep.meal_score ?? '—') + '/100';
+    document.getElementById('reportCard').style.display = 'block';
+  } catch (e) { console.warn('রিপোর্ট লোড হয়নি:', e); }
 }
 
 async function fetchAnalysis() {
