@@ -170,7 +170,6 @@ exports.handler = async (event) => {
       case 'kitchenQueue': {
         const wanted = Array.isArray(p.statuses) && p.statuses.length
           ? p.statuses : ['queued', 'preparing', 'ready'];
-        // PostgREST in.(...) ফিল্টার
         const inList = wanted.map(encodeURIComponent).join(',');
         const url = `${SUPABASE_URL}/rest/v1/orders`
           + `?payment_status=eq.paid`
@@ -180,13 +179,24 @@ exports.handler = async (event) => {
         const rows = await r.json();
         if (!Array.isArray(rows)) return reply(200, { tickets: [] });
 
-        // প্রতিটা অর্ডারকে kitchen-এর টিকিট আকারে রূপান্তর
+        // সব গ্রাহকের নাম এক ডাকে আনা (অর্ডারে customer_id থাকে)
+        const custIds = [...new Set(rows.map(o => o.customer_id).filter(Boolean))];
+        const custMap = {};
+        if (custIds.length) {
+          const cidList = custIds.map(encodeURIComponent).join(',');
+          const cr = await fetch(
+            `${SUPABASE_URL}/rest/v1/customers?id=in.(${cidList})&select=id,full_name,phone`,
+            { headers: SB });
+          const cl = await cr.json();
+          if (Array.isArray(cl)) cl.forEach(c => { custMap[c.id] = c; });
+        }
+
         const tickets = [];
         for (const o of rows) {
           const items = Array.isArray(o.items_json) ? o.items_json : [];
-          // একটা অর্ডারে একাধিক মিল থাকতে পারে — প্রতিটা মিল একটা টিকিট
+          const cust = custMap[o.customer_id] || {};
           items.forEach((it, idx) => {
-            // রেসিপির কোর্স সাজানো (kitchen modal এ দেখাবে)
+            // কোর্সের বিস্তারিত (নাম + উপকরণ)
             const detail = Array.isArray(it.courseDetail) ? it.courseDetail : [];
             const selected_courses = detail.map((c, i) => ({
               slot:       i + 1,
@@ -196,16 +206,29 @@ exports.handler = async (event) => {
                             typeof g === 'string' ? { item: g, grams: '' } : g),
               steps:      c.steps || [],
             }));
+            // মেডিসিনাল পাউডার ও চাটনি (meal-score থেকে)
+            const medicinals = []
+              .concat(it.diseasePowders || [])
+              .concat(it.conditionPowders || [])
+              .filter(Boolean);
             tickets.push({
-              id:               `${o.id}_${idx}`,   // টিকিটের আলাদা আইডি
+              id:               `${o.id}_${idx}`,
               order_id:         o.order_number || o.id,
-              real_order_id:    o.id,                // status বদলাতে আসল id
+              real_order_id:    o.id,
+              customer_name:    cust.full_name || 'গ্রাহক',
+              customer_phone:   cust.phone || '',
+              payment_status:   o.payment_status || 'pending',
+              payment_method:   o.payment_method || (o.order_type === 'delivery' ? 'COD' : ''),
               menu_name:        it.name_bn || it.name || 'থেরাপিউটিক মিল',
               menu_code:        it.code || it.menu_code || '',
               meal_type:        it.meal || '',
               day:              it.day || '',
               total_kcal:       it.kcal || 0,
               total_protein:    it.protein || 0,
+              course_count:     it.courseCount || (it.courses ? it.courses.length : detail.length),
+              medicinals:       medicinals,
+              chutney:          it.chutney || '',
+              topping:          it.topping || '',
               selected_courses,
               status:           o.kitchen_status || 'queued',
               claimed_by:       o.claimed_by || null,
