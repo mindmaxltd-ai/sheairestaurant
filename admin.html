@@ -1018,10 +1018,14 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
         <div class="field-wrap">
           <label class="field-label">ভূমিকা *</label>
           <select class="filter-select" id="new-staff-role" style="width:100%">
-            <option value="sar_dietitian">SAR ডায়েটিশিয়ান</option>
-            <option value="sar_nutritionist">SAR পুষ্টিবিদ</option>
+            <option value="cook">রাঁধুনি (Cook)</option>
+            <option value="assistant_cook">সহকারী রাঁধুনি</option>
+            <option value="quality_checker">মান যাচাইকারী</option>
+            <option value="delivery_manager">ডেলিভারি ম্যানেজার</option>
             <option value="kitchen_manager">কিচেন ম্যানেজার</option>
             <option value="floor_manager">ফ্লোর ম্যানেজার</option>
+            <option value="sar_dietitian">SAR ডায়েটিশিয়ান</option>
+            <option value="sar_nutritionist">SAR পুষ্টিবিদ</option>
             <option value="rider">রাইডার</option>
             <option value="cashier">ক্যাশিয়ার</option>
             <option value="admin">অ্যাডমিন</option>
@@ -1675,7 +1679,7 @@ function deleteStaff(id){
 }
 
 function getRoleClass(r) { return { super_admin:'role-super', admin:'role-admin', kitchen_manager:'role-kitchen', sar_dietitian:'role-admin', sar_nutritionist:'role-admin' }[r] || 'role-other'; }
-function getRoleLabel(r) { return { super_admin:'সুপার অ্যাডমিন', admin:'অ্যাডমিন', sar_dietitian:'ডায়েটিশিয়ান', sar_nutritionist:'পুষ্টিবিদ', kitchen_manager:'কিচেন ম্যানেজার', floor_manager:'ফ্লোর ম্যানেজার', rider:'রাইডার', cashier:'ক্যাশিয়ার' }[r] || r; }
+function getRoleLabel(r) { return { super_admin:'সুপার অ্যাডমিন', admin:'অ্যাডমিন', cook:'রাঁধুনি', assistant_cook:'সহকারী রাঁধুনি', quality_checker:'মান যাচাইকারী', delivery_manager:'ডেলিভারি ম্যানেজার', sar_dietitian:'ডায়েটিশিয়ান', sar_nutritionist:'পুষ্টিবিদ', kitchen_manager:'কিচেন ম্যানেজার', floor_manager:'ফ্লোর ম্যানেজার', rider:'রাইডার', cashier:'ক্যাশিয়ার' }[r] || r; }
 
 // INVENTORY
 // Load inventory from localStorage or defaults
@@ -2476,7 +2480,8 @@ async function addStaff() {
   const role = document.getElementById('new-staff-role').value;
   if (!name || !phone) { showToast('নাম ও ফোন আবশ্যক!', true); return; }
 
-  const newStaff = { name, phone, email, role, is_active: true, password: document.getElementById('new-staff-pass').value || 'sar2024', created_at: new Date().toISOString() };
+  const pass = document.getElementById('new-staff-pass').value || 'sar2024';
+  const newStaff = { name, phone, email, role, is_active: true, password_hash: pass, created_at: new Date().toISOString() };
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/staff`, {
       method: 'POST',
@@ -2485,7 +2490,7 @@ async function addStaff() {
     });
   } catch {}
 
-  allStaff.push({ ...newStaff, id: 's' + Date.now() });
+  allStaff.push({ ...newStaff, id: 's' + Date.now(), password: pass });
   localStorage.setItem('sar_staff', JSON.stringify(allStaff));
   renderStaff();
   closeModal('addStaff');
