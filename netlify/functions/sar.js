@@ -19,6 +19,8 @@ const SB = {
   'Content-Type': 'application/json',
 };
 
+const K = require('./kitchen-lib');
+
 const reply = (status, body) => ({
   statusCode: status,
   headers: {
@@ -166,151 +168,421 @@ exports.handler = async (event) => {
       }
 
 
-      // ═══ রান্নাঘর + স্টাফ লগইন (যোগ করা) ═══
-      case 'kitchenQueue': {
-        const wanted = Array.isArray(p.statuses) && p.statuses.length
-          ? p.statuses : ['queued', 'preparing', 'ready'];
-        // paid অর্ডার আনি, ক্রম: নতুন আগে (desc)
-        // kitchen_status এখানে ফিল্টার করি না — কারণ নতুন paid অর্ডারে
-        // এটা সেট নাও থাকতে পারে। নিচে কোডে বাছাই করব।
-        const url = `${SUPABASE_URL}/rest/v1/orders`
-          + `?payment_status=eq.paid`
-          + `&select=*&order=created_at.desc`;
-        const r = await fetch(url, { headers: SB });
-        let rows = await r.json();
-        if (!Array.isArray(rows)) return reply(200, { tickets: [] });
+      // ═══ রান্নাঘর v2 — unified kitchen system ═══
 
-        // kitchen_status সেট না থাকলে 'queued' ধরি; তারপর wanted তালিকায় ফিল্টার
-        rows = rows.filter(o => {
+      case 'kitchenQueue': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        const wanted = Array.isArray(p.statuses) && p.statuses.length
+          ? p.statuses
+          : ['queued', 'claimed', 'preparing', 'ready', 'out_for_delivery'];
+        const url = `${SUPABASE_URL}/rest/v1/orders`
+          + `?payment_status=in.(paid,pending)`
+          + `&select=*&order=created_at.desc&limit=200`;
+        const { data: rows } = await K.sbFetch(url, SB);
+        if (!Array.isArray(rows)) return reply(200, { tickets: [], metrics: {} });
+
+        const filtered = rows.filter(o => {
+          if (!K.kitchenQueueFilter(o)) return false;
           const ks = o.kitchen_status || 'queued';
           return wanted.includes(ks);
         });
 
-        // সব গ্রাহকের নাম এক ডাকে আনা (অর্ডারে customer_id থাকে)
-        const custIds = [...new Set(rows.map(o => o.customer_id).filter(Boolean))];
+        if (p.cook) {
+          const cook = String(p.cook);
+          filtered.splice(0, filtered.length,
+            ...filtered.filter(o => o.claimed_by === cook));
+        }
+        if (p.priority_only) {
+          filtered.splice(0, filtered.length,
+            ...filtered.filter(o => o.is_priority || o.is_rush));
+        }
+        if (p.search) {
+          const q = String(p.search).toLowerCase();
+          filtered.splice(0, filtered.length, ...filtered.filter(o => {
+            const num = String(o.order_number || '').toLowerCase();
+            return num.includes(q);
+          }));
+        }
+
+        const custIds = [...new Set(filtered.map(o => o.customer_id).filter(Boolean))];
         const custMap = {};
         if (custIds.length) {
           const cidList = custIds.map(encodeURIComponent).join(',');
-          const cr = await fetch(
+          const { data: cl } = await K.sbFetch(
             `${SUPABASE_URL}/rest/v1/customers?id=in.(${cidList})&select=id,full_name,phone`,
-            { headers: SB });
-          const cl = await cr.json();
+            SB);
           if (Array.isArray(cl)) cl.forEach(c => { custMap[c.id] = c; });
         }
 
-        const tickets = [];
-        for (const o of rows) {
-          const items = Array.isArray(o.items_json) ? o.items_json : [];
-          const cust = custMap[o.customer_id] || {};
-          items.forEach((it, idx) => {
-            // কোর্সের বিস্তারিত (নাম + উপকরণ)
-            const detail = Array.isArray(it.courseDetail) ? it.courseDetail : [];
-            const selected_courses = detail.map((c, i) => ({
-              slot:       i + 1,
-              name_bn:    c.name || ('কোর্স ' + (i + 1)),
-              kcal:       c.kcal || null,
-              ingredients:(c.items || []).map(g =>
-                            typeof g === 'string' ? { item: g, grams: '' } : g),
-              steps:      c.steps || [],
-            }));
-            // মেডিসিনাল পাউডার ও চাটনি (meal-score থেকে)
-            const medicinals = []
-              .concat(it.diseasePowders || [])
-              .concat(it.conditionPowders || [])
-              .filter(Boolean);
-            tickets.push({
-              id:               `${o.id}_${idx}`,
-              order_id:         o.order_number || o.id,
-              real_order_id:    o.id,
-              customer_name:    cust.full_name || 'গ্রাহক',
-              customer_phone:   cust.phone || '',
-              payment_status:   o.payment_status || 'pending',
-              payment_method:   o.payment_method || (o.order_type === 'delivery' ? 'COD' : ''),
-              menu_name:        it.name_bn || it.name || 'থেরাপিউটিক মিল',
-              menu_code:        it.code || it.menu_code || '',
-              meal_type:        it.meal || '',
-              day:              it.day || '',
-              total_kcal:       it.kcal || 0,
-              total_protein:    it.protein || 0,
-              course_count:     it.courseCount || (it.courses ? it.courses.length : detail.length),
-              medicinals:       medicinals,
-              chutney:          it.chutney || '',
-              topping:          it.topping || '',
-              selected_courses,
-              status:           o.kitchen_status || 'queued',
-              claimed_by:       o.claimed_by || null,
-              created_at:       o.created_at,
-            });
-          });
-        }
-        return reply(200, { tickets });
+        const tickets = filtered.map(o =>
+          K.buildOrderTicket(o, custMap[o.customer_id] || {}));
+
+        const metrics = {
+          queued:            tickets.filter(t => t.status === 'queued').length,
+          claimed:           tickets.filter(t => t.status === 'claimed').length,
+          preparing:         tickets.filter(t => t.status === 'preparing').length,
+          ready:             tickets.filter(t => t.status === 'ready').length,
+          out_for_delivery:  tickets.filter(t => t.status === 'out_for_delivery').length,
+          total_active:      tickets.length,
+          cooks_active:      [...new Set(tickets.map(t => t.claimed_by).filter(Boolean))].length,
+          rush:              tickets.filter(t => t.is_rush).length,
+          priority:          tickets.filter(t => t.is_priority).length,
+        };
+
+        return reply(200, { tickets, metrics });
       }
 
-      // ── রান্নাঘরের স্ট্যাটাস বদলানো (+ বোতাম লক) ───────────────
-      // kitchen.html "রান্না শুরু/প্রস্তুত/ডেলিভারি/বাতিল" চাপলে এটা ডাকে।
       case 'kitchenStatus': {
-        // id আসে "orderid_index" আকারে — আসল order id বের করি
         const realId = String(p.id || '').split('_')[0];
-        if (!realId) return reply(400, { ok: false, error: 'no id' });
-
-        const patch = { kitchen_status: p.status };
-        // রান্না ধরলে কে ধরল রেকর্ড করি (বোতাম লক)
-        if (p.status === 'preparing' && p.claimed_by) {
-          patch.claimed_by = p.claimed_by;
-          patch.claimed_at = new Date().toISOString();
+        if (!realId) return reply(400, { ok: false, error: 'no_id' });
+        if (!K.KITCHEN_STATUSES.includes(p.status)) {
+          return reply(400, { ok: false, error: 'invalid_status' });
         }
 
-        // লক যাচাই: অন্য কেউ আগে ধরে ফেললে আটকে দাও
-        if (p.status === 'preparing' && p.claimed_by) {
-          const chk = await fetch(
-            `${SUPABASE_URL}/rest/v1/orders?id=eq.${realId}&select=claimed_by,kitchen_status`,
-            { headers: SB });
-          const cur = (await chk.json())[0];
-          if (cur && cur.claimed_by && cur.claimed_by !== p.claimed_by) {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+
+        const cur = await K.getOrderById(SUPABASE_URL, SB, realId);
+        if (!cur) return reply(404, { ok: false, error: 'not_found' });
+
+        const fromStatus = cur.kitchen_status || 'queued';
+        if (!K.canTransition(session.staff_role, fromStatus, p.status)) {
+          return reply(403, { ok: false, error: 'forbidden', role: session.staff_role });
+        }
+
+        if (['claimed', 'preparing'].includes(p.status)) {
+          if (cur.claimed_by && cur.claimed_by !== (p.claimed_by || session.staff_name)
+              && !K.hasPermission(session.staff_role, 'reassign')) {
             return reply(200, { ok: false, locked: true, by: cur.claimed_by });
           }
         }
 
-        const r = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${realId}`, {
-          method: 'PATCH',
-          headers: { ...SB, Prefer: 'return=minimal' },
-          body: JSON.stringify(patch),
+        if (p.status === 'served' && !cur.verification_completed
+            && cur.kitchen_status !== 'out_for_delivery') {
+          return reply(400, { ok: false, error: 'verification_required' });
+        }
+
+        const built = K.buildStatusPatch(p.status, session, {
+          claimed_by:       p.claimed_by || session.staff_name,
+          assigned_by:      p.assigned_by || session.staff_name,
+          eta_minutes:      p.eta_minutes || cur.estimated_time_minutes || 15,
+          verified:         !!p.verified,
+          require_verification: true,
+          is_priority:      p.is_priority,
+          is_rush:          p.is_rush,
         });
-        return reply(r.ok ? 200 : 400, { ok: r.ok });
+        if (built.error) return reply(400, { ok: false, error: built.error });
+
+        const { ok } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(realId)}`, SB, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=minimal' },
+            body: JSON.stringify(built.patch),
+          });
+
+        if (ok) {
+          await K.writeAudit(SUPABASE_URL, SB, {
+            order_id:     realId,
+            order_number: cur.order_number,
+            staff_id:     session.staff_id,
+            staff_name:   session.staff_name,
+            staff_role:   session.staff_role,
+            action:       'status_change',
+            old_status:   fromStatus,
+            new_status:   p.status,
+            metadata:     { claimed_by: built.patch.claimed_by || cur.claimed_by },
+          });
+        }
+
+        return reply(ok ? 200 : 400, { ok });
       }
 
+      case 'kitchenAssign': {
+        const realId = String(p.id || '');
+        if (!realId) return reply(400, { ok: false, error: 'no_id' });
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        if (!K.hasPermission(session.staff_role, 'assign')
+            && !K.hasPermission(session.staff_role, 'reassign')) {
+          return reply(403, { ok: false, error: 'forbidden' });
+        }
+
+        const cur = await K.getOrderById(SUPABASE_URL, SB, realId);
+        if (!cur) return reply(404, { ok: false, error: 'not_found' });
+
+        const cookName = String(p.cook_name || '').trim();
+        if (!cookName) return reply(400, { ok: false, error: 'no_cook' });
+
+        const patch = {
+          claimed_by:        cookName,
+          claimed_at:        new Date().toISOString(),
+          assigned_by:       session.staff_name,
+          kitchen_status:    cur.kitchen_status === 'queued' ? 'claimed' : (cur.kitchen_status || 'claimed'),
+          expected_ready_at: K.estimateReadyAt(p.eta_minutes || 15),
+          updated_at:        new Date().toISOString(),
+        };
+        if (patch.kitchen_status === 'claimed') {
+          patch.status = K.mapKitchenToOrderStatus('claimed');
+        }
+
+        const { ok } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(realId)}`, SB, {
+            method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(patch),
+          });
+
+        if (ok) {
+          await K.writeAudit(SUPABASE_URL, SB, {
+            order_id: realId, order_number: cur.order_number,
+            staff_id: session.staff_id, staff_name: session.staff_name,
+            staff_role: session.staff_role, action: 'assign',
+            old_status: cur.kitchen_status, new_status: patch.kitchen_status,
+            metadata: { assigned_to: cookName },
+          });
+        }
+        return reply(ok ? 200 : 400, { ok });
+      }
+
+      case 'kitchenUpdateFlags': {
+        const realId = String(p.id || '');
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        if (!K.hasPermission(session.staff_role, 'priority')) {
+          return reply(403, { ok: false, error: 'forbidden' });
+        }
+        const patch = { updated_at: new Date().toISOString() };
+        if (p.is_rush != null) patch.is_rush = !!p.is_rush;
+        if (p.is_priority != null) patch.is_priority = !!p.is_priority;
+        const { ok } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(realId)}`, SB, {
+            method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(patch),
+          });
+        return reply(ok ? 200 : 400, { ok });
+      }
+
+        const realId = String(p.id || '');
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        if (!K.hasPermission(session.staff_role, 'verify')) {
+          return reply(403, { ok: false, error: 'forbidden' });
+        }
+        if (!p.items_checked || !Array.isArray(p.items_checked)) {
+          return reply(400, { ok: false, error: 'items_required' });
+        }
+
+        const patch = {
+          verification_completed: true,
+          verified_by:            session.staff_name,
+          verified_at:            new Date().toISOString(),
+          updated_at:             new Date().toISOString(),
+        };
+        const { ok } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(realId)}`, SB, {
+            method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(patch),
+          });
+
+        if (ok) {
+          await K.writeAudit(SUPABASE_URL, SB, {
+            order_id: realId, staff_id: session.staff_id,
+            staff_name: session.staff_name, staff_role: session.staff_role,
+            action: 'verify', metadata: { items: p.items_checked },
+          });
+        }
+        return reply(ok ? 200 : 400, { ok, verified: ok });
+      }
+
+      case 'kitchenWorkload': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+
+        const url = `${SUPABASE_URL}/rest/v1/orders`
+          + `?kitchen_status=in.(claimed,preparing)`
+          + `&select=claimed_by,kitchen_status,estimated_time_minutes,expected_ready_at`
+          + `&limit=500`;
+        const { data: rows } = await K.sbFetch(url, SB);
+        const map = {};
+        (Array.isArray(rows) ? rows : []).forEach(o => {
+          const name = o.claimed_by || 'অনির্ধারিত';
+          if (!map[name]) map[name] = { cook: name, claimed: 0, preparing: 0, total: 0 };
+          if (o.kitchen_status === 'claimed') map[name].claimed++;
+          if (o.kitchen_status === 'preparing') map[name].preparing++;
+          map[name].total++;
+        });
+        return reply(200, { workload: Object.values(map) });
+      }
+
+      case 'getRecipe': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+
+        const menuCode = String(p.menu_code || '').trim();
+        const orderId  = String(p.order_id || '').trim();
+        let recipe = null;
+
+        if (menuCode) {
+          const { data: rows } = await K.sbFetch(
+            `${SUPABASE_URL}/rest/v1/recipes?menu_code=eq.${encodeURIComponent(menuCode)}`
+            + `&is_active=eq.true&select=*&limit=1`, SB);
+          if (Array.isArray(rows) && rows[0]) recipe = rows[0];
+        }
+
+        if (!recipe && p.menu_item_id) {
+          const { data: rows } = await K.sbFetch(
+            `${SUPABASE_URL}/rest/v1/recipes?menu_item_id=eq.${encodeURIComponent(p.menu_item_id)}`
+            + `&is_active=eq.true&select=*&limit=1`, SB);
+          if (Array.isArray(rows) && rows[0]) recipe = rows[0];
+        }
+
+        if (!recipe && orderId) {
+          const order = await K.getOrderById(SUPABASE_URL, SB, orderId);
+          const items = Array.isArray(order && order.items_json) ? order.items_json : [];
+          const it = items.find(x => (x.code || x.menu_code) === menuCode)
+            || items[p.item_index || 0];
+          if (it) {
+            const courses = K.parseItemCourses(it);
+            recipe = {
+              name_bn:           it.name_bn || it.name,
+              menu_code:         it.code || it.menu_code,
+              ingredients:       courses.flatMap(c => c.ingredients),
+              steps:             courses.flatMap(c => c.steps),
+              cook_time_minutes: 15,
+              serving_method:    'তেলমুক্ত · স্টিম/এয়ার-ফ্রাই',
+              allergens:         [it.has_egg ? 'ডিম' : null, it.has_chicken ? 'মুরগি' : null].filter(Boolean),
+              kitchen_notes:     it.note || order.special_instructions || '',
+              source:            'order_snapshot',
+            };
+          }
+        }
+
+        if (!recipe) {
+          return reply(404, { ok: false, error: 'recipe_not_found' });
+        }
+        return reply(200, { ok: true, recipe });
+      }
 
       case 'staffLogin': {
         const user = String(p.user || '').trim();
         const pass = String(p.pass || '');
         if (!user || !pass) return reply(200, { ok: false, error: 'missing' });
 
-        // staff টেবিলে ইউজার খোঁজা (email বা phone বা name যেকোনোটা দিয়ে)
-        // আপনার staff টেবিলে লগইন আইডি হিসেবে কোন কলাম, সেটা নিচে মেলান।
-        // ধরা হচ্ছে: email কে ইউজার আইডি হিসেবে ব্যবহার করা হয়।
         const url = `${SUPABASE_URL}/rest/v1/staff`
           + `?or=(email.eq.${encodeURIComponent(user)},phone.eq.${encodeURIComponent(user)})`
           + `&select=id,name,email,phone,role,password_hash,is_active&limit=1`;
-        const r = await fetch(url, { headers: SB });
-        const rows = await r.json();
+        const { data: rows } = await K.sbFetch(url, SB);
         const s = Array.isArray(rows) ? rows[0] : null;
 
-        if (!s)                       return reply(200, { ok: false, error: 'notfound' });
-        if (s.is_active === false)    return reply(200, { ok: false, error: 'inactive' });
-        if (s.password_hash !== pass)      return reply(200, { ok: false, error: 'wrongpass' });
+        if (!s)                    return reply(200, { ok: false, error: 'notfound' });
+        if (s.is_active === false) return reply(200, { ok: false, error: 'inactive' });
+        if (!K.verifyPassword(s.password_hash, pass)) {
+          return reply(200, { ok: false, error: 'wrongpass' });
+        }
 
-        // কোন role রান্নাঘরে ঢুকতে পারবে
-        const kitchenRoles = ['kitchen_manager', 'super_admin', 'admin', 'floor_manager'];
-        if (!kitchenRoles.includes(s.role)) {
+        const kitchenRoles = K.KITCHEN_ROLES.concat(['sar_dietitian', 'sar_nutritionist', 'cashier', 'rider']);
+        const kitchenAccess = ['super_admin', 'admin', 'kitchen_manager', 'cook', 'assistant_cook',
+          'quality_checker', 'delivery_manager', 'floor_manager'];
+        if (!kitchenAccess.includes(s.role)) {
           return reply(200, { ok: false, error: 'noaccess', role: s.role });
         }
 
-        // সফল — পাসওয়ার্ড ছাড়া তথ্য ফেরত
+        const token = K.genToken();
+        const expires = new Date(Date.now() + K.SESSION_HOURS * 3600000).toISOString();
+        await K.sbFetch(`${SUPABASE_URL}/rest/v1/kitchen_sessions`, SB, {
+          method: 'POST',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            staff_id: s.id, token, staff_name: s.name,
+            staff_role: s.role, expires_at: expires,
+          }),
+        });
+
+        await K.sbFetch(`${SUPABASE_URL}/rest/v1/staff?id=eq.${encodeURIComponent(s.id)}`, SB, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({ last_login: new Date().toISOString() }),
+        }).catch(() => null);
+
         return reply(200, {
           ok: true,
-          staff: { id: s.id, name: s.name, role: s.role,
-                   is_super: s.role === 'super_admin' },
+          token,
+          expires_at: expires,
+          permissions: K.ROLE_PERMISSIONS[s.role] || ['view'],
+          staff: {
+            id: s.id, name: s.name, role: s.role, email: s.email, phone: s.phone,
+            is_super: s.role === 'super_admin',
+          },
         });
+      }
+
+      case 'staffSessionValidate': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'invalid_session' });
+        return reply(200, {
+          ok: true,
+          staff: {
+            id: session.staff_id, name: session.staff_name, role: session.staff_role,
+          },
+          permissions: K.ROLE_PERMISSIONS[session.staff_role] || ['view'],
+        });
+      }
+
+      case 'staffLogout': {
+        if (p.token) {
+          await K.sbFetch(
+            `${SUPABASE_URL}/rest/v1/kitchen_sessions?token=eq.${encodeURIComponent(p.token)}`, SB, {
+              method: 'DELETE', headers: { Prefer: 'return=minimal' },
+            });
+        }
+        return reply(200, { ok: true });
+      }
+
+      case 'staffList': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        if (!K.hasPermission(session.staff_role, 'manage_staff')
+            && !K.hasPermission(session.staff_role, 'assign')) {
+          return reply(403, { ok: false, error: 'forbidden' });
+        }
+        const { data: rows } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/staff?is_active=eq.true&select=id,name,role,phone,email&order=name`, SB);
+        const cooks = (Array.isArray(rows) ? rows : []).filter(s =>
+          ['cook', 'assistant_cook', 'kitchen_manager', 'floor_manager'].includes(s.role));
+        return reply(200, { ok: true, staff: rows || [], cooks });
+      }
+
+      case 'staffUpsert': {
+        const session = await K.validateSession(SUPABASE_URL, SB, p.token);
+        if (!session) return reply(401, { ok: false, error: 'unauthorized' });
+        if (!K.hasPermission(session.staff_role, 'manage_staff')) {
+          return reply(403, { ok: false, error: 'forbidden' });
+        }
+
+        const row = {
+          name:  String(p.name || '').trim(),
+          phone: String(p.phone || '').trim(),
+          email: String(p.email || '').trim() || null,
+          role:  String(p.role || 'cook'),
+          is_active: p.is_active !== false,
+          updated_at: new Date().toISOString(),
+        };
+        if (p.password) row.password_hash = K.hashPassword(p.password);
+        if (!row.name || !row.phone) return reply(400, { ok: false, error: 'missing_fields' });
+
+        if (p.id) {
+          const { ok } = await K.sbFetch(
+            `${SUPABASE_URL}/rest/v1/staff?id=eq.${encodeURIComponent(p.id)}`, SB, {
+              method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row),
+            });
+          return reply(ok ? 200 : 400, { ok });
+        }
+
+        row.created_at = new Date().toISOString();
+        if (!row.password_hash) row.password_hash = K.hashPassword('sar2024');
+        const { ok, data } = await K.sbFetch(`${SUPABASE_URL}/rest/v1/staff`, SB, {
+          method: 'POST',
+          headers: { Prefer: 'return=representation' },
+          body: JSON.stringify(row),
+        });
+        return reply(ok ? 200 : 400, { ok, staff: Array.isArray(data) ? data[0] : data });
       }
 
 
