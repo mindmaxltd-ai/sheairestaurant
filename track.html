@@ -414,13 +414,30 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const STEPS_CONFIG = [
   { key:'pending',           icon:'📝', title:'অর্ডার প্রাপ্ত',      desc:'অপেক্ষায়' },
   { key:'confirmed',         icon:'✅', title:'নিশ্চিত',              desc:'নিশ্চিত হয়েছে' },
+  { key:'claimed',           icon:'👨‍🍳', title:'দাবি করা',            desc:'রান্নাঘরে গ্রহণ' },
   { key:'preparing',         icon:'👩‍🍳', title:'রান্না চলছে',          desc:'কিচেনে' },
   { key:'ready',             icon:'🍱', title:'প্রস্তুত',              desc:'প্যাক হচ্ছে' },
   { key:'out_for_delivery',  icon:'🚴‍♀️', title:'পথে আছে',             desc:'ডেলিভারিতে' },
   { key:'delivered',         icon:'🏠', title:'পৌঁছে গেছে',           desc:'সম্পন্ন' },
 ];
 
-const STATUS_ORDER = ['pending','confirmed','preparing','ready','out_for_delivery','delivered'];
+const STATUS_ORDER = ['pending','confirmed','claimed','preparing','ready','out_for_delivery','delivered'];
+
+/** kitchen_status → customer tracking status (single source of truth) */
+function effectiveTrackStatus(order){
+  const ks = order.kitchen_status;
+  const map = {
+    queued:           'confirmed',
+    claimed:          'claimed',
+    preparing:        'preparing',
+    ready:            'ready',
+    out_for_delivery: 'out_for_delivery',
+    served:           'delivered',
+    declined:         'cancelled',
+  };
+  if(ks && map[ks]) return map[ks];
+  return order.status || 'pending';
+}
 
 let currentOrderId = null;
 let refreshTimer = null;
@@ -463,8 +480,9 @@ function renderOrder(order){
   const eta = order.estimated_time_minutes;
   document.getElementById('etaTime').textContent = eta ? `${eta} মিনিট` : '৩০-৪৫ মিনিট';
 
-  updateStatusUI(order.status || 'pending');
-  renderSteps(order.status || 'pending', order.created_at);
+  const trackStatus = effectiveTrackStatus(order);
+  updateStatusUI(trackStatus);
+  renderSteps(trackStatus, order.created_at);
 
   if(order.items_json){
     renderItems(order.items_json, order.total_amount);
@@ -487,10 +505,11 @@ async function refreshOrder(id){
   try{
     const data = await sbFetch(`orders?id=eq.${id}&select=*`);
     if(data && data[0]){
+      const trackStatus = effectiveTrackStatus(data[0]);
       const prev = document.getElementById('statusText').textContent;
-      updateStatusUI(data[0].status);
-      renderSteps(data[0].status, data[0].created_at);
-      const newStatus = getStatusBn(data[0].status);
+      updateStatusUI(trackStatus);
+      renderSteps(trackStatus, data[0].created_at);
+      const newStatus = getStatusBn(trackStatus);
       if(prev !== newStatus) showToast('স্ট্যাটাস আপডেট', `অর্ডার এখন: ${newStatus}`);
     }
   } catch(e){}
@@ -524,13 +543,16 @@ function updateStatusUI(status){
   const text = document.getElementById('statusText');
   pill.className = `status-pill ${status}`;
   text.textContent = getStatusBn(status);
-  const icons = {pending:'📝',confirmed:'✅',preparing:'👩‍🍳',ready:'🍱',out_for_delivery:'🚴‍♀️',delivered:'🎉',cancelled:'❌'};
+  const icons = {pending:'📝',confirmed:'✅',claimed:'👨‍🍳',preparing:'👩‍🍳',ready:'🍱',out_for_delivery:'🚴‍♀️',delivered:'🎉',cancelled:'❌'};
   pill.querySelector('span').textContent = icons[status] || '⏳';
 }
 
 function getStatusBn(s){
-  const m = {pending:'অপেক্ষায়',confirmed:'নিশ্চিত',preparing:'রান্না চলছে',
-    ready:'প্রস্তুত',out_for_delivery:'পথে আছে',delivered:'পৌঁছে গেছে',cancelled:'বাতিল'};
+  const m = {
+    pending:'অপেক্ষায়', confirmed:'নিশ্চিত', claimed:'রান্নাঘরে দাবি',
+    preparing:'রান্না চলছে', ready:'প্রস্তুত', out_for_delivery:'পথে আছে',
+    delivered:'পৌঁছে গেছে', cancelled:'বাতিল'
+  };
   return m[s] || s;
 }
 
