@@ -183,13 +183,7 @@ function selIntlPM(el, method) {
   if (trxWrap) trxWrap.style.display = 'block';
 }
 
-// Show cash form when cash selected
-const origSelPM = selPM;
-function selPM(el, method) {
-  origSelPM(el, method);
-  const cashForm = document.getElementById('cashForm');
-  if (cashForm) cashForm.className = 'cash-form' + (method === 'cash' ? ' show' : '');
-}
+// (cash form toggle is now handled inside the main selPM below)
 
 // ═══════════════════════════════════════════════════
 // ADMIN NOTIFICATION (only for reg/membership)
@@ -817,6 +811,8 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .pm.selected{border-color:var(--pink);background:var(--pink3);
   box-shadow:0 0 14px rgba(233,30,140,.18)}
 .pm-icon{font-size:1.3rem;display:block;margin-bottom:.3rem}
+.pm-logo{height:30px;width:auto;max-width:80%;object-fit:contain;display:block;margin:0 auto .35rem;
+  background:#fff;border-radius:6px;padding:.2rem .35rem}
 .pm-name{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.65)}
 .pm-badge{position:absolute;top:4px;right:4px;background:var(--green);
   color:#fff;font-size:.55rem;border-radius:4px;padding:.1rem .3rem;font-weight:700}
@@ -1086,6 +1082,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .intl-pm:hover{border-color:rgba(233,30,140,.3);background:var(--pink3)}
 .intl-pm.selected{border-color:var(--pink);background:var(--pink3)}
 .intl-pm-icon{font-size:1.2rem;display:block;margin-bottom:.2rem}
+.intl-pm-logo{height:24px;width:auto;max-width:85%;object-fit:contain;display:block;margin:0 auto .25rem;background:#fff;border-radius:5px;padding:.15rem .3rem}
 .intl-pm-name{font-size:.65rem;font-weight:600;color:rgba(255,255,255,.6)}
 
 /* ── Cash Payment Form ── */
@@ -1617,17 +1614,17 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">📱 মোবাইল ব্যাংকিং</div>
             <div class="pm-grid" style="margin-bottom:1rem">
               <div class="pm selected" onclick="selPM(this,'bkash')" style="border-color:#D91A6E">
-                <span style="font-size:1.5rem">📱</span>
+                <img class="pm-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/BKash_logo.svg/320px-BKash_logo.svg.png" alt="bKash" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">📱</span>
                 <span class="pm-name" style="color:#FF69B4;font-weight:800">bKash</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">01XXXXXXXXX</span>
               </div>
               <div class="pm" onclick="selPM(this,'nagad')">
-                <span style="font-size:1.5rem">🟠</span>
+                <img class="pm-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Nagad-Logo.png/320px-Nagad-Logo.png" alt="Nagad" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">🟠</span>
                 <span class="pm-name" style="color:#F7941D;font-weight:800">Nagad</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">01XXXXXXXXX</span>
               </div>
               <div class="pm" onclick="selPM(this,'rocket')">
-                <span style="font-size:1.5rem">🚀</span>
+                <img class="pm-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Dutch_Bangl_Rocket_Logo.png/320px-Dutch_Bangl_Rocket_Logo.png" alt="Rocket" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">🚀</span>
                 <span class="pm-name" style="color:#8D1A4D;font-weight:800">Rocket</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">DBBL</span>
               </div>
@@ -1652,17 +1649,17 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">💳 ক্রেডিট / ডেবিট কার্ড</div>
             <div class="pm-grid" style="margin-bottom:1rem">
               <div class="pm" onclick="selPM(this,'visa')">
-                <span style="font-size:1.5rem">💳</span>
+                <img class="pm-logo" src="https://crm.mypihr.com/images/credit_cards/visacard.png" alt="Visa" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">💳</span>
                 <span class="pm-name" style="color:#1A1AFF;font-weight:800">Visa</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">ক্রেডিট/ডেবিট</span>
               </div>
               <div class="pm" onclick="selPM(this,'mastercard')">
-                <span style="font-size:1.5rem">🔴</span>
+                <img class="pm-logo" src="https://crm.mypihr.com/images/credit_cards/mastercard.png" alt="Mastercard" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">🔴</span>
                 <span class="pm-name" style="color:#EB001B;font-weight:800">Mastercard</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">ক্রেডিট/ডেবিট</span>
               </div>
               <div class="pm" onclick="selPM(this,'amex')">
-                <span style="font-size:1.5rem">🔷</span>
+                <img class="pm-logo" src="https://crm.mypihr.com/images/credit_cards/americanexpress.png" alt="Amex" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="font-size:1.5rem;display:none">🔷</span>
                 <span class="pm-name" style="color:#2E77BC;font-weight:800">Amex</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">American Express</span>
               </div>
@@ -1704,20 +1701,9 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
                 </div>
                 <span class="ssl-secure">🔒 ১০০% নিরাপদ</span>
               </div>
-              <div class="ssl-banner">
-                <img
-                  src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-03.png"
-                  alt="SSLCommerz — bKash, Nagad, Rocket, Visa, Mastercard, Amex সহ সকল পেমেন্ট পদ্ধতি"
-                  onerror="this.style.display='none';document.getElementById('sslFallback').style.display='flex';">
-                <div class="ssl-logos" id="sslFallback" style="display:none">
-                  <img src="https://crm.mypihr.com/images/credit_cards/visacard.png" alt="Visa" onerror="this.style.display='none'">
-                  <img src="https://crm.mypihr.com/images/credit_cards/mastercard.png" alt="Mastercard" onerror="this.style.display='none'">
-                  <img src="https://crm.mypihr.com/images/credit_cards/americanexpress.png" alt="Amex" onerror="this.style.display='none'">
-                </div>
-              </div>
               <div class="ssl-foot">
                 <span>🛡️</span>
-                <span>নিচের <b>পেমেন্ট নিশ্চিত করুন</b> বাটনে ক্লিক করলে SSLCommerz-এর নিরাপদ গেটওয়েতে গিয়ে আপনি যেকোনো পদ্ধতিতে (bKash, কার্ড, নেট-ব্যাংকিং) পেমেন্ট করতে পারবেন।</span>
+                <span>কার্ড (Visa/Mastercard/Amex) বা গেটওয়ে বেছে <b>পেমেন্ট নিশ্চিত করুন</b> বাটনে ক্লিক করলে SSLCommerz-এর নিরাপদ গেটওয়েতে গিয়ে পেমেন্ট সম্পন্ন হবে।</span>
               </div>
               <div class="ssl-count">✔ PCI-DSS সার্টিফায়েড · ৪০+ পেমেন্ট অপশন · SSL এনক্রিপশন</div>
             </div>
@@ -1728,11 +1714,11 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
               <div class="intl-label">🌍 আন্তর্জাতিক পেমেন্ট (NRB / Overseas)</div>
               <div class="intl-grid">
                 <div class="intl-pm" onclick="selIntlPM(this,'paypal')">
-                  <span class="intl-pm-icon">🅿️</span>
+                  <img class="intl-pm-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/320px-PayPal.svg.png" alt="PayPal" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="intl-pm-icon" style="display:none">🅿️</span>
                   <span class="intl-pm-name">PayPal</span>
                 </div>
                 <div class="intl-pm" onclick="selIntlPM(this,'stripe')">
-                  <span class="intl-pm-icon">⚡</span>
+                  <img class="intl-pm-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/320px-Stripe_Logo%2C_revised_2016.svg.png" alt="Stripe" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="intl-pm-icon" style="display:none">⚡</span>
                   <span class="intl-pm-name">Stripe</span>
                 </div>
                 <div class="intl-pm" onclick="selIntlPM(this,'wise')">
@@ -2015,9 +2001,9 @@ const METHOD_INFO = {
   upay:     { name:'Upay', num:'01346098892', instr:'Upay Send Money করুন এই নম্বরে:', showTrx:true },
   tap:      { name:'TapTap', num:'01346098892', instr:'TapTap Send Money করুন এই নম্বরে:', showTrx:true },
   okwallet: { name:'OK Wallet', num:'01346098892', instr:'OK Wallet Send Money করুন এই নম্বরে:', showTrx:true },
-  visa:     { name:'Visa Card', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
-  mastercard:{ name:'Mastercard', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
-  amex:     { name:'Amex', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে ShurjoPay গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  visa:     { name:'Visa Card', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে SSLCommerz গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  mastercard:{ name:'Mastercard', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে SSLCommerz গেটওয়েতে নিয়ে যাবে।', showTrx:false },
+  amex:     { name:'Amex', num:'', instr:'নিচের Pay বাটনে ক্লিক করলে SSLCommerz গেটওয়েতে নিয়ে যাবে।', showTrx:false },
   nexus:    { name:'Nexus Pay', num:'', instr:'DBBL Nexus Pay অ্যাপ থেকে QR স্ক্যান করুন।', showTrx:false },
   internet_banking:{ name:'Internet Banking', num:'', instr:'আপনার ব্যাংকের নেট ব্যাংকিং পোর্টালে গিয়ে পেমেন্ট করুন।', showTrx:true },
   shurjopay:{ name:'ShurjoPay', num:'', instr:'ShurjoPay গেটওয়েতে নিয়ে যাবে — সব পদ্ধতি সমর্থিত।', showTrx:false },
@@ -2028,6 +2014,7 @@ const METHOD_INFO = {
 function selPM(el, method) {
   document.querySelectorAll('.pm').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
+  const sb=document.getElementById('sslBlock'); if(sb) sb.classList.remove('selected');
   selMethod = method;
 
   const info = METHOD_INFO[method] || {};
@@ -2038,8 +2025,13 @@ function selPM(el, method) {
 
   instr.textContent = info.instr || '';
   num.textContent = info.num || '';
+  num.style.display = info.num ? 'block' : 'none';
   details.style.display = 'block';
+  // manual MFS (bKash/Nagad/Rocket) → transaction id field; cards → none
   trxWrap.style.display = info.showTrx ? 'block' : 'none';
+
+  const cashForm = document.getElementById('cashForm');
+  if(cashForm) cashForm.className = 'cash-form' + (method === 'cash' ? ' show' : '');
 
   document.getElementById('verifyStatus').style.display = 'none';
   document.getElementById('payMsg').textContent = '';
@@ -2162,19 +2154,20 @@ function selectPkg(el, type, amount, original, name){
   updateSummary();
 }
 
-function selPM(el, method){
-  document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));
-  el.classList.add('selected');
-  // deselect the SSLCommerz gateway block when a specific method is chosen
-  const sb=document.getElementById('sslBlock'); if(sb) sb.classList.remove('selected');
-  selMethod = method;
-}
-
-// select the SSLCommerz "Pay With" gateway (covers all PSPs in one)
+// select the SSLCommerz gateway block (cards/MFS via hosted checkout)
 function selSSL(el){
   document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));
+  document.querySelectorAll('.intl-pm').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
   selMethod = 'sslcommerz';
+  const details=document.getElementById('methodDetails');
+  const instr=document.getElementById('methodInstr');
+  const num=document.getElementById('methodNum');
+  const trxWrap=document.getElementById('trxIdWrap');
+  if(details) details.style.display='block';
+  if(instr) instr.textContent='নিচের পেমেন্ট নিশ্চিত করুন বাটনে ক্লিক করলে SSLCommerz-এর নিরাপদ গেটওয়েতে গিয়ে bKash/কার্ড/নেট-ব্যাংকিং যেকোনো উপায়ে পেমেন্ট করতে পারবেন।';
+  if(num){ num.textContent=''; num.style.display='none'; }
+  if(trxWrap) trxWrap.style.display='none';
 }
 
 // ═══════════════════════════════
