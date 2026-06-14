@@ -26,7 +26,7 @@ let _orders   = [];     // last 3 orders
 window.addEventListener('DOMContentLoaded', async () => {
   try {
     const [metrics, log, ai, orders] = await Promise.all([
-      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1`,{headers:H}).then(r=>r.json()),
+      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1`,{headers:H}).then(r=>r.json()),
       fetch(`${SUPA}/rest/v1/daily_health_log?customer_id=eq.${CID}&order=log_date.desc&limit=1`,{headers:H}).then(r=>r.json()),
       fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1`,{headers:H}).then(r=>r.json()),
       fetch(`${SUPA}/rest/v1/orders?customer_id=eq.${CID}&order=created_at.desc&limit=3&select=*`,{headers:H}).then(r=>r.json()),
@@ -820,6 +820,41 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
 .pm-name{font-size:.72rem;font-weight:600;color:rgba(255,255,255,.65)}
 .pm-badge{position:absolute;top:4px;right:4px;background:var(--green);
   color:#fff;font-size:.55rem;border-radius:4px;padding:.1rem .3rem;font-weight:700}
+
+/* ── world-class SSLCommerz "Pay With" gateway block (Sakara theme) ── */
+.ssl-block{position:relative;border-radius:18px;padding:1.4rem 1.3rem;margin-bottom:1.2rem;
+  background:linear-gradient(135deg,rgba(233,30,140,.10),rgba(107,33,168,.10));
+  border:1.5px solid var(--border);cursor:pointer;transition:all .35s;overflow:hidden}
+.ssl-block:before{content:'';position:absolute;inset:0;
+  background:radial-gradient(120% 120% at 0% 0%,rgba(233,30,140,.14),transparent 55%);
+  opacity:0;transition:opacity .35s;pointer-events:none}
+.ssl-block:hover{border-color:rgba(233,30,140,.5);transform:translateY(-2px);
+  box-shadow:0 14px 40px rgba(233,30,140,.18)}
+.ssl-block:hover:before{opacity:1}
+.ssl-block.selected{border-color:var(--pink);
+  background:linear-gradient(135deg,rgba(233,30,140,.18),rgba(107,33,168,.16));
+  box-shadow:0 0 26px rgba(233,30,140,.28)}
+.ssl-block.selected:before{opacity:1}
+.ssl-top{display:flex;align-items:center;gap:.7rem;margin-bottom:1rem;position:relative;z-index:1}
+.ssl-tick{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);
+  display:grid;place-items:center;flex:none;transition:all .3s;color:transparent;font-size:.8rem;font-weight:800}
+.ssl-block.selected .ssl-tick{background:var(--pink);border-color:var(--pink);color:#fff}
+.ssl-title{font-weight:800;font-size:1rem;color:#fff;line-height:1.2}
+.ssl-sub{font-size:.68rem;color:rgba(255,255,255,.45);font-family:'Space Mono',monospace}
+.ssl-secure{margin-left:auto;display:flex;align-items:center;gap:.3rem;
+  font-size:.62rem;color:var(--green);background:rgba(16,185,129,.12);
+  border:1px solid rgba(16,185,129,.3);border-radius:30px;padding:.2rem .55rem;font-weight:700}
+.ssl-banner{position:relative;z-index:1;background:#fff;border-radius:12px;
+  padding:.7rem;display:flex;align-items:center;justify-content:center}
+.ssl-banner img{max-width:100%;height:auto;display:block}
+/* fallback logo strip if the external banner image fails to load */
+.ssl-logos{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:.2rem}
+.ssl-logos img{height:26px;background:#fff;border-radius:5px;padding:.15rem .35rem}
+.ssl-foot{position:relative;z-index:1;display:flex;align-items:center;gap:.4rem;
+  margin-top:.85rem;font-size:.72rem;color:rgba(255,255,255,.6);line-height:1.5}
+.ssl-foot b{color:var(--pink2)}
+.ssl-count{display:inline-flex;align-items:center;gap:.3rem;font-size:.66rem;
+  color:rgba(255,255,255,.4);margin-top:.5rem;position:relative;z-index:1}
 
 /* ── ORDER SUMMARY ── */
 .summary-card{
@@ -1651,16 +1686,40 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
                 <span class="pm-name" style="color:#FFD700;font-weight:800">ShurjoPay</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">গেটওয়ে</span>
               </div>
-              <div class="pm" onclick="selPM(this,'sslcommerz')">
-                <span style="font-size:1.5rem">🔒</span>
-                <span class="pm-name" style="color:#00B4D8;font-weight:800">SSLCommerz</span>
-                <span style="font-size:.6rem;color:rgba(255,255,255,.3)">গেটওয়ে</span>
-              </div>
               <div class="pm" onclick="selPM(this,'cash')">
                 <span style="font-size:1.5rem">💵</span>
                 <span class="pm-name" style="color:#2ECC71;font-weight:800">নগদ টাকা</span>
                 <span style="font-size:.6rem;color:rgba(255,255,255,.3)">হাতে হাতে</span>
               </div>
+            </div>
+
+            <!-- ══ SSLCommerz "Pay With" gateway — all PSP in one ══ -->
+            <div style="font-size:.7rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.65rem">⚡ এক ক্লিকে নিরাপদ গেটওয়ে</div>
+            <div class="ssl-block" id="sslBlock" onclick="selSSL(this)">
+              <div class="ssl-top">
+                <span class="ssl-tick">✓</span>
+                <div>
+                  <div class="ssl-title">SSLCommerz দিয়ে পেমেন্ট</div>
+                  <div class="ssl-sub">bKash · Nagad · Rocket · Card · Net Banking — সব একসাথে</div>
+                </div>
+                <span class="ssl-secure">🔒 ১০০% নিরাপদ</span>
+              </div>
+              <div class="ssl-banner">
+                <img
+                  src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-03.png"
+                  alt="SSLCommerz — bKash, Nagad, Rocket, Visa, Mastercard, Amex সহ সকল পেমেন্ট পদ্ধতি"
+                  onerror="this.style.display='none';document.getElementById('sslFallback').style.display='flex';">
+                <div class="ssl-logos" id="sslFallback" style="display:none">
+                  <img src="https://crm.mypihr.com/images/credit_cards/visacard.png" alt="Visa" onerror="this.style.display='none'">
+                  <img src="https://crm.mypihr.com/images/credit_cards/mastercard.png" alt="Mastercard" onerror="this.style.display='none'">
+                  <img src="https://crm.mypihr.com/images/credit_cards/americanexpress.png" alt="Amex" onerror="this.style.display='none'">
+                </div>
+              </div>
+              <div class="ssl-foot">
+                <span>🛡️</span>
+                <span>নিচের <b>পেমেন্ট নিশ্চিত করুন</b> বাটনে ক্লিক করলে SSLCommerz-এর নিরাপদ গেটওয়েতে গিয়ে আপনি যেকোনো পদ্ধতিতে (bKash, কার্ড, নেট-ব্যাংকিং) পেমেন্ট করতে পারবেন।</span>
+              </div>
+              <div class="ssl-count">✔ PCI-DSS সার্টিফায়েড · ৪০+ পেমেন্ট অপশন · SSL এনক্রিপশন</div>
             </div>
 
 
@@ -2106,7 +2165,16 @@ function selectPkg(el, type, amount, original, name){
 function selPM(el, method){
   document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
+  // deselect the SSLCommerz gateway block when a specific method is chosen
+  const sb=document.getElementById('sslBlock'); if(sb) sb.classList.remove('selected');
   selMethod = method;
+}
+
+// select the SSLCommerz "Pay With" gateway (covers all PSPs in one)
+function selSSL(el){
+  document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  selMethod = 'sslcommerz';
 }
 
 // ═══════════════════════════════
@@ -2130,12 +2198,14 @@ function updateSummary(){
 async function processPayment(){
   const btn = document.getElementById('payBtn');
   btn.disabled = true;
-  showLoader('পেমেন্ট প্রক্রিয়া করা হচ্ছে...');
+  const viaSSL = (selMethod === 'sslcommerz');
+  showLoader(viaSSL ? 'SSLCommerz নিরাপদ গেটওয়েতে নিয়ে যাওয়া হচ্ছে...' : 'পেমেন্ট প্রক্রিয়া করা হচ্ছে...');
 
   const vat   = Math.round(selPkg.amount * 0.05);
   const total = selPkg.amount + vat;
   const txnId = 'TXN-' + Date.now() + '-' + Math.random().toString(36).substr(2,6).toUpperCase();
   const today = new Date();
+  const gatewayName = viaSSL ? 'SSLCommerz' : 'ShurjoPay';
 
   try {
     // 1. Save payment record
@@ -2149,7 +2219,7 @@ async function processPayment(){
       payment_method: selMethod,
       transaction_id: txnId,
       status: 'success',
-      surjopay_response_json: { gateway:'ShurjoPay', txn:txnId, amount:total, method:selMethod, time:today.toISOString() }
+      surjopay_response_json: { gateway:gatewayName, txn:txnId, amount:total, method:selMethod, time:today.toISOString() }
     };
     const pr = await fetch(`${SUPA}/rest/v1/payments`,{method:'POST',headers:H,body:JSON.stringify(payData)});
     if(!pr.ok){ const e=await pr.json(); throw new Error(e.message) }
