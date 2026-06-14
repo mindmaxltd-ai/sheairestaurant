@@ -3,196 +3,118 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>পেমেন্ট ও সাবস্ক্রিপশন — SAR She AI Restaurant</title>
+<title>Invoice Payment — SAR She AI Restaurant</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');font-weight:400;font-display:swap}
 @font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
 :root{
-  --pink:#E91E8C;--pink2:#FF7EB8;--pink3:#FDE9F4;--pinkd:#B51267;
-  --orange:#F97316;--orange2:#FDBA74;--orange3:#FFF0E6;--oranged:#C2410C;
-  --green:#059669;--green2:#34D399;--green3:#E3F7EF;
-  --purple:#4C1D5E;--plum:#2D1B2F;--cream:#FCFAF6;--milk:#FFFDF9;
-  --ink:#241D24;--muted:#756B75;--line:#E9DED3;--line2:#DACABA;
-  --red:#DC2626;--yellow:#F59E0B;
+  --pink:#E91E8C;--pinkd:#B51267;--pink2:#FF7EB8;--pink3:#FDE9F4;
+  --orange:#F97316;--oranged:#C2410C;--orange2:#FDBA74;--orange3:#FFF0E6;
+  --green:#059669;--green2:#34D399;--green3:#E5F7EF;
+  --blue:#2563EB;--purple:#4C1D5E;--plum:#2D1B2F;--cream:#FCFAF6;--milk:#FFFDF9;
+  --ink:#241D24;--muted:#756B75;--line:#E9DED3;--line2:#DACABA;--red:#DC2626;--yellow:#F59E0B;
   --grad:linear-gradient(125deg,#B51267 0%,#E91E8C 32%,#FF7EB8 55%,#F97316 82%,#FDBA74 120%);
-  --soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF0E6 120%);
   --shadow:0 14px 45px rgba(71,42,60,.10),0 2px 9px rgba(71,42,60,.05);
   --shadow-lg:0 26px 80px rgba(233,30,140,.18),0 10px 28px rgba(71,42,60,.10);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'SolaimanLipi',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;line-height:1.65}
-body::before{content:'';position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(900px 520px at 85% -10%,rgba(233,30,140,.18),transparent 58%),
-  radial-gradient(760px 520px at -8% 15%,rgba(249,115,22,.16),transparent 58%),
-  radial-gradient(760px 520px at 50% 110%,rgba(255,126,184,.12),transparent 58%)}
-body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.28;background-image:linear-gradient(rgba(233,30,140,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(233,30,140,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 82%)}
+body::before{content:'';position:fixed;inset:0;z-index:-2;background:radial-gradient(900px 520px at 85% -10%,rgba(233,30,140,.18),transparent 58%),radial-gradient(760px 520px at -8% 15%,rgba(249,115,22,.16),transparent 58%),radial-gradient(760px 520px at 50% 110%,rgba(255,126,184,.12),transparent 58%)}
 .num{font-family:'Space Mono',monospace}.serif{font-family:'Playfair Display',serif}
 .topbar{height:3px;background:var(--grad);background-size:240% 100%;animation:slide 8s linear infinite}@keyframes slide{to{background-position:240% 0}}
 .nav{position:sticky;top:0;z-index:50;background:rgba(255,253,249,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:1180px;margin:0 auto;padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.logo{display:flex;align-items:center;gap:.68rem;color:var(--ink);text-decoration:none}
-.logo-mark{width:44px;height:44px;border-radius:15px;background:var(--grad);display:grid;place-items:center;color:#fff;font-family:'Playfair Display',serif;font-weight:900;box-shadow:var(--shadow)}
-.logo-name{font-weight:800;letter-spacing:-.02em}.logo-name small{display:block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--pinkd);text-transform:uppercase;font-weight:400}
-.nav-actions{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}
-.nav-link{color:var(--muted);text-decoration:none;font-weight:700;font-size:.9rem;padding:.42rem .72rem;border-radius:999px;transition:.2s}.nav-link:hover{background:#fff;color:var(--pinkd)}
-.page{max-width:1180px;margin:0 auto;padding:3.3rem 1.25rem 4rem}
-.hero{display:grid;grid-template-columns:1fr 390px;gap:1.25rem;align-items:stretch;margin-bottom:1.35rem}
-.hero-card,.trust-card,.panel,.summary{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);overflow:hidden}
-.hero-card{padding:2rem;position:relative}.hero-card::after{content:'৳';position:absolute;right:1rem;bottom:-2.6rem;font-family:'Space Mono',monospace;font-size:10rem;font-weight:700;color:rgba(233,30,140,.045)}
-.eyebrow{display:inline-flex;gap:.45rem;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.42rem .9rem;color:var(--pinkd);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 1.7s ease-in-out infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.84)}}
-h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5.5vw,4.6rem);line-height:.96;color:var(--plum);letter-spacing:-.035em;margin-bottom:1rem;max-width:11ch}
-h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:1.03rem;color:var(--muted);max-width:58ch}.hero-sub b{color:var(--pinkd)}
-.hero-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.35rem}
-.btn{border:none;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;padding:.82rem 1.28rem;font-family:inherit;font-weight:800;cursor:pointer;transition:.2s}
-.btn-primary{background:var(--grad);color:#fff;box-shadow:0 16px 38px rgba(233,30,140,.22)}.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.btn-soft{background:#fff;color:var(--plum);border:1px solid var(--line)}.btn-soft:hover{border-color:var(--orange);transform:translateY(-1px)}
-.trust-card{padding:1.2rem;background:linear-gradient(135deg,#fff,#FFF7FC)}
-.secure-ring{height:135px;border-radius:24px;background:var(--grad);display:grid;place-items:center;color:#fff;text-align:center;box-shadow:var(--shadow-lg);margin-bottom:1rem}
-.secure-ring b{display:block;font-size:2.3rem;font-family:'Playfair Display',serif}.secure-ring span{font-size:.8rem;opacity:.9}
-.trust-list{display:grid;gap:.6rem}.trust-item{display:flex;gap:.58rem;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:.72rem}.trust-item b{font-size:.86rem}.trust-item span{display:block;font-size:.74rem;color:var(--muted)}
-.psp-strip{background:#fff;border:1px solid var(--line);border-radius:24px;padding:1rem;margin-bottom:1.2rem;box-shadow:var(--shadow)}
-.strip-head{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:.8rem}.strip-head b{color:var(--plum)}.strip-head span{font-size:.78rem;color:var(--green);font-weight:800}
-.logo-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.55rem}
-.pay-logo{min-height:58px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#fff,#FFFCF8);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:900;color:var(--plum);box-shadow:0 6px 16px rgba(71,42,60,.04)}
-.pay-logo small{display:block;font-size:.58rem;color:var(--muted);font-weight:700}.bkash{color:#D81B60}.nagad{color:#F97316}.rocket{color:#7C2D6B}.visa{color:#1A46A3}.mc{color:#EB001B}.ssl{color:#0084C7}.sp{color:#EAB308}.stripe{color:#635BFF}
-.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:1.2rem;align-items:start}
-.left-stack{display:grid;gap:1.1rem}.panel{padding:1.25rem}.panel-h{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}.panel-title{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--plum)}.panel-note{font-size:.82rem;color:var(--muted)}
-.status{display:flex;gap:.9rem;align-items:flex-start;border:1px solid var(--line);border-radius:18px;padding:1rem;background:linear-gradient(135deg,var(--green3),#fff)}.status.expired{background:linear-gradient(135deg,#FFF1F2,#fff)}.status .ic{font-size:1.75rem}.status b{display:block}.status span{font-size:.82rem;color:var(--muted)}
-.pkg-grid{display:grid;gap:.85rem}.pkg{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:.82rem;align-items:center;background:#fff;border:2px solid var(--line);border-radius:22px;padding:1rem;cursor:pointer;transition:.2s}.pkg:hover{border-color:var(--orange);transform:translateY(-1px)}.pkg.selected{border-color:var(--pink);box-shadow:0 18px 42px rgba(233,30,140,.13);background:linear-gradient(135deg,#fff,#FFF6FB)}
-.radio{width:21px;height:21px;border:2px solid #E7C5D7;border-radius:50%;display:grid;place-items:center}.pkg.selected .radio{border-color:var(--pink);background:var(--pink)}.pkg.selected .radio::after{content:'';width:8px;height:8px;background:#fff;border-radius:50%}
-.pkg-ico{font-size:1.6rem}.pkg-name{font-weight:900;color:var(--plum)}.pkg-desc{font-size:.78rem;color:var(--muted);margin-top:.1rem}.pkg-feats{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}.feat{font-size:.66rem;color:var(--green);background:var(--green3);border-radius:999px;padding:.14rem .48rem;font-weight:800}
-.pkg-price{text-align:right}.orig{text-decoration:line-through;color:var(--muted);font-size:.78rem}.now{font-family:'Space Mono',monospace;font-weight:900;font-size:1.18rem;color:var(--pinkd)}.period{font-size:.68rem;color:var(--muted)}.badge{position:absolute;right:.75rem;top:.65rem;background:var(--orange);color:#fff;border-radius:999px;padding:.14rem .5rem;font-size:.62rem;font-weight:900}
-.method-tabs{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:.9rem}.method-tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:.48rem .75rem;font-family:inherit;font-weight:800;cursor:pointer}.method-tab.active{background:var(--pink);border-color:var(--pink);color:#fff}
-.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem}.pm{border:1.5px solid var(--line);border-radius:18px;background:#fff;padding:.82rem .5rem;text-align:center;cursor:pointer;transition:.2s;position:relative}.pm:hover{border-color:var(--orange);transform:translateY(-1px)}.pm.selected{border-color:var(--pink);background:var(--pink3);box-shadow:0 14px 34px rgba(233,30,140,.12)}
-.pm .emoji{font-size:1.45rem;display:block;margin-bottom:.15rem}.pm b{display:block;font-size:.8rem}.pm small{display:block;font-size:.64rem;color:var(--muted);line-height:1.25}
-.method-details{margin-top:1rem;background:#fff;border:1px solid var(--line);border-radius:18px;padding:1rem}.method-details b{color:var(--pinkd)}.method-details p{color:var(--muted);font-size:.82rem;margin:.2rem 0 .75rem}
-.trx-input{width:100%;border:1px solid var(--line);background:#FFFCF8;border-radius:12px;padding:.72rem .9rem;font-family:'Space Mono',monospace;outline:none}.trx-input:focus{border-color:var(--pink)}
-.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.field{display:flex;flex-direction:column;gap:.25rem}.field label{font-size:.75rem;color:var(--muted);font-weight:800}.inp,.sel{border:1px solid var(--line);background:#fff;border-radius:12px;padding:.7rem .85rem;font-family:inherit;outline:none}.inp:focus,.sel:focus{border-color:var(--pink)}
-.verify-status{grid-column:1/-1;font-size:.86rem;font-weight:800;text-align:center;min-height:1.3rem}.verify-status.ok{color:var(--green)}.verify-status.err{color:var(--red)}.verify-status.wait{color:var(--yellow)}
-.summary{position:sticky;top:88px;padding:1.2rem}.summary h2{font-family:'Playfair Display',serif;color:var(--plum);font-size:1.45rem;margin-bottom:.85rem}.sum-row{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px dashed var(--line2);padding:.62rem 0;font-size:.9rem;color:var(--muted)}.sum-row b{color:var(--ink)}.sum-row.total{border:none;padding-top:.85rem;font-size:1.05rem}.sum-row.total b{font-family:'Space Mono',monospace;font-size:1.25rem;color:var(--pinkd)}
-.secure-box{background:linear-gradient(135deg,var(--pink3),var(--orange3));border:1px solid #F9C7DE;border-radius:18px;padding:.85rem;margin:1rem 0;color:var(--plum);font-size:.82rem}.secure-box b{display:block;color:var(--pinkd);margin-bottom:.2rem}
-.pay-btn{width:100%;border:none;background:var(--grad);color:#fff;border-radius:999px;padding:1rem;font-family:inherit;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 18px 40px rgba(233,30,140,.22);transition:.2s}.pay-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}.pay-btn:disabled{opacity:.55;cursor:wait;transform:none}
-.mini-actions{display:grid;gap:.55rem;margin-top:.85rem}.mini-actions a,.mini-actions button{border:1px solid var(--line);background:#fff;color:var(--plum);border-radius:14px;padding:.64rem;text-align:center;text-decoration:none;font-family:inherit;font-weight:800;cursor:pointer}
-.history{max-height:340px;overflow:auto}.hist-row{display:grid;grid-template-columns:90px 1fr auto;gap:.7rem;border-bottom:1px solid var(--line);padding:.72rem 0;align-items:center}.hist-row:last-child{border-bottom:none}.pill{display:inline-flex;border-radius:999px;padding:.16rem .5rem;font-size:.68rem;font-weight:900}.pill.ok{background:var(--green3);color:var(--green)}.pill.wait{background:#FFF7D6;color:#A16207}
-.receipt-modal{position:fixed;inset:0;background:rgba(36,29,36,.55);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:1rem;overflow:auto}.receipt-modal.open{display:flex}.receipt{width:min(720px,100%);background:#fff;border-radius:28px;box-shadow:0 28px 90px rgba(36,29,36,.4);overflow:hidden;margin:auto}.rcp-head{background:var(--grad);padding:1.5rem;color:#fff;text-align:center}.rcp-head h2{font-family:'Playfair Display',serif}.rcp-body{padding:1.35rem}.rcp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.rcp-cell{border:1px solid var(--line);border-radius:14px;padding:.7rem;background:#FFFCF8}.rcp-cell small{display:block;color:var(--muted);font-weight:800}.rcp-total{margin:1rem 0;background:var(--pink3);border:1px solid #F3BEDA;border-radius:18px;padding:1rem;display:flex;justify-content:space-between;font-weight:900}.rcp-actions{display:flex;gap:.6rem;flex-wrap:wrap}.rcp-actions .btn{flex:1}
+.nav-in{max-width:1220px;margin:0 auto;padding:.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center;gap:.68rem;color:var(--ink);text-decoration:none}.logo-mark{width:44px;height:44px;border-radius:15px;background:var(--grad);display:grid;place-items:center;color:#fff;font-family:'Playfair Display',serif;font-weight:900;box-shadow:var(--shadow)}.logo-name{font-weight:800}.logo-name small{display:block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--pinkd);text-transform:uppercase;font-weight:400}
+.nav-actions{display:flex;gap:.45rem;flex-wrap:wrap}.nav-link{color:var(--muted);text-decoration:none;font-weight:700;font-size:.9rem;padding:.42rem .72rem;border-radius:999px}.nav-link:hover{background:#fff;color:var(--pinkd)}
+.page{max-width:1220px;margin:0 auto;padding:3rem 1.25rem 4rem}
+.hero{display:grid;grid-template-columns:1fr 370px;gap:1.1rem;margin-bottom:1.1rem}.card{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
+.hero-main{padding:2rem;position:relative}.eyebrow{display:inline-flex;align-items:center;gap:.45rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.42rem .9rem;color:var(--pinkd);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}.dot{width:7px;height:7px;border-radius:50%;background:var(--pink)}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2.45rem,5.6vw,4.7rem);line-height:.95;color:var(--plum);letter-spacing:-.035em;max-width:11ch;margin-bottom:1rem}h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.02rem;color:var(--muted);max-width:64ch}.hero-sub b{color:var(--pinkd)}
+.flow-card{padding:1rem;background:linear-gradient(135deg,#fff,#FFF7FC)}.flow-title{font-family:'Playfair Display',serif;color:var(--plum);font-size:1.25rem;margin-bottom:.8rem}.flow{display:grid;gap:.55rem}.flow-step{display:flex;gap:.58rem;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:.72rem}.flow-step b{display:block;font-size:.86rem}.flow-step span{font-size:.74rem;color:var(--muted)}
+.psp-strip{background:#fff;border:1px solid var(--line);border-radius:24px;padding:1rem;margin-bottom:1.15rem;box-shadow:var(--shadow)}.strip-head{display:flex;justify-content:space-between;gap:1rem;align-items:center;margin-bottom:.8rem}.strip-head b{color:var(--plum)}.strip-head span{font-size:.78rem;color:var(--green);font-weight:800}
+.logo-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:.55rem}.pay-logo{min-height:58px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#fff,#FFFCF8);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:900;color:var(--plum);box-shadow:0 6px 16px rgba(71,42,60,.04)}.pay-logo small{display:block;font-size:.58rem;color:var(--muted);font-weight:700}.bkash{color:#D81B60}.aamar{color:#16A34A}.two{color:#2563EB}.ssl{color:#0084C7}.sp{color:#EAB308}.visa{color:#1A46A3}.mc{color:#EB001B}
+.grid{display:grid;grid-template-columns:310px 1fr 360px;gap:1rem;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:1.1rem}.panel-h{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:.9rem}.panel-title{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--plum)}.panel-note{font-size:.8rem;color:var(--muted)}
+.invoice-list{display:grid;gap:.65rem}.invoice-item{border:1.5px solid var(--line);border-radius:18px;padding:.8rem;background:#fff;cursor:pointer;transition:.2s}.invoice-item:hover{border-color:var(--orange);transform:translateY(-1px)}.invoice-item.active{border-color:var(--pink);background:var(--pink3);box-shadow:0 12px 30px rgba(233,30,140,.10)}.invoice-top{display:flex;justify-content:space-between;gap:.5rem}.invoice-no{font-family:'Space Mono',monospace;font-weight:800;color:var(--pinkd);font-size:.82rem}.status{border-radius:999px;padding:.12rem .48rem;font-size:.66rem;font-weight:900}.due{background:#FFF7D6;color:#A16207}.paid{background:var(--green3);color:var(--green)}.cancel{background:#FEE2E2;color:var(--red)}.invoice-item p{font-size:.76rem;color:var(--muted);margin-top:.25rem}.invoice-amt{font-family:'Space Mono',monospace;font-weight:900;margin-top:.35rem;color:var(--plum)}
+.detail-head{background:linear-gradient(135deg,var(--pink3),var(--orange3));border:1px solid #F8C8DA;border-radius:20px;padding:1rem;margin-bottom:.9rem}.detail-head small{font-family:'Space Mono',monospace;color:var(--pinkd);font-weight:800}.detail-head h2{font-family:'Playfair Display',serif;color:var(--plum);font-size:1.9rem;line-height:1.05;margin:.25rem 0}.detail-row{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px dashed var(--line2);padding:.68rem 0;color:var(--muted)}.detail-row b{color:var(--ink)}.detail-row.total{border-bottom:none;font-size:1.15rem}.detail-row.total b{font-family:'Space Mono',monospace;color:var(--pinkd);font-size:1.35rem}
+.items{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:.9rem}.item-row{display:grid;grid-template-columns:1fr auto;gap:1rem;padding:.75rem .85rem;border-bottom:1px solid var(--line)}.item-row:last-child{border-bottom:none}.item-row span{color:var(--muted);font-size:.8rem}.route-box{background:#F8FAFC;border:1px solid #DCE4EF;border-radius:18px;padding:.85rem;margin-top:.9rem}.route-box b{color:var(--blue)}.route{font-family:'Space Mono',monospace;font-size:.72rem;color:#475569;word-break:break-all;margin-top:.35rem}
+.gateway-grid{display:grid;gap:.65rem}.gateway{border:2px solid var(--line);border-radius:20px;background:#fff;padding:.9rem;cursor:pointer;transition:.2s}.gateway:hover{border-color:var(--orange);transform:translateY(-1px)}.gateway.active{border-color:var(--pink);background:linear-gradient(135deg,#fff,var(--pink3));box-shadow:0 12px 30px rgba(233,30,140,.1)}.gateway-top{display:flex;justify-content:space-between;gap:.7rem;align-items:center}.gateway-brand{display:flex;gap:.55rem;align-items:center}.gateway-logo{width:42px;height:42px;border-radius:14px;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:900}.gateway b{display:block}.gateway small{display:block;color:var(--muted);font-size:.72rem}.gateway .tag{font-size:.62rem;font-weight:900;color:var(--green);background:var(--green3);padding:.12rem .45rem;border-radius:999px}
+.summary{position:sticky;top:88px}.pay-btn{width:100%;border:none;background:var(--grad);color:#fff;border-radius:999px;padding:1rem;font-family:inherit;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 18px 40px rgba(233,30,140,.22);transition:.2s;margin-top:.8rem}.pay-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}.pay-btn:disabled{opacity:.55;cursor:wait;transform:none}
+.verify{margin-top:.9rem;border-top:1px solid var(--line);padding-top:.9rem}.field{display:flex;flex-direction:column;gap:.25rem;margin-bottom:.55rem}.field label{font-size:.75rem;color:var(--muted);font-weight:800}.inp{border:1px solid var(--line);background:#FFFCF8;border-radius:12px;padding:.7rem .85rem;font-family:inherit;outline:none}.inp:focus{border-color:var(--pink)}.verify-status{font-size:.84rem;font-weight:800;text-align:center;min-height:1.2rem}.verify-status.ok{color:var(--green)}.verify-status.err{color:var(--red)}.verify-status.wait{color:var(--yellow)}
+.timeline{display:grid;gap:.45rem;margin-top:.9rem}.tl{display:flex;gap:.45rem;align-items:center;color:var(--muted);font-size:.78rem}.tl.done{color:var(--green);font-weight:800}.tl.now{color:var(--pinkd);font-weight:800}
+.receipt-modal{position:fixed;inset:0;background:rgba(36,29,36,.58);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:1rem;overflow:auto}.receipt-modal.open{display:flex}.receipt{width:min(760px,100%);background:#fff;border-radius:28px;box-shadow:0 28px 90px rgba(36,29,36,.4);overflow:hidden;margin:auto}.rcp-head{background:var(--grad);padding:1.5rem;color:#fff;text-align:center}.rcp-head h2{font-family:'Playfair Display',serif}.rcp-body{padding:1.35rem}.rcp-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.rcp-cell{border:1px solid var(--line);border-radius:14px;padding:.7rem;background:#FFFCF8}.rcp-cell small{display:block;color:var(--muted);font-weight:800}.rcp-total{margin:1rem 0;background:var(--pink3);border:1px solid #F3BEDA;border-radius:18px;padding:1rem;display:flex;justify-content:space-between;font-weight:900}.btn{border:none;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;padding:.78rem 1.1rem;font-family:inherit;font-weight:800;cursor:pointer;transition:.2s}.btn-primary{background:var(--grad);color:#fff}.btn-soft{background:#fff;color:var(--plum);border:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:1.2rem;z-index:250;transform:translateX(-50%) translateY(18px);opacity:0;visibility:hidden;background:var(--plum);color:#fff;border-radius:999px;padding:.75rem 1.15rem;font-weight:800;box-shadow:0 16px 42px rgba(0,0,0,.25);transition:.22s}.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-@media(max-width:980px){.hero,.main-grid{grid-template-columns:1fr}.summary{position:static}.logo-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:620px){.page{padding-top:2rem}.nav-in{align-items:flex-start}.nav-actions .nav-link{display:none}.method-grid,.verify-grid,.rcp-grid{grid-template-columns:1fr}.logo-grid{grid-template-columns:repeat(2,1fr)}.pkg{grid-template-columns:auto 1fr}.pkg-price{grid-column:2;text-align:left}}
+@media(max-width:1080px){.hero,.grid{grid-template-columns:1fr}.summary{position:static}.logo-grid{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:620px){.page{padding-top:2rem}.nav-actions .nav-link{display:none}.logo-grid{grid-template-columns:repeat(2,1fr)}.rcp-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="topbar"></div>
 <nav class="nav">
   <div class="nav-in">
-    <a href="index.html" class="logo"><span class="logo-mark">SAR</span><span class="logo-name">She AI Restaurant<small>Secure payment center</small></span></a>
-    <div class="nav-actions">
-      <a class="nav-link" href="dashboard.html">ড্যাশবোর্ড</a>
-      <a class="nav-link" href="order.html">অর্ডার</a>
-      <a class="nav-link" href="track.html">ট্র্যাক</a>
-      <a class="nav-link" href="receipt.html">রিসিট</a>
-    </div>
+    <a href="index.html" class="logo"><span class="logo-mark">SAR</span><span class="logo-name">SAR Billing<small>invoice hosted checkout</small></span></a>
+    <div class="nav-actions"><a class="nav-link" href="dashboard.html">ড্যাশবোর্ড</a><a class="nav-link" href="order.html">অর্ডার</a><a class="nav-link" href="receipt.html">রিসিট</a></div>
   </div>
 </nav>
 
 <main class="page">
   <section class="hero">
-    <div class="hero-card">
-      <span class="eyebrow"><span class="dot"></span> Bangladesh + International PSP ready</span>
-      <h1>পেমেন্ট <em>নিরাপদ</em> ও সহজ</h1>
-      <p class="hero-sub">SAR membership, subscription এবং verification-এর জন্য premium payment page. bKash, Nagad, Rocket, SSLCommerz, ShurjoPay, card ও international transfer method এক জায়গায়। <b>Production gateway যুক্ত হলে সব success server webhook দিয়ে verify হবে।</b></p>
-      <div class="hero-actions">
-        <a href="#checkout" class="btn btn-primary">প্যাকেজ নির্বাচন করুন →</a>
-        <a href="#verify" class="btn btn-soft">পেমেন্ট যাচাই</a>
-      </div>
+    <div class="hero-main card">
+      <span class="eyebrow"><span class="dot"></span> invoice → goto-payment → hosted checkout</span>
+      <h1>Invoice <em>Payment</em> Center</h1>
+      <p class="hero-sub">ExonHost-এর invoice flow, bKash hosted checkout, AamarPay secure pay এবং 2Checkout international pattern থেকে অনুপ্রাণিত SAR billing design. <b>Customer invoice দেখে gateway select করবে, তারপর secure hosted checkout-এ যাবে।</b></p>
     </div>
-    <aside class="trust-card">
-      <div class="secure-ring"><div><b>SSL</b><span>Encrypted checkout design</span></div></div>
-      <div class="trust-list">
-        <div class="trust-item"><span>🔒</span><div><b>Server verification ready</b><span>Real PSP webhook যোগ করার জন্য UI প্রস্তুত।</span></div></div>
-        <div class="trust-item"><span>🧾</span><div><b>Receipt workflow</b><span>Email/WhatsApp/PDF receipt design included.</span></div></div>
-        <div class="trust-item"><span>🇧🇩</span><div><b>Bangladesh methods</b><span>MFS, card, net banking, PSP gateway support.</span></div></div>
+    <aside class="flow-card card">
+      <div class="flow-title">Payment flow</div>
+      <div class="flow">
+        <div class="flow-step"><span>১</span><div><b>Invoice list</b><span>সব due/paid invoice দেখা যাবে।</span></div></div>
+        <div class="flow-step"><span>২</span><div><b>Invoice detail</b><span>Line item, VAT, total, due date।</span></div></div>
+        <div class="flow-step"><span>৩</span><div><b>Gateway redirect</b><span>bKash/AamarPay/2Checkout hosted page।</span></div></div>
+        <div class="flow-step"><span>৪</span><div><b>Webhook verify</b><span>Production success server-side হবে।</span></div></div>
       </div>
     </aside>
   </section>
 
-  <section class="psp-strip" aria-label="Supported payment services">
-    <div class="strip-head"><b>Supported PSP & payment logos</b><span>Official assets can replace these badges</span></div>
+  <section class="psp-strip">
+    <div class="strip-head"><b>Gateway badges</b><span>Official logos can replace these badges</span></div>
     <div class="logo-grid">
-      <div class="pay-logo bkash">bKash<small>mobile money</small></div>
-      <div class="pay-logo nagad">Nagad<small>mobile money</small></div>
-      <div class="pay-logo rocket">Rocket<small>DBBL</small></div>
-      <div class="pay-logo">Upay<small>UCB</small></div>
-      <div class="pay-logo ssl">SSLCommerz<small>gateway</small></div>
-      <div class="pay-logo sp">ShurjoPay<small>gateway</small></div>
-      <div class="pay-logo visa">VISA<small>card</small></div>
-      <div class="pay-logo mc">Mastercard<small>card</small></div>
-      <div class="pay-logo">AMEX<small>card</small></div>
-      <div class="pay-logo stripe">Stripe<small>global</small></div>
-      <div class="pay-logo">PayPal<small>global</small></div>
-      <div class="pay-logo">Wise<small>transfer</small></div>
+      <div class="pay-logo bkash">bKash<small>hosted</small></div><div class="pay-logo aamar">AamarPay<small>secure pay</small></div><div class="pay-logo two">2Checkout<small>global</small></div><div class="pay-logo ssl">SSLCommerz<small>gateway</small></div><div class="pay-logo sp">ShurjoPay<small>gateway</small></div><div class="pay-logo">Nagad<small>MFS</small></div><div class="pay-logo rocket">Rocket<small>DBBL</small></div><div class="pay-logo visa">VISA<small>card</small></div><div class="pay-logo mc">Mastercard<small>card</small></div><div class="pay-logo">PayPal<small>global</small></div>
     </div>
   </section>
 
-  <section class="main-grid" id="checkout">
-    <div class="left-stack">
-      <section class="panel">
-        <div class="panel-h"><div><h2 class="panel-title">সদস্যতা অবস্থা</h2><p class="panel-note">গ্রাহকের বর্তমান subscription status</p></div></div>
-        <div class="status" id="statusBox"><span class="ic">⏳</span><div><b>তথ্য লোড হচ্ছে...</b><span>অনুগ্রহ করে অপেক্ষা করুন</span></div></div>
-      </section>
+  <section class="grid">
+    <aside class="panel">
+      <div class="panel-h"><div><h2 class="panel-title">Invoices</h2><p class="panel-note">my.exonhost.com/invoices style list</p></div></div>
+      <div class="invoice-list" id="invoiceList"></div>
+    </aside>
 
-      <section class="panel">
-        <div class="panel-h"><div><h2 class="panel-title">প্যাকেজ নির্বাচন করুন</h2><p class="panel-note">প্রথম ১ লাখ গ্রাহকের জন্য বিশেষ introductory price</p></div></div>
-        <div class="pkg-grid" id="pkgGrid"></div>
-      </section>
+    <section class="panel">
+      <div class="detail-head">
+        <small id="detailRoute">/invoices/—</small>
+        <h2 id="detailTitle">Invoice</h2>
+        <p class="panel-note" id="detailSub">নির্বাচিত invoice detail</p>
+      </div>
+      <div class="items" id="lineItems"></div>
+      <div id="totals"></div>
+      <div class="route-box">
+        <b>Hosted payment route</b>
+        <div class="route" id="routeText">/invoice/goto-payment?invoice=...</div>
+      </div>
+    </section>
 
-      <section class="panel">
-        <div class="panel-h"><div><h2 class="panel-title">পেমেন্ট পদ্ধতি</h2><p class="panel-note">Bangladesh ও international methods</p></div></div>
-        <div class="method-tabs">
-          <button class="method-tab active" onclick="setGroup('mfs',this)">Mobile Banking</button>
-          <button class="method-tab" onclick="setGroup('card',this)">Cards</button>
-          <button class="method-tab" onclick="setGroup('gateway',this)">Gateway</button>
-          <button class="method-tab" onclick="setGroup('intl',this)">International</button>
-        </div>
-        <div class="method-grid" id="methodGrid"></div>
-        <div class="method-details" id="methodDetails"></div>
-      </section>
-
-      <section class="panel" id="verify">
-        <div class="panel-h"><div><h2 class="panel-title">পেমেন্ট যাচাই</h2><p class="panel-note">Invoice / TxnID / mobile দিয়ে verification request</p></div></div>
-        <div class="verify-grid">
-          <div class="field"><label>Invoice / TxnID</label><input class="inp" id="vInvoice" placeholder="TXN-... / RCP-..."></div>
-          <div class="field"><label>মোবাইল নম্বর</label><input class="inp" id="vMobile" placeholder="01XXXXXXXXX"></div>
-          <div class="field"><label>পরিমাণ</label><input class="inp" id="vAmount" type="number" placeholder="525"></div>
-          <div class="field"><label>পদ্ধতি</label><select class="sel" id="vMethod"><option>bKash</option><option>Nagad</option><option>Rocket</option><option>SSLCommerz</option><option>ShurjoPay</option><option>Card</option><option>International</option></select></div>
-          <button class="btn btn-primary" onclick="verifyPaymentForm()">যাচাই অনুরোধ পাঠান</button>
-          <div class="verify-status" id="vStatus"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-h"><div><h2 class="panel-title">পেমেন্ট ইতিহাস</h2><p class="panel-note">শেষ payment records</p></div></div>
-        <div class="history" id="historyBox"><p class="panel-note">লোড হচ্ছে...</p></div>
-      </section>
-    </div>
-
-    <aside class="summary">
-      <h2>পেমেন্ট সারাংশ</h2>
-      <div class="sum-row"><span>প্যাকেজ</span><b id="sumPkg">—</b></div>
-      <div class="sum-row"><span>সাধারণ মূল্য</span><b id="sumOrig">—</b></div>
-      <div class="sum-row"><span>ছাড়</span><b id="sumDisc">—</b></div>
-      <div class="sum-row"><span>ভ্যাট (৫%)</span><b id="sumVat">—</b></div>
-      <div class="sum-row total"><span>মোট</span><b id="sumTotal">—</b></div>
-      <div class="secure-box"><b>Production note</b>এই design PSP hosted checkout/webhook integration-এর জন্য প্রস্তুত। এখন demo mode-এ receipt preview দেখায়।</div>
-      <button class="pay-btn" id="payBtn" onclick="processPayment()">নিরাপদ পেমেন্ট শুরু করুন · <span id="payBtnAmt">—</span></button>
-      <div class="mini-actions">
-        <button onclick="openReceiptDemo()">রিসিট preview</button>
-        <a href="order.html">খাবার অর্ডার পেমেন্টে যান</a>
-        <a href="dashboard.html">ড্যাশবোর্ডে ফিরুন</a>
+    <aside class="panel summary">
+      <div class="panel-h"><div><h2 class="panel-title">Gateway</h2><p class="panel-note">Select hosted checkout</p></div></div>
+      <div class="gateway-grid" id="gatewayGrid"></div>
+      <button class="pay-btn" id="payBtn" onclick="startHostedPayment()">Pay selected invoice</button>
+      <div class="timeline" id="timeline"></div>
+      <div class="verify">
+        <div class="field"><label>TxnID / Payment ID</label><input class="inp" id="verifyTxn" placeholder="TR0011... / AAMARPAY..."></div>
+        <button class="btn btn-soft" style="width:100%" onclick="verifyPayment()">Verify payment</button>
+        <div class="verify-status" id="verifyStatus"></div>
       </div>
     </aside>
   </section>
@@ -200,23 +122,17 @@ h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 
 <div class="receipt-modal" id="receiptModal" onclick="if(event.target===this)closeReceipt()">
   <div class="receipt">
-    <div class="rcp-head"><h2>SAR Payment Receipt</h2><p id="rcpNum">RCP-—</p></div>
+    <div class="rcp-head"><h2>SAR Invoice Receipt</h2><p id="rcpNo">—</p></div>
     <div class="rcp-body">
       <div class="rcp-grid">
-        <div class="rcp-cell"><small>গ্রাহক</small><b id="rcpName">—</b></div>
-        <div class="rcp-cell"><small>সদস্য আইডি</small><b id="rcpMember">—</b></div>
-        <div class="rcp-cell"><small>প্যাকেজ</small><b id="rcpPkg">—</b></div>
-        <div class="rcp-cell"><small>পদ্ধতি</small><b id="rcpMethod">—</b></div>
-        <div class="rcp-cell"><small>TxnID</small><b id="rcpTxn">—</b></div>
-        <div class="rcp-cell"><small>তারিখ</small><b id="rcpDate">—</b></div>
+        <div class="rcp-cell"><small>Invoice</small><b id="rcpInv">—</b></div>
+        <div class="rcp-cell"><small>Gateway</small><b id="rcpGw">—</b></div>
+        <div class="rcp-cell"><small>Payment ID</small><b id="rcpTxn">—</b></div>
+        <div class="rcp-cell"><small>Date</small><b id="rcpDate">—</b></div>
       </div>
-      <div class="rcp-total"><span>মোট পরিশোধিত</span><span id="rcpTotal">—</span></div>
-      <p class="panel-note">⚕️ SAR চিকিৎসা প্রতিষ্ঠান নয়। payment status production-এ PSP webhook থেকে verify হবে।</p>
-      <div class="rcp-actions">
-        <button class="btn btn-primary" onclick="window.print()">Print/PDF</button>
-        <button class="btn btn-soft" onclick="sendWhatsApp()">WhatsApp</button>
-        <button class="btn btn-soft" onclick="closeReceipt()">বন্ধ</button>
-      </div>
+      <div class="rcp-total"><span>Total paid</span><span id="rcpTotal">—</span></div>
+      <p class="panel-note">Production-এ এই status PSP webhook/IPN verification থেকে আসবে।</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap"><button class="btn btn-primary" onclick="window.print()">Print/PDF</button><button class="btn btn-soft" onclick="closeReceipt()">বন্ধ</button></div>
     </div>
   </div>
 </div>
@@ -224,64 +140,32 @@ h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 
 <script>
 const CUSTOMER=JSON.parse(localStorage.getItem('sar_customer')||'{}');
-const CNAME=CUSTOMER.full_name||localStorage.getItem('sar_customer_name')||'গ্রাহক';
-const CMID=CUSTOMER.member_id||localStorage.getItem('sar_member_id')||'—';
-const PACKAGES=[
-  {type:'reg',icon:'🎫',name:'নিবন্ধন ফি',desc:'একবারের payment · স্থায়ী SAR member ID',amount:1000,original:2000,period:'একবার',badge:'৫০% ছাড়',feats:['সদস্য আইডি','২৫০ মেট্রিক্স','Health wall']},
-  {type:'sub',icon:'⭐',name:'মাসিক সাবস্ক্রিপশন',desc:'৩০ দিন · AI analysis ও personalized menu',amount:500,original:1000,period:'মাস',badge:'জনপ্রিয়',feats:['AI বিশ্লেষণ','ব্যক্তিগত মেনু','রিপোর্ট']},
-  {type:'3month',icon:'🏆',name:'৩ মাসের সাবস্ক্রিপশন',desc:'৯০ দিন · priority support',amount:1200,original:3000,period:'৩ মাস',badge:'সেরা মূল্য',feats:['৯০ দিন','সব সুবিধা','Priority']}
+const CMID=CUSTOMER.member_id||localStorage.getItem('sar_member_id')||'SAR-MEMBER';
+const INVOICES=[
+  {id:'SAR-INV-283714',route:'/invoices/283714',title:'মাসিক সাবস্ক্রিপশন',status:'due',due:'আজ',items:[['SAR Monthly Subscription',500],['AI Meal Score Access',0],['VAT 5%',25]],total:525},
+  {id:'SAR-INV-283715',route:'/invoices/283715',title:'নিবন্ধন ফি',status:'due',due:'৩ দিন',items:[['Registration Fee',1000],['Member ID Setup',0],['VAT 5%',50]],total:1050},
+  {id:'SAR-INV-283700',route:'/invoices/283700',title:'৩ মাসের সাবস্ক্রিপশন',status:'paid',due:'Paid',items:[['3 Month Subscription',1200],['Priority Support',0],['VAT 5%',60]],total:1260}
 ];
-const METHODS={
-  mfs:[['bkash','📱','bKash','Send Money'],['nagad','🟠','Nagad','Mobile wallet'],['rocket','🚀','Rocket','DBBL'],['upay','🔵','Upay','UCB'],['tap','💜','TapTap','One Bank'],['okwallet','🟢','OK Wallet','Rupali']],
-  card:[['visa','💳','Visa','Credit/Debit'],['mastercard','🔴','Mastercard','Credit/Debit'],['amex','🔷','Amex','Card'],['nexus','🏦','Nexus Pay','DBBL']],
-  gateway:[['sslcommerz','🔒','SSLCommerz','Hosted checkout'],['shurjopay','☀️','ShurjoPay','Hosted checkout'],['bank','🏦','Internet Banking','All banks'],['cash','💵','Cash','Counter payment']],
-  intl:[['stripe','⚡','Stripe','Global cards'],['paypal','🅿️','PayPal','International'],['wise','🟢','Wise','Transfer'],['western','🔴','Western Union','Manual']]
-};
-const METHOD_INFO={
-  bkash:'bKash merchant payment number: 01346098892',
-  nagad:'Nagad merchant payment number: 01346098892',
-  rocket:'Rocket biller / merchant reference: SAR',
-  sslcommerz:'Production: create SSLCommerz hosted checkout session from backend.',
-  shurjopay:'Production: create ShurjoPay hosted checkout session from backend.',
-  stripe:'Production: Stripe Checkout session from backend required.',
-  paypal:'Production: PayPal order capture from backend required.',
-  wise:'Wise transfer requires manual admin reconciliation.',
-  cash:'Cash payment requires staff/admin approval.'
-};
-let selectedPackage=PACKAGES[1],selectedMethod='bkash',selectedGroup='mfs',lastReceipt=null;
-function init(){renderStatus();renderPackages();renderMethods();updateSummary();renderHistory();}
-function renderStatus(){
-  const active=localStorage.getItem('sar_sub_paid')==='true';
-  const exp=localStorage.getItem('sar_sub_expiry')||'—';
-  statusBox.className='status '+(active?'':'expired');
-  statusBox.innerHTML=active?`<span class="ic">✅</span><div><b>সাবস্ক্রিপশন সক্রিয়</b><span>মেয়াদ: ${exp} পর্যন্ত · সদস্য: ${CMID}</span></div>`:`<span class="ic">⏸️</span><div><b>সাবস্ক্রিপশন সক্রিয় নয়</b><span>নিবন্ধন/সাবস্ক্রিপশন পেমেন্ট করুন · সদস্য: ${CMID}</span></div>`;
-}
-function renderPackages(){
-  pkgGrid.innerHTML=PACKAGES.map(p=>`<div class="pkg ${p.type===selectedPackage.type?'selected':''}" onclick="selectPackage('${p.type}')"><span class="badge">${p.badge}</span><span class="radio"></span><div><div class="pkg-ico">${p.icon}</div><div class="pkg-name">${p.name}</div><div class="pkg-desc">${p.desc}</div><div class="pkg-feats">${p.feats.map(f=>`<span class="feat">✓ ${f}</span>`).join('')}</div></div><div class="pkg-price"><div class="orig">৳${p.original.toLocaleString('bn-BD')}</div><div class="now">৳${p.amount.toLocaleString('bn-BD')}</div><div class="period">${p.period}</div></div></div>`).join('');
-}
-function selectPackage(type){selectedPackage=PACKAGES.find(p=>p.type===type)||PACKAGES[1];renderPackages();updateSummary();}
-function setGroup(g,btn){selectedGroup=g;document.querySelectorAll('.method-tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');selectedMethod=METHODS[g][0][0];renderMethods();}
-function renderMethods(){
-  methodGrid.innerHTML=METHODS[selectedGroup].map(m=>`<button class="pm ${m[0]===selectedMethod?'selected':''}" onclick="selectMethod('${m[0]}')"><span class="emoji">${m[1]}</span><b>${m[2]}</b><small>${m[3]}</small></button>`).join('');
-  renderMethodDetails();
-}
-function selectMethod(m){selectedMethod=m;renderMethods();}
-function renderMethodDetails(){
-  methodDetails.innerHTML=`<b>${selectedMethod.toUpperCase()}</b><p>${METHOD_INFO[selectedMethod]||'Production gateway configuration required.'}</p><input class="trx-input" id="trxInput" placeholder="Manual TxnID / reference (optional)">`;
-}
-function totals(){const discount=selectedPackage.original-selectedPackage.amount,vat=Math.round(selectedPackage.amount*.05),total=selectedPackage.amount+vat;return{discount,vat,total};}
-function updateSummary(){const t=totals();sumPkg.textContent=selectedPackage.name;sumOrig.textContent='৳ '+selectedPackage.original.toLocaleString('bn-BD');sumDisc.textContent='- ৳ '+t.discount.toLocaleString('bn-BD');sumVat.textContent='৳ '+t.vat.toLocaleString('bn-BD');sumTotal.textContent='৳ '+t.total.toLocaleString('bn-BD');payBtnAmt.textContent='৳ '+t.total.toLocaleString('bn-BD');}
-function verifyPaymentForm(){const inv=vInvoice.value.trim(),mob=vMobile.value.trim();if(!inv&&!mob){vStatus.className='verify-status err';vStatus.textContent='Invoice/TXN অথবা মোবাইল নম্বর দিন।';return}vStatus.className='verify-status wait';vStatus.textContent='Verification request queued for admin review.';setTimeout(()=>{vStatus.className='verify-status ok';vStatus.textContent='✅ অনুরোধ গ্রহণ করা হয়েছে। Production-এ PSP API দিয়ে verify হবে।'},900)}
-function renderHistory(){const rows=JSON.parse(localStorage.getItem('sar_payment_history')||'[]');historyBox.innerHTML=rows.length?rows.slice(0,8).map(r=>`<div class="hist-row"><span>${r.date}</span><div><b>${r.pkg}</b><br><small>${r.method} · ${r.txn}</small></div><span class="pill ok">সফল</span></div>`).join(''):'<p class="panel-note">কোনো payment history নেই।</p>'}
-function processPayment(){payBtn.disabled=true;payBtn.textContent='Gateway session তৈরি হচ্ছে...';setTimeout(()=>{payBtn.disabled=false;payBtn.innerHTML='নিরাপদ পেমেন্ট শুরু করুন · <span id="payBtnAmt">'+sumTotal.textContent+'</span>';openReceiptDemo(true)},900)}
-function openReceiptDemo(save){
-  const t=totals(),txn=(document.getElementById('trxInput')?.value||'TXN-DEMO-'+Date.now()).trim(),date=new Date();
-  lastReceipt={txn,total:t.total,date,pkg:selectedPackage.name,method:selectedMethod};
-  if(save){const rows=JSON.parse(localStorage.getItem('sar_payment_history')||'[]');rows.unshift({date:date.toLocaleDateString('bn-BD'),pkg:selectedPackage.name,method:selectedMethod,txn,total:t.total});localStorage.setItem('sar_payment_history',JSON.stringify(rows));renderHistory();if(selectedPackage.type!=='reg'){localStorage.setItem('sar_sub_paid','true');const exp=new Date();exp.setDate(exp.getDate()+(selectedPackage.type==='3month'?90:30));localStorage.setItem('sar_sub_expiry',exp.toISOString().slice(0,10));renderStatus();}}
-  rcpNum.textContent='RCP-'+date.toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.floor(1000+Math.random()*9000);rcpName.textContent=CNAME;rcpMember.textContent=CMID;rcpPkg.textContent=selectedPackage.name;rcpMethod.textContent=selectedMethod.toUpperCase();rcpTxn.textContent=txn;rcpDate.textContent=date.toLocaleString('bn-BD');rcpTotal.textContent='৳ '+t.total.toLocaleString('bn-BD');receiptModal.classList.add('open');toast('Receipt preview ready');
-}
+const GATEWAYS=[
+  {id:'bkash',name:'bKash Hosted Checkout',icon:'📱',tag:'MFS',route:'https://payment.bkash.com/?paymentId={paymentId}&mode=0011'},
+  {id:'aamarpay',name:'AamarPay Secure Pay',icon:'🟢',tag:'BD PSP',route:'https://secure.aamarpay.com/paynow_check_update.php?d={token}'},
+  {id:'2checkout',name:'2Checkout Global',icon:'🌍',tag:'INTL',route:'https://www.2checkout.com/checkout/'},
+  {id:'sslcommerz',name:'SSLCommerz',icon:'🔒',tag:'Gateway',route:'/invoice/goto-payment?gateway=sslcommerz'},
+  {id:'shurjopay',name:'ShurjoPay',icon:'☀️',tag:'Gateway',route:'/invoice/goto-payment?gateway=shurjopay'}
+];
+let selectedInvoice=INVOICES[0],selectedGateway=GATEWAYS[0];
+function init(){renderInvoices();renderDetail();renderGateways();renderTimeline('idle')}
+function renderInvoices(){invoiceList.innerHTML=INVOICES.map(inv=>`<div class="invoice-item ${inv.id===selectedInvoice.id?'active':''}" onclick="selectInvoice('${inv.id}')"><div class="invoice-top"><span class="invoice-no">${inv.id}</span><span class="status ${inv.status==='paid'?'paid':'due'}">${inv.status}</span></div><p>${inv.title} · Due: ${inv.due}</p><div class="invoice-amt">৳ ${inv.total.toLocaleString('bn-BD')}</div></div>`).join('')}
+function selectInvoice(id){selectedInvoice=INVOICES.find(x=>x.id===id)||INVOICES[0];renderInvoices();renderDetail();renderTimeline('idle')}
+function renderDetail(){detailRoute.textContent=selectedInvoice.route;detailTitle.textContent=selectedInvoice.title;detailSub.textContent=`Invoice ${selectedInvoice.id} · Member ${CMID}`;lineItems.innerHTML=selectedInvoice.items.map(r=>`<div class="item-row"><div><b>${r[0]}</b><br><span>${selectedInvoice.id}</span></div><b>৳ ${r[1].toLocaleString('bn-BD')}</b></div>`).join('');totals.innerHTML=`<div class="detail-row"><span>Subtotal</span><b>৳ ${(selectedInvoice.total-Math.round(selectedInvoice.total/21)).toLocaleString('bn-BD')}</b></div><div class="detail-row"><span>Tax/VAT</span><b>Included</b></div><div class="detail-row total"><span>Total Due</span><b>৳ ${selectedInvoice.total.toLocaleString('bn-BD')}</b></div>`;routeText.textContent=`/invoice/goto-payment?invoice=${encodeURIComponent(selectedInvoice.id)}&gateway=${selectedGateway.id}`}
+function renderGateways(){gatewayGrid.innerHTML=GATEWAYS.map(g=>`<div class="gateway ${g.id===selectedGateway.id?'active':''}" onclick="selectGateway('${g.id}')"><div class="gateway-top"><div class="gateway-brand"><span class="gateway-logo">${g.icon}</span><div><b>${g.name}</b><small>${g.route}</small></div></div><span class="tag">${g.tag}</span></div></div>`).join('');renderDetail()}
+function selectGateway(id){selectedGateway=GATEWAYS.find(x=>x.id===id)||GATEWAYS[0];renderGateways();renderTimeline('idle')}
+function hostedUrl(){const pid='TR0011XX'+Math.random().toString(36).slice(2,10).toUpperCase();const token=btoa(selectedInvoice.id+'|'+selectedGateway.id+'|'+Date.now()).replace(/=/g,'');return selectedGateway.route.replace('{paymentId}',pid).replace('{token}',token)}
+function renderTimeline(state){const steps=[['invoice','Invoice selected'],['goto','Goto payment route'],['hosted','Hosted checkout'],['webhook','Webhook verify'],['receipt','Receipt']];const done={idle:0,goto:2,hosted:3,verified:5}[state]||0;timeline.innerHTML=steps.map((s,i)=>`<div class="tl ${i<done?'done':i===done?'now':''}">${i<done?'✅':i===done?'⏳':'○'} ${s[1]}</div>`).join('')}
+function startHostedPayment(){if(selectedInvoice.status==='paid'){toast('এই invoice already paid');return}const url=hostedUrl();routeText.textContent=url;renderTimeline('hosted');verifyTxn.value='PAY-'+Date.now();toast('Hosted checkout URL generated');setTimeout(()=>openReceipt(url),900)}
+function verifyPayment(){const v=verifyTxn.value.trim();if(!v){verifyStatus.className='verify-status err';verifyStatus.textContent='Payment ID দিন';return}verifyStatus.className='verify-status wait';verifyStatus.textContent='Webhook/IPN যাচাই simulation চলছে...';setTimeout(()=>{verifyStatus.className='verify-status ok';verifyStatus.textContent='✅ Payment verified (demo). Production-এ PSP signature verify হবে।';renderTimeline('verified');openReceipt(v)},900)}
+function openReceipt(ref){const date=new Date();rcpNo.textContent='RCP-'+date.toISOString().slice(0,10).replace(/-/g,'')+'-'+Math.floor(1000+Math.random()*9000);rcpInv.textContent=selectedInvoice.id;rcpGw.textContent=selectedGateway.name;rcpTxn.textContent=String(ref).slice(0,60);rcpDate.textContent=date.toLocaleString('bn-BD');rcpTotal.textContent='৳ '+selectedInvoice.total.toLocaleString('bn-BD');receiptModal.classList.add('open')}
 function closeReceipt(){receiptModal.classList.remove('open')}
-function sendWhatsApp(){if(!lastReceipt){openReceiptDemo(false);return}const msg=`SAR Payment Receipt\\n${CNAME}\\n${lastReceipt.pkg}\\n৳${lastReceipt.total}\\nTxn: ${lastReceipt.txn}`;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2500)}
 window.addEventListener('DOMContentLoaded',init);
 </script>
