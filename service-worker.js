@@ -3,7 +3,7 @@
    MindMax Enterprises | mindmaxbd.xyz
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'sar-v1.0.3';
+const CACHE_NAME = 'sar-v1.0.4';
 const OFFLINE_URL = '/offline.html';
 
 // Core pages to cache on install

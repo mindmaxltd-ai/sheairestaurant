@@ -12,19 +12,19 @@
   --pink:#E91E8C;--pink-d:#B51267;--pink-soft:#FDE9F4;--rose:#FF7EB8;
   --cream:#FCFAF6;--milk:#FFFDF9;--card:#FFFFFF;--ink:#241D24;--muted:#756B75;
   --line:#E9DED3;--line2:#DACABA;--gold:#C9A24B;--gold-soft:#F8EFD8;
-  --green:#2E8B62;--green-soft:#DFF0E8;--orange:#D97824;--plum:#38283B;
+  --green:#2E8B62;--green-soft:#DFF0E8;--orange:#F97316;--orange-d:#C2410C;--orange-soft:#FFF0E6;--plum:#38283B;
   --shadow:0 14px 45px rgba(71,42,60,.10),0 2px 9px rgba(71,42,60,.05);
   --shadow-lg:0 26px 80px rgba(233,30,140,.18),0 10px 28px rgba(71,42,60,.10);
-  --grad:linear-gradient(125deg,#B51267 0%,#E91E8C 30%,#FF7EB8 55%,#C9A24B 82%,#2E8B62 130%);
-  --soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF3D8 120%);
+  --grad:linear-gradient(125deg,#B51267 0%,#E91E8C 32%,#FF7EB8 55%,#F97316 82%,#FDBA74 120%);
+  --soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF0E6 120%);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Hind Siliguri',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.64;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:-2;background:
   radial-gradient(920px 560px at 85% -8%,rgba(233,30,140,.18),transparent 58%),
-  radial-gradient(760px 500px at -5% 12%,rgba(255,126,184,.16),transparent 58%),
-  radial-gradient(700px 520px at 55% 108%,rgba(46,139,98,.10),transparent 58%)}
+  radial-gradient(760px 500px at -5% 12%,rgba(249,115,22,.16),transparent 58%),
+  radial-gradient(700px 520px at 55% 108%,rgba(255,126,184,.12),transparent 58%)}
 body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.28;background-image:linear-gradient(rgba(233,30,140,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(233,30,140,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
 img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.num{font-family:'Space Mono',monospace}
 .topbar{height:3px;background:var(--grad);background-size:240% 100%;animation:slide 8s linear infinite}@keyframes slide{to{background-position:240% 0}}
@@ -39,7 +39,7 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
 .eyebrow{display:inline-flex;align-items:center;gap:.55rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.47rem 1rem;color:var(--pink-d);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;box-shadow:var(--shadow);margin-bottom:1.15rem}.dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 1.7s ease-in-out infinite}@keyframes pulse{50%{opacity:.28;transform:scale(.8)}}
 .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.75rem,6vw,5.35rem);line-height:.95;font-weight:800;letter-spacing:-.035em;color:var(--plum);max-width:11.5ch}.hero h1 em{font-style:italic;background:var(--grad);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero-sub{margin-top:1.15rem;color:var(--muted);font-size:1.08rem;max-width:64ch}.hero-sub b{color:var(--pink-d)}
-.hero-cta{display:flex;gap:.72rem;flex-wrap:wrap;margin-top:1.55rem}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;padding:.82rem 1.35rem;transition:.2s}.btn-primary{background:var(--grad);color:#fff;box-shadow:0 16px 38px rgba(233,30,140,.22)}.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}.btn-soft{background:#fff;color:var(--plum);border:1px solid var(--line);box-shadow:var(--shadow)}.btn-soft:hover{border-color:var(--pink);transform:translateY(-1px)}
+.hero-cta{display:flex;gap:.72rem;flex-wrap:wrap;margin-top:1.55rem}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;padding:.82rem 1.35rem;transition:.2s}.btn-primary{background:var(--grad);color:#fff;box-shadow:0 16px 38px rgba(233,30,140,.22)}.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}.btn-soft{background:#fff;color:var(--plum);border:1px solid var(--line);box-shadow:var(--shadow)}.btn-soft:hover{border-color:var(--orange);transform:translateY(-1px)}
 .hero-panel{background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:34px;padding:.78rem;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}.hero-photo{height:440px;border-radius:27px;overflow:hidden;position:relative;background:var(--soft)}.hero-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(1.04) contrast(1.02)}.hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(44,22,38,.78))}
 .photo-caption{position:absolute;left:1.25rem;right:1.25rem;bottom:1.1rem;color:#fff;z-index:2}.photo-caption small{display:block;font-family:'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#FFD6EA;font-size:.66rem}.photo-caption b{display:block;font-family:'Playfair Display',serif;font-size:1.55rem;line-height:1.1;margin:.25rem 0}.photo-caption span{display:block;color:rgba(255,255,255,.78);font-size:.86rem}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;max-width:1240px;margin:0 auto 1.4rem;padding:0 1.25rem}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1rem;box-shadow:var(--shadow)}.stat b{display:block;font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--plum);line-height:1}.stat span{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
@@ -50,10 +50,10 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
 .catbar{max-width:1240px;margin:1.45rem auto 0;padding:0 1.25rem;display:flex;gap:.55rem;overflow-x:auto;scrollbar-width:none}.catbar::-webkit-scrollbar{display:none}.cat-tab{flex-shrink:0;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:.58rem 1rem;font-family:inherit;font-weight:800;cursor:pointer;transition:.18s}.cat-tab:hover,.cat-tab.active{border-color:var(--pink);background:var(--pink);color:#fff}.cat-tab small{display:block;font-weight:400;opacity:.8}
 .sec-head{max-width:1240px;margin:2.2rem auto .95rem;padding:0 1.25rem;display:flex;align-items:end;justify-content:space-between;gap:1rem}.sec-head h2{font-family:'Playfair Display',serif;font-size:2.3rem;line-height:1.05;color:var(--plum)}.sec-head p{color:var(--muted);max-width:66ch}.count-badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem .85rem;font-family:'Space Mono',monospace;color:var(--pink-d);font-weight:700;font-size:.78rem;white-space:nowrap}
 .meals{max-width:1240px;margin:0 auto;padding:0 1.25rem 3.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem}.meal-group{display:flex;flex-direction:column;gap:1rem}.meal-label{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.05rem;color:var(--plum)}.meal-label .ic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--pink-soft)}
-.mcard{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:.22s}.mcard:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--pink)}.mc-img{height:218px;position:relative;overflow:hidden;background:var(--soft)}.mc-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}.mcard:hover .mc-img img{transform:scale(1.055)}.mc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(45,22,42,.55))}.mc-badges{position:absolute;left:.85rem;right:.85rem;top:.8rem;display:flex;justify-content:space-between;gap:.45rem;z-index:2}.pill{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.28rem .58rem;font-size:.68rem;font-weight:800;background:rgba(255,255,255,.92);color:var(--plum);backdrop-filter:blur(10px)}.pill.dark{background:rgba(233,30,140,.86);color:#fff}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:.22s}.mcard:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--pink)}.mc-img{height:218px;position:relative;overflow:hidden;background:var(--soft)}.mc-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}.mcard:hover .mc-img img{transform:scale(1.055)}.mc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(45,22,42,.55))}.mc-badges{position:absolute;left:.85rem;right:.85rem;top:.8rem;display:flex;justify-content:space-between;gap:.45rem;z-index:2}.pill{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.28rem .58rem;font-size:.68rem;font-weight:800;background:rgba(255,255,255,.92);color:var(--plum);backdrop-filter:blur(10px)}.pill.dark{background:linear-gradient(135deg,rgba(233,30,140,.9),rgba(249,115,22,.86));color:#fff}
 .mc-head{padding:1.1rem 1.08rem .85rem;background:var(--soft);border-bottom:1px solid var(--line)}.mc-no{font-size:.66rem;font-weight:800;color:var(--pink-d);letter-spacing:.13em;text-transform:uppercase}.mc-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.38rem;line-height:1.15;color:var(--plum);margin-top:.25rem}.mc-en{font-size:.84rem;color:var(--muted);font-weight:700;margin-top:.15rem}
 .mc-body{padding:1.05rem 1.08rem;display:flex;flex-direction:column;gap:.88rem;flex:1}.desc{font-size:.86rem;color:var(--muted)}.badges,.ings,.benefits{display:flex;gap:.35rem;flex-wrap:wrap}.dbadge{font-size:.65rem;font-weight:800;color:var(--green);background:var(--green-soft);border:1px solid #CBE6D9;padding:.22rem .55rem;border-radius:999px}.ing{font-size:.74rem;font-weight:800;color:var(--pink-d);background:#FFF2FA;border:1px solid #F4C7DF;padding:.25rem .58rem;border-radius:999px}.bchip{background:var(--green-soft);color:#1E6748;border-radius:999px;padding:.25rem .58rem;font-size:.74rem;font-weight:800}
-.panel-h{font-size:.69rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem;display:flex;align-items:center;gap:.42rem}.panel-h::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--pink),var(--gold))}
+.panel-h{font-size:.69rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem;display:flex;align-items:center;gap:.42rem}.panel-h::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--pink),var(--orange))}
 .nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.42rem}.n-pill{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:.45rem .25rem;text-align:center}.n-pill .nv{font-family:'Space Mono',monospace;font-weight:700;font-size:.82rem}.n-pill .nk{font-size:.56rem;color:var(--muted)}.n-pill.cal{background:var(--pink-soft);border-color:transparent}.n-pill.cal .nv{color:var(--pink-d)}
 .drc{display:flex;flex-direction:column;gap:.36rem}.dr-line{display:grid;grid-template-columns:78px 1fr 38px;gap:.45rem;align-items:center;font-size:.76rem;color:var(--muted)}.dr-bar{height:7px;border-radius:999px;background:var(--green-soft);overflow:hidden}.dr-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--green));width:var(--w)}.dr-line .dp{font-family:'Space Mono',monospace;font-weight:700;color:var(--green)}
 .med{display:flex;flex-direction:column;gap:.45rem}.med-row{display:flex;gap:.4rem;flex-wrap:wrap;align-items:baseline}.med-row .ml{font-size:.72rem;color:var(--muted);font-weight:800;min-width:86px}.pw{font-size:.72rem;font-weight:800;padding:.22rem .52rem;border-radius:999px}.pw.dis{background:var(--pink-soft);color:var(--pink-d)}.pw.con{background:var(--gold-soft);color:#8B681B}.pw.chu{background:var(--green-soft);color:var(--green)}
@@ -97,11 +97,11 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
   </div>
   <div class="hero-panel">
     <div class="hero-photo">
-      <img src="https://www.sakara.com/cms-image/desktop/md/1735319869000/f46520d4-d9da-4b5e-90ee-e267ae752cf2.webp" alt="Sakara style SAR weekly meals">
+      <img src="https://images.unsplash.com/photo-1543353071-087092ec393a?auto=format&fit=crop&w=1200&q=80" alt="SAR weekly meals without visible brand text">
       <div class="photo-caption">
-        <small>Sakara visual direction · SAR nutrition logic</small>
+        <small>Premium weekly menu direction · SAR nutrition logic</small>
         <b>২১টি ready-to-order healing meal</b>
-        <span>Public Sakara-style food photography + Bangladesh ingredient substitutions.</span>
+        <span>Clean, non-branded food photography + Bangladesh ingredient substitutions.</span>
       </div>
     </div>
   </div>
@@ -148,7 +148,7 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
 <div class="sec-head">
   <div>
     <h2>৭ দিনের <span class="serif"><em>২১ recipe</em></span></h2>
-    <p>`meal-score.html`-এর মতো breakfast/lunch/dinner grouped card format, কিন্তু Sakara-inspired clean layout এবং women-only pink SAR branding. প্রতিটি card-এ Sakara-style ছবি, localized ingredient, nutrition, daily requirement %, benefits ও substitutions আছে।</p>
+    <p>`meal-score.html`-এর মতো breakfast/lunch/dinner grouped card format, কিন্তু premium weekly-menu clean layout এবং women-only pink-orange SAR branding. প্রতিটি card-এ non-branded food ছবি, localized ingredient, nutrition, daily requirement %, নারীদের উপকারিতা ও substitutions আছে।</p>
   </div>
   <span class="count-badge" id="visibleCount">২১ recipe</span>
 </div>
@@ -162,15 +162,15 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
       <p>Sakara-এর plant-rich, ready-to-eat weekly menu ধারণাকে SAR বাংলাদেশি নারীর জন্য localize করেছে। যেসব imported ingredient সহজলভ্য নয়, সেগুলোর বিকল্প হিসেবে কচি শাক, লাউ, কুমড়া, মুগ, ছোলা, তিল, আমলকি, দেশি ডিম, মাছ ও দই ব্যবহার করা হয়েছে।</p>
     </div>
     <div class="story-grid">
-      <div class="story-card"><b>Sakara-style visuals</b><span>Public Sakara CDN images and Sakara-like photography direction.</span></div>
+      <div class="story-card"><b>Clean premium visuals</b><span>Non-branded food imagery; no visible SAKARA text on pictures.</span></div>
       <div class="story-card"><b>Bangladesh ingredients</b><span>Local market friendly substitutions for hard-to-find imported items.</span></div>
-      <div class="story-card"><b>Meal-score format</b><span>Nutrition panel, daily requirement bars, benefits and medicinal layer.</span></div>
+      <div class="story-card"><b>Meal-score format</b><span>Nutrition panel, daily requirement bars, women’s benefits and medicinal layer.</span></div>
       <div class="story-card"><b>Order ready</b><span>Add to cart and direct order connect with existing SAR order flow.</span></div>
     </div>
   </div>
 </section>
 
-<p class="note"><b>নোট:</b> SAR Signature Meal একটি wellness food program, চিকিৎসা পরামর্শ নয়। Sakara ছবি/ধারণা visual inspiration হিসেবে ব্যবহৃত; recipe ingredient SAR-এর Bangladesh-localized therapeutic version.</p>
+<p class="note"><b>নোট:</b> SAR Signature Meal একটি wellness food program, চিকিৎসা পরামর্শ নয়। ডিজাইনটি premium weekly menu থেকে অনুপ্রাণিত; ছবিগুলো non-branded food photography, যাতে কোনো visible SAKARA লেখা নেই। Recipe ingredient SAR-এর Bangladesh-localized therapeutic version.</p>
 
 <div class="overlay" id="overlay" onclick="closeCart()"></div>
 <aside class="drawer" id="drawer">
@@ -210,45 +210,47 @@ const ADDONS=[
   {k:'protein',title:'Women Protein Boost',sub:'স্প্রাউট/ডিম/মাছ/তিল extra protein layer',price:980},
   {k:'dessert',title:'Sweet Healing Cup',sub:'চিনি ছাড়া ৪টি ফল-চিয়া dessert cup',price:720}
 ];
-const SAKARA_IMAGES=[
-  'https://www.sakara.com/cms-image/desktop/md/1738009753000/7689e574-c4f5-44fb-860e-25b7b57d5185.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1745340580000/01f13b44-9ab5-4f56-a58c-bdf0a0a7d79d.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1745340633000/8e93a917-2588-4b57-9674-449cd98ea730.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1745340679000/b49385ce-039f-4d5d-b297-08e28ca2096a.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1735319869000/f46520d4-d9da-4b5e-90ee-e267ae752cf2.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1735319885000/bf945784-15c7-4a34-bac7-99fe4173c642.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1735319902000/c1292ab5-cd22-4c02-94e3-e806e30b5bd7.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1735319951000/7f205d78-a437-482b-8ac5-5d088bb5a544.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1709058523000/f700793c-e9f1-4a45-9c71-5ec93be00eb3.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1709058598000/c596342e-d9ca-472d-9852-75a88d964cd5.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1709058705000/8d9860e6-3ff3-48df-9234-7a02a596659e.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1709058788000/36d9198e-2448-48fa-b357-4700a8c9bf7f.webp',
-  'https://www.sakara.com/cms-image/desktop/md/1709058876000/7aad4d1a-0ea3-4c62-a582-c9086d0cd32c.webp'
+const CLEAN_IMAGES=[
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1505252585461-04db1eb84625?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1625944525533-473f1a3d54e7?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=900&q=80'
 ];
 const RAW_MENU=[
-  ['mon','breakfast','কাউয়াই মরিঙ্গা স্মুদি বোল','Kauai Smoothie Bowl','Sakara-style tropical smoothie bowl, but spirulina/blue majik বদলে মরিঙ্গা ও আমলকি।',390,17,42,13,12,5.1,210,['মরিঙ্গা পাতা','পেয়ারা','কলা','চিয়া বীজ','টক দই'],['Hydration','Skin glow','Iron support'],'Blue majik → মরিঙ্গা + আমলকি'],
-  ['mon','lunch','মাইক্রোবায়োম ছোলা-শাক সালাদ','Microbiome Mojo Salad','Watercress/cashew ranch vibe localize করে ছোলা, লাল শাক, শসা ও টকদই dressing।',560,26,58,18,18,7.0,180,['ছোলা','লাল শাক','শসা','টক দই','লেবু'],['Microbiome','High fiber','Bloat relief'],'Watercress/cashew ranch → লাল শাক + টকদই'],
-  ['mon','dinner','স্ট্রেংথ মুগ ট্যাগিন','Strength + Clarity Tagine','Tagine flavor profile, but quinoa/couscous বদলে মুগ ডাল, কুমড়া ও গাজর।',505,23,62,14,13,5.3,140,['মুগ ডাল','কুমড়া','গাজর','জিরা','ধনে পাতা'],['Steady energy','Digestive calm','Protein'],'Couscous → মুগ ডাল + কুমড়া'],
-  ['tue','breakfast','গোলাপ-চিয়া বিউটি পারফে','Rose Chia Beauty Parfait','Sakara parfait style; imported berry বদলে ড্রাগন ফল/পেয়ারা/খেজুর।',405,16,45,12,11,3.7,280,['চিয়া বীজ','টক দই','ড্রাগন ফল','পেয়ারা','খেজুর'],['Skin clarity','Calcium','Omega support'],'Imported berries → ড্রাগন ফল + পেয়ারা'],
-  ['tue','lunch','ক্যালাইডোস্কোপ লাল চাল বোল','Kaleidoscope Vitality Bowl','Rainbow grain bowl using red rice, beet, spinach and sprouted lentil.',595,25,74,16,15,6.2,170,['লাল চাল','বিট','পালং শাক','ডাল স্প্রাউট','তিল'],['Micronutrients','Iron','Satiety'],'Farro/wild rice → লাল চাল'],
-  ['tue','dinner','পিঙ্ক শক্তি মাছ প্লেট','Pink Strength Fish Plate','Clean-protein dinner with steamed local fish, greens and lemon-herb chutney.',620,38,38,11,16,5.8,190,['দেশি মাছ','পালং শাক','ব্রকলি','লেবু','কালোজিরা'],['High protein','Lean strength','Iron support'],'Salmon → দেশি মাছ'],
-  ['wed','breakfast','দারুচিনি-ওটস গ্লুকোজ বাটি','Cinnamon Oat Glucose Bowl','Sakara breakfast bowl format with oats, apple, flax and cinnamon.',410,15,56,12,10,4.0,130,['ওটস','আপেল','দারুচিনি','ফ্ল্যাক্স বীজ','বাদাম'],['Blood sugar support','Heart health','Fiber'],'Maple granola → ওটস + খেজুর'],
-  ['wed','lunch','আমলকি-বিট লিভার বোল','Amla Beet Liver Bowl','Beet quinoa style; quinoa optional, local red rice and amla keep it practical.',575,23,66,15,14,5.6,150,['বিট','লাল চাল','আমলকি','ধনেপাতা','সূর্যমুখী বীজ'],['Liver support','Antioxidants','Vitamin C'],'Quinoa → লাল চাল/কাউন'],
-  ['wed','dinner','সফট মুগ-লাউ খিচুড়ি','Gentle Mung Kitchari','Soft digestive dinner using mung, bottle gourd, carrot and cumin.',480,22,62,13,12,4.9,110,['মুগ ডাল','লাউ','গাজর','জিরা','পুদিনা'],['Gut healing','Easy digest','Night calm'],'Imported lentil blend → মুগ ডাল'],
-  ['thu','breakfast','ডিম-পালং লেটুস র‍্যাপ','Egg Spinach Lettuce Wrap','Protein breakfast inspired by Sakara toast/wrap formats, using deshi egg and leafy greens.',430,26,28,8,15,5.8,210,['দেশি ডিম','পালং শাক','লেটুস','তিল','লেবু'],['Protein','Folate','Women strength'],'Avocado toast → দেশি ডিম + পালং র‍্যাপ'],
-  ['thu','lunch','রেইনবো সবজি থালি','Rainbow Vegetable Thali','A Sakara plate translated into Bangladeshi thali with cauliflower, sprouts and mint chutney.',610,28,64,17,16,6.8,170,['ফুলকপি','গাজর','ডাল স্প্রাউট','পুদিনা চাটনি','শসা'],['Metabolism','Micronutrients','High fiber'],'Tahini dressing → তিল-পুদিনা চাটনি'],
-  ['thu','dinner','নারকেল-কুমড়া কমফোর্ট কারি','Pumpkin Coconut Comfort Curry','Creamy dairy-free dinner with pumpkin, coconut, ginger and mung.',455,18,52,10,12,4.1,140,['কুমড়া','নারকেল','মুগ ডাল','আদা','ধনেপাতা'],['Anti-inflammatory','Comfort','Gut calm'],'Butternut squash → দেশি কুমড়া'],
-  ['fri','breakfast','ড্রাগন ফল দই গ্লো বোল','Dragon Fruit Yogurt Glow Bowl','Pink women-only glow breakfast with yogurt, dragon fruit, chia and almonds.',405,19,40,10,12,3.2,320,['টক দই','ড্রাগন ফল','চিয়া বীজ','বাদাম','পেয়ারা'],['Microbiome','Calcium','Skin glow'],'Coconut yogurt → টক দই'],
-  ['fri','lunch','করলা-ছোলা স্মার্ট সুগার বোল','Smart Sugar Bitter Gourd Bowl','Low-GI lunch with bitter gourd, chickpea, fenugreek and cucumber.',540,25,44,16,11,5.9,145,['করলা','ছোলা','মেথি','শসা','লেবু'],['Glucose support','Low GI','Fiber'],'Kale → করলা + শসা'],
-  ['fri','dinner','গোল্ডেন নাইট রিসেট স্যুপ','Golden Night Reset Soup','Light dinner with lentil, turmeric, bottle gourd and mint.',465,22,52,13,11,4.7,120,['মসুর ডাল','হলুদ','লাউ','পুদিনা','আদা'],['Sleep calm','Digestive reset','Anti-inflammatory'],'Miso broth → হলুদ-আদা ডাল broth'],
-  ['sat','breakfast','তিল-খেজুর গোল্ডেন পোরিজ','Sesame Date Golden Porridge','Sweet breakfast without refined sugar using oats, sesame, date and turmeric.',420,16,56,11,13,4.3,300,['ওটস','তিল','খেজুর','হলুদ','দারুচিনি'],['Calcium','Hormone balance','Energy'],'Almond butter → তিল paste'],
-  ['sat','lunch','মামা আর্থ ডিটক্স বোল','Mama Earth Detox Bowl','Sakara Mama Earth style localized with greens, sprout, pumpkin and amla dressing.',585,27,60,18,17,7.2,190,['পালং শাক','কুমড়া','ছোলা স্প্রাউট','আমলকি','তিল'],['Detox','Iron','Satiety'],'Arugula → পালং + লাল শাক'],
-  ['sat','dinner','চিকপি-রোজমেরি কাম বোল','Rosemary Chickpea Calm Bowl','Weekend dinner with chickpea, vegetables and herb dressing.',505,24,55,15,12,5.4,130,['ছোলা','জুকিনি/লাউ','গাজর','রোজমেরি/ধনে','লেবু'],['Satiety','Gut fiber','Calm'],'Zucchini optional → লাউ'],
-  ['sun','breakfast','মাদার আর্থ ফল-সিড প্লেট','Mother Earth Fruit Seed Plate','Restorative fruit, seed and nut plate with guava, pomegranate and sesame.',395,13,45,11,10,3.6,240,['পেয়ারা','ডালিম','তিল','আখরোট/বাদাম','চিয়া'],['Antioxidants','Minerals','Light start'],'Imported stone fruit → পেয়ারা + ডালিম'],
-  ['sun','lunch','SAR রয়্যাল হিলিং বোল','SAR Royal Healing Bowl','The weekly signature bowl: local greens, sprout, grain, seed and AI chutney.',640,30,67,18,16,6.5,180,['কাউন/লাল চাল','মরিঙ্গা','মুগ স্প্রাউট','AI চাটনি','কুমড়ার বীজ'],['Signature meal','Full spectrum','Protein'],'Quinoa optional → কাউন/লাল চাল'],
-  ['sun','dinner','পিঙ্ক সারেনিটি স্যুপ','Pink Serenity Soup','Final night recovery soup with beet, lentil, ginger and lemon.',470,22,52,13,12,4.8,125,['বিট','মসুর ডাল','আদা','লেবু','পুদিনা'],['Recovery','Digestive calm','Iron'],'Imported root blend → বিট + মসুর']
+  ['mon','breakfast','চকলেট লাভ মাফিন','Chocolate Love Muffin','নারকেল-ওট crumble ও honey almond caramel style; cacao, oats, নারকেল ও মধু দিয়ে heatable breakfast.',410,14,54,8,13,3.6,130,['ওটস','কোকো/কাকাও','নারকেল','মধু','বাদাম/চিনাবাদাম'],['মুড সাপোর্ট','PMS sweet craving control','স্থির সকাল এনার্জি'],'Pecan/superfood caramel → বাদাম/চিনাবাদাম + মধু'],
+  ['mon','lunch','বাটারফ্লাই বোল','Butterfly Bowl','অপরাজিতা ফুলের নীল ভাত, কিশমিশ, কাজু ও লেবু-yuzu style dressing.',560,18,76,11,14,4.8,120,['অপরাজিতা ফুল','লাল/সাদা চাল','কিশমিশ','কাজু','লেবু'],['Antioxidant support','Cycle-day hydration','Gentle energy'],'Yuzu/currants/pecans → লেবু + কিশমিশ + কাজু'],
+  ['mon','dinner','হার্ট + সোল শাওয়ারমা বোল','Heart + Soul Shawarma Bowl w/ Power Pita','কাঁঠাল shawarma, ছোলা, ফুলকপি, মরিচ paste, কালোজিরা রুটি ও herb hummus.',620,27,72,16,17,6.3,170,['কাঁঠাল','ছোলা','ফুলকপি','কালোজিরা রুটি','তিল-হার্ব hummus'],['Iron + fiber','Heart-friendly satiety','প্রোটিন সাপোর্ট'],'Harissa/power pita → শুকনা মরিচ paste + কালোজিরা রুটি'],
+  ['tue','breakfast','জর্জিয়া পিচ পারফে','Georgia Peach Parfait','Peach parfait idea; বাংলাদেশে সহজলভ্য আম/পেঁপে, দারুচিনি ও কাজু granola.',395,15,48,9,12,3.2,240,['আম/পেঁপে','টক দই','দারুচিনি','কাজু','গাঁদা ফুল পাপড়ি'],['Skin glow','Calcium for women','Gut microbiome'],'Peach/calendula/pecan → আম-পেঁপে + গাঁদা + কাজু'],
+  ['tue','lunch','ইনার ফায়ার বোল','Inner Fire Bowl','Gochujang mayo style spicy bowl; fermented red chili-garlic yogurt sauce, ছোলা ও লাল চাল.',585,24,66,14,16,5.4,145,['লাল চাল','ছোলা','লাল মরিচ-রসুন paste','টক দই','শসা'],['Metabolism support','Bloat relief','Midday focus'],'Gochujang mayo → ফার্মেন্টেড মরিচ-রসুন দই sauce'],
+  ['tue','dinner','লাসাগনা বোলোনিজ হাইড্রেটিং গ্রিনস','Lasagna Bolognese w/ Hydrating Greens','Green lentil bolognese, গাজর, আখরোট/চিনাবাদাম, দই-ricotta style ও শাক.',610,30,58,15,18,6.5,210,['সবুজ/মসুর ডাল','গাজর','পালং শাক','টক দই','আখরোট/চিনাবাদাম'],['Protein for muscle','Folate greens','Comfort without heaviness'],'Ricotta/walnut → টক দই ricotta + local nut option'],
+  ['wed','breakfast','বানানা নাট ব্রেইন-ফুড গ্রানোলা','Banana Nut Brain-Food Granola w/ Banana-Cacao Mylk','কলা chips, pumpkin seed, flaxseed, almond/peanut ও banana-cacao milk.',430,16,58,11,15,4.3,160,['কলা','কাকাও','কুমড়ার বীজ','ফ্ল্যাক্স বীজ','বাদাম/চিনাবাদাম'],['Brain focus','Omega support','Hormone-friendly fats'],'Pecan pieces → চিনাবাদাম/বাদাম'],
+  ['wed','lunch','ক্রাঞ্চি কেল সালাদ','Crunchy Kale Salad','Kale idea localize করে পালং/লাল শাক, বাঁধাকপি, ছোলা, আপেল, গাজর ও শসা.',540,22,54,18,16,6.8,150,['পালং/লাল শাক','বেগুনি বাঁধাকপি','ছোলা','আপেল','গাজর'],['Iron + folate','High fiber','Skin clarity'],'Kale/avocado → পালং/লাল শাক + শসা'],
+  ['wed','dinner','মিসো রামেন চিলি-কোম্বু ব্রথ','Miso Ramen w/ Chili-Kombu Broth','Brown rice noodles vibe; ডাল-chili broth, rice noodles, chickpea tofu ও mushroom.',575,25,68,12,14,5.2,130,['রাইস নুডলস','ছোলা tofu','মাশরুম','আদা-মরিচ broth','তিল'],['Warm digestion','Protein','Stress comfort'],'Miso/kombu/shiitake → ডাল broth + local mushroom'],
+  ['thu','breakfast','সেরোটোনিন গ্লো পারফে','Serotonin Glow Parfait','Raw cacao, coconut cream, puffed rice/quinoa style, খেজুর, আম ও কিশমিশ.',405,13,46,10,16,3.4,180,['কাকাও','নারকেল cream','মুড়ি/কাউন puff','খেজুর','আম/কিশমিশ'],['Mood support','Skin glow','Healthy fats'],'Avocado/apricot/goji → আম + খেজুর + কিশমিশ'],
+  ['thu','lunch','বাফেলো ফুলকপি বোল','Buffalo Cauliflower Bowl','Spicy buffalo cauliflower, কাউন/লাল চাল, herb yogurt ranch dressing.',565,21,62,14,15,4.9,180,['ফুলকপি','কাউন/লাল চাল','টক দই','ধনেপাতা','লাল মরিচ'],['Metabolic fire','Calcium support','Satiety'],'Quinoa/ranch → কাউন + টকদই herb dressing'],
+  ['thu','dinner','সাদা বিন ও শালগম স্যুপ','White Bean and Parsnip Soup w/ Turmeric Bread','White bean soup; parsnip বদলে শালগম/মূলা, turmeric millet roll ও local chili butter.',500,24,58,13,12,5.5,150,['সাদা বরবটি/শিম','শালগম/মূলা','হলুদ রুটি','পুদিনা','কাঁচা মরিচ'],['Gentle protein','Digestive warmth','Mineral support'],'Cannellini/parsnip/calabrian chili → শিম + শালগম + কাঁচা মরিচ'],
+  ['fri','breakfast','রাইজ + শাইন লেমন ডোনাট','Rise + Shine Lemon Donut','Heatable lemon-oat donut with coconut, honey and yogurt glaze.',390,12,50,7,12,3.0,120,['ওটস','লেবু','নারকেল','মধু','টক দই'],['Light morning energy','Vitamin C','Craving balance'],'Imported gluten-free flour blend → ওটস + চালের আটা'],
+  ['fri','lunch','ক্যারিবিয়ান জার্ক সালাদ','Caribbean Jerk Salad','Spiced rice, কাজু, আম, শাক ও herb dressing with local jerk-style spice.',590,22,70,13,18,5.2,140,['লাল চাল','আম','কাজু','পালং শাক','জিরা-মরিচ spice'],['Energy for busy day','Iron greens','Healthy fats'],'Caribbean spice blend → জিরা-ধনে-মরিচ local blend'],
+  ['fri','dinner','ফাইভ-স্পাইস ড্যান ড্যান নুডলস','Five-Spice Dan Dan Noodles','Rice noodles, chickpea tofu, mushroom and sesame-panch phoron sauce.',610,26,72,12,17,5.4,160,['রাইস নুডলস','ছোলা tofu','মাশরুম','তিল','পাঁচফোড়ন'],['Hearty protein','Warm circulation','Comfort dinner'],'Pumpkin seed tofu/five spice → ছোলা tofu + পাঁচফোড়ন'],
+  ['sat','breakfast','মিষ্টি আলু-নারকেল ড্রিম পারফে','Sweet Potato-Coconut Dream Parfait','Nutmeg sweet potato parfait with coconut, green apple/আমড়া and pumpkin-sesame crunch.',415,14,52,10,13,3.8,210,['মিষ্টি আলু','নারকেল','জায়ফল','সবুজ আপেল/আমড়া','কুমড়া-তিল'],['Hormone-friendly carbs','Calcium','Steady energy'],'Hemp seed/green apple → কুমড়া-তিল + আমড়া'],
+  ['sat','lunch','SAR বুরিটো বোল','Sakara Burrito Bowl','Pink pitaya rice idea; beet-tinted rice, pickled chili, turmeric corn salsa and cilantro dressing.',605,23,76,15,14,5.6,130,['বিট-রঙা চাল','ভুট্টা','ধনেপাতা','আচার কাঁচা মরিচ','টক দই dressing'],['Lunch satiety','Antioxidants','Cycle energy'],'Pitaya/serrano/cilantro crema → বিট + কাঁচা মরিচ + টক দই'],
+  ['sat','dinner','সিচুয়ান নুডলস টমেটো-আদা সস','Sichuan Noodles w/ Tomato-Ginger Sauce','Brown rice noodles style with sesame carrots, white beans and tomato-ginger sauce.',590,24,70,13,14,5.0,135,['রাইস নুডলস','গাজর','সাদা শিম','টমেটো','আদা-তিল sauce'],['Digestive heat','Plant protein','Evening comfort'],'Brown rice noodles → local rice noodles'],
+  ['sun','breakfast','বানানা প্রোটিন ব্রেড','Banana Protein Bread','Heatable banana-oat protein bread with fresh berry/পেয়ারা compote.',425,18,54,9,12,3.6,150,['কলা','ওটস','ডিম/মুগ protein','পেয়ারা jam','দারুচিনি'],['Protein breakfast','Mood support','Post-period energy'],'Ruby red berries → পেয়ারা/strawberry when seasonal'],
+  ['sun','lunch','ইতালিয়ান চপড সালাদ','Italian Chopped Salad','Chickpeas, olives optional, green chili pickle, pumpkin seed, basil butter style seeded roll.',570,24,58,16,17,5.7,170,['ছোলা','শসা','কুমড়ার বীজ','তুলসি butter','কাঁচা মরিচ আচার'],['Fiber + protein','Healthy fats','Bloat control'],'Pepperoncini/pine nuts/vegan feta → কাঁচা মরিচ আচার + কুমড়ার বীজ + টকদই/paneer'],
+  ['sun','dinner','রুট ভেজ এনচিলাডা রাইস-বিনস','Root Veggie Enchilada w/ SAR Rice & Beans','Root vegetables, rice-beans, cumin, cashew-lime crema and green chutney.',625,27,78,15,16,6.0,155,['মিষ্টি আলু','লাল চাল','রাজমা/শিম','জিরা','কাজু-লেবু crema'],['Iron + protein','Comfort recovery','Hormone-friendly fullness'],'Corn tortilla/guacamole → চালের রুটি + সবুজ চাটনি']
 ];
-const MENU=RAW_MENU.map((m,i)=>({id:'sar-21-'+String(i+1).padStart(2,'0'),day:m[0],meal:m[1],bn:m[2],name:m[3],desc:m[4],img:SAKARA_IMAGES[i%SAKARA_IMAGES.length],kcal:m[5],protein:m[6],carb:m[7],fiber:m[8],fat:m[9],iron:m[10],calcium:m[11],ingredients:m[12],benefits:m[13],swap:m[14],price:PRICE_PER_MEAL}));
+const MENU=RAW_MENU.map((m,i)=>({id:'sar-21-'+String(i+1).padStart(2,'0'),day:m[0],meal:m[1],bn:m[2],name:m[3],desc:m[4],img:CLEAN_IMAGES[i%CLEAN_IMAGES.length],kcal:m[5],protein:m[6],carb:m[7],fiber:m[8],fat:m[9],iron:m[10],calcium:m[11],ingredients:m[12],benefits:m[13],swap:m[14],price:PRICE_PER_MEAL}));
 let activeDay='all',selectedAddons=new Set(),cart=safeCart();
 function safeCart(){try{const raw=JSON.parse(localStorage.getItem('sar_cart')||'[]');return Array.isArray(raw)?raw.filter(Boolean):[]}catch(e){return []}}
 function dayLabel(k){const d=DAYS.find(x=>x.k===k);return d?d.bn:k}
@@ -279,7 +281,7 @@ function card(m,i){
       <div><div class="panel-h">বাংলাদেশে পাওয়া উপাদান</div><div class="ings">${m.ingredients.map(x=>`<span class="ing">${x}</span>`).join('')}</div></div>
       <div><div class="panel-h">Nutrition panel</div><div class="nutri"><div class="n-pill cal"><div class="nv">${bn(m.kcal)}</div><div class="nk">kcal</div></div><div class="n-pill"><div class="nv">${bn(m.protein)}g</div><div class="nk">প্রোটিন</div></div><div class="n-pill"><div class="nv">${bn(m.carb)}g</div><div class="nk">কার্ব</div></div><div class="n-pill"><div class="nv">${bn(m.fat)}g</div><div class="nk">ফ্যাট</div></div><div class="n-pill"><div class="nv">${bn(m.fiber)}g</div><div class="nk">ফাইবার</div></div></div></div>
       <div><div class="panel-h">Daily requirement coverage</div><div class="drc">${dvRows(m)}</div></div>
-      <div><div class="panel-h">Benefits</div><div class="benefits">${m.benefits.map(b=>`<span class="bchip">✓ ${b}</span>`).join('')}</div></div>
+      <div><div class="panel-h">নারীদের উপকারিতা</div><div class="benefits">${m.benefits.map(b=>`<span class="bchip">✓ ${b}</span>`).join('')}</div></div>
       <div><div class="panel-h">Medicinal layer</div><div class="med"><div class="med-row"><span class="ml">Disease</span><span class="pw dis">হলুদ</span><span class="pw dis">আমলকি</span><span class="pw dis">মরিঙ্গা</span></div><div class="med-row"><span class="ml">Condition</span><span class="pw con">তুলসি</span><span class="pw con">আদা</span><span class="pw con">মৌরি</span></div><div class="med-row"><span class="ml">Chutney</span><span class="pw chu">SAR Pink-Green AI Chutney</span></div></div></div>
       <div class="substitutions"><b>Local substitution:</b> ${m.swap}</div>
       <div class="mc-foot"><span class="price">${fmt(m.price)}</span><button class="cart-add" onclick="addMeal('${m.id}',event)">কার্টে যোগ</button><button class="order-btn" onclick="orderDirect('${m.id}')">সরাসরি অর্ডার</button></div>
