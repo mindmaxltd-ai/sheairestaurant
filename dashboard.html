@@ -678,6 +678,10 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   color:var(--red2);animation:mpulse .7s ease infinite;border-style:solid}
 @keyframes mpulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+.m-mic-mini{position:absolute;right:.5rem;bottom:.6rem;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:rgba(233,30,140,.12);color:var(--pink2,#FF7EB8);cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s}
+.m-mic-mini:hover{background:rgba(233,30,140,.22)}
+.m-mic-mini.rec{background:rgba(220,38,38,.2);border-color:var(--red2,#F87171);color:var(--red2,#F87171);animation:mpulse .7s ease infinite}
+
 /* ── Report cards ── */
 .rpt-card{background:rgba(255,255,255,.035);border:1px solid var(--border);
   border-radius:14px;overflow:hidden;margin-bottom:.7rem}
@@ -1025,19 +1029,6 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             </div>
           </div>
 
-          <!-- TODAY'S PDF REPORT (auto-added) -->
-          <div id="reportCard" style="display:none;margin:0 0 1.25rem;padding:16px;
-               background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.25);
-               border-radius:12px;text-align:center">
-            <div style="font-weight:600;color:#34D399;margin-bottom:8px">📄 আজকের স্বাস্থ্য রিপোর্ট</div>
-            <a id="reportLink" href="#" target="_blank"
-               style="display:inline-block;background:#059669;color:#fff;padding:9px 18px;
-                      border-radius:9px;text-decoration:none;font-weight:600">
-               পূর্ণ রিপোর্ট (PDF) দেখুন →
-            </a>
-            <div id="reportDate" style="font-size:.72rem;color:#888;margin-top:8px"></div>
-          </div>
-
           <!-- LOYALTY -->
           <div class="dcard loyalty-card">
             <div class="dcard-header">
@@ -1229,13 +1220,19 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <span style="font-size:.72rem;color:rgba(255,255,255,.3)">/10</span>
         </div>
       </div>
-      <textarea id="di2_mental" class="m-input m-textarea" style="margin-top:.5rem"
-        placeholder="মানসিক অবস্থা বিস্তারিত বলুন..."></textarea>
+      <div style="position:relative">
+        <textarea id="di2_mental" class="m-input m-textarea" style="margin-top:.5rem"
+          placeholder="মানসিক অবস্থা বিস্তারিত বলুন..."></textarea>
+        <button class="m-mic-mini" id="mentalVoiceBtn" type="button" onclick="mVoice('di2_mental')" title="কণ্ঠে বলুন">🎤</button>
+      </div>
 
       <!-- খাবার -->
       <div class="m-label">🍽️ আজকের খাবার ও পানীয়</div>
-      <textarea id="di2_food" class="m-input m-textarea"
-        placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+      <div style="position:relative">
+        <textarea id="di2_food" class="m-input m-textarea"
+          placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+        <button class="m-mic-mini" id="foodVoiceBtn" type="button" onclick="mVoice('di2_food')" title="কণ্ঠে বলুন">🎤</button>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem">
         <div>
           <div style="font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:.3rem">☕ কফি (কাপ)</div>
@@ -1424,7 +1421,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const [cust, metrics, analysis, orders, notes] = await Promise.all([
       fetchCustomer(), fetchMetrics(), fetchAnalysis(), fetchOrders(), fetchNotes()
     ]);
-    loadLatestReport();
 
     // Update UI with fresh Supabase data
     fillBasicUI(cust);
@@ -1707,31 +1703,13 @@ async function fetchMetrics() {
   try {
     if (!CID) return {};
     console.log('🔄 Fetching metrics, customer_id=', CID);
-    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    const r = await fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
     console.log('fetchMetrics response:', r.status);
     if (!r.ok) { console.warn('fetchMetrics error:', r.status); return {}; }
     const d = await r.json();
     console.log('fetchMetrics data:', d);
     return d?.[0] || {};
   } catch(e) { console.error('fetchMetrics exception:', e); return {}; }
-}
-
-// ── আজকের PDF রিপোর্টের লিংক আনা (auto-added) ──
-async function loadLatestReport() {
-  try {
-    if (!CID) return;
-    const r = await fetch(
-      `${SUPA}/rest/v1/reports?customer_id=eq.${CID}&order=report_date.desc&limit=1&select=*`,
-      { headers: H });
-    if (!r.ok) return;
-    const data = await r.json();
-    const rep = data && data[0];
-    if (!rep || !rep.pdf_url) return;
-    document.getElementById('reportLink').href = rep.pdf_url;
-    document.getElementById('reportDate').textContent =
-      'তারিখ: ' + rep.report_date + ' · স্কোর: ' + (rep.meal_score ?? '—') + '/100';
-    document.getElementById('reportCard').style.display = 'block';
-  } catch (e) { console.warn('রিপোর্ট লোড হয়নি:', e); }
 }
 
 async function fetchAnalysis() {
@@ -1855,7 +1833,7 @@ function renderMetrics(m, cust) {
   const get = (...keys) => { for(const k of keys){ if(m&&m[k]!=null&&m[k]!=='') return m[k]; } return null; };
 
   // ── BMI ──
-  // First try customer_metrics, fallback to customers table (registration data)
+  // First try customer-metrics, fallback to customers table (registration data)
   const bmi = get('bmi','body_mass_index') || cust?.bmi || null;
   if(bmi){
     const b = parseFloat(bmi);
@@ -1955,7 +1933,7 @@ function renderMetrics(m, cust) {
   if(wtEl && wt) wtEl.textContent = parseFloat(wt).toFixed(1) + ' কেজি';
   if(htEl && ht) htEl.textContent = parseFloat(ht).toFixed(0) + ' সেমি';
 
-  // ── Show fill-metrics banner if no customer_metrics data ──
+  // ── Show fill-metrics banner if no customer-metrics data ──
   const hasMetrics = m && Object.keys(m).length > 2;
   if(!hasMetrics){
     const banner = document.getElementById('metricsFillBanner');
@@ -3217,7 +3195,7 @@ async function loadAndRenderProfile() {
   try {
     const [custArr, metricsArr] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}).then(r=>r.json()),
-      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
+      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
     ]);
     renderProfilePanel(custArr?.[0] || {}, metricsArr?.[0] || {});
   } catch(e) {
@@ -3276,7 +3254,7 @@ async function mLoadProfile() {
   try {
     const [custR, metR] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}),
-      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
+      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
     ]);
     const cust    = (await custR.json())?.[0] || {};
     const metrics = (await metR.json())?.[0]  || {};
@@ -3378,18 +3356,25 @@ async function mSaveDailyLog() {
   };
 
   try {
-    const r = await fetch(`${SUPA}/rest/v1/daily_health_log`, {
+    // ── 1) save the full daily log (UPSERT so saving twice in one
+    //        day UPDATES instead of throwing a 409 duplicate error) ──
+    const r = await fetch(
+      `${SUPA}/rest/v1/daily_health_log?on_conflict=customer_id,log_date`, {
       method: 'POST',
-      headers: { ...H, 'Prefer': 'return=minimal' },
+      headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify(data)
     });
     if (r.ok || r.status === 201 || r.status === 204) {
+      // ── 2) mirror the AI-relevant signals into customer_metrics so
+      //        the 6 AM meal-score AI reads today's mood/stress/sleep
+      //        directly. Non-blocking: if it fails the log is still saved. ──
+      await mUpdateMetricsFromLog(data);
+
       if (status) { status.style.color='#34D399'; status.textContent='✅ সংরক্ষিত!'; }
       toast('✅ আজকের স্বাস্থ্য আপডেট সংরক্ষিত হয়েছে!', true);
       setTimeout(closeModal, 1200);
     } else {
       const err = await r.text();
-      // If 404 = table missing
       if (r.status === 404) throw new Error('daily_health_log table নেই। Supabase-এ SQL রান করুন।');
       throw new Error(`HTTP ${r.status}: ${err.substring(0,80)}`);
     }
@@ -3399,6 +3384,37 @@ async function mSaveDailyLog() {
   } finally {
     if (btn) { btn.textContent = '💾 Save করুন'; btn.disabled = false; }
   }
+}
+
+// ── push today's mood/stress/sleep into customer_metrics ──
+// Only the few fields the 6 AM AI actually uses are mirrored here;
+// the full 250-metric profile is NOT overwritten. Uses PATCH so the
+// existing row is updated in place. Silent on failure (non-critical).
+async function mUpdateMetricsFromLog(log) {
+  if (!CID) return;
+  try {
+    const patch = {
+      mood:         log.mood || null,
+      stress_level: log.stress_level,
+      sleep_hours:  log.sleep_hours,
+      updated_at:   new Date().toISOString(),
+    };
+    // PATCH the existing metrics row for this customer
+    const r = await fetch(
+      `${SUPA}/rest/v1/customer_metrics?customer_id=eq.${encodeURIComponent(CID)}`, {
+      method: 'PATCH',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(patch),
+    });
+    // If no metrics row exists yet, create a minimal one so AI has signals
+    if (r.status === 404 || r.status === 406) {
+      await fetch(`${SUPA}/rest/v1/customer_metrics?on_conflict=customer_id`, {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ customer_id: CID, ...patch }),
+      }).catch(()=>{});
+    }
+  } catch(e) { /* non-critical: log already saved */ }
 }
 
 // Pre-load today's saved data into daily input form
@@ -3688,7 +3704,8 @@ function mVoice(targetId) {
   if (!SR) { toast('Voice: Chrome browser-এ কাজ করে।', false); return; }
 
   // Determine button to style
-  const btnMap = { diNotes:'diVoiceBtn', sarText:'sarVoiceBtn' };
+  const btnMap = { diNotes:'diVoiceBtn', sarText:'sarVoiceBtn',
+                   di2_mental:'mentalVoiceBtn', di2_food:'foodVoiceBtn' };
   const voiceBtn = document.getElementById(btnMap[targetId]) ||
     document.querySelector('[onclick*="mVoice"]');
 
