@@ -155,7 +155,7 @@ header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
 </div>
 
 <header>
-  <div class="brand"><b>SAR রান্নাঘর</b><span>Kitchen Board</span></div>
+  <div class="brand"><b>SAR রান্নাঘর</b><span>Kitchen Board · v2-board</span></div>
   <div class="live"><span class="dot"></span> লাইভ · <span id="qcount" class="num">০</span> সক্রিয়</div>
   <span class="clock" id="clock">—</span>
   <div class="spacer"></div>
@@ -298,6 +298,7 @@ function detectCatFromItem(it){return it.cat||it.disease_category||'DM';}
 
 // ── build the collapsible recipe HTML for ALL items in an order ──
 function recipeHTML(t){
+  try{
   const items=Array.isArray(t.items)?t.items:[];
   if(!items.length) return '<div class="col-empty">রেসিপি তথ্য নেই</div>';
   const f=t._factor||1;
@@ -347,10 +348,14 @@ function recipeHTML(t){
     '</div>';
   }).join('')+
   '<div class="method-note">❄ তেল/দুধ/চিনি/রং নিষিদ্ধ · শুধু Steam · Bake · Air-fry · লবণ = পিংক সল্ট · পরিমাণ হুবহু অনুসরণ করুন</div>';
+  }catch(e){
+    return '<div class="col-empty">রেসিপি দেখানো গেল না (ডেটা অসম্পূর্ণ)।<br><small>'+(e.message||'')+'</small></div>';
+  }
 }
 
 // ── one board card ──
 function card(t){
+  try{
   const age=ageOf(t.created_at);
   const itemCount=t.item_count||(Array.isArray(t.items)?t.items.length:0);
   let foot='';
@@ -378,6 +383,15 @@ function card(t){
     '<div class="recipe">'+recipeHTML(t)+'</div>'+
     '<div class="c-foot">'+foot+'</div>'+
   '</div>';
+  }catch(e){
+    // even if something is odd, show a usable card (never a blank line)
+    return '<div class="card"><div class="c-head" onclick="toggleCard(this)">'+
+      '<span class="c-no">#'+((t&&(t.order_id||t.id))||'—')+'</span>'+
+      '<span class="c-cust">'+((t&&t.customer_name)||'গ্রাহক')+'</span>'+
+      '<span class="caret">▶</span></div>'+
+      '<div class="recipe"><div class="col-empty">বিস্তারিত দেখানো গেল না।<br><small>'+(e.message||'')+'</small></div></div>'+
+    '</div>';
+  }
 }
 function toggleCard(headEl){headEl.parentElement.classList.toggle('open');}
 
