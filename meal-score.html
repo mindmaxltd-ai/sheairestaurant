@@ -680,7 +680,10 @@ window.addEventListener('DOMContentLoaded',async()=>{
   // is there any real health signal to personalize from?
   window._metricsEmpty = !hasUsefulMetrics(metrics);
   myCats=detectCats(metrics);
-  activeCat=myCats[0];
+  // If no real disease was detected we keep GENERAL internally, but show
+  // a real disease tab (DM) as the active default so a full menu renders
+  // and HER can freely switch to any other category.
+  activeCat = (myCats.length===1 && myCats[0]==='GENERAL') ? 'DM' : myCats[0];
   renderCatBar();
   if(window._metricsEmpty) showMetricsCTA();
   document.getElementById('mixBar').style.display = myCats.length>1?'block':'none';
@@ -918,13 +921,18 @@ function paintScore(a){
 // ── category bar: only MY cats active, rest locked ──
 function renderCatBar(){
   const html=['<span class="lbl">আপনার বিভাগ:</span>'];
+  // If no real disease was detected (only GENERAL), let HER pick any
+  // category freely instead of locking everything. Disease patients
+  // still get only their own category(s) unlocked, as before.
+  const noDisease = myCats.length===1 && myCats[0]==='GENERAL';
   CATS.forEach(c=>{
-    const mine=myCats.includes(c.k);
+    const mine = noDisease ? true : myCats.includes(c.k);
     const cls='cat-tab'+(mine?' mine':' locked')+(c.k===activeCat?' active':'');
     const onclick=mine?'switchCat(\''+c.k+'\')':'lockedMsg()';
     html.push('<button class="'+cls+'" onclick="'+onclick+'">'+c.bn+(mine?'':' <span class="lk">🔒</span>')+'</button>');
   });
-  if(myCats.length>1) html.push('<span class="cat-note">⭐ আপনার মেট্রিক্সে '+myCats.map(k=>CAT_INFO[k].bn).join(' ও ')+' — দুটোই দেখানো হচ্ছে</span>');
+  if(noDisease) html.push('<span class="cat-note">⭐ আপনার রোগ-বিভাগ এখনো সেট হয়নি — যেকোনো বিভাগ বেছে দেখুন, অথবা মেট্রিক্সে রোগ যোগ করুন</span>');
+  else if(myCats.length>1) html.push('<span class="cat-note">⭐ আপনার মেট্রিক্সে '+myCats.map(k=>CAT_INFO[k].bn).join(' ও ')+' — দুটোই দেখানো হচ্ছে</span>');
   else html.push('<span class="cat-note">⭐ মেট্রিক্স থেকে নির্বাচিত: '+CAT_INFO[myCats[0]].bn+'</span>');
   document.getElementById('catBar').innerHTML=html.join('');
 }
