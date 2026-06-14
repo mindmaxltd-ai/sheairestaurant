@@ -246,8 +246,79 @@ exports.handler = async (event) => {
         return reply(200, { ok: !!row, score: row });
       }
 
+      // ── 4d. kitchenBoard — token-free 3-column board feed ───
+      // Powers the new kitchen.html kanban (queue / cooking / ready).
+      // Uses the same kitchen-lib filter + ticket builder as the secure
+      // kitchenQueue, but needs NO token (the page has its own simple
+      // admin-style login). Returns full tickets incl. recipe courses.
+      case 'kitchenBoard': {
+        const url = `${SUPABASE_URL}/rest/v1/orders`
+          + `?payment_status=in.(paid,pending)`
+          + `&select=*&order=created_at.desc&limit=200`;
+        const { data: rows } = await K.sbFetch(url, SB);
+        if (!Array.isArray(rows)) return reply(200, { tickets: [], metrics: {} });
 
-      // ═══ রান্নাঘর v2 — unified kitchen system ═══
+        const wanted = ['queued', 'claimed', 'preparing', 'ready', 'out_for_delivery'];
+        const filtered = rows.filter(o => {
+          if (!K.kitchenQueueFilter(o)) return false;
+          const ks = o.kitchen_status || 'queued';
+          return wanted.includes(ks);
+        });
+
+        // attach customer names
+        const custIds = [...new Set(filtered.map(o => o.customer_id).filter(Boolean))];
+        const custMap = {};
+        if (custIds.length) {
+          const cidList = custIds.map(encodeURIComponent).join(',');
+          const { data: cl } = await K.sbFetch(
+            `${SUPABASE_URL}/rest/v1/customers?id=in.(${cidList})&select=id,full_name,phone`, SB);
+          if (Array.isArray(cl)) cl.forEach(c => { custMap[c.id] = c; });
+        }
+
+        const tickets = filtered.map(o => K.buildOrderTicket(o, custMap[o.customer_id] || {}));
+        const metrics = {
+          queued:    tickets.filter(t => ['queued', 'claimed'].includes(t.status)).length,
+          preparing: tickets.filter(t => t.status === 'preparing').length,
+          ready:     tickets.filter(t => ['ready', 'out_for_delivery'].includes(t.status)).length,
+          total:     tickets.length,
+        };
+        return reply(200, { ok: true, tickets, metrics });
+      }
+
+      // ── 4e. kitchenAdvance — token-free status change ───────
+      // Moves an order between columns (queued→preparing→ready→served)
+      // or declines it. Mirrors order status via kitchen-lib so the
+      // track page sees "delivered" when served. No token (simple login).
+      case 'kitchenAdvance': {
+        const realId = String(p.id || '').split('_')[0];
+        if (!realId) return reply(400, { ok: false, error: 'no_id' });
+        if (!K.KITCHEN_STATUSES.includes(p.status)) {
+          return reply(400, { ok: false, error: 'invalid_status' });
+        }
+        const cur = await K.getOrderById(SUPABASE_URL, SB, realId);
+        if (!cur) return reply(404, { ok: false, error: 'not_found' });
+
+        const staff = { staff_name: p.staff_name || 'kitchen' };
+        const built = K.buildStatusPatch(p.status, staff, {
+          claimed_by:  p.staff_name || 'kitchen',
+          assigned_by: p.staff_name || 'kitchen',
+          eta_minutes: p.eta_minutes || cur.estimated_time_minutes || 15,
+          verified:    true,             // simple board auto-verifies on ready
+          require_verification: false,
+        });
+        if (built.error) return reply(400, { ok: false, error: built.error });
+
+        const { ok } = await K.sbFetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(realId)}`, SB, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=minimal' },
+            body: JSON.stringify(built.patch),
+          });
+        return reply(ok ? 200 : 400, { ok, status: p.status, order_status: built.patch.status || null });
+      }
+
+
+      // ═══ রান্নাঘর v2 — unified kitchen system (token-secured) ═══
 
       case 'kitchenQueue': {
         const session = await K.validateSession(SUPABASE_URL, SB, p.token);
