@@ -2,794 +2,479 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://xlkrggspepnysbouatec.supabase.co; img-src 'self' data:;">
-<title>SAR রান্নাঘর · Kitchen Command</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>রান্নাঘর — Kitchen Recipe Ticket · SAR</title>
 <style>
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');font-weight:400;font-display:swap}
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Space+Mono:wght@400;700&display=swap');
+
 :root{
-  --bg:#0a0e13;--surface:#121820;--surface2:#1a2330;--line:#2a3644;
-  --ink:#f0f4f8;--muted:#8fa3b8;--dim:#5c7084;
-  --brand:#e8893b;--blue:#4aa3df;--green:#3ecf8e;--amber:#f5b73c;--red:#e2604f;--purple:#a78bfa;
-  --radius:12px;--shadow:0 8px 32px rgba(0,0,0,.35);
+  /* kitchen = steel/ticket palette: cooler, higher-contrast, print-friendly */
+  --steel:#1C2230;--steel-2:#2C3346;--slate:#3D4660;
+  --paper:#F6F4EF;--ticket:#FFFFFF;--line:#E2DDD2;--line-d:#CFC8BA;
+  --ink:#1A1D26;--ink-2:#5A5566;
+  --amber:#E2620A;--amber-soft:#FFEAD8;
+  --green:#1C7A4B;--green-soft:#E4F6EC;
+  --red:#C2334E;--red-soft:#FDE7EC;
+  --blue:#2456A6;--blue-soft:#E4EDFA;
+  --mono:'Space Mono',monospace;
+  --shadow:0 4px 22px rgba(28,34,48,.08);
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"SolaimanLipi","Hind Siliguri",system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-.num{font-variant-numeric:tabular-nums}
-.hidden{display:none!important}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+.num{font-family:var(--mono)}
+.serif{font-family:'Playfair Display',serif}
 
-/* ── Login ── */
-.login-wrap{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1.5rem}
-.login-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:2rem;max-width:400px;width:100%;box-shadow:var(--shadow)}
-.login-card h1{font-size:1.4rem;margin-bottom:.25rem;text-align:center}
-.login-card .sub{color:var(--muted);font-size:.82rem;text-align:center;margin-bottom:1.5rem}
-.login-field{margin-bottom:1rem}
-.login-field label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.35rem}
-.login-field input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:.75rem .9rem;color:var(--ink);font-family:inherit;font-size:.9rem}
-.login-btn{width:100%;background:var(--brand);color:#0c1116;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:.5rem}
-.login-err{background:rgba(226,96,79,.12);border:1px solid rgba(226,96,79,.3);color:var(--red);border-radius:8px;padding:.65rem;font-size:.8rem;margin-top:.75rem;display:none;text-align:center}
-.login-err.show{display:block}
+/* top steel bar */
+.kbar{background:var(--steel);color:#fff;position:sticky;top:0;z-index:40}
+.kbar-in{max-width:1100px;margin:0 auto;padding:.75rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.kbrand{display:flex;align-items:center;gap:.7rem}
+.kmark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#FF7A1A,#2EA86B);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.kbrand b{font-size:1.05rem;letter-spacing:-.01em}
+.kbrand small{display:block;font-size:.64rem;opacity:.7;letter-spacing:.06em;font-weight:400}
+.kbadge{font-size:.66rem;font-weight:700;background:var(--red);padding:.2rem .55rem;border-radius:6px;letter-spacing:.05em;margin-left:.4rem}
+.kclock{font-family:var(--mono);font-size:.85rem;opacity:.85}
+.kactions{display:flex;gap:.5rem}
+.kbtn{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;padding:.45rem .9rem;border-radius:8px;transition:.15s}
+.kbtn:hover{background:rgba(255,255,255,.16)}
+.kbtn.print{background:#fff;color:var(--steel);border-color:#fff}
 
-/* ── Header ── */
-.hdr{display:flex;align-items:center;gap:.75rem;padding:.7rem 1rem;background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:.6rem}
-.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--brand),#c96a20);display:grid;place-items:center;font-size:1.1rem}
-.logo b{font-size:1.05rem;display:block;line-height:1.2}
-.logo span{font-size:.68rem;color:var(--muted)}
-.live-pill{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:.25rem .65rem}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.spacer{flex:1}
-.hdr-actions{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
-.who{font-size:.74rem;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:.35rem .65rem}
-.who b{color:var(--amber)}
-.btn{background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:.45rem .75rem;font-size:.78rem;cursor:pointer;font-family:inherit}
-.btn:hover{border-color:var(--blue)}
-.btn.primary{background:var(--blue);color:#fff;border-color:transparent}
-.btn.ghost{background:transparent;color:var(--muted)}
+.wrap{max-width:1100px;margin:0 auto;padding:1.4rem 1.25rem 3rem}
 
-/* ── Metrics dashboard ── */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;padding:.75rem 1rem;background:var(--bg);border-bottom:1px solid var(--line)}
-.metric{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:.75rem .85rem}
-.metric .lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.metric .val{font-size:1.5rem;font-weight:700;margin-top:.15rem;line-height:1}
-.metric .val.amber{color:var(--amber)}.metric .val.orange{color:var(--brand)}.metric .val.green{color:var(--green)}.metric .val.blue{color:var(--blue)}.metric .val.purple{color:var(--purple)}
+/* order header / ticket meta */
+.ohead{background:var(--steel-2);color:#fff;border-radius:16px 16px 0 0;padding:1.1rem 1.3rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.ohead .oid{font-family:var(--mono);font-size:.78rem;opacity:.7;letter-spacing:.04em}
+.ohead h1{font-size:1.45rem;font-weight:700;margin-top:.15rem}
+.ohead .ometa{display:flex;gap:1.3rem;flex-wrap:wrap;margin-top:.55rem;font-size:.82rem;opacity:.92}
+.ohead .ometa b{font-family:var(--mono)}
+.ostamp{text-align:right;font-size:.74rem;opacity:.8}
+.ostamp .big{font-family:var(--mono);font-size:1.5rem;font-weight:700;opacity:1;display:block;line-height:1}
 
-/* ── Toolbar ── */
-.toolbar{display:flex;gap:.5rem;padding:.6rem 1rem;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);background:var(--surface)}
-.toolbar input,.toolbar select{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:.45rem .7rem;color:var(--ink);font-family:inherit;font-size:.8rem}
-.toolbar input{min-width:180px;flex:1;max-width:280px}
-.toolbar label{font-size:.72rem;color:var(--muted)}
+/* diet compliance strip — what the kitchen MUST honor */
+.compliance{background:var(--steel);color:#dfe6f2;padding:.7rem 1.3rem;display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;font-size:.74rem}
+.compliance .cl{font-weight:700;opacity:.7;margin-right:.3rem}
+.ctag{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:.15rem .5rem;border-radius:14px;font-weight:700}
+.ctag.allow{background:var(--green-soft);color:var(--green);border-color:transparent}
 
-/* ── Kanban ── */
-.board-wrap{flex:1;overflow:auto;padding:.75rem}
-.board{display:grid;grid-template-columns:repeat(5,minmax(260px,1fr));gap:.65rem;min-height:calc(100vh - 280px)}
-@media(max-width:1400px){.board{grid-template-columns:repeat(5,minmax(240px,1fr));min-width:1200px}}
-@media(max-width:760px){.board{grid-template-columns:1fr;min-width:0}}
-.col{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;max-height:calc(100vh - 260px)}
-.col-head{padding:.65rem .85rem;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.45rem;flex:none}
-.col-dot{width:8px;height:8px;border-radius:50%}
-.col-head b{font-size:.85rem;flex:1}
-.col-count{font-size:.72rem;color:var(--muted);background:var(--surface2);border-radius:999px;padding:.1rem .5rem}
-.col-body{flex:1;overflow-y:auto;padding:.55rem;display:flex;flex-direction:column;gap:.55rem;min-height:80px}
-.col-body.drag-over{background:rgba(74,163,223,.06);outline:2px dashed var(--blue);outline-offset:-4px;border-radius:0 0 var(--radius) var(--radius)}
-.col-empty{color:var(--dim);text-align:center;padding:2rem .5rem;font-size:.8rem}
+/* per-meal recipe ticket */
+.ticket{background:var(--ticket);border:1px solid var(--line);border-top:none;box-shadow:var(--shadow)}
+.ticket:last-of-type{border-radius:0 0 16px 16px}
+.t-head{display:flex;align-items:center;gap:.7rem;padding:1rem 1.3rem;border-bottom:1px dashed var(--line-d);background:var(--paper)}
+.t-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+.t-ic.b{background:var(--amber-soft)}.t-ic.l{background:var(--green-soft)}.t-ic.d{background:var(--red-soft)}
+.t-h-txt{flex:1}
+.t-meal{font-size:.7rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+.t-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700}
+.t-name small{font-family:'SolaimanLipi';font-size:.8rem;color:var(--ink-2);font-weight:400}
+.t-portion{text-align:right;font-size:.72rem;color:var(--ink-2)}
+.t-portion b{font-family:var(--mono);font-size:1.1rem;color:var(--amber);display:block}
 
-/* ── Order card ── */
-.card{background:var(--surface2);border:1px solid var(--line);border-radius:10px;cursor:grab;transition:box-shadow .15s,border-color .15s}
-.card:active{cursor:grabbing}
-.card.dragging{opacity:.45}
-.card.rush{border-color:var(--red);box-shadow:0 0 0 1px rgba(226,96,79,.3)}
-.card.priority{border-left:3px solid var(--amber)}
-.card-head{padding:.6rem .75rem;border-bottom:1px solid var(--line)}
-.card-top{display:flex;align-items:flex-start;gap:.4rem}
-.card-no{font-weight:700;font-size:.88rem}
-.card-badges{display:flex;gap:.25rem;flex-wrap:wrap;margin-left:auto}
-.badge{font-size:.62rem;border-radius:4px;padding:.1rem .35rem;border:1px solid var(--line);color:var(--muted)}
-.badge.cod{color:var(--amber);border-color:rgba(245,183,60,.4)}
-.badge.paid{color:var(--green);border-color:rgba(62,207,142,.4)}
-.badge.rush{color:var(--red);border-color:rgba(226,96,79,.4)}
-.card-cust{font-size:.78rem;color:var(--blue);font-weight:600;margin-top:.25rem}
-.card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:.35rem;font-size:.7rem;color:var(--muted)}
-.age{padding:.1rem .4rem;border-radius:4px;background:var(--surface)}
-.age.warn{background:rgba(245,183,60,.15);color:var(--amber)}
-.age.late{background:rgba(226,96,79,.15);color:var(--red)}
-.card-assign{font-size:.72rem;color:var(--brand);margin-top:.3rem}
-.card-eta{font-size:.68rem;color:var(--muted)}
+.t-body{padding:1.1rem 1.3rem;display:grid;grid-template-columns:1.15fr 1fr;gap:1.4rem}
+@media(max-width:760px){.t-body{grid-template-columns:1fr}}
 
-.card-sections{padding:0 .75rem}
-.acc{border-top:1px solid var(--line)}
-.acc-btn{width:100%;background:none;border:none;color:var(--muted);font-family:inherit;font-size:.74rem;padding:.5rem 0;text-align:left;cursor:pointer;display:flex;align-items:center;gap:.4rem}
-.acc-btn:hover{color:var(--ink)}
-.acc-body{display:none;padding-bottom:.55rem;font-size:.76rem;color:var(--muted);line-height:1.5}
-.acc.open .acc-body{display:block}
-.acc.open .acc-btn{color:var(--ink)}
-.item-row{padding:.25rem 0;border-bottom:1px dashed var(--line)}
-.item-row:last-child{border:none}
-.chip-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.35rem}
-.chip{font-size:.65rem;border:1px solid var(--line);border-radius:4px;padding:.08rem .35rem}
+.blk-h{font-size:.72rem;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
+.blk-h::before{content:'';width:14px;height:2px;background:var(--amber);border-radius:2px}
 
-.card-foot{display:flex;flex-wrap:wrap;gap:.35rem;padding:.55rem .75rem;border-top:1px solid var(--line)}
-.act{border:none;border-radius:8px;padding:.45rem .65rem;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit;color:#0c1116}
-.act.primary{background:var(--brand)}
-.act.green{background:var(--green)}
-.act.blue{background:var(--blue);color:#fff}
-.act.red{background:transparent;color:var(--red);border:1px solid rgba(226,96,79,.4)}
-.act.ghost{background:var(--surface);color:var(--muted);border:1px solid var(--line)}
-.act:disabled{opacity:.4;cursor:not-allowed}
-.lockmsg{flex:1;font-size:.72rem;color:var(--dim);text-align:center;padding:.45rem}
+/* ingredient + amount table (KITCHEN ONLY) */
+.ing-tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.ing-tbl th{text-align:left;font-size:.66rem;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;padding:.3rem .4rem;border-bottom:1px solid var(--line)}
+.ing-tbl th.r,.ing-tbl td.r{text-align:right}
+.ing-tbl td{padding:.4rem .4rem;border-bottom:1px solid var(--line)}
+.ing-tbl tr:last-child td{border-bottom:none}
+.ing-tbl .amt{font-family:var(--mono);font-weight:700;color:var(--steel)}
+.ing-tbl .course-row td{background:var(--paper);font-weight:700;font-size:.72rem;color:var(--amber);text-transform:uppercase;letter-spacing:.04em}
+.med-tag{font-size:.62rem;font-weight:700;color:var(--green);background:var(--green-soft);padding:.05rem .35rem;border-radius:10px;margin-left:.3rem}
 
-/* ── Modals / panels ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;z-index:200;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
-.overlay.show{display:flex}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:640px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
-.panel.wide{max-width:780px}
-.panel-head{display:flex;align-items:center;padding:.85rem 1rem;border-bottom:1px solid var(--line);gap:.5rem}
-.panel-head b{flex:1;font-size:1rem}
-.panel-close{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1}
-.panel-body{padding:1rem;overflow-y:auto;flex:1}
-.panel-foot{padding:.85rem 1rem;border-top:1px solid var(--line)}
-.recipe-block{border-top:1px dashed var(--line);padding:.75rem 0}
-.recipe-block:first-child{border:none;padding-top:0}
-.recipe-block h4{font-size:.88rem;margin-bottom:.35rem;color:var(--amber)}
-.ing-list{display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0}
-.ing{background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:.15rem .5rem;font-size:.76rem}
-.steps{list-style:none;margin:.4rem 0}
-.steps li{font-size:.78rem;color:var(--muted);padding:.2rem 0 .2rem 1rem;position:relative}
-.steps li:before{content:"›";position:absolute;left:0;color:var(--dim)}
-.check-row{display:flex;align-items:center;gap:.55rem;padding:.45rem 0;border-top:1px solid var(--line)}
-.check-row input{width:16px;height:16px}
+/* cooking process steps */
+.steps{counter-reset:s;display:flex;flex-direction:column;gap:.6rem}
+.step{display:flex;gap:.7rem;font-size:.86rem}
+.step::before{counter-increment:s;content:counter(s);flex-shrink:0;width:24px;height:24px;border-radius:8px;background:var(--steel);color:#fff;font-family:var(--mono);font-size:.78rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step b{color:var(--steel)}
+.method-note{margin-top:.7rem;background:var(--blue-soft);border:1px solid #cfe;border-radius:10px;padding:.55rem .7rem;font-size:.76rem;color:var(--blue);font-weight:700;display:flex;gap:.45rem}
 
-.toast{position:fixed;bottom:1.2rem;right:1.2rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:.65rem 1rem;font-size:.8rem;z-index:400;transform:translateY(120%);transition:transform .25s;max-width:320px;box-shadow:var(--shadow)}
-.toast.show{transform:translateY(0)}
-.toast.err{border-color:var(--red);color:var(--red)}
+/* powders / chutney to add (the therapeutic layer the kitchen doses) */
+.dose{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+.dchip{font-size:.74rem;font-weight:700;padding:.22rem .55rem;border-radius:14px}
+.dchip.dis{background:var(--amber-soft);color:var(--amber)}
+.dchip.con{background:var(--red-soft);color:var(--red)}
+.dchip.chu{background:var(--green-soft);color:var(--green)}
 
-/* Display mode (large screen) */
-body.display-mode .metrics{grid-template-columns:repeat(6,1fr)}
-body.display-mode .toolbar{display:none}
-body.display-mode .card{font-size:1.05em}
+/* plating / handoff footer */
+.t-foot{border-top:1px dashed var(--line-d);padding:.8rem 1.3rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;font-size:.78rem;color:var(--ink-2)}
+.t-foot .chk{display:flex;align-items:center;gap:.45rem;font-weight:700;color:var(--steel)}
+.t-foot .chk input{width:18px;height:18px;accent-color:var(--green)}
+
+.empty{background:#fff;border:1px dashed var(--line-d);border-radius:16px;padding:3rem 1.5rem;text-align:center;color:var(--ink-2)}
+.empty b{color:var(--steel);display:block;font-size:1.1rem;margin-bottom:.4rem}
+
+.loader{position:fixed;inset:0;background:rgba(246,244,239,.93);display:none;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:90}
+.loader.show{display:flex}
+.spin{width:46px;height:46px;border:4px solid var(--line);border-top-color:var(--amber);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+.footnote{margin-top:1.5rem;font-size:.76rem;color:var(--ink-2);line-height:1.7}
+.footnote b{color:var(--amber)}
+
+@media print{
+  .kbar,.kactions,.loader,.footnote,.t-foot .chk input{display:none!important}
+  body{background:#fff}
+  .ticket{box-shadow:none;break-inside:avoid}
+  .ohead,.compliance{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ── simple kitchen login (admin-style, no token) ── */
+.klogin{position:fixed;inset:0;z-index:9999;background:rgba(8,11,15,.94);
+  display:flex;align-items:center;justify-content:center;padding:1.2rem}
+.klogin.hidden{display:none}
+.klogin-card{background:var(--panel,#171c24);border:1px solid var(--line,#283341);
+  border-radius:20px;padding:2rem 1.6rem;max-width:360px;width:100%;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.klogin-logo{text-align:center;margin-bottom:1.4rem}
+.klogin-logo .mk{width:58px;height:58px;border-radius:16px;margin:0 auto .7rem;
+  display:grid;place-items:center;font-size:1.5rem;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,#e8893b,#46c08a)}
+.klogin-logo b{font-size:1.15rem}
+.klogin-logo small{display:block;color:var(--ink-3,#6b7c8c);font-size:.74rem;margin-top:.2rem}
+.klogin label{display:block;font-size:.78rem;color:var(--ink-2,#9fb0c0);margin:.8rem 0 .3rem}
+.klogin input{width:100%;background:#0f141a;border:1px solid var(--line,#283341);
+  border-radius:10px;padding:.7rem .9rem;color:#fff;font-family:inherit;font-size:.95rem}
+.klogin input:focus{outline:none;border-color:#e8893b}
+.klogin .kbtn-login{width:100%;margin-top:1.2rem;background:linear-gradient(135deg,#e8893b,#46c08a);
+  color:#fff;border:none;border-radius:10px;padding:.8rem;font-size:.95rem;font-weight:700;
+  cursor:pointer;font-family:inherit}
+.klogin .kbtn-login:hover{filter:brightness(1.08)}
+.klogin .err{display:none;margin-top:.8rem;background:rgba(226,96,79,.12);
+  border:1px solid rgba(226,96,79,.3);border-radius:8px;padding:.55rem .8rem;
+  color:#e2604f;font-size:.82rem;text-align:center}
+.klogin .err.show{display:block}
 </style>
 </head>
 <body>
 
-<div class="login-wrap" id="loginWrap">
-  <div class="login-card">
-    <h1>🍳 SAR রান্নাঘর</h1>
-    <div class="sub">Kitchen Command · স্টাফ লগইন</div>
-    <div class="login-field">
-      <label>ইউজার আইডি (ইমেইল বা ফোন)</label>
-      <input id="loginUser" type="text" placeholder="email@example.com বা 01XXXXXXXXX" autocomplete="username">
+<!-- ── simple kitchen login gate (admin-style; no server token) ── -->
+<div class="klogin" id="kLogin">
+  <div class="klogin-card">
+    <div class="klogin-logo">
+      <div class="mk">🍳</div>
+      <b>SAR রান্নাঘর</b>
+      <small>Kitchen Login · স্টাফ প্রবেশ</small>
     </div>
-    <div class="login-field">
-      <label>পাসওয়ার্ড</label>
-      <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+    <label for="kUser">ইউজার আইডি</label>
+    <input id="kUser" type="text" placeholder="user id" autocomplete="username">
+    <label for="kPass">পাসওয়ার্ড</label>
+    <input id="kPass" type="password" placeholder="••••••••" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')kitchenLogin()">
+    <button class="kbtn-login" onclick="kitchenLogin()">প্রবেশ করুন →</button>
+    <div class="err" id="kLoginErr">ভুল ইউজার আইডি বা পাসওয়ার্ড</div>
+  </div>
+</div>
+
+<div class="kbar">
+  <div class="kbar-in">
+    <div class="kbrand">
+      <span class="kmark">সা</span>
+      <div><b>SAR Kitchen<span class="kbadge">RECIPE TICKET</span></b><small>রান্নাঘর · গোপনীয় — গ্রাহক দেখেন না</small></div>
     </div>
-    <button class="login-btn" id="loginBtn" type="button">লগইন করুন →</button>
-    <div class="login-err" id="loginErr"></div>
-  </div>
-</div>
-
-<header class="hdr">
-  <div class="logo">
-    <div class="logo-mark">🍳</div>
-    <div><b>SAR রান্নাঘর</b><span>Kitchen Command Center</span></div>
-  </div>
-  <div class="live-pill"><span class="dot"></span> লাইভ</div>
-  <div class="spacer"></div>
-  <span class="who">স্টাফ: <b id="whoName">—</b></span>
-  <div class="hdr-actions">
-    <button class="btn" id="btnDisplay" type="button" title="বড় ডিসপ্লে মোড">📺</button>
-    <button class="btn" id="btnRefresh" type="button">↻ রিফ্রেশ</button>
-    <button class="btn ghost" id="btnLogout" type="button">লগআউট</button>
-  </div>
-</header>
-
-<section class="metrics" id="metrics">
-  <div class="metric"><div class="lbl">নতুন</div><div class="val amber num" id="m-queued">০</div></div>
-  <div class="metric"><div class="lbl">দাবি করা</div><div class="val purple num" id="m-claimed">০</div></div>
-  <div class="metric"><div class="lbl">রান্না হচ্ছে</div><div class="val orange num" id="m-preparing">০</div></div>
-  <div class="metric"><div class="lbl">প্রস্তুত</div><div class="val green num" id="m-ready">০</div></div>
-  <div class="metric"><div class="lbl">ডেলিভারিতে</div><div class="val blue num" id="m-ofd">০</div></div>
-  <div class="metric"><div class="lbl">সক্রিয় রাঁধুনি</div><div class="val num" id="m-cooks">০</div></div>
-</section>
-
-<div class="toolbar">
-  <input type="search" id="searchInput" placeholder="🔍 অর্ডার নম্বর খুঁজুন...">
-  <select id="filterStatus"><option value="">সব স্ট্যাটাস</option></select>
-  <select id="filterCook"><option value="">সব রাঁধুনি</option></select>
-  <label><input type="checkbox" id="filterRush"> রাশ</label>
-  <label><input type="checkbox" id="filterPriority"> অগ্রাধিকার</label>
-  <button class="btn" id="btnSound" type="button">🔔 সাউন্ড</button>
-</div>
-
-<div class="board-wrap">
-  <div class="board" id="board">
-    <div class="col" data-status="queued"><div class="col-head"><span class="col-dot" style="background:var(--amber)"></span><b>নতুন অর্ডার</b><span class="col-count num" id="n-queued">০</span></div><div class="col-body" id="col-queued"></div></div>
-    <div class="col" data-status="claimed"><div class="col-head"><span class="col-dot" style="background:var(--purple)"></span><b>দাবি করা</b><span class="col-count num" id="n-claimed">০</span></div><div class="col-body" id="col-claimed"></div></div>
-    <div class="col" data-status="preparing"><div class="col-head"><span class="col-dot" style="background:var(--brand)"></span><b>রান্না হচ্ছে</b><span class="col-count num" id="n-preparing">০</span></div><div class="col-body" id="col-preparing"></div></div>
-    <div class="col" data-status="ready"><div class="col-head"><span class="col-dot" style="background:var(--green)"></span><b>প্রস্তুত</b><span class="col-count num" id="n-ready">০</span></div><div class="col-body" id="col-ready"></div></div>
-    <div class="col" data-status="out_for_delivery"><div class="col-head"><span class="col-dot" style="background:var(--blue)"></span><b>ডেলিভারিতে</b><span class="col-count num" id="n-ofd">০</span></div><div class="col-body" id="col-ofd"></div></div>
-  </div>
-</div>
-
-<div class="overlay" id="recipeOverlay">
-  <div class="panel wide">
-    <div class="panel-head"><b id="recipeTitle">রেসিপি</b><button class="panel-close" type="button" data-close="recipeOverlay">×</button></div>
-    <div class="panel-body" id="recipeBody"></div>
-    <div class="panel-foot"><button class="btn primary" type="button" onclick="window.print()">🖨️ প্রিন্ট</button></div>
-  </div>
-</div>
-
-<div class="overlay" id="verifyOverlay">
-  <div class="panel">
-    <div class="panel-head"><b id="verifyTitle">চূড়ান্ত যাচাই</b><button class="panel-close" type="button" data-close="verifyOverlay">×</button></div>
-    <div class="panel-body" id="verifyBody"></div>
-    <div class="panel-foot">
-      <button class="act green" id="verifySubmit" type="button" style="width:100%;padding:.7rem" disabled>✓ যাচাই সম্পন্ন করুন</button>
+    <span class="kclock" id="clock">—</span>
+    <div class="kactions">
+      <button class="kbtn" onclick="loadTicket()">↻ রিফ্রেশ</button>
+      <button class="kbtn print" onclick="window.print()">🖨 প্রিন্ট</button>
+      <button class="kbtn" onclick="kitchenLogout()">🚪 লগআউট</button>
     </div>
   </div>
 </div>
 
-<div class="overlay" id="assignOverlay">
-  <div class="panel">
-    <div class="panel-head"><b id="assignTitle">অর্ডার অ্যাসাইন</b><button class="panel-close" type="button" data-close="assignOverlay">×</button></div>
-    <div class="panel-body">
-      <label style="font-size:.78rem;color:var(--muted)">রাঁধুনি নির্বাচন</label>
-      <select id="assignCook" style="width:100%;margin-top:.35rem;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:.55rem;color:var(--ink);font-family:inherit"></select>
-      <label style="font-size:.78rem;color:var(--muted);display:block;margin-top:.85rem">ETA (মিনিট)</label>
-      <input id="assignEta" type="number" value="15" min="5" max="120" style="width:100%;margin-top:.35rem;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:.55rem;color:var(--ink);font-family:inherit">
-    </div>
-    <div class="panel-foot"><button class="act primary" id="assignSubmit" type="button" style="width:100%;padding:.7rem">✓ অ্যাসাইন করুন</button></div>
+<div class="wrap">
+  <div id="ticketRoot">
+    <div class="empty"><b>কোনো অর্ডার লোড হয়নি</b>অর্ডার আইডি দিয়ে লিংক খুলুন — যেমন <span class="num">kitchen.html?order=SAR-1042</span><br>অথবা গ্রাহকের সর্বশেষ অর্ডার স্বয়ংক্রিয়ভাবে লোড হবে।</div>
   </div>
+
+  <p class="footnote">
+    <b>রান্নাঘরের নিয়ম:</b> এই টিকিট প্রতিটি অর্ডারের সাথে স্বয়ংক্রিয়ভাবে তৈরি — শুধুমাত্র অনুমোদিত <b>১০০-উপাদানের মাস্টার তালিকা</b> (+ মৌসুমি ফল) থেকে। সব রান্না <b>আগুনমুক্ত</b> — শুধু স্টিম, বেক বা এয়ার-ফ্রাই; তেল, চিনি, কৃত্রিম রং ও দুধ সম্পূর্ণ নিষিদ্ধ। লবণের বদলে শুধু পিংক সল্ট। অনুমোদিত প্রোটিন/ফ্যাট: মাখন, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম। উপাদানের পরিমাণ গ্রাহকের ভোর ৬টার AI বিশ্লেষণ (BMI, রোগ, গত রাতের ডেটা) অনুযায়ী স্কেল করা — <b>পরিমাণ হুবহু অনুসরণ করুন</b>। থেরাপিউটিক পাউডার ও চাটনি প্লেটিংয়ের ঠিক আগে যোগ করুন, রান্নায় নয়।
+  </p>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="loader" id="loader"><div class="spin"></div><p>রেসিপি টিকিট লোড হচ্ছে…</p></div>
 
 <script>
-(function(){
-'use strict';
-
-const API = '/.netlify/functions/sar';
-const COLS = ['queued','claimed','preparing','ready','out_for_delivery'];
-const STATUS_LABELS = {queued:'নতুন',claimed:'দাবি করা',preparing:'রান্না',ready:'প্রস্তুত',out_for_delivery:'ডেলিভারিতে',served:'সম্পন্ন',declined:'বাতিল'};
-const MEAL = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
-
-let SESSION = { token:'', staff:null, permissions:[] };
-let TICKETS = {};
-let METRICS = {};
-let COOKS = [];
-let lastQueueCount = 0;
-let soundOn = localStorage.getItem('sar_kitchen_sound') !== 'false';
-let refreshTimer = null;
-let verifyOrderId = null;
-let assignOrderId = null;
-let dragId = null;
-
-const $ = id => document.getElementById(id);
-const bn = n => (n == null ? 0 : n).toLocaleString('bn-BD');
-
-function esc(s){
-  if(s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+// ════════════════════════════════════════════════════
+// SAR KITCHEN — recipe ticket generator.
+// Mirrors meal-score.html data model but exposes the RECIPE
+// (ingredients + exact amounts + fire-free cooking process)
+// that the customer never sees. Personalized amounts come from
+// the same 6AM AI factor saved with the order / customer metrics.
+// ════════════════════════════════════════════════════
+const API='/.netlify/functions/sar';
+async function api(action,body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action},body||{}))});
+  if(!r.ok) throw new Error(action+' '+r.status); return r.json();
 }
 
-function toast(msg, isErr){
-  const el = $('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (isErr ? ' err' : '');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 3500);
+// ---- shared therapeutic data (same source of truth as meal-score) ----
+const MEAL_DB={
+  DM:{bn:'ডায়াবেটিস',ingredients:['Pumpkin','Bottle Gourd','Spinach','Chickpea Sprout','Chia Seed','Bitter Gourd','Flax Seed'],
+      protein:'Boneless Fish',disease:['Cinnamon','Fenugreek','Gurmar'],benefits:['Blood Sugar Control','Insulin Sensitivity','Satiety']},
+  OB:{bn:'স্থূলতা',ingredients:['Ash Gourd','Broccoli','Mustard Greens','Green Gram Sprout','Cucumber','Pumpkin Seed','Moringa Leaves'],
+      protein:'Indigenous Egg',disease:['Triphala','Garcinia','Green Tea'],benefits:['Fat Burning','Appetite Control','Metabolism Boost']},
+  FL:{bn:'ফ্যাটি লিভার',ingredients:['Ridge Gourd','Radish','Water Spinach','Lentil Sprout','Amla','Beetroot','Coriander Leaves'],
+      protein:'Boneless Fish',disease:['Milk Thistle','Bhumyamalaki Powder','Turmeric'],benefits:['Liver Detox','ALT Reduction','Fat Flush']},
+  IB:{bn:'IBS/গ্যাস্ট্রিক',ingredients:['Snake Gourd','Carrot','Bael Pulp','Green Gram Sprout','Mint Leaves','Curry Leaves','Peppermint Powder'],
+      protein:'Boneless Indigenous Chicken',disease:['Lemongrass','Licorice','Ginger'],benefits:['Gut Healing','Microbiome Balance','Bloating Relief']},
+  PR:{bn:'গর্ভাবস্থা',ingredients:['Moringa Leaves','Red Spinach','Beetroot','Chickpea Sprout','Almond','Sesame Seed','Dragon Fruit'],
+      protein:'Indigenous Egg',disease:['Shatavari','Moringa Powder','Amla Powder'],benefits:['Iron & Folate','Calcium Support','Fetal Growth']},
+};
+const CONDITION_POWDERS=['Ashwagandha','Tulsi','Brahmi'];
+const SEASONAL_FRUITS={
+  DM:['Guava','Black Berry','Green Apple','Pear'],OB:['Water Melon','Guava','Pear'],
+  FL:['Amla','Black Berry','Guava','Apple'],IB:['Banana','Papaya','Guava'],
+  PR:['Mango','Jackfruit','Pineapple','Banana','Orange'],
+};
+const MEALS=[{key:'breakfast',bn:'সকাল',en:'BREAKFAST',ic:'🌅',cls:'b'},
+             {key:'lunch',bn:'দুপুর',en:'LUNCH',ic:'☀️',cls:'l'},
+             {key:'dinner',bn:'রাত',en:'DINNER',ic:'🌙',cls:'d'}];
+const CAT_BN={DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+
+// base ingredient grams per course slot @ factor 1.0 (kitchen reference weights)
+// course 1 main, 2 protein+sprout, 3 steamed veg, 4 chutney, 5 fruit
+const COURSE_BASE_G={
+  0:[['main veg A',90],['main veg B',70],['therapeutic veg',55]],
+  1:[['sprout/legume',60],['allowed protein',75],['seed',12]],
+  2:[['steamed veg A',80],['steamed veg B',70],['leafy green',40]],
+  3:[['chutney base (herb+amla)',45],['lemon',8],['pink salt',1]],
+  4:[['seasonal fruit',120]],
+};
+const COURSE_LABEL=['থেরাপিউটিক মেইন কোর্স','প্রোটিন ও স্প্রাউট কোর্স','স্টিমড/বেকড সবজি কোর্স','ইমোশনাল চাটনি কোর্স','মৌসুমি ফল কোর্স'];
+
+// SAME rotation pools as meal-score.html (fallback when order has no courseDetail)
+const COURSE_POOLS={
+  DM:{ main:['Bitter Gourd','Bottle Gourd','Pumpkin','Ash Gourd','Ridge Gourd','Snake Gourd','Pointed Gourd'],prot:['Chickpea Sprout','Green Gram Sprout','Boneless Fish','Indigenous Egg','Black Chickpea','Field Pea','Lentil Sprout'],steam:['Broccoli','Cauliflower','Green Beans','Okra','Cabbage','Capsicum','Turnip'],leafy:['Spinach','Mustard Greens','Fenugreek Leaves','Moringa Leaves','Amaranth Leaves'],seed:['Chia Seed','Flax Seed','Pumpkin Seed','Sunflower Seed'] },
+  OB:{ main:['Ash Gourd','Bottle Gourd','Cucumber','Zucchini','Ridge Gourd','Chayote','Pumpkin'],prot:['Green Gram Sprout','Indigenous Egg','Boneless Indigenous Chicken','Mung Bean','Soybean','Cowpea','Lentil Sprout'],steam:['Broccoli','Cauliflower','Cabbage','Green Beans','Capsicum','Okra','Carrot'],leafy:['Mustard Greens','Moringa Leaves','Spinach','Water Spinach','Malabar Spinach'],seed:['Pumpkin Seed','Flax Seed','Sunflower Seed','Watermelon Seed'] },
+  FL:{ main:['Ridge Gourd','Bottle Gourd','Snake Gourd','Pointed Gourd','Ash Gourd','Bitter Gourd','Radish'],prot:['Lentil Sprout','Boneless Fish','Green Gram Sprout','Red Lentil','Mung Bean','Chickpea Sprout','Indigenous Egg'],steam:['Beetroot','Radish','Carrot','Broccoli','Cauliflower','Green Papaya','Turnip'],leafy:['Water Spinach','Coriander Leaves','Spinach','Amaranth Leaves','Mint Leaves'],seed:['Flax Seed','Sunflower Seed','Pumpkin Seed','Basil Seed'] },
+  IB:{ main:['Snake Gourd','Bottle Gourd','Pointed Gourd','Ridge Gourd','Green Papaya','Carrot','Ash Gourd'],prot:['Green Gram Sprout','Boneless Indigenous Chicken','Mung Bean','Lentil Sprout','Indigenous Egg','Red Lentil','Boneless Fish'],steam:['Carrot','Green Papaya','Raw Banana','Sweet Potato','Turnip','Green Beans','Drumstick'],leafy:['Mint Leaves','Curry Leaves','Coriander Leaves','Spinach','Malabar Spinach'],seed:['Flax Seed','Basil Seed','Sunflower Seed','Pumpkin Seed'] },
+  PR:{ main:['Pumpkin','Bottle Gourd','Drumstick','Sweet Potato','Green Papaya','Carrot','Beetroot'],prot:['Chickpea Sprout','Indigenous Egg','Boneless Fish','Almond','Lentil Sprout','Mung Bean','Black Chickpea'],steam:['Beetroot','Carrot','Broccoli','Green Beans','Drumstick','Sweet Potato','Capsicum'],leafy:['Moringa Leaves','Red Spinach','Spinach','Amaranth Leaves','Fenugreek Leaves'],seed:['Sesame Seed','Almond','Sunflower Seed','Watermelon Seed'] },
+};
+function conditionOffset(m){let o=0;const stress=+(m.stress_level||0),sleep=+(m.sleep_hours||m.sleep||7),mood=(m.mood||'').toString();if(stress>=7)o+=2;else if(stress>=4)o+=1;if(sleep<6)o+=1;if(/low|tired|ক্লান্ত|খারাপ/i.test(mood))o+=1;if(m.bloating&&/yes|হ্যাঁ/i.test(String(m.bloating)))o+=1;return o;}
+function rotPick(pool,day,off,count){if(!pool||!pool.length)return[];const out=[],n=pool.length;for(let i=0;i<count;i++)out.push(pool[(day+off+i)%n]);return out;}
+// rebuild this day's courses if the order didn't carry courseDetail
+function rebuildCourses(cat,di,mealKey){
+  const pools=COURSE_POOLS[cat]||COURSE_POOLS.DM;
+  const off=conditionOffset(metrics), mShift={breakfast:0,lunch:2,dinner:4}[mealKey]||0, seed=di+off+mShift;
+  const fruits=SEASONAL_FRUITS[cat]||SEASONAL_FRUITS.DM;
+  return [
+    {name:'থেরাপিউটিক মেইন কোর্স',items:rotPick(pools.main,seed,0,2).concat(rotPick(pools.leafy,seed,0,1))},
+    {name:'প্রোটিন ও স্প্রাউট কোর্স',items:rotPick(pools.prot,seed,0,2).concat(rotPick(pools.seed,seed,0,1))},
+    {name:'স্টিমড/বেকড সবজি কোর্স',items:rotPick(pools.steam,seed,0,2)},
+    {name:'ইমোশনাল চাটনি কোর্স',items:['Herb + Amla চাটনি','Lemon','Pink Salt']},
+    {name:'মৌসুমি ফল কোর্স',items:[fruits[seed%fruits.length]]},
+  ];
+}
+// per-item base grams (factor-scaled), matched positionally to course items
+const SLOT_G=[ [90,70,55], [60,75,12], [80,70], [45,8,1], [120] ];
+
+const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
+function isoWeek(d){d=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil(((d-ys)/86400000+1)/7);}
+
+// fire-free cooking method per meal type — STEAM / BAKE / AIR-FRY only
+function methodFor(mealKey,cat){
+  const db=MEAL_DB[cat]||MEAL_DB.DM;
+  const prot=db.protein;
+  const base=[
+    {t:'সব সবজি ধুয়ে সমান টুকরা করুন — গ্রামে ওজন মেপে নিন (নিচের পরিমাণ অনুযায়ী)।'},
+    {t:'<b>স্টিমার</b>-এ মেইন ও স্টিমড কোর্সের সবজি ৮–১০ মিনিট ভাপে সিদ্ধ করুন। তেল ব্যবহার নিষিদ্ধ।'},
+  ];
+  if(/Fish/i.test(prot)) base.push({t:'<b>বোনলেস মাছ</b> হলুদ+পিংক সল্ট মাখিয়ে <b>স্টিম বা বেক</b> করুন (১৮০°C, ১২ মিনিট) — ভাজা নয়।'});
+  else if(/Chicken/i.test(prot)) base.push({t:'<b>দেশি মুরগি (boneless)</b> স্টিম-ম্যারিনেট করে <b>এয়ার-ফ্রাই/বেক</b> করুন (১৮০°C, ১৪ মিনিট)।'});
+  else base.push({t:'<b>দেশি ডিম</b> সিদ্ধ বা স্টিম করুন (তেল ছাড়া)।'});
+  base.push({t:'স্প্রাউট/ডাল হালকা ভাপ দিন; বীজ শুকনো টেলে (টেলা যাবে, তেল ছাড়া) উপরে ছড়িয়ে দিন।'});
+  base.push({t:'চাটনি কোর্স — ভেষজ, আমলকি, লেবু ও পিংক সল্ট ঠান্ডা ব্লেন্ড করুন। রান্না নয়।'});
+  base.push({t:'<b>থেরাপিউটিক ও কন্ডিশন পাউডার এবং চাটনি প্লেটিংয়ের ঠিক আগে যোগ করুন</b> — তাপে নয়, যাতে গুণ নষ্ট না হয়।'});
+  return base;
 }
 
-async function api(action, body){
-  const r = await fetch(API, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(Object.assign({action}, body||{}))
+let order=null, metrics={}, factor=1;
+
+// ── simple kitchen login (admin-style: client creds + sessionStorage) ──
+// NOTE: this is a lightweight gate like the admin page, NOT the server
+// token system. Good enough to keep the recipe ticket out of casual view.
+// To change who can log in, edit KITCHEN_CREDS below.
+const KITCHEN_CREDS=[
+  {user:'kitchen', pass:'sar2024'},
+  {user:'cook',    pass:'sar2024'},
+  {user:'tutul',   pass:'aimthm@2008'},   // super admin can also enter
+];
+function kitchenLogin(){
+  const u=(document.getElementById('kUser').value||'').trim();
+  const p=(document.getElementById('kPass').value||'');
+  const err=document.getElementById('kLoginErr');
+  const ok=KITCHEN_CREDS.find(c=>c.user===u && c.pass===p);
+  if(ok){
+    sessionStorage.setItem('sar_kitchen_user', JSON.stringify({user:u, at:Date.now()}));
+    document.getElementById('kLogin').classList.add('hidden');
+    startKitchen();
+  }else{
+    err.textContent='❌ ভুল ইউজার আইডি বা পাসওয়ার্ড';
+    err.classList.add('show');
+    document.getElementById('kPass').value='';
+    setTimeout(()=>err.classList.remove('show'),4000);
+  }
+}
+function kitchenLogout(){
+  sessionStorage.removeItem('sar_kitchen_user');
+  document.getElementById('kLogin').classList.remove('hidden');
+}
+// start clock + load ticket — only after a valid session
+function startKitchen(){tick();setInterval(tick,1000);loadTicket();}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  // restore session if already logged in this browser tab
+  const saved=sessionStorage.getItem('sar_kitchen_user');
+  if(saved){
+    document.getElementById('kLogin').classList.add('hidden');
+    startKitchen();
+  }else{
+    // show login; clock still ticks behind the overlay is fine but we
+    // wait for login before fetching any order/recipe data.
+    const u=document.getElementById('kUser'); if(u) u.focus();
+  }
+});
+function tick(){const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('bn-BD');}
+function showLoader(b){document.getElementById('loader').classList.toggle('show',b);}
+
+async function loadTicket(){
+  showLoader(true);
+  const qs=new URLSearchParams(location.search);
+  const orderId=qs.get('order')||localStorage.getItem('sar_last_order_id');
+  const sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const cid=qs.get('customer')||sc.id||localStorage.getItem('sar_customer_id')||'demo';
+
+  // 1) pull the order (items + saved analysis factor); fall back to local cart
+  try{
+    if(orderId){const r=await api('getOrder',{order_id:orderId});if(r&&r.order)order=r.order;}
+  }catch(e){}
+  if(!order){
+    const localCart=JSON.parse(localStorage.getItem('sar_cart')||localStorage.getItem('sar_ms_cart')||'[]');
+    const payload=JSON.parse(localStorage.getItem('sar_order_payload')||'null');
+    if(payload){order={id:orderId||'LOCAL-DRAFT',customer_id:cid,items:payload.items,total:payload.total,meal_date:payload.meal_date,note:payload.note};}
+    else if(localCart.length){order={id:'LOCAL-DRAFT',customer_id:cid,items:localCart,meal_date:new Date().toISOString().slice(0,10),note:'Local draft'};}
+  }
+
+  // 2) pull metrics + saved 6AM score to recover the personalization factor
+  try{const m=await api('metrics',{customer_id:cid});metrics=m.metrics||{};}catch(e){metrics={};}
+  try{const s=await api('getScore',{customer_id:cid});if(s&&s.score){const t=s.score.daily_kcal||1500;factor=Math.max(0.8,Math.min(1.3,t/1500));}}
+  catch(e){const t=estimateTarget(metrics);factor=Math.max(0.8,Math.min(1.3,t/1500));}
+
+  render();
+  showLoader(false);
+}
+function estimateTarget(m){const bmi=+m.bmi||23;let t=1650;if(bmi>=30)t=1350;else if(bmi>=25)t=1450;else if(bmi<18.5)t=1750;return t;}
+
+function render(){
+  const root=document.getElementById('ticketRoot');
+  if(!order||!order.items||!order.items.length){
+    root.innerHTML='<div class="empty"><b>কোনো অর্ডার পাওয়া যায়নি</b>অর্ডার আইডি দিয়ে খুলুন: <span class="num">kitchen.html?order=SAR-XXXX</span></div>';
+    return;
+  }
+  const cat=(order.items[0]&&order.items[0].cat)||detectCat(metrics);
+  const wk=isoWeek(new Date());
+  const date=order.meal_date||new Date().toISOString().slice(0,10);
+  const cname=metrics.full_name||(JSON.parse(localStorage.getItem('sar_customer')||'{}').full_name)||'গ্রাহক';
+
+  let html='<div class="ohead">'+
+    '<div><div class="oid">ORDER # '+(order.id||'—')+' · সপ্তাহ '+bn(wk)+'</div>'+
+      '<h1>'+cname+' — '+(CAT_BN[cat]||cat)+' প্ল্যান</h1>'+
+      '<div class="ometa"><span>তারিখ <b>'+date+'</b></span>'+
+        '<span>BMI <b>'+(metrics.bmi||'—')+'</b></span>'+
+        '<span>পরিমাণ ফ্যাক্টর <b>×'+factor.toFixed(2)+'</b></span>'+
+        '<span>আইটেম <b>'+bn(order.items.length)+'</b></span></div></div>'+
+    '<div class="ostamp">ভোর ৬:০০ AI স্কেলড<span class="big">×'+factor.toFixed(2)+'</span>পরিমাণ গ্রাহক-নির্দিষ্ট</div>'+
+  '</div>';
+
+  // compliance strip — non-negotiable kitchen rules
+  html+='<div class="compliance"><span class="cl">আবশ্যক:</span>'+
+    ['তেলমুক্ত','চিনিমুক্ত','রংমুক্ত','দুধমুক্ত','আগুনমুক্ত (Steam/Bake/Air-fry)','অর্গানিক','আয়ুর্বেদিক','পিংক সল্ট']
+      .map(c=>'<span class="ctag">'+c+'</span>').join('')+
+    '<span class="cl" style="margin-left:.6rem">অনুমোদিত:</span>'+
+    ['মাখন','বোনলেস মাছ','দেশি মুরগি','দেশি ডিম','মৌসুমি ফল']
+      .map(c=>'<span class="ctag allow">'+c+'</span>').join('')+
+  '</div>';
+
+  // one ticket per ordered item
+  order.items.forEach((it,ix)=>{html+=ticket(it,cat,ix);});
+  root.innerHTML=html;
+}
+
+function detectCat(m){
+  if(m.pregnancy_status&&m.pregnancy_status!=='না')return 'PR';
+  if(m.diabetes_type&&m.diabetes_type!=='না')return 'DM';
+  if(m.fatty_liver_grade&&m.fatty_liver_grade!=='না')return 'FL';
+  if(m.ibs_type&&m.ibs_type!=='না')return 'IB';
+  if(m.bmi&&+m.bmi>=25)return 'OB';
+  return 'DM';
+}
+
+function ticket(it,fallbackCat,ix){
+  const cat=it.cat||fallbackCat;
+  const db=MEAL_DB[cat]||MEAL_DB.DM;
+  const mealKey=it.meal||'lunch';
+  const meal=MEALS.find(m=>m.key===mealKey)||MEALS[1];
+  const courseCount=it.courseCount||(it.courses?it.courses.length:3);
+  const di=(it.day_index!=null?it.day_index:ix);
+  const f=it.kcalFactor||factor;
+
+  // PREFER the exact day ingredients the customer ordered; else rebuild this day
+  let courseSrc=it.courseDetail&&it.courseDetail.length?it.courseDetail:rebuildCourses(cat,di,mealKey).slice(0,courseCount);
+  const selected=[]; for(let i=0;i<courseSrc.length&&i<5;i++)selected.push(i);
+
+  // build ingredient rows with AI-scaled grams (seasonal fruit exempt)
+  let rows='';
+  courseSrc.forEach((co,idx)=>{
+    // figure out which of the 5 canonical courses this is (by label match) for gram weights
+    const ci=COURSE_LABEL.findIndex(L=>L.replace(/\//g,'')===(co.name||'').replace(/\//g,''));
+    const cIdx=ci>=0?ci:idx;
+    const grams=SLOT_G[cIdx]||SLOT_G[0];
+    const items=(co.items&&co.items.length)?co.items:[(co.name||'উপাদান')];
+    rows+='<tr class="course-row"><td colspan="3">'+(cIdx+1)+'. '+(co.name||COURSE_LABEL[cIdx])+'</td></tr>';
+    items.forEach((name,si)=>{
+      const exempt=(cIdx===4); // seasonal fruit not scaled
+      const isProt=/Fish|Chicken|Egg|Sprout|Lentil|Gram|Bean|Chickpea|Pea|Soybean|Cowpea|Almond/i.test(name)&&cIdx===1;
+      const baseG=grams[si]!=null?grams[si]:(grams[grams.length-1]||50);
+      const g=exempt?baseG:Math.round(baseG*f);
+      rows+='<tr><td>'+name+(isProt?'<span class="med-tag">PROTEIN</span>':'')+(exempt?'<span class="med-tag">ফল·exempt</span>':'')+'</td>'+
+        '<td class="r amt">'+bn(g)+' g</td>'+
+        '<td class="r" style="font-size:.7rem;color:var(--ink-2)">'+(exempt?'fixed':'×'+f.toFixed(2))+'</td></tr>';
+    });
   });
-  let data;
-  try { data = await r.json(); } catch { data = {}; }
-  if(!r.ok && !data.error) throw new Error(action + ' HTTP ' + r.status);
-  return data;
+
+  const steps=methodFor(mealKey,cat).map(s=>'<div class="step">'+s.t+'</div>').join('');
+  // medicinal layer = the day's AI/condition-driven powders from the order (fallback to disease defaults)
+  const dis=(it.diseasePowders&&it.diseasePowders.length)?it.diseasePowders:db.disease;
+  const con=(it.conditionPowders&&it.conditionPowders.length)?it.conditionPowders:CONDITION_POWDERS;
+  const chut=it.chutney||'Stress Relief Green Chutney';
+  const topping=it.topping||'Roasted Pumpkin Seed';
+
+  return '<div class="ticket">'+
+    '<div class="t-head"><span class="t-ic '+meal.cls+'">'+meal.ic+'</span>'+
+      '<div class="t-h-txt"><div class="t-meal">'+meal.en+' · '+meal.bn+'</div>'+
+        '<div class="t-name">'+(it.name||it.name_bn||db.bn+' Meal')+(it.name_bn&&it.name?' <small>('+it.name_bn+')</small>':'')+'</div></div>'+
+      '<div class="t-portion">কোর্স<b>'+bn(courseCount)+'</b></div></div>'+
+    '<div class="t-body">'+
+      '<div><div class="blk-h">উপাদান ও পরিমাণ (Kitchen only)</div>'+
+        '<table class="ing-tbl"><thead><tr><th>উপাদান</th><th class="r">পরিমাণ</th><th class="r">স্কেল</th></tr></thead>'+
+        '<tbody>'+rows+'</tbody></table>'+
+        '<div class="dose">'+
+          dis.map(p=>'<span class="dchip dis">Disease: '+p+'</span>').join('')+
+          con.map(p=>'<span class="dchip con">Condition: '+p+'</span>').join('')+
+          '<span class="dchip chu">Chutney: '+chut+'</span>'+
+          '<span class="dchip chu">Topping: '+topping+'</span>'+
+        '</div></div>'+
+      '<div><div class="blk-h">রান্নার প্রণালী · আগুনমুক্ত</div>'+
+        '<div class="steps">'+steps+'</div>'+
+        '<div class="method-note">❄ তেল/দুধ/চিনি/রং নিষিদ্ধ · শুধু Steam · Bake · Air-fry · লবণ = পিংক সল্ট</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="t-foot"><span>ব্যাচ স্কেল ×'+f.toFixed(2)+' · মাস্টার-১০০ তালিকা থেকে · দিন '+bn(di+1)+'</span>'+
+      '<label class="chk"><input type="checkbox"> প্রস্তুত ও প্যাকড</label></div>'+
+  '</div>';
 }
-
-function can(p){ return SESSION.permissions.includes('*') || SESSION.permissions.includes(p); }
-
-function loadSession(){
-  const token = localStorage.getItem('sar_kitchen_token');
-  const name = localStorage.getItem('sar_kitchen_name');
-  const role = localStorage.getItem('sar_kitchen_role');
-  const perms = JSON.parse(localStorage.getItem('sar_kitchen_perms') || '[]');
-  if(token && name){
-    SESSION = { token, staff:{ name, role }, permissions: perms };
-    return true;
-  }
-  return false;
-}
-
-function saveSession(res){
-  SESSION = {
-    token: res.token,
-    staff: res.staff,
-    permissions: res.permissions || ['view']
-  };
-  localStorage.setItem('sar_kitchen_token', res.token);
-  localStorage.setItem('sar_kitchen_name', res.staff.name);
-  localStorage.setItem('sar_kitchen_role', res.staff.role);
-  localStorage.setItem('sar_kitchen_super', res.staff.is_super ? 'true' : 'false');
-  localStorage.setItem('sar_kitchen_perms', JSON.stringify(SESSION.permissions));
-}
-
-function clearSession(){
-  const tok = SESSION.token;
-  SESSION = { token:'', staff:null, permissions:[] };
-  ['sar_kitchen_token','sar_kitchen_name','sar_kitchen_role','sar_kitchen_super','sar_kitchen_perms'].forEach(k => localStorage.removeItem(k));
-  if(tok) api('staffLogout',{token:tok}).catch(()=>{});
-}
-
-async function validateSession(){
-  if(!SESSION.token) return false;
-  try{
-    const res = await api('staffSessionValidate',{token:SESSION.token});
-    if(!res.ok) return false;
-    SESSION.staff = res.staff;
-    SESSION.permissions = res.permissions || [];
-    localStorage.setItem('sar_kitchen_perms', JSON.stringify(SESSION.permissions));
-    return true;
-  }catch{ return false; }
-}
-
-async function doLogin(){
-  const user = $('loginUser').value.trim();
-  const pass = $('loginPass').value;
-  const errEl = $('loginErr');
-  errEl.className = 'login-err';
-  if(!user || !pass){ errEl.textContent='আইডি ও পাসওয়ার্ড দিন।'; errEl.className='login-err show'; return; }
-  $('loginBtn').disabled = true;
-  try{
-    const res = await api('staffLogin',{user,pass});
-    if(!res.ok){
-      const msgs = {notfound:'আইডি পাওয়া যায়নি।',wrongpass:'পাসওয়ার্ড ভুল।',inactive:'অ্যাকাউন্ট নিষ্ক্রিয়।',noaccess:'রান্নাঘরে ঢোকার অনুমতি নেই।',missing:'আইডি ও পাসওয়ার্ড দিন।'};
-      errEl.textContent = msgs[res.error] || 'লগইন ব্যর্থ।';
-      errEl.className = 'login-err show';
-      return;
-    }
-    saveSession(res);
-    showBoard();
-  }catch(e){
-    errEl.textContent = 'সংযোগ সমস্যা: ' + esc(e.message);
-    errEl.className = 'login-err show';
-  }finally{ $('loginBtn').disabled = false; }
-}
-
-async function doLogout(){
-  clearSession();
-  $('loginWrap').classList.remove('hidden');
-  if(refreshTimer) clearInterval(refreshTimer);
-}
-
-async function showBoard(){
-  $('loginWrap').classList.add('hidden');
-  const superMark = localStorage.getItem('sar_kitchen_super') === 'true' ? ' 👑' : '';
-  $('whoName').textContent = SESSION.staff.name + superMark;
-  await loadCooks();
-  await load();
-  if(refreshTimer) clearInterval(refreshTimer);
-  refreshTimer = setInterval(load, 12000);
-}
-
-function ageOf(iso){
-  if(!iso) return 0;
-  const t = new Date(iso).getTime();
-  if(isNaN(t)) return 0;
-  return Math.max(0, Math.round((Date.now()-t)/60000));
-}
-function ageClass(m){ return m>=25?'late':m>=12?'warn':''; }
-
-function payBadge(t){
-  if(t.payment_status==='paid') return '<span class="badge paid">✓ পরিশোধিত</span>';
-  if(t.payment_method==='cash' || t.payment_method==='COD') return '<span class="badge cod">💵 COD</span>';
-  return '<span class="badge">বাকি</span>';
-}
-
-function renderItemsList(items){
-  return items.map(it => `
-    <div class="item-row">
-      <strong>${esc(it.name_bn)}</strong>
-      ${it.menu_code ? `<span class="chip">${esc(it.menu_code)}</span>` : ''}
-      <div class="chip-row">
-        <span class="chip">${bn(it.kcal||0)} kcal</span>
-        <span class="chip">${bn(it.course_count||0)} কোর্স</span>
-        ${it.chutney ? `<span class="chip">চাটনি: ${esc(it.chutney)}</span>` : ''}
-      </div>
-    </div>`).join('');
-}
-
-function renderNutrition(t){
-  return `<div class="chip-row">
-    <span class="chip">${bn(t.total_kcal||0)} kcal মোট</span>
-    <span class="chip">প্রোটিন ${bn(t.total_protein||0)}g</span>
-    <span class="chip">${bn(t.item_count||0)} আইটেম</span>
-    <span class="chip">${bn(t.course_count||0)} কোর্স</span>
-  </div>`;
-}
-
-function renderInstructions(t){
-  const parts = [];
-  if(t.special_instructions) parts.push(esc(t.special_instructions));
-  if(t.kitchen_notes) parts.push(esc(t.kitchen_notes));
-  t.items.forEach(it => {
-    if(it.medicinals && it.medicinals.length) parts.push('💊 ' + esc(it.medicinals.join(', ')));
-    if(it.special_note) parts.push(esc(it.special_note));
-  });
-  return parts.length ? parts.join('<br>') : '<span style="color:var(--dim)">কোনো বিশেষ নির্দেশনা নেই</span>';
-}
-
-function actionButtons(t){
-  const id = esc(t.id);
-  const locked = t.claimed_by && t.claimed_by !== SESSION.staff.name;
-  const btns = [];
-
-  if(can('recipe')) btns.push(`<button class="act ghost" type="button" data-action="recipe" data-id="${id}">📖 রেসিপি</button>`);
-
-  if(t.status==='queued'){
-    if(can('claim')) btns.push(`<button class="act primary" type="button" data-action="claim" data-id="${id}">🍳 দাবি করুন</button>`);
-    if(can('assign')) btns.push(`<button class="act ghost" type="button" data-action="assign" data-id="${id}">👤 অ্যাসাইন</button>`);
-    if(can('decline')) btns.push(`<button class="act red" type="button" data-action="decline" data-id="${id}">✕</button>`);
-    if(can('priority')) btns.push(`<button class="act ghost" type="button" data-action="rush" data-id="${id}">⚡ রাশ</button>`);
-  }
-  if(t.status==='claimed'){
-    if(locked && !can('reassign')) btns.push(`<span class="lockmsg">🔒 ${esc(t.claimed_by)} দায়িত্বে</span>`);
-    else if(can('prepare')) btns.push(`<button class="act primary" type="button" data-action="prepare" data-id="${id}">🔥 রান্না শুরু</button>`);
-    if(can('reassign')) btns.push(`<button class="act ghost" type="button" data-action="assign" data-id="${id}">↻ পুনরায় অ্যাসাইন</button>`);
-  }
-  if(t.status==='preparing'){
-    if(locked && !can('reassign')) btns.push(`<span class="lockmsg">🔒 ${esc(t.claimed_by)} রান্না করছেন</span>`);
-    else if(can('ready')) btns.push(`<button class="act green" type="button" data-action="ready" data-id="${id}">✓ প্রস্তুত</button>`);
-  }
-  if(t.status==='ready'){
-    if(can('verify')) btns.push(`<button class="act blue" type="button" data-action="verify" data-id="${id}">🔍 যাচাই</button>`);
-    if(can('deliver')) btns.push(`<button class="act green" type="button" data-action="ofd" data-id="${id}" ${!t.verification_completed?'disabled title="আগে যাচাই করুন"':''}>🛵 ডেলিভারি</button>`);
-  }
-  if(t.status==='out_for_delivery'){
-    if(can('deliver')) btns.push(`<button class="act green" type="button" data-action="served" data-id="${id}">✓ ডেলিভার সম্পন্ন</button>`);
-  }
-  return btns.join('');
-}
-
-function cardHtml(t){
-  const age = ageOf(t.created_at);
-  const eta = t.expected_ready_at ? new Date(t.expected_ready_at) : null;
-  const etaStr = eta && !isNaN(eta) ? eta.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'}) : bn(t.estimated_time_minutes||15)+' মিন';
-  const cls = ['card', t.is_rush?'rush':'', t.is_priority?'priority':''].filter(Boolean).join(' ');
-
-  return `<div class="${cls}" draggable="true" data-id="${esc(t.id)}" data-status="${esc(t.status)}">
-    <div class="card-head">
-      <div class="card-top">
-        <span class="card-no">#${bn(t.order_id)}</span>
-        <div class="card-badges">${payBadge(t)}${t.is_rush?'<span class="badge rush">⚡ RUSH</span>':''}${t.is_priority?'<span class="badge">⭐ PRIORITY</span>':''}</div>
-      </div>
-      <div class="card-cust">${esc(t.customer_name)}</div>
-      <div class="card-meta">
-        <span>${esc(MEAL[t.items[0]?.meal_type] || t.items[0]?.meal_type || t.order_type || '')}</span>
-        <span class="age ${ageClass(age)}">${bn(age)} মিন</span>
-      </div>
-      ${t.claimed_by ? `<div class="card-assign">👨‍🍳 ${esc(t.claimed_by)}</div>` : ''}
-      <div class="card-eta">⏱ ETA: ${esc(etaStr)}</div>
-    </div>
-    <div class="card-sections">
-      <div class="acc"><button class="acc-btn" type="button" data-acc>📋 আইটেম দেখুন (${bn(t.item_count||0)})</button><div class="acc-body">${renderItemsList(t.items||[])}</div></div>
-      <div class="acc"><button class="acc-btn" type="button" data-acc>🥗 পুষ্টি</button><div class="acc-body">${renderNutrition(t)}</div></div>
-      <div class="acc"><button class="acc-btn" type="button" data-acc>📝 বিশেষ নির্দেশনা</button><div class="acc-body">${renderInstructions(t)}</div></div>
-    </div>
-    <div class="card-foot">${actionButtons(t)}</div>
-  </div>`;
-}
-
-function fillColumn(colId, list, countId){
-  const el = $(colId);
-  $(countId).textContent = bn(list.length);
-  if(!list.length){ el.innerHTML = '<div class="col-empty">কোনো অর্ডার নেই</div>'; return; }
-  list.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-  el.innerHTML = list.map(cardHtml).join('');
-}
-
-function applyFilters(tickets){
-  let list = tickets.slice();
-  const q = $('searchInput').value.trim().toLowerCase();
-  const st = $('filterStatus').value;
-  const cook = $('filterCook').value;
-  if(q) list = list.filter(t => String(t.order_id).toLowerCase().includes(q));
-  if(st) list = list.filter(t => t.status === st);
-  if(cook) list = list.filter(t => t.claimed_by === cook);
-  if($('filterRush').checked) list = list.filter(t => t.is_rush);
-  if($('filterPriority').checked) list = list.filter(t => t.is_priority);
-  return list;
-}
-
-function renderBoard(tickets){
-  const list = applyFilters(tickets);
-  fillColumn('col-queued', list.filter(t=>t.status==='queued'), 'n-queued');
-  fillColumn('col-claimed', list.filter(t=>t.status==='claimed'), 'n-claimed');
-  fillColumn('col-preparing', list.filter(t=>t.status==='preparing'), 'n-preparing');
-  fillColumn('col-ready', list.filter(t=>t.status==='ready'), 'n-ready');
-  fillColumn('col-ofd', list.filter(t=>t.status==='out_for_delivery'), 'n-ofd');
-}
-
-function updateMetrics(m){
-  METRICS = m || {};
-  $('m-queued').textContent = bn(m.queued||0);
-  $('m-claimed').textContent = bn(m.claimed||0);
-  $('m-preparing').textContent = bn(m.preparing||0);
-  $('m-ready').textContent = bn(m.ready||0);
-  $('m-ofd').textContent = bn(m.out_for_delivery||0);
-  $('m-cooks').textContent = bn(m.cooks_active||0);
-}
-
-function playNewOrderSound(){
-  if(!soundOn) return;
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [880,1100].forEach((f,i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = f;
-      g.gain.setValueAtTime(0.12, ctx.currentTime + i*0.15);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i*0.15 + 0.3);
-      o.start(ctx.currentTime + i*0.15);
-      o.stop(ctx.currentTime + i*0.15 + 0.35);
-    });
-  }catch{}
-}
-
-async function load(){
-  if(!SESSION.token) return;
-  try{
-    const res = await api('kitchenQueue', {
-      token: SESSION.token,
-      statuses: COLS,
-      search: $('searchInput').value.trim() || undefined,
-      cook: $('filterCook').value || undefined,
-      priority_only: $('filterPriority').checked || undefined,
-    });
-    if(res.error === 'unauthorized'){
-      toast('সেশন শেষ — আবার লগইন করুন', true);
-      doLogout();
-      return;
-    }
-    const tk = res.tickets || [];
-    TICKETS = {};
-    tk.forEach(t => { TICKETS[t.id] = t; });
-
-    const total = tk.length;
-    if(total > lastQueueCount && lastQueueCount > 0) playNewOrderSound();
-    lastQueueCount = total;
-
-    updateMetrics(res.metrics || {});
-    renderBoard(tk);
-  }catch(e){
-    toast('কিউ লোড হয়নি: ' + e.message, true);
-  }
-}
-
-async function loadCooks(){
-  if(!can('assign') && !can('reassign')) return;
-  try{
-    const res = await api('staffList',{token:SESSION.token});
-    COOKS = res.cooks || [];
-    const sel = $('filterCook');
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">সব রাঁধুনি</option>' +
-      COOKS.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
-    sel.value = cur;
-  }catch{}
-}
-
-async function setStatus(id, status, extra){
-  try{
-    const res = await api('kitchenStatus', Object.assign({
-      token: SESSION.token, id, status,
-      claimed_by: SESSION.staff.name,
-    }, extra||{}));
-    if(res.locked){ toast('🔒 '+esc(res.by)+' ইতিমধ্যে দায়িত্বে', true); return; }
-    if(res.error === 'verification_required'){ toast('আগে যাচাই সম্পন্ন করুন', true); return; }
-    if(!res.ok){ toast('স্ট্যাটাস পরিবর্তন ব্যর্থ', true); return; }
-    toast('✓ '+ (STATUS_LABELS[status]||status));
-    await load();
-  }catch(e){ toast('ত্রুটি: '+e.message, true); }
-}
-
-async function openRecipe(orderId, itemIndex){
-  const t = TICKETS[orderId]; if(!t) return;
-  const it = (t.items||[])[itemIndex||0];
-  $('recipeTitle').textContent = 'রেসিপি · #' + bn(t.order_id);
-  $('recipeBody').innerHTML = '<div style="color:var(--muted)">লোড হচ্ছে...</div>';
-  $('recipeOverlay').classList.add('show');
-  try{
-    const res = await api('getRecipe', {
-      token: SESSION.token,
-      order_id: orderId,
-      menu_code: it?.menu_code,
-      menu_item_id: it?.menu_item_id,
-      item_index: itemIndex||0,
-    });
-    if(!res.ok || !res.recipe){ $('recipeBody').innerHTML = '<p>রেসিপি পাওয়া যায়নি।</p>'; return; }
-    const r = res.recipe;
-    const ings = (Array.isArray(r.ingredients)?r.ingredients:[]).map(g => {
-      const name = typeof g === 'string' ? g : (g.item||g.name||'');
-      const grams = g.grams ? ' <b>'+bn(g.grams)+'g</b>' : '';
-      return `<span class="ing">${esc(name)}${grams}</span>`;
-    }).join('') || '<span class="ing">উপকরণ তালিকা নেই</span>';
-    const steps = (Array.isArray(r.steps)?r.steps:[]).map(s => `<li>${esc(s)}</li>`).join('')
-      || '<li>তেলমুক্ত পদ্ধতিতে রান্না করুন</li><li>গোলাপি লবণ ব্যবহার করুন</li>';
-    const allergens = (Array.isArray(r.allergens)?r.allergens:[]).join(', ') || 'নির্দিষ্ট নয়';
-    $('recipeBody').innerHTML = `
-      <div class="recipe-block">
-        <h4>${esc(r.name_bn||it?.name_bn||'রেসিপি')}</h4>
-        <p style="font-size:.78rem;color:var(--muted)">⏱ ${bn(r.cook_time_minutes||15)} মিন · ${esc(r.serving_method||'')}</p>
-        <p style="font-size:.78rem;margin:.4rem 0"><b>অ্যালার্জেন:</b> ${esc(allergens)}</p>
-        <h4 style="font-size:.8rem;margin-top:.5rem">উপকরণ</h4><div class="ing-list">${ings}</div>
-        <h4 style="font-size:.8rem;margin-top:.5rem">প্রস্তুতি ধাপ</h4><ul class="steps">${steps}</ul>
-        ${r.kitchen_notes ? `<p style="margin-top:.5rem;font-size:.78rem"><b>কিচেন নোট:</b> ${esc(r.kitchen_notes)}</p>` : ''}
-      </div>`;
-  }catch(e){ $('recipeBody').innerHTML = '<p>ত্রুটি: '+esc(e.message)+'</p>'; }
-}
-
-function openVerify(id){
-  const t = TICKETS[id]; if(!t) return;
-  verifyOrderId = id;
-  $('verifyTitle').textContent = 'যাচাই · #' + bn(t.order_id);
-  const rows = (t.items||[]).map((it,i) =>
-    `<label class="check-row"><input type="checkbox" class="vchk" data-idx="${i}"> <span><b>${esc(it.name_bn)}</b> · ${bn(it.kcal||0)} kcal</span></label>`
-  ).join('');
-  $('verifyBody').innerHTML = rows || '<p>আইটেম নেই</p>';
-  $('verifySubmit').disabled = true;
-  $('verifyOverlay').classList.add('show');
-}
-
-function openAssign(id){
-  assignOrderId = id;
-  const t = TICKETS[id];
-  $('assignTitle').textContent = 'অ্যাসাইন · #' + bn(t?.order_id||'');
-  const sel = $('assignCook');
-  sel.innerHTML = COOKS.map(c => `<option value="${esc(c.name)}">${esc(c.name)} (${esc(c.role)})</option>`).join('')
-    || `<option value="${esc(SESSION.staff.name)}">${esc(SESSION.staff.name)}</option>`;
-  $('assignOverlay').classList.add('show');
-}
-
-async function submitVerify(){
-  const checks = [...document.querySelectorAll('.vchk')];
-  const allChecked = checks.length && checks.every(c => c.checked);
-  if(!allChecked){ toast('সব আইটেম যাচাই করুন', true); return; }
-  try{
-    const items = checks.map(c => ({ index:+c.dataset.idx, checked:true }));
-    const v = await api('kitchenVerify', { token:SESSION.token, id:verifyOrderId, items_checked:items });
-    if(!v.ok){ toast('যাচাই ব্যর্থ', true); return; }
-    toast('✓ যাচাই সম্পন্ন — এখন ডেলিভারি পাঠাতে পারেন');
-    $('verifyOverlay').classList.remove('show');
-    await load();
-  }catch(e){ toast('ত্রুটি: '+e.message, true); }
-}
-
-async function submitAssign(){
-  if(!assignOrderId) return;
-  try{
-    const res = await api('kitchenAssign', {
-      token: SESSION.token,
-      id: assignOrderId,
-      cook_name: $('assignCook').value,
-      eta_minutes: +$('assignEta').value || 15,
-    });
-    if(!res.ok){ toast('অ্যাসাইন ব্যর্থ', true); return; }
-    toast('✓ অ্যাসাইন সম্পন্ন');
-    $('assignOverlay').classList.remove('show');
-    await load();
-  }catch(e){ toast('ত্রুটি: '+e.message, true); }
-}
-
-function closeOverlay(id){ $(id).classList.remove('show'); }
-
-/* ── Drag & drop ── */
-document.getElementById('board').addEventListener('dragstart', e => {
-  const card = e.target.closest('.card');
-  if(!card) return;
-  dragId = card.dataset.id;
-  card.classList.add('dragging');
-  e.dataTransfer.setData('text/plain', dragId);
-});
-document.getElementById('board').addEventListener('dragend', e => {
-  e.target.closest('.card')?.classList.remove('dragging');
-  document.querySelectorAll('.col-body').forEach(c => c.classList.remove('drag-over'));
-});
-document.querySelectorAll('.col-body').forEach(col => {
-  col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over'); });
-  col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
-  col.addEventListener('drop', async e => {
-    e.preventDefault();
-    col.classList.remove('drag-over');
-    const id = e.dataTransfer.getData('text/plain') || dragId;
-    const newStatus = col.closest('.col').dataset.status;
-    const t = TICKETS[id];
-    if(!t || t.status === newStatus) return;
-    const flow = {queued:['claimed'],claimed:['preparing'],preparing:['ready'],ready:['out_for_delivery'],out_for_delivery:['served']};
-    const allowed = flow[t.status] || [];
-    if(!allowed.includes(newStatus)){ toast('এই স্থানান্তর অনুমোদিত নয়', true); return; }
-    if(newStatus==='out_for_delivery' && !t.verification_completed){ toast('আগে যাচাই করুন', true); return; }
-    await setStatus(id, newStatus, newStatus==='out_for_delivery'?{verified:true}:{});
-  });
-});
-
-/* ── Event delegation ── */
-document.body.addEventListener('click', async e => {
-  const acc = e.target.closest('[data-acc]');
-  if(acc){ acc.closest('.acc').classList.toggle('open'); return; }
-
-  const close = e.target.dataset.close;
-  if(close){ closeOverlay(close); return; }
-  if(e.target.classList.contains('overlay')){ e.target.classList.remove('show'); return; }
-
-  const btn = e.target.closest('[data-action]');
-  if(!btn) return;
-  const id = btn.dataset.id;
-  const action = btn.dataset.action;
-  if(action==='recipe') openRecipe(id, 0);
-  else if(action==='claim') await setStatus(id, 'claimed');
-  else if(action==='prepare') await setStatus(id, 'preparing');
-  else if(action==='ready') await setStatus(id, 'ready');
-  else if(action==='verify') openVerify(id);
-  else if(action==='ofd') await setStatus(id, 'out_for_delivery', {verified:true});
-  else if(action==='served') await setStatus(id, 'served', {verified:true});
-  else if(action==='decline'){ if(confirm('অর্ডার বাতিল করবেন?')) await setStatus(id, 'declined'); }
-  else if(action==='assign') openAssign(id);
-  else if(action==='rush'){
-    try{
-      const res = await api('kitchenUpdateFlags',{token:SESSION.token,id,is_rush:true});
-      if(res.ok){ toast('⚡ রাশ মার্ক করা হয়েছে'); await load(); }
-      else toast('রাশ মার্ক ব্যর্থ', true);
-    }catch(err){ toast('ত্রুটি: '+err.message, true); }
-  }
-});
-
-document.getElementById('verifyBody').addEventListener('change', () => {
-  const checks = [...document.querySelectorAll('.vchk')];
-  $('verifySubmit').disabled = !(checks.length && checks.every(c => c.checked));
-});
-
-$('loginBtn').addEventListener('click', doLogin);
-$('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-$('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-$('btnLogout').addEventListener('click', doLogout);
-$('btnRefresh').addEventListener('click', load);
-$('verifySubmit').addEventListener('click', submitVerify);
-$('assignSubmit').addEventListener('click', submitAssign);
-$('btnDisplay').addEventListener('click', () => document.body.classList.toggle('display-mode'));
-$('btnSound').addEventListener('click', () => {
-  soundOn = !soundOn;
-  localStorage.setItem('sar_kitchen_sound', soundOn);
-  $('btnSound').textContent = soundOn ? '🔔 সাউন্ড' : '🔕 নিঃশব্দ';
-});
-['searchInput','filterStatus','filterCook','filterRush','filterPriority'].forEach(id => {
-  $(id).addEventListener('change', () => load());
-  $(id).addEventListener('input', () => { clearTimeout($(id)._d); $(id)._d = setTimeout(load, 400); });
-});
-
-document.querySelectorAll('[data-close]').forEach(b => {
-  b.addEventListener('click', () => closeOverlay(b.dataset.close));
-});
-
-const fs = COLS.map(s => `<option value="${s}">${STATUS_LABELS[s]}</option>`).join('');
-$('filterStatus').innerHTML = '<option value="">সব স্ট্যাটাস</option>' + fs;
-
-/* ── Init ── */
-(async function init(){
-  if(loadSession()){
-    const ok = await validateSession();
-    if(ok) showBoard();
-    else { clearSession(); $('loginWrap').classList.remove('hidden'); }
-  }
-  $('btnSound').textContent = soundOn ? '🔔 সাউন্ড' : '🔕 নিঃশব্দ';
-})();
-})();
 </script>
 </body>
 </html>
