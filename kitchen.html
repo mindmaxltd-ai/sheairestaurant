@@ -82,6 +82,9 @@ header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
 .age.warn{background:rgba(245,183,60,.18);color:var(--amber)}
 .age.late{background:rgba(226,96,79,.2);color:var(--red)}
 .caret{transition:transform .2s;color:var(--ink-3);font-size:.8rem;margin-left:.3rem}
+.c-big{background:var(--panel);border:1px solid var(--line);color:var(--ink-2);
+  border-radius:.4rem;padding:.15rem .4rem;font-size:.82rem;cursor:pointer;margin-left:.4rem}
+.c-big:hover{background:var(--steam);color:#0c1116;border-color:var(--steam)}
 .card.open .caret{transform:rotate(90deg)}
 .c-sum{padding:.55rem .8rem;display:flex;flex-wrap:wrap;gap:.3rem}
 .chip{font-size:.7rem;border:1px solid var(--line);border-radius:.4rem;padding:.1rem .45rem;color:var(--ink-2)}
@@ -241,7 +244,8 @@ function kitchenLogout(){
 function startKitchen(){
   tick(); setInterval(tick,1000);
   load();
-  window._kTimer=setInterval(load,15000);   // auto-refresh board
+  // auto-refresh every 20s, BUT pause while the cook has a recipe open
+  window._kTimer=setInterval(()=>{ if(OPEN.size===0) load(); },20000);
 }
 function tick(){const d=new Date();const el=document.getElementById('clock');if(el)el.textContent=d.toLocaleTimeString('bn-BD');}
 
@@ -394,6 +398,7 @@ function card(t){
       '<span class="c-no">#'+(t.order_id||t.id)+'</span>'+
       '<span class="c-cust">'+(t.customer_name||'গ্রাহক')+'</span>'+
       '<span class="c-meta"><span class="age '+ageClass(age)+'">'+bn(age)+' মিন</span></span>'+
+      '<button class="c-big" title="বড় করে দেখুন" onclick="event.stopPropagation();openBig(\''+t.id+'\')">🔍</button>'+
       '<span class="caret">▶</span>'+
     '</div>'+
     '<div class="c-sum">'+
@@ -415,7 +420,60 @@ function card(t){
     '</div>';
   }
 }
-function toggleCard(headEl){headEl.parentElement.classList.toggle('open');}
+// track which order cards the cook has expanded, so an auto-refresh
+// doesn't snap them shut mid-read
+const OPEN=new Set();
+// open one order's full recipe in a clean medium pop-up window so the
+// cook can read it without the board auto-refreshing underneath
+function openBig(id){
+  const t=(window._TICKETS||{})[id];
+  if(!t){ toast('রেসিপি ডেটা পাওয়া যায়নি — রিফ্রেশ করুন'); return; }
+  const w=window.open('','sar_recipe_'+id,'width=720,height=820,scrollbars=yes,resizable=yes');
+  if(!w){ toast('পপ-আপ ব্লক হয়েছে — ব্রাউজারে পপ-আপ চালু করুন'); return; }
+  const body=recipeHTML(t);
+  w.document.write(
+    '<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<title>রেসিপি · #'+(t.order_id||t.id)+'</title><style>'+
+    ':root{--bg:#11161c;--panel:#1a222c;--panel-2:#212c38;--line:#2c3a49;--ink:#eef3f8;--ink-2:#9fb0c0;--ink-3:#6b7c8c;--steam:#4aa3df;--airfry:#e8893b;--cold:#46c08a;}'+
+    '*{box-sizing:border-box;margin:0;padding:0}'+
+    'body{background:var(--bg);color:var(--ink);font-family:"SolaimanLipi","Hind Siliguri",system-ui,sans-serif;padding:1.2rem 1.4rem;line-height:1.5}'+
+    'h1{font-size:1.15rem;margin-bottom:.2rem}.sub{color:var(--ink-3);font-size:.82rem;margin-bottom:1rem}'+
+    '.course{border-top:1px dashed var(--line);padding:.7rem 0}.course:first-child{border-top:none}'+
+    '.co-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}'+
+    '.co-slot{width:1.6rem;height:1.6rem;border-radius:.4rem;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:#0c1116}'+
+    '.co-name{font-size:.95rem;font-weight:700}'+
+    '.ings{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0 .5rem}'+
+    '.ing{background:var(--panel-2);border:1px solid var(--line);border-radius:.45rem;padding:.2rem .55rem;font-size:.88rem}'+
+    '.ing b{color:var(--steam)}.ing .ex{color:var(--cold);font-size:.72rem;margin-left:.25rem}'+
+    '.steps{list-style:none;display:flex;flex-direction:column;gap:.35rem;margin-top:.4rem}'+
+    '.steps li{font-size:.88rem;color:var(--ink-2);line-height:1.6;padding-left:1.1rem;position:relative}'+
+    '.steps li:before{content:"›";position:absolute;left:0;color:var(--ink-3)}'+
+    '.dose{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}'+
+    '.dchip{font-size:.78rem;border-radius:.45rem;padding:.15rem .5rem;border:1px solid var(--line)}'+
+    '.dchip.dis{color:var(--airfry);border-color:rgba(232,137,59,.4)}'+
+    '.dchip.con{color:var(--steam);border-color:rgba(74,163,223,.4)}'+
+    '.dchip.chu{color:var(--cold);border-color:rgba(70,192,138,.4)}'+
+    '.method-note{margin-top:.7rem;font-size:.82rem;color:var(--cold);background:rgba(70,192,138,.08);border-radius:.45rem;padding:.5rem .7rem}'+
+    '.col-empty{color:var(--ink-3);text-align:center;padding:2rem}'+
+    '.pbtn{position:fixed;top:1rem;right:1rem;background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:.5rem;padding:.45rem .8rem;font-size:.82rem;cursor:pointer;font-family:inherit}'+
+    '@media print{.pbtn{display:none}body{background:#fff;color:#000}}'+
+    '</style></head><body>'+
+    '<button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট</button>'+
+    '<h1>🍳 রেসিপি · অর্ডার #'+(t.order_id||t.id)+'</h1>'+
+    '<div class="sub">'+(t.customer_name||'গ্রাহক')+' · '+bn(t.total_kcal||0)+' kcal · '+bn(t.item_count||0)+' আইটেম · '+bn(t.course_count||0)+' কোর্স</div>'+
+    body+
+    '</body></html>'
+  );
+  w.document.close();
+}
+
+function toggleCard(headEl){
+  const cardEl=headEl.parentElement;
+  cardEl.classList.toggle('open');
+  const id=cardEl.getAttribute('data-id');
+  if(cardEl.classList.contains('open')) OPEN.add(id); else OPEN.delete(id);
+}
 
 function fill(colId,list,nId){
   const el=document.getElementById(colId);
@@ -423,18 +481,23 @@ function fill(colId,list,nId){
   if(!list.length){el.innerHTML='<div class="col-empty">কোনো অর্ডার নেই</div>';return;}
   list.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));   // oldest first (FIFO)
   el.innerHTML=list.map(card).join('');
+  // restore any cards that were open before this refresh
+  el.querySelectorAll('.card').forEach(c=>{
+    if(OPEN.has(c.getAttribute('data-id'))) c.classList.add('open');
+  });
 }
 
 async function load(){
   try{
     const r=await api('kitchenBoard',{});
     const tk=r.tickets||[];
-    // attach personalization factor + metrics per ticket (best-effort)
     const q=tk.filter(t=>['queued','claimed'].includes(t.status));
     const p=tk.filter(t=>t.status==='preparing');
     const rd=tk.filter(t=>['ready','out_for_delivery'].includes(t.status));
     fill('col-queued',q,'n-q'); fill('col-preparing',p,'n-p'); fill('col-ready',rd,'n-r');
     document.getElementById('qcount').textContent=bn(tk.length);
+    // keep the latest ticket data around for the "big window" view
+    window._TICKETS={}; tk.forEach(t=>window._TICKETS[t.id]=t);
   }catch(e){
     document.getElementById('col-queued').innerHTML=
       '<div class="col-empty">কিউ লোড হয়নি। sar.js ডিপ্লয় হয়েছে কিনা দেখুন।<br><small>'+e.message+'</small></div>';
