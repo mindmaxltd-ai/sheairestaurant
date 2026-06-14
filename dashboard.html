@@ -1703,7 +1703,7 @@ async function fetchMetrics() {
   try {
     if (!CID) return {};
     console.log('🔄 Fetching metrics, customer_id=', CID);
-    const r = await fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
     console.log('fetchMetrics response:', r.status);
     if (!r.ok) { console.warn('fetchMetrics error:', r.status); return {}; }
     const d = await r.json();
@@ -1833,7 +1833,7 @@ function renderMetrics(m, cust) {
   const get = (...keys) => { for(const k of keys){ if(m&&m[k]!=null&&m[k]!=='') return m[k]; } return null; };
 
   // ── BMI ──
-  // First try customer-metrics, fallback to customers table (registration data)
+  // First try customer_metrics, fallback to customers table (registration data)
   const bmi = get('bmi','body_mass_index') || cust?.bmi || null;
   if(bmi){
     const b = parseFloat(bmi);
@@ -1933,7 +1933,7 @@ function renderMetrics(m, cust) {
   if(wtEl && wt) wtEl.textContent = parseFloat(wt).toFixed(1) + ' কেজি';
   if(htEl && ht) htEl.textContent = parseFloat(ht).toFixed(0) + ' সেমি';
 
-  // ── Show fill-metrics banner if no customer-metrics data ──
+  // ── Show fill-metrics banner if no customer_metrics data ──
   const hasMetrics = m && Object.keys(m).length > 2;
   if(!hasMetrics){
     const banner = document.getElementById('metricsFillBanner');
@@ -3195,7 +3195,7 @@ async function loadAndRenderProfile() {
   try {
     const [custArr, metricsArr] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}).then(r=>r.json()),
-      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
+      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
     ]);
     renderProfilePanel(custArr?.[0] || {}, metricsArr?.[0] || {});
   } catch(e) {
@@ -3254,7 +3254,7 @@ async function mLoadProfile() {
   try {
     const [custR, metR] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}),
-      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
+      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
     ]);
     const cust    = (await custR.json())?.[0] || {};
     const metrics = (await metR.json())?.[0]  || {};
