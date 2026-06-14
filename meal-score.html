@@ -727,6 +727,7 @@ function showNoDiseaseScreen(){
 // true only if at least one disease/BMI/interest signal exists
 function hasUsefulMetrics(m){
   if(!m||typeof m!=='object') return false;
+  if(normalizeCat(m.sar_category)) return true;
   if(normalizeCat(m.sar_category_interest)) return true;
   if(m.sar_category_interest_2) return true;
   if(m.pregnancy_status&&m.pregnancy_status!=='না') return true;
@@ -767,12 +768,16 @@ function normalizeCat(v){
 }
 
 // detect ONE or TWO disease categories from metrics.
-// RULE: NO fallback category. If nothing real is found the array is
-// empty, and the page shows the "set your disease" screen instead of
-// any menu. (Never defaults to Diabetes.)
+// PRIMARY source: customers.sar_category (e.g. "DM" or "DM,OB"),
+// merged in by the backend. Falls back to other known fields.
+// RULE: NO fallback category — empty if nothing real is set, which
+// makes the page show the "set your disease" screen (never Diabetes).
 function detectCats(m){
   const found=[];
   const push=c=>{const k=normalizeCat(c);if(k&&k!=='GENERAL'&&CAT_INFO[k]&&!found.includes(k))found.push(k);};
+  // primary: customers.sar_category — can be "DM" or "DM,OB"
+  if(m.sar_category) String(m.sar_category).split(/[,\s]+/).forEach(push);
+  // secondary sources (kept for backward compatibility)
   if(m.sar_category_interest) String(m.sar_category_interest).split(/[,\s]+/).forEach(push);
   if(m.sar_category_interest_2) push(m.sar_category_interest_2);
   if(m.pregnancy_status&&m.pregnancy_status!=='না') push('PR');
