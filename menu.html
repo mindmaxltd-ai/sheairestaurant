@@ -1,1 +1,368 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SAR Signature Meal — ২১টি মিল | She AI Revolution</title>
+<meta name="description" content="She AI Revolution - SAR Signature Meal: ৭ দিনের ২১টি Sakara-inspired therapeutic meal, Bangladesh-available ingredients, nutrition, daily requirement coverage and order flow.">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff2') format('woff2'),url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi.woff') format('woff');font-weight:400;font-display:swap}
+@font-face{font-family:'SolaimanLipi';src:url('https://cdn.jsdelivr.net/gh/maateen/bangla-web-fonts/fonts/SolaimanLipi/SolaimanLipi-Bold.woff2') format('woff2');font-weight:700;font-display:swap}
+:root{
+  --pink:#E91E8C;--pink-d:#B51267;--pink-soft:#FDE9F4;--rose:#FF7EB8;
+  --cream:#FCFAF6;--milk:#FFFDF9;--card:#FFFFFF;--ink:#241D24;--muted:#756B75;
+  --line:#E9DED3;--line2:#DACABA;--gold:#C9A24B;--gold-soft:#F8EFD8;
+  --green:#2E8B62;--green-soft:#DFF0E8;--orange:#F97316;--orange-d:#C2410C;--orange-soft:#FFF0E6;--plum:#38283B;
+  --shadow:0 14px 45px rgba(71,42,60,.10),0 2px 9px rgba(71,42,60,.05);
+  --shadow-lg:0 26px 80px rgba(233,30,140,.18),0 10px 28px rgba(71,42,60,.10);
+  --grad:linear-gradient(125deg,#B51267 0%,#E91E8C 32%,#FF7EB8 55%,#F97316 82%,#FDBA74 120%);
+  --soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF0E6 120%);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'SolaimanLipi',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.64;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(920px 560px at 85% -8%,rgba(233,30,140,.18),transparent 58%),
+  radial-gradient(760px 500px at -5% 12%,rgba(249,115,22,.16),transparent 58%),
+  radial-gradient(700px 520px at 55% 108%,rgba(255,126,184,.12),transparent 58%)}
+body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.28;background-image:linear-gradient(rgba(233,30,140,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(233,30,140,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
+img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.num{font-family:'Space Mono',monospace}
+.topbar{height:3px;background:var(--grad);background-size:240% 100%;animation:slide 8s linear infinite}@keyframes slide{to{background-position:240% 0}}
+.nav{position:sticky;top:0;z-index:70;background:rgba(255,253,249,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(218,202,186,.82)}
+.nav-in{max-width:1240px;margin:0 auto;padding:.82rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.logo{display:flex;align-items:center;gap:.68rem;text-decoration:none;color:var(--ink)}
+.logo-mark{width:43px;height:43px;border-radius:15px;background:var(--grad);display:grid;place-items:center;color:#fff;font-family:'Playfair Display',serif;font-weight:800;box-shadow:var(--shadow);position:relative}.logo-mark::after{content:'';position:absolute;inset:1px;border:1px solid rgba(255,255,255,.42);border-radius:14px}
+.logo-name{font-weight:800;letter-spacing:-.02em}.logo-name small{display:block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--pink-d);text-transform:uppercase;font-weight:400}
+.nav-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}.nav-link{color:var(--muted);font-size:.9rem;text-decoration:none;padding:.42rem .65rem;border-radius:20px;transition:.2s}.nav-link:hover{color:var(--pink-d);background:#fff}
+.cart-btn{border:none;cursor:pointer;font-family:inherit;font-weight:800;color:#fff;background:var(--plum);display:flex;align-items:center;gap:.55rem;padding:.62rem 1.12rem;border-radius:28px;box-shadow:0 9px 24px rgba(56,40,59,.22);transition:.2s}.cart-btn:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(56,40,59,.28)}.cart-pill{background:var(--pink);border-radius:20px;padding:.04rem .48rem;font-family:'Space Mono',monospace;font-size:.74rem}
+.hero{max-width:1240px;margin:0 auto;padding:4.1rem 1.25rem 2rem;display:grid;grid-template-columns:minmax(0,1.02fr) minmax(360px,.98fr);gap:2.2rem;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.55rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.47rem 1rem;color:var(--pink-d);font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;box-shadow:var(--shadow);margin-bottom:1.15rem}.dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 1.7s ease-in-out infinite}@keyframes pulse{50%{opacity:.28;transform:scale(.8)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.75rem,6vw,5.35rem);line-height:.95;font-weight:800;letter-spacing:-.035em;color:var(--plum);max-width:11.5ch}.hero h1 em{font-style:italic;background:var(--grad);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{margin-top:1.15rem;color:var(--muted);font-size:1.08rem;max-width:64ch}.hero-sub b{color:var(--pink-d)}
+.hero-cta{display:flex;gap:.72rem;flex-wrap:wrap;margin-top:1.55rem}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;padding:.82rem 1.35rem;transition:.2s}.btn-primary{background:var(--grad);color:#fff;box-shadow:0 16px 38px rgba(233,30,140,.22)}.btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}.btn-soft{background:#fff;color:var(--plum);border:1px solid var(--line);box-shadow:var(--shadow)}.btn-soft:hover{border-color:var(--orange);transform:translateY(-1px)}
+.hero-panel{background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:34px;padding:.78rem;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}.hero-photo{height:440px;border-radius:27px;overflow:hidden;position:relative;background:var(--soft)}.hero-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(1.04) contrast(1.02)}.hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(44,22,38,.78))}
+.photo-caption{position:absolute;left:1.25rem;right:1.25rem;bottom:1.1rem;color:#fff;z-index:2}.photo-caption small{display:block;font-family:'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#FFD6EA;font-size:.66rem}.photo-caption b{display:block;font-family:'Playfair Display',serif;font-size:1.55rem;line-height:1.1;margin:.25rem 0}.photo-caption span{display:block;color:rgba(255,255,255,.78);font-size:.86rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;max-width:1240px;margin:0 auto 1.4rem;padding:0 1.25rem}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1rem;box-shadow:var(--shadow)}.stat b{display:block;font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--plum);line-height:1}.stat span{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.program{max-width:1240px;margin:1.25rem auto 0;padding:0 1.25rem}.program-in{display:grid;grid-template-columns:1fr 360px;gap:1rem;align-items:start}.control-card,.summary-card{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:1.25rem}.control-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}.control-head h2{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.1;color:var(--plum)}.control-head p{color:var(--muted);font-size:.9rem;margin-top:.18rem}.tag{font-family:'Space Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;background:var(--pink-soft);color:var(--pink-d);border:1px solid #F3BEDA;border-radius:999px;padding:.32rem .62rem;white-space:nowrap}
+.sel-box{border:1px solid var(--pink);background:#FFF5FB;border-radius:18px;padding:.95rem;text-align:left;box-shadow:0 12px 26px rgba(233,30,140,.10)}.sel-box .k{font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}.sel-box .v{font-weight:800;color:var(--plum);margin-top:.1rem}.sel-box .p{font-family:'Space Mono',monospace;color:var(--pink-d);font-weight:700;font-size:.86rem;margin-top:.24rem}
+.addons{margin-top:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.addon{display:flex;gap:.65rem;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:17px;padding:.78rem;cursor:pointer}.addon input{margin-top:.25rem;accent-color:var(--pink)}.addon b{display:block;font-size:.85rem}.addon span{display:block;color:var(--muted);font-size:.74rem}.addon .price{font-family:'Space Mono',monospace;color:var(--green);font-weight:700;margin-top:.16rem}
+.summary-card{position:sticky;top:86px}.summary-card h3{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--plum);margin-bottom:.85rem}.sum-row{display:flex;justify-content:space-between;gap:.9rem;border-bottom:1px dashed var(--line2);padding:.62rem 0;color:var(--muted);font-size:.9rem}.sum-row b{color:var(--ink)}.sum-row.total{border-bottom:none;padding-top:.85rem;font-size:1.05rem}.sum-row.total b{font-family:'Space Mono',monospace;color:var(--pink-d)}.summary-note{margin:.8rem 0 1rem;color:var(--muted);font-size:.8rem}.summary-card .btn{width:100%;margin-top:.55rem}
+.catbar{max-width:1240px;margin:1.45rem auto 0;padding:0 1.25rem;display:flex;gap:.55rem;overflow-x:auto;scrollbar-width:none}.catbar::-webkit-scrollbar{display:none}.cat-tab{flex-shrink:0;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:.58rem 1rem;font-family:inherit;font-weight:800;cursor:pointer;transition:.18s}.cat-tab:hover,.cat-tab.active{border-color:var(--pink);background:var(--pink);color:#fff}.cat-tab small{display:block;font-weight:400;opacity:.8}
+.sec-head{max-width:1240px;margin:2.2rem auto .95rem;padding:0 1.25rem;display:flex;align-items:end;justify-content:space-between;gap:1rem}.sec-head h2{font-family:'Playfair Display',serif;font-size:2.3rem;line-height:1.05;color:var(--plum)}.sec-head p{color:var(--muted);max-width:66ch}.count-badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:.45rem .85rem;font-family:'Space Mono',monospace;color:var(--pink-d);font-weight:700;font-size:.78rem;white-space:nowrap}
+.meals{max-width:1240px;margin:0 auto;padding:0 1.25rem 3.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.15rem}.meal-group{display:flex;flex-direction:column;gap:1rem}.meal-label{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.05rem;color:var(--plum)}.meal-label .ic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--pink-soft)}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;transition:.22s}.mcard:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--pink)}.mc-img{height:218px;position:relative;overflow:hidden;background:var(--soft)}.mc-img img{width:100%;height:100%;object-fit:cover;transition:transform .45s}.mcard:hover .mc-img img{transform:scale(1.055)}.mc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(45,22,42,.55))}.mc-badges{position:absolute;left:.85rem;right:.85rem;top:.8rem;display:flex;justify-content:space-between;gap:.45rem;z-index:2}.pill{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.28rem .58rem;font-size:.68rem;font-weight:800;background:rgba(255,255,255,.92);color:var(--plum);backdrop-filter:blur(10px)}.pill.dark{background:linear-gradient(135deg,rgba(233,30,140,.9),rgba(249,115,22,.86));color:#fff}
+.mc-head{padding:1.1rem 1.08rem .85rem;background:var(--soft);border-bottom:1px solid var(--line)}.mc-no{font-size:.66rem;font-weight:800;color:var(--pink-d);letter-spacing:.13em;text-transform:uppercase}.mc-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.38rem;line-height:1.15;color:var(--plum);margin-top:.25rem}.mc-en{font-size:.84rem;color:var(--muted);font-weight:700;margin-top:.15rem}
+.mc-body{padding:1.05rem 1.08rem;display:flex;flex-direction:column;gap:.88rem;flex:1}.desc{font-size:.86rem;color:var(--muted)}.badges,.ings,.benefits{display:flex;gap:.35rem;flex-wrap:wrap}.dbadge{font-size:.65rem;font-weight:800;color:var(--green);background:var(--green-soft);border:1px solid #CBE6D9;padding:.22rem .55rem;border-radius:999px}.ing{font-size:.74rem;font-weight:800;color:var(--pink-d);background:#FFF2FA;border:1px solid #F4C7DF;padding:.25rem .58rem;border-radius:999px}.bchip{background:var(--green-soft);color:#1E6748;border-radius:999px;padding:.25rem .58rem;font-size:.74rem;font-weight:800}
+.panel-h{font-size:.69rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem;display:flex;align-items:center;gap:.42rem}.panel-h::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--pink),var(--orange))}
+.nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.42rem}.n-pill{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:.45rem .25rem;text-align:center}.n-pill .nv{font-family:'Space Mono',monospace;font-weight:700;font-size:.82rem}.n-pill .nk{font-size:.56rem;color:var(--muted)}.n-pill.cal{background:var(--pink-soft);border-color:transparent}.n-pill.cal .nv{color:var(--pink-d)}
+.drc{display:flex;flex-direction:column;gap:.36rem}.dr-line{display:grid;grid-template-columns:78px 1fr 38px;gap:.45rem;align-items:center;font-size:.76rem;color:var(--muted)}.dr-bar{height:7px;border-radius:999px;background:var(--green-soft);overflow:hidden}.dr-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),var(--green));width:var(--w)}.dr-line .dp{font-family:'Space Mono',monospace;font-weight:700;color:var(--green)}
+.nutrition-label{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}.nutrition-label .nl-head{display:flex;justify-content:space-between;gap:.7rem;background:linear-gradient(135deg,var(--pink-soft),var(--orange-soft));padding:.65rem .78rem;font-weight:800;color:var(--plum);font-size:.82rem}.nutrition-label table{width:100%;border-collapse:collapse;font-size:.76rem}.nutrition-label th,.nutrition-label td{padding:.42rem .5rem;border-top:1px solid var(--line);text-align:left}.nutrition-label th{font-weight:800;color:var(--muted);background:#FFFCF8}.nutrition-label td:nth-child(2),.nutrition-label td:nth-child(3){font-family:'Space Mono',monospace;white-space:nowrap}.info-box{background:#fff;border:1px solid var(--line);border-radius:15px;padding:.72rem;font-size:.79rem;color:var(--muted)}.info-box b{color:var(--pink-d)}.claim-list{display:flex;gap:.35rem;flex-wrap:wrap}.claim{background:var(--orange-soft);color:var(--orange-d);border:1px solid #FED7AA;border-radius:999px;padding:.24rem .55rem;font-size:.72rem;font-weight:800}
+.substitutions{background:#FFF9FD;border:1px dashed #F0B9D4;border-radius:14px;padding:.7rem;font-size:.78rem;color:var(--muted)}.substitutions b{color:var(--pink-d)}
+.mc-foot{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;border-top:1px dashed var(--line2);padding-top:.82rem}.price{grid-column:1/-1;font-family:'Space Mono',monospace;font-weight:700;color:var(--pink-d)}.cart-add,.order-btn{border-radius:999px;padding:.6rem .76rem;cursor:pointer;font-family:inherit;font-weight:800;transition:.18s}.cart-add{border:1.5px solid var(--pink);background:#fff;color:var(--pink-d)}.cart-add:hover,.cart-add.added{background:var(--pink);color:#fff}.order-btn{border:1.5px solid var(--plum);background:var(--plum);color:#fff}.order-btn:hover{background:var(--pink);border-color:var(--pink)}
+.story{background:linear-gradient(135deg,#3B1831,#2A2130);color:#fff;margin-top:1rem}.story-in{max-width:1240px;margin:0 auto;padding:3.5rem 1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center}.story h2{font-family:'Playfair Display',serif;font-size:2.65rem;line-height:1.05;margin-bottom:.9rem}.story p{color:rgba(255,255,255,.70)}.story-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.story-card{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:20px;padding:1rem}.story-card b{display:block;color:#FFD6EA;margin-bottom:.25rem}.story-card span{font-size:.83rem;color:rgba(255,255,255,.66)}
+.overlay{position:fixed;inset:0;background:rgba(32,20,30,.46);opacity:0;visibility:hidden;transition:.24s;z-index:90}.overlay.show{opacity:1;visibility:visible}.drawer{position:fixed;right:0;top:0;height:100%;width:min(430px,92vw);background:var(--milk);z-index:100;transform:translateX(100%);transition:.28s cubic-bezier(.4,0,.2,1);box-shadow:-18px 0 55px rgba(0,0,0,.18);display:flex;flex-direction:column}.drawer.open{transform:translateX(0)}.dr-head{padding:1.15rem 1.2rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.dr-head h3{font-family:'Playfair Display',serif;font-size:1.38rem;color:var(--plum)}.dr-close{border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:1.6rem;line-height:1}.dr-body{flex:1;overflow-y:auto;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.72rem}.empty{text-align:center;color:var(--muted);padding:3rem 1rem}.ci{background:#fff;border:1px solid var(--line);border-radius:17px;padding:.82rem}.ci-top{display:flex;gap:.7rem;justify-content:space-between}.ci-name{font-weight:800;line-height:1.25}.ci-meal{font-size:.76rem;color:var(--muted);margin-top:.18rem}.ci-del{border:none;background:transparent;color:var(--muted);cursor:pointer}.ci-line{display:flex;justify-content:space-between;border-top:1px dashed var(--line2);padding-top:.55rem;margin-top:.55rem;font-size:.85rem}.dr-foot{background:#fff;border-top:1px solid var(--line);padding:1.05rem 1.2rem}.dr-foot .btn{width:100%;margin-top:.75rem}.toast{position:fixed;left:50%;bottom:1.3rem;transform:translateX(-50%) translateY(18px);background:var(--plum);color:#fff;border-radius:999px;padding:.72rem 1.1rem;font-weight:800;box-shadow:0 15px 40px rgba(0,0,0,.22);opacity:0;visibility:hidden;transition:.22s;z-index:130}.toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.note{max-width:1240px;margin:0 auto;padding:0 1.25rem 3rem;color:var(--muted);font-size:.82rem}.note b{color:var(--pink-d)}
+@media(max-width:1040px){.hero{grid-template-columns:1fr}.program-in{grid-template-columns:1fr}.summary-card{position:static}.meals{grid-template-columns:1fr}.meal-group{display:grid;grid-template-columns:repeat(2,1fr)}.meal-label{grid-column:1/-1}.story-in{grid-template-columns:1fr}}
+@media(max-width:720px){.nav-in{align-items:flex-start}.nav-actions .nav-link{display:none}.hero{padding-top:2.5rem}.hero-photo{height:340px}.stats,.addons,.meal-group,.story-grid{grid-template-columns:1fr}.sec-head{align-items:flex-start;flex-direction:column}.nutri{grid-template-columns:repeat(2,1fr)}.toast{width:calc(100% - 2rem);text-align:center}}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">SAR</span>
+      <span class="logo-name">She AI Revolution<small>Women-only Signature Menu</small></span>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-link" href="index.html">হোম</a>
+      <a class="nav-link" href="meal-score.html">AI Meal Score</a>
+      <a class="nav-link" href="register.html">রেজিস্টার</a>
+      <a class="nav-link" href="menu.html" download="she-ai-revolution-sar-21-meal-menu.html">HTML ডাউনলোড</a>
+      <button class="cart-btn" onclick="openCart()">কার্ট <span class="cart-pill" id="cartCount">0</span></button>
+    </div>
+  </div>
+</nav>
 
+<header class="hero">
+  <div>
+    <div class="eyebrow"><span class="dot"></span> Sakara-inspired · ৭ দিন · ২১ recipe · pink for women</div>
+    <h1>SAR <em>Signature</em> Meal</h1>
+    <p class="hero-sub">Sakara-এর clean weekly menu ধারণা থেকে অনুপ্রাণিত, কিন্তু SAR-এর নারী-কেন্দ্রিক therapeutic nutrition অনুযায়ী তৈরি: <b>৭ দিন × সকাল, দুপুর, রাত = ২১টি meal</b>. Ingredient list বাংলাদেশে সাধারণত পাওয়া যায় এমন শাক, ডাল, বীজ, ফল, দেশি ডিম, দই ও মাছ দিয়ে localize করা হয়েছে।</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#meals">২১টি recipe দেখুন →</a>
+      <button class="btn btn-soft" onclick="addWeekToCart()">সব ২১টি কার্টে যোগ</button>
+      <a class="btn btn-soft" href="menu.html" download="she-ai-revolution-sar-21-meal-menu.html">HTML কোড ডাউনলোড</a>
+    </div>
+  </div>
+  <div class="hero-panel">
+    <div class="hero-photo">
+      <img id="heroImg" alt="SAR weekly meals generated non-branded food artwork">
+      <div class="photo-caption">
+        <small>Premium weekly menu direction · SAR nutrition logic</small>
+        <b>২১টি ready-to-order healing meal</b>
+        <span>Clean, non-branded food photography + Bangladesh ingredient substitutions.</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats" aria-label="SAR Signature Meal highlights">
+  <div class="stat"><b>৭</b><span>দিন</span></div>
+  <div class="stat"><b>২১</b><span>মোট recipe</span></div>
+  <div class="stat"><b>৩</b><span>প্রতিদিন meal</span></div>
+  <div class="stat"><b>AI</b><span>Women-only nutrition</span></div>
+</section>
+
+<section class="program" id="program">
+  <div class="program-in">
+    <div class="control-card">
+      <div class="control-head">
+        <div>
+          <h2>আপনার SAR Signature সপ্তাহ</h2>
+          <p>একটি fixed women-only program: ৭ দিন, প্রতিদিন ৩ meal, মোট ২১টি recipe.</p>
+        </div>
+        <span class="tag">Sakara-inspired</span>
+      </div>
+      <div class="sel-box" id="planBox"></div>
+      <div class="addons" id="addonGrid"></div>
+    </div>
+    <aside class="summary-card">
+      <h3>প্রোগ্রাম সারাংশ</h3>
+      <div class="sum-row"><span>প্ল্যান</span><b id="sumPlan">৭ দিন / ২১ meal</b></div>
+      <div class="sum-row"><span>Recipe সংখ্যা</span><b id="sumMeals">২১</b></div>
+      <div class="sum-row"><span>অ্যাড-অন</span><b id="sumAddons">৳০</b></div>
+      <div class="sum-row"><span>সাবটোটাল</span><b id="sumSub">৳০</b></div>
+      <div class="sum-row"><span>ভ্যাট (৫%)</span><b id="sumVat">৳০</b></div>
+      <div class="sum-row total"><span>সর্বমোট</span><b id="sumTotal">৳০</b></div>
+      <p class="summary-note">সব ২১টি meal একসাথে কার্টে যোগ করতে পারেন। প্রতিটি কার্ড থেকেও আলাদা করে কার্টে যোগ বা সরাসরি অর্ডার করা যাবে।</p>
+      <button class="btn btn-primary" onclick="addWeekToCart()">সব ২১টি কার্টে যোগ</button>
+      <button class="btn btn-soft" onclick="goCheckout()">চেকআউট</button>
+      <a class="btn btn-soft" href="menu.html" download="she-ai-revolution-sar-21-meal-menu.html">HTML কোড ডাউনলোড</a>
+    </aside>
+  </div>
+</section>
+
+<div class="catbar" id="dayBar"></div>
+
+<div class="sec-head">
+  <div>
+    <h2>৭ দিনের <span class="serif"><em>২১ recipe</em></span></h2>
+    <p>`meal-score.html`-এর মতো breakfast/lunch/dinner grouped card format, কিন্তু premium weekly-menu clean layout এবং women-only pink-orange SAR branding. প্রতিটি card-এ non-branded food ছবি, localized ingredient, nutrition, daily requirement %, নারীদের উপকারিতা ও substitutions আছে।</p>
+  </div>
+  <span class="count-badge" id="visibleCount">২১ recipe</span>
+</div>
+
+<main class="meals" id="meals"></main>
+
+<section class="story">
+  <div class="story-in">
+    <div>
+      <h2>Sakara idea, SAR execution</h2>
+      <p>Sakara-এর plant-rich, ready-to-eat weekly menu ধারণাকে SAR বাংলাদেশি নারীর জন্য localize করেছে। যেসব imported ingredient সহজলভ্য নয়, সেগুলোর বিকল্প হিসেবে কচি শাক, লাউ, কুমড়া, মুগ, ছোলা, তিল, আমলকি, দেশি ডিম, মাছ ও দই ব্যবহার করা হয়েছে।</p>
+    </div>
+    <div class="story-grid">
+      <div class="story-card"><b>Clean premium visuals</b><span>Non-branded food imagery; no visible SAKARA text on pictures.</span></div>
+      <div class="story-card"><b>Bangladesh ingredients</b><span>Local market friendly substitutions for hard-to-find imported items.</span></div>
+      <div class="story-card"><b>Meal-score format</b><span>Nutrition panel, daily requirement bars, women’s benefits, allergen and product claims.</span></div>
+      <div class="story-card"><b>Order ready</b><span>Add to cart and direct order connect with existing SAR order flow.</span></div>
+    </div>
+  </div>
+</section>
+
+<p class="note"><b>নোট:</b> SAR Signature Meal একটি wellness food program, চিকিৎসা পরামর্শ নয়। ডিজাইনটি premium weekly menu থেকে অনুপ্রাণিত; ছবিগুলো non-branded food photography, যাতে কোনো visible SAKARA লেখা নেই। Recipe ingredient SAR-এর Bangladesh-localized therapeutic version.</p>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+<aside class="drawer" id="drawer">
+  <div class="dr-head"><h3>আপনার SAR কার্ট</h3><button class="dr-close" onclick="closeCart()">×</button></div>
+  <div class="dr-body" id="cartBody"></div>
+  <div class="dr-foot">
+    <div class="sum-row"><span>সাবটোটাল</span><b id="cartSub">৳০</b></div>
+    <div class="sum-row"><span>ভ্যাট (৫%)</span><b id="cartVat">৳০</b></div>
+    <div class="sum-row total"><span>সর্বমোট</span><b id="cartTotal">৳০</b></div>
+    <button class="btn btn-primary" onclick="goCheckout()">অর্ডার চেকআউট →</button>
+  </div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const PRICE_PER_MEAL=360,VAT_RATE=.05;
+const DAILY={kcal:2000,protein:50,carb:260,fat:65,fiber:25,iron:18,calcium:1000};
+const fmt=n=>'৳'+Math.round(n).toLocaleString('bn-BD');
+const bn=n=>(n||0).toLocaleString('bn-BD');
+const DAYS=[
+  {k:'mon',bn:'সোমবার',en:'Monday'},
+  {k:'tue',bn:'মঙ্গলবার',en:'Tuesday'},
+  {k:'wed',bn:'বুধবার',en:'Wednesday'},
+  {k:'thu',bn:'বৃহস্পতিবার',en:'Thursday'},
+  {k:'fri',bn:'শুক্রবার',en:'Friday'},
+  {k:'sat',bn:'শনিবার',en:'Saturday'},
+  {k:'sun',bn:'রবিবার',en:'Sunday'}
+];
+const MEALS=[
+  {k:'breakfast',bn:'সকাল',en:'Breakfast',ic:'🌅',cls:'b'},
+  {k:'lunch',bn:'দুপুর',en:'Lunch',ic:'☀️',cls:'l'},
+  {k:'dinner',bn:'রাত',en:'Dinner',ic:'🌙',cls:'d'}
+];
+const PLAN={title:'৭ দিন · ২১ recipe',sub:'প্রতিদিন সকাল + দুপুর + রাত',meals:21,price:7560};
+const ADDONS=[
+  {k:'tonic',title:'Daily Rose-Tulsi Tonic',sub:'৭টি তুলসি-গোলাপ-লেবু hydration shot',price:840},
+  {k:'protein',title:'Women Protein Boost',sub:'স্প্রাউট/ডিম/মাছ/তিল extra protein layer',price:980},
+  {k:'dessert',title:'Sweet Healing Cup',sub:'চিনি ছাড়া ৪টি ফল-চিয়া dessert cup',price:720}
+];
+function svgMealImage(title,index){
+  const palettes=[
+    ['#E91E8C','#F97316','#FFE4F2'],['#B51267','#FF7EB8','#FFF0E6'],['#F97316','#FDBA74','#FDE9F4'],
+    ['#2E8B62','#E91E8C','#FFF7FC'],['#C9A24B','#F97316','#FDE9F4'],['#7C2D6B','#FF7EB8','#FFF0E6']
+  ];
+  const p=palettes[index%palettes.length];
+  const safe=String(title).replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="620" viewBox="0 0 900 620">
+    <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="${p[0]}"/><stop offset=".55" stop-color="${p[1]}"/><stop offset="1" stop-color="${p[2]}"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#4b1f3b" flood-opacity=".25"/></filter></defs>
+    <rect width="900" height="620" rx="38" fill="url(#g)"/>
+    <circle cx="720" cy="95" r="170" fill="#fff" opacity=".20"/><circle cx="120" cy="520" r="190" fill="#fff" opacity=".16"/>
+    <g filter="url(#s)"><ellipse cx="450" cy="345" rx="265" ry="118" fill="#fff" opacity=".95"/><ellipse cx="450" cy="318" rx="230" ry="88" fill="#FFF7ED"/>
+    <circle cx="350" cy="290" r="54" fill="#2E8B62"/><circle cx="435" cy="278" r="48" fill="#F97316"/><circle cx="515" cy="295" r="58" fill="#E91E8C"/>
+    <circle cx="590" cy="326" r="37" fill="#C9A24B"/><circle cx="300" cy="348" r="35" fill="#FF7EB8"/><path d="M240 385c95 64 330 73 455-2" fill="none" stroke="#38283B" stroke-width="18" stroke-linecap="round" opacity=".18"/></g>
+    <rect x="72" y="68" width="305" height="62" rx="31" fill="#fff" opacity=".88"/><text x="96" y="107" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#B51267">SAR WOMEN MEAL</text>
+    <text x="72" y="558" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#fff">${safe}</text>
+  </svg>`;
+  return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+}
+const RAW_MENU=[
+  ['mon','breakfast','চকলেট লাভ মাফিন','Chocolate Love Muffin','নারকেল-ওট crumble ও honey almond caramel style; cacao, oats, নারকেল ও মধু দিয়ে heatable breakfast.',410,14,54,8,13,3.6,130,['ওটস','কোকো/কাকাও','নারকেল','মধু','বাদাম/চিনাবাদাম'],['মুড সাপোর্ট','PMS sweet craving control','স্থির সকাল এনার্জি'],'Pecan/superfood caramel → বাদাম/চিনাবাদাম + মধু'],
+  ['mon','lunch','বাটারফ্লাই বোল','Butterfly Bowl','অপরাজিতা ফুলের নীল ভাত, কিশমিশ, কাজু ও লেবু-yuzu style dressing.',560,18,76,11,14,4.8,120,['অপরাজিতা ফুল','লাল/সাদা চাল','কিশমিশ','কাজু','লেবু'],['Antioxidant support','Cycle-day hydration','Gentle energy'],'Yuzu/currants/pecans → লেবু + কিশমিশ + কাজু'],
+  ['mon','dinner','হার্ট + সোল শাওয়ারমা বোল','Heart + Soul Shawarma Bowl w/ Power Pita','কাঁঠাল shawarma, ছোলা, ফুলকপি, মরিচ paste, কালোজিরা রুটি ও herb hummus.',620,27,72,16,17,6.3,170,['কাঁঠাল','ছোলা','ফুলকপি','কালোজিরা রুটি','তিল-হার্ব hummus'],['Iron + fiber','Heart-friendly satiety','প্রোটিন সাপোর্ট'],'Harissa/power pita → শুকনা মরিচ paste + কালোজিরা রুটি'],
+  ['tue','breakfast','জর্জিয়া পিচ পারফে','Georgia Peach Parfait','Peach parfait idea; বাংলাদেশে সহজলভ্য আম/পেঁপে, দারুচিনি ও কাজু granola.',395,15,48,9,12,3.2,240,['আম/পেঁপে','টক দই','দারুচিনি','কাজু','গাঁদা ফুল পাপড়ি'],['Skin glow','Calcium for women','Gut microbiome'],'Peach/calendula/pecan → আম-পেঁপে + গাঁদা + কাজু'],
+  ['tue','lunch','ইনার ফায়ার বোল','Inner Fire Bowl','Gochujang mayo style spicy bowl; fermented red chili-garlic yogurt sauce, ছোলা ও লাল চাল.',585,24,66,14,16,5.4,145,['লাল চাল','ছোলা','লাল মরিচ-রসুন paste','টক দই','শসা'],['Metabolism support','Bloat relief','Midday focus'],'Gochujang mayo → ফার্মেন্টেড মরিচ-রসুন দই sauce'],
+  ['tue','dinner','লাসাগনা বোলোনিজ হাইড্রেটিং গ্রিনস','Lasagna Bolognese w/ Hydrating Greens','Green lentil bolognese, গাজর, আখরোট/চিনাবাদাম, দই-ricotta style ও শাক.',610,30,58,15,18,6.5,210,['সবুজ/মসুর ডাল','গাজর','পালং শাক','টক দই','আখরোট/চিনাবাদাম'],['Protein for muscle','Folate greens','Comfort without heaviness'],'Ricotta/walnut → টক দই ricotta + local nut option'],
+  ['wed','breakfast','বানানা নাট ব্রেইন-ফুড গ্রানোলা','Banana Nut Brain-Food Granola w/ Banana-Cacao Mylk','কলা chips, pumpkin seed, flaxseed, almond/peanut ও banana-cacao milk.',430,16,58,11,15,4.3,160,['কলা','কাকাও','কুমড়ার বীজ','ফ্ল্যাক্স বীজ','বাদাম/চিনাবাদাম'],['Brain focus','Omega support','Hormone-friendly fats'],'Pecan pieces → চিনাবাদাম/বাদাম'],
+  ['wed','lunch','ক্রাঞ্চি কেল সালাদ','Crunchy Kale Salad','Kale idea localize করে পালং/লাল শাক, বাঁধাকপি, ছোলা, আপেল, গাজর ও শসা.',540,22,54,18,16,6.8,150,['পালং/লাল শাক','বেগুনি বাঁধাকপি','ছোলা','আপেল','গাজর'],['Iron + folate','High fiber','Skin clarity'],'Kale/avocado → পালং/লাল শাক + শসা'],
+  ['wed','dinner','মিসো রামেন চিলি-কোম্বু ব্রথ','Miso Ramen w/ Chili-Kombu Broth','Brown rice noodles vibe; ডাল-chili broth, rice noodles, chickpea tofu ও mushroom.',575,25,68,12,14,5.2,130,['রাইস নুডলস','ছোলা tofu','মাশরুম','আদা-মরিচ broth','তিল'],['Warm digestion','Protein','Stress comfort'],'Miso/kombu/shiitake → ডাল broth + local mushroom'],
+  ['thu','breakfast','সেরোটোনিন গ্লো পারফে','Serotonin Glow Parfait','Raw cacao, coconut cream, puffed rice/quinoa style, খেজুর, আম ও কিশমিশ.',405,13,46,10,16,3.4,180,['কাকাও','নারকেল cream','মুড়ি/কাউন puff','খেজুর','আম/কিশমিশ'],['Mood support','Skin glow','Healthy fats'],'Avocado/apricot/goji → আম + খেজুর + কিশমিশ'],
+  ['thu','lunch','বাফেলো ফুলকপি বোল','Buffalo Cauliflower Bowl','Spicy buffalo cauliflower, কাউন/লাল চাল, herb yogurt ranch dressing.',565,21,62,14,15,4.9,180,['ফুলকপি','কাউন/লাল চাল','টক দই','ধনেপাতা','লাল মরিচ'],['Metabolic fire','Calcium support','Satiety'],'Quinoa/ranch → কাউন + টকদই herb dressing'],
+  ['thu','dinner','সাদা বিন ও শালগম স্যুপ','White Bean and Parsnip Soup w/ Turmeric Bread','White bean soup; parsnip বদলে শালগম/মূলা, turmeric millet roll ও local chili butter.',500,24,58,13,12,5.5,150,['সাদা বরবটি/শিম','শালগম/মূলা','হলুদ রুটি','পুদিনা','কাঁচা মরিচ'],['Gentle protein','Digestive warmth','Mineral support'],'Cannellini/parsnip/calabrian chili → শিম + শালগম + কাঁচা মরিচ'],
+  ['fri','breakfast','রাইজ + শাইন লেমন ডোনাট','Rise + Shine Lemon Donut','Heatable lemon-oat donut with coconut, honey and yogurt glaze.',390,12,50,7,12,3.0,120,['ওটস','লেবু','নারকেল','মধু','টক দই'],['Light morning energy','Vitamin C','Craving balance'],'Imported gluten-free flour blend → ওটস + চালের আটা'],
+  ['fri','lunch','ক্যারিবিয়ান জার্ক সালাদ','Caribbean Jerk Salad','Spiced rice, কাজু, আম, শাক ও herb dressing with local jerk-style spice.',590,22,70,13,18,5.2,140,['লাল চাল','আম','কাজু','পালং শাক','জিরা-মরিচ spice'],['Energy for busy day','Iron greens','Healthy fats'],'Caribbean spice blend → জিরা-ধনে-মরিচ local blend'],
+  ['fri','dinner','ফাইভ-স্পাইস ড্যান ড্যান নুডলস','Five-Spice Dan Dan Noodles','Rice noodles, chickpea tofu, mushroom and sesame-panch phoron sauce.',610,26,72,12,17,5.4,160,['রাইস নুডলস','ছোলা tofu','মাশরুম','তিল','পাঁচফোড়ন'],['Hearty protein','Warm circulation','Comfort dinner'],'Pumpkin seed tofu/five spice → ছোলা tofu + পাঁচফোড়ন'],
+  ['sat','breakfast','মিষ্টি আলু-নারকেল ড্রিম পারফে','Sweet Potato-Coconut Dream Parfait','Nutmeg sweet potato parfait with coconut, green apple/আমড়া and pumpkin-sesame crunch.',415,14,52,10,13,3.8,210,['মিষ্টি আলু','নারকেল','জায়ফল','সবুজ আপেল/আমড়া','কুমড়া-তিল'],['Hormone-friendly carbs','Calcium','Steady energy'],'Hemp seed/green apple → কুমড়া-তিল + আমড়া'],
+  ['sat','lunch','SAR বুরিটো বোল','Sakara Burrito Bowl','Pink pitaya rice idea; beet-tinted rice, pickled chili, turmeric corn salsa and cilantro dressing.',605,23,76,15,14,5.6,130,['বিট-রঙা চাল','ভুট্টা','ধনেপাতা','আচার কাঁচা মরিচ','টক দই dressing'],['Lunch satiety','Antioxidants','Cycle energy'],'Pitaya/serrano/cilantro crema → বিট + কাঁচা মরিচ + টক দই'],
+  ['sat','dinner','সিচুয়ান নুডলস টমেটো-আদা সস','Sichuan Noodles w/ Tomato-Ginger Sauce','Brown rice noodles style with sesame carrots, white beans and tomato-ginger sauce.',590,24,70,13,14,5.0,135,['রাইস নুডলস','গাজর','সাদা শিম','টমেটো','আদা-তিল sauce'],['Digestive heat','Plant protein','Evening comfort'],'Brown rice noodles → local rice noodles'],
+  ['sun','breakfast','বানানা প্রোটিন ব্রেড','Banana Protein Bread','Heatable banana-oat protein bread with fresh berry/পেয়ারা compote.',425,18,54,9,12,3.6,150,['কলা','ওটস','ডিম/মুগ protein','পেয়ারা jam','দারুচিনি'],['Protein breakfast','Mood support','Post-period energy'],'Ruby red berries → পেয়ারা/strawberry when seasonal'],
+  ['sun','lunch','ইতালিয়ান চপড সালাদ','Italian Chopped Salad','Chickpeas, olives optional, green chili pickle, pumpkin seed, basil butter style seeded roll.',570,24,58,16,17,5.7,170,['ছোলা','শসা','কুমড়ার বীজ','তুলসি butter','কাঁচা মরিচ আচার'],['Fiber + protein','Healthy fats','Bloat control'],'Pepperoncini/pine nuts/vegan feta → কাঁচা মরিচ আচার + কুমড়ার বীজ + টকদই/paneer'],
+  ['sun','dinner','রুট ভেজ এনচিলাডা রাইস-বিনস','Root Veggie Enchilada w/ SAR Rice & Beans','Root vegetables, rice-beans, cumin, cashew-lime crema and green chutney.',625,27,78,15,16,6.0,155,['মিষ্টি আলু','লাল চাল','রাজমা/শিম','জিরা','কাজু-লেবু crema'],['Iron + protein','Comfort recovery','Hormone-friendly fullness'],'Corn tortilla/guacamole → চালের রুটি + সবুজ চাটনি']
+];
+const MENU=RAW_MENU.map((m,i)=>({
+  id:'sar-21-'+String(i+1).padStart(2,'0'),day:m[0],meal:m[1],bn:m[2],name:m[3],desc:m[4],
+  img:svgMealImage(m[2],i),serving:320,kcal:m[5],energy:Math.round(m[5]*4.184),protein:m[6],carb:m[7],
+  fiber:m[8],fat:m[9],satFat:Math.round(m[9]*0.34*10)/10,sugars:Math.round(m[7]*0.18*10)/10,
+  sodium:Math.round(320+(m[5]*0.62)+(i%5)*28),iron:m[10],calcium:m[11],ingredients:m[12],benefits:m[13],swap:m[14],price:PRICE_PER_MEAL
+}));
+let activeDay='all',selectedAddons=new Set(),cart=safeCart();
+function safeCart(){try{const raw=JSON.parse(localStorage.getItem('sar_cart')||'[]');return Array.isArray(raw)?raw.filter(Boolean):[]}catch(e){return []}}
+function dayLabel(k){const d=DAYS.find(x=>x.k===k);return d?d.bn:k}
+function mealInfo(k){return MEALS.find(x=>x.k===k)||MEALS[0]}
+function pct(v,key){return Math.min(100,Math.round((v/DAILY[key])*100))}
+function renderPlans(){
+  document.getElementById('planBox').innerHTML=`<div class="k">${bn(PLAN.meals)}টি recipe</div><div class="v">${PLAN.title}</div><div class="p">${fmt(PLAN.price)}</div><div class="k" style="margin-top:.18rem;text-transform:none;letter-spacing:0">${PLAN.sub}</div>`;
+  document.getElementById('addonGrid').innerHTML=ADDONS.map(a=>`<label class="addon"><input type="checkbox" ${selectedAddons.has(a.k)?'checked':''} onchange="toggleAddon('${a.k}',this.checked)"><span><b>${a.title}</b><span>${a.sub}</span><span class="price">+ ${fmt(a.price)}</span></span></label>`).join('');
+  updateSummary();
+}
+function toggleAddon(k,on){on?selectedAddons.add(k):selectedAddons.delete(k);updateSummary()}
+function addonTotal(){return ADDONS.filter(a=>selectedAddons.has(a.k)).reduce((s,a)=>s+a.price,0)}
+function updateSummary(){const add=addonTotal(),sub=PLAN.price+add,vat=Math.round(sub*VAT_RATE);sumPlan.textContent=PLAN.title;sumMeals.textContent=bn(PLAN.meals);sumAddons.textContent=fmt(add);sumSub.textContent=fmt(sub);sumVat.textContent=fmt(vat);sumTotal.textContent=fmt(sub+vat)}
+function renderDayBar(){
+  dayBar.innerHTML=[`<button class="cat-tab ${activeDay==='all'?'active':''}" onclick="setDay('all')">সব দিন<small>২১ recipe</small></button>`].concat(DAYS.map(d=>`<button class="cat-tab ${activeDay===d.k?'active':''}" onclick="setDay('${d.k}')">${d.bn}<small>${d.en}</small></button>`)).join('');
+}
+function setDay(k){activeDay=k;renderDayBar();renderMeals()}
+function visibleMeals(){return MENU.filter(m=>activeDay==='all'||m.day===activeDay)}
+function dvRows(m){return [['ক্যালরি',pct(m.kcal,'kcal')],['প্রোটিন',pct(m.protein,'protein')],['ফাইবার',pct(m.fiber,'fiber')],['আয়রন',pct(m.iron,'iron')],['ক্যালসিয়াম',pct(m.calcium,'calcium')]].map(r=>`<div class="dr-line"><span>${r[0]}</span><span class="dr-bar"><i style="--w:${r[1]}%"></i></span><span class="dp">${bn(r[1])}%</span></div>`).join('')}
+function per100(v,m){return Math.round((v/(m.serving/100))*10)/10}
+function nutritionTable(m){
+  const rows=[
+    ['Energy',m.energy+' kJ',per100(m.energy,m)+' kJ'],
+    ['Protein',m.protein+' g',per100(m.protein,m)+' g'],
+    ['Fat, total',m.fat+' g',per100(m.fat,m)+' g'],
+    ['saturated',m.satFat+' g',per100(m.satFat,m)+' g'],
+    ['Carbohydrate',m.carb+' g',per100(m.carb,m)+' g'],
+    ['sugars',m.sugars+' g',per100(m.sugars,m)+' g'],
+    ['Sodium',m.sodium+' mg',per100(m.sodium,m)+' mg']
+  ];
+  return `<div class="nutrition-label"><div class="nl-head"><span>Nutritional Information</span><span>Serving size: ${m.serving}g</span></div><table><thead><tr><th>AVG. QUANTITY</th><th>PER SERVING</th><th>PER 100g</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function detailedIngredients(m){
+  const pct=[28,22,17,11,7];
+  return `${m.bn} (${m.serving}g): ${m.ingredients.map((x,i)=>`${x} (${pct[i]||5}%)`).join(', ')}, পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা। Total meal uses Bangladesh-available ingredients.`;
+}
+function allergenInfo(m){
+  const txt=m.ingredients.join(' ');
+  const a=[];
+  if(/বাদাম|চিনাবাদাম|কাজু|আখরোট/.test(txt))a.push('TREE NUTS/PEANUT');
+  if(/তিল|sesame/i.test(txt))a.push('SESAME');
+  if(/ডিম/i.test(txt))a.push('EGG');
+  if(/দই|cream|butter|paneer/i.test(txt))a.push('MILK');
+  if(/মাছ/i.test(txt))a.push('FISH');
+  if(/ওটস|রুটি|নুডলস/i.test(txt))a.push('GLUTEN traces possible');
+  return a.length?'Contains '+a.join(', ')+'. May contain soy, sesame, peanut, tree nut traces from shared kitchen.':'May contain sesame, peanut, tree nut or soy traces from shared kitchen.';
+}
+function claims(m){return ['বাংলাদেশে পাওয়া উপাদান','Good source of protein','No artificial colours or flavours','Women-focused nutrition'].map(c=>`<span class="claim">${c}</span>`).join('')}
+function womenBenefits(m){return m.benefits.map(b=>`<span class="bchip">✓ ${b}</span>`).join('')}
+function card(m,i){
+  const meal=mealInfo(m.meal);
+  return `<article class="mcard">
+    <div class="mc-img"><img src="${m.img}" alt="${m.bn}"><div class="mc-badges"><span class="pill dark">${dayLabel(m.day)}</span><span class="pill">${meal.ic} ${meal.bn}</span></div></div>
+    <div class="mc-head"><div class="mc-no">SAR Recipe ${bn(i+1)} · ${meal.en}</div><div class="mc-name">${m.bn}</div><div class="mc-en">${m.name}</div></div>
+    <div class="mc-body">
+      <p class="desc">${m.desc}</p>
+      <div class="badges">${['নারীর জন্য','Gluten-conscious','Refined sugar-free','Plant-rich'].map(b=>`<span class="dbadge">${b}</span>`).join('')}</div>
+      <div><div class="panel-h">বাংলাদেশে পাওয়া উপাদান</div><div class="ings">${m.ingredients.map(x=>`<span class="ing">${x}</span>`).join('')}</div></div>
+      <div><div class="panel-h">Quick nutrition panel</div><div class="nutri"><div class="n-pill cal"><div class="nv">${bn(m.kcal)}</div><div class="nk">kcal</div></div><div class="n-pill"><div class="nv">${bn(m.protein)}g</div><div class="nk">প্রোটিন</div></div><div class="n-pill"><div class="nv">${bn(m.carb)}g</div><div class="nk">কার্ব</div></div><div class="n-pill"><div class="nv">${bn(m.fat)}g</div><div class="nk">ফ্যাট</div></div><div class="n-pill"><div class="nv">${bn(m.fiber)}g</div><div class="nk">ফাইবার</div></div></div></div>
+      ${nutritionTable(m)}
+      <div><div class="panel-h">Daily requirement coverage</div><div class="drc">${dvRows(m)}</div></div>
+      <div><div class="panel-h">নারীদের উপকারিতা</div><div class="benefits">${womenBenefits(m)}</div></div>
+      <div class="info-box"><b>Ingredients</b><br>${detailedIngredients(m)}</div>
+      <div class="info-box"><b>Allergen</b><br>${allergenInfo(m)}</div>
+      <div><div class="panel-h">Product claims</div><div class="claim-list">${claims(m)}</div></div>
+      <div class="substitutions"><b>Local substitution:</b> ${m.swap}</div>
+      <div class="mc-foot"><span class="price">${fmt(m.price)}</span><button class="cart-add" onclick="addMeal('${m.id}',event)">কার্টে যোগ</button><button class="order-btn" onclick="orderDirect('${m.id}')">সরাসরি অর্ডার</button></div>
+    </div>
+  </article>`;
+}
+function renderMeals(){
+  const list=visibleMeals();
+  visibleCount.textContent=bn(list.length)+' recipe';
+  const grouped=MEALS.map(meal=>{
+    const items=list.filter(m=>m.meal===meal.k);
+    if(!items.length)return '';
+    return `<section class="meal-group"><div class="meal-label"><span class="ic">${meal.ic}</span>${meal.bn} · ${meal.en}</div>${items.map(m=>card(m,MENU.indexOf(m))).join('')}</section>`;
+  }).join('');
+  meals.innerHTML=grouped;
+}
+function cartItemFromMeal(m){return {uid:m.id,source:'sar-21-signature',code:m.id,name:m.bn,name_bn:m.bn,meal:m.meal,mealBn:mealInfo(m.meal).bn,day:dayLabel(m.day),cat:'AI',courses:['SAR Signature Recipe'],courseDetail:[{name:'SAR Signature Recipe',items:m.ingredients}],courseCount:1,ingredients:m.ingredients,kcal:m.kcal,protein:m.protein,carb:m.carb,fiber:m.fiber,benefits:m.benefits.join(' · '),price:m.price,basePrice:m.price,qty:1}}
+function addMeal(id,ev){const m=MENU.find(x=>x.id===id);if(!m)return;cart=cart.filter(c=>c.uid!==id).concat(cartItemFromMeal(m));persistCart();renderCart();if(ev&&ev.target){ev.target.textContent='✓ যোগ হয়েছে';ev.target.classList.add('added');setTimeout(()=>{ev.target.textContent='কার্টে যোগ';ev.target.classList.remove('added')},1300)}toast('✓ '+m.bn+' কার্টে যোগ হয়েছে')}
+function orderDirect(id){addMeal(id);goCheckout()}
+function addWeekToCart(){
+  const mealIds=new Set(MENU.map(m=>m.id)),addonIds=new Set(ADDONS.map(a=>'sar-addon-'+a.k));
+  cart=cart.filter(c=>!mealIds.has(c.uid)&&!addonIds.has(c.uid)).concat(MENU.map(cartItemFromMeal));
+  ADDONS.filter(a=>selectedAddons.has(a.k)).forEach(a=>{const uid='sar-addon-'+a.k;cart=cart.filter(c=>c.uid!==uid).concat({uid,source:'sar-21-signature',code:uid,name:a.title,name_bn:a.title,meal:'addon',mealBn:'অ্যাড-অন',day:'SAR ৭ দিনের প্ল্যান',cat:'AI',courses:['Weekly add-on'],courseDetail:[{name:'Weekly add-on',items:[a.sub]}],courseCount:1,ingredients:[a.sub],benefits:a.sub,price:a.price,basePrice:a.price,qty:1,kcal:0,protein:0,fiber:0})});
+  persistCart();renderCart();openCart();toast('✓ ২১টি SAR Signature recipe কার্টে যোগ হয়েছে');
+}
+function persistCart(){localStorage.setItem('sar_cart',JSON.stringify(cart))}
+function renderCart(){
+  cartCount.textContent=bn(cart.length);
+  if(!cart.length){cartBody.innerHTML='<div class="empty">কার্ট খালি।<br>একটি SAR Signature recipe যোগ করুন।</div>'}
+  else cartBody.innerHTML=cart.map(c=>`<div class="ci"><div class="ci-top"><div><div class="ci-name">${c.name}</div><div class="ci-meal">${c.day||''} · ${c.mealBn||''}</div></div><button class="ci-del" onclick="removeCart('${c.uid}')">✕</button></div><div class="ci-line"><span>${c.courseCount||1} item</span><b>${fmt((c.price||0)*(c.qty||1))}</b></div></div>`).join('');
+  const sub=cart.reduce((s,c)=>s+(c.price||0)*(c.qty||1),0),vat=Math.round(sub*VAT_RATE);cartSub.textContent=fmt(sub);cartVat.textContent=fmt(vat);cartTotal.textContent=fmt(sub+vat);
+}
+function removeCart(uid){cart=cart.filter(c=>c.uid!==uid);persistCart();renderCart()}
+function openCart(){drawer.classList.add('open');overlay.classList.add('show')}
+function closeCart(){drawer.classList.remove('open');overlay.classList.remove('show')}
+function goCheckout(){if(!cart.length){toast('কার্ট খালি');return}persistCart();window.location.href='order.html'}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),2400)}
+window.addEventListener('DOMContentLoaded',()=>{renderPlans();renderDayBar();renderMeals();renderCart();if('serviceWorker' in navigator)navigator.serviceWorker.register('/service-worker.js').catch(()=>{});});
+</script>
+</body>
+</html>
