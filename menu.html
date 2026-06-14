@@ -48,7 +48,7 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
 .photo-caption{position:absolute;left:1.25rem;right:1.25rem;bottom:1.1rem;color:#fff;z-index:2}.photo-caption small{display:block;font-family:'Space Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);font-size:.66rem}.photo-caption b{display:block;font-family:'Playfair Display',serif;font-size:1.55rem;line-height:1.1;margin:.25rem 0}.photo-caption span{display:block;color:rgba(255,255,255,.76);font-size:.86rem}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;max-width:1220px;margin:0 auto 1.4rem;padding:0 1.25rem}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1rem;box-shadow:var(--shadow)}.stat b{display:block;font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--plum);line-height:1}.stat span{font-size:.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .program{max-width:1220px;margin:1.25rem auto 0;padding:0 1.25rem}.program-in{display:grid;grid-template-columns:1fr 360px;gap:1rem;align-items:start}.control-card,.summary-card{background:rgba(255,255,255,.82);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:1.25rem}.control-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}.control-head h2{font-family:'Playfair Display',serif;font-size:1.8rem;line-height:1.1;color:var(--plum)}.control-head p{color:var(--muted);font-size:.9rem;margin-top:.18rem}.tag{font-family:'Space Mono',monospace;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;background:var(--rose2);color:#9B3750;border:1px solid #F0CED7;border-radius:999px;padding:.32rem .62rem;white-space:nowrap}
-.selector-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.sel-box{border:1px solid var(--line);background:#fff;border-radius:18px;padding:.9rem;cursor:pointer;transition:.18s}.sel-box:hover,.sel-box.active{border-color:var(--orange);box-shadow:0 12px 26px rgba(166,80,18,.10);transform:translateY(-1px)}.sel-box.active{background:#FFF6EB}.sel-box .k{font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}.sel-box .v{font-weight:800;color:var(--plum);margin-top:.1rem}.sel-box .p{font-family:'Space Mono',monospace;color:var(--orange2);font-weight:700;font-size:.86rem;margin-top:.24rem}
+.selector-grid{display:grid;grid-template-columns:1fr;gap:.75rem}.sel-box{border:1px solid var(--line);background:#fff;border-radius:18px;padding:.9rem;cursor:pointer;transition:.18s;text-align:left}.sel-box:hover,.sel-box.active{border-color:var(--orange);box-shadow:0 12px 26px rgba(166,80,18,.10);transform:translateY(-1px)}.sel-box.active{background:#FFF6EB}.sel-box .k{font-size:.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}.sel-box .v{font-weight:800;color:var(--plum);margin-top:.1rem}.sel-box .p{font-family:'Space Mono',monospace;color:var(--orange2);font-weight:700;font-size:.86rem;margin-top:.24rem}
 .addons{margin-top:1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.addon{display:flex;gap:.65rem;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:17px;padding:.78rem;cursor:pointer}.addon input{margin-top:.25rem;accent-color:var(--orange)}.addon b{display:block;font-size:.85rem}.addon span{display:block;color:var(--muted);font-size:.74rem}.addon .price{font-family:'Space Mono',monospace;color:var(--green);font-weight:700;margin-top:.16rem}
 .summary-card{position:sticky;top:86px}.summary-card h3{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--plum);margin-bottom:.85rem}.sum-row{display:flex;justify-content:space-between;gap:.9rem;border-bottom:1px dashed var(--line2);padding:.62rem 0;color:var(--muted);font-size:.9rem}.sum-row b{color:var(--ink)}.sum-row.total{border-bottom:none;padding-top:.85rem;font-size:1.05rem}.sum-row.total b{font-family:'Space Mono',monospace;color:var(--orange2)}.summary-note{margin:.8rem 0 1rem;color:var(--muted);font-size:.8rem}.summary-card .btn{width:100%}
 .filters{max-width:1220px;margin:1.4rem auto 0;padding:0 1.25rem}.filter-row{display:flex;gap:.55rem;overflow-x:auto;padding-bottom:.35rem;scrollbar-width:none}.filter-row::-webkit-scrollbar{display:none}.chip{flex-shrink:0;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:.58rem 1rem;font-family:inherit;font-weight:800;cursor:pointer;transition:.18s}.chip:hover,.chip.active{border-color:var(--plum);background:var(--plum);color:#fff}.meal-filters{margin-top:.65rem}.meal-filters .chip.active{background:var(--orange);border-color:var(--orange)}
@@ -113,7 +113,7 @@ img{display:block;max-width:100%}.serif{font-family:'Playfair Display',serif}.nu
       <div class="control-head">
         <div>
           <h2>Build your SAR week</h2>
-          <p>Sakara-style weekly controls, localized for SAR Signature Meal.</p>
+      <p>One fixed weekly program: 7 days, 3 meals per day, 21 total SAR Signature meals.</p>
         </div>
         <span class="tag">Recommended</span>
       </div>
@@ -200,9 +200,7 @@ const MEAL_TYPES=[
   {k:'dinner',bn:'রাত',en:'Dinner',ic:'🌙'}
 ];
 const PLANS=[
-  {k:'full',title:'7 Days · 21 Meals',sub:'Breakfast + Lunch + Dinner',meals:21,price:7140},
-  {k:'weekday',title:'5 Days · 15 Meals',sub:'Mon-Fri signature flow',meals:15,price:5100},
-  {k:'trial',title:'3 Days · 9 Meals',sub:'Starter healing taste',meals:9,price:3060}
+  {k:'full',title:'7 Days · 21 Meals',sub:'Breakfast + Lunch + Dinner every day',meals:21,price:7140}
 ];
 const ADDONS=[
   {k:'tonic',title:'Daily Healing Tonic',sub:'7 herbal hydration shots',price:840},
@@ -249,11 +247,12 @@ const MENU=[
 
 let activeDay='all', activeMeal='all', activePlan='full';
 let selectedAddons=new Set();
-let cart=JSON.parse(localStorage.getItem('sar_cart')||'[]').filter(x=>x&&x.source!=='sar-signature-temp');
+let cart=safeCart();
 
 function dayLabel(k){const d=DAYS.find(x=>x.k===k);return d?d.bn:k}
 function mealLabel(k){const m=MEAL_TYPES.find(x=>x.k===k);return m?m.bn:k}
 function mealIcon(k){const m=MEAL_TYPES.find(x=>x.k===k);return m?m.ic:'🍽️'}
+function safeCart(){try{const raw=JSON.parse(localStorage.getItem('sar_cart')||'[]');return Array.isArray(raw)?raw.filter(Boolean):[]}catch(e){return []}}
 function renderPlans(){
   document.getElementById('planGrid').innerHTML=PLANS.map(p=>`<button class="sel-box ${p.k===activePlan?'active':''}" onclick="setPlan('${p.k}')"><div class="k">${p.meals} meals</div><div class="v">${p.title}</div><div class="p">${fmt(p.price)}</div><div class="k" style="margin-top:.18rem;text-transform:none;letter-spacing:0">${p.sub}</div></button>`).join('');
   document.getElementById('addonGrid').innerHTML=ADDONS.map(a=>`<label class="addon"><input type="checkbox" ${selectedAddons.has(a.k)?'checked':''} onchange="toggleAddon('${a.k}',this.checked)"><span><b>${a.title}</b><span>${a.sub}</span><span class="price">+ ${fmt(a.price)}</span></span></label>`).join('');
@@ -318,15 +317,12 @@ function addMeal(id,ev){
   if(ev&&ev.target){ev.target.textContent='✓ Added';ev.target.classList.add('added');setTimeout(()=>{ev.target.textContent='Add meal';ev.target.classList.remove('added')},1300)}
   toast('✓ '+m.name+' added');
 }
-function mealsForPlan(){
-  if(activePlan==='weekday')return MENU.filter(m=>!['sat','sun'].includes(m.day));
-  if(activePlan==='trial')return MENU.filter(m=>['mon','tue','wed'].includes(m.day));
-  return MENU.slice();
-}
+function mealsForPlan(){return MENU.slice()}
 function addWeekToCart(){
   const planMeals=mealsForPlan();
-  const ids=new Set(planMeals.map(m=>m.id));
-  cart=cart.filter(c=>!ids.has(c.uid)).concat(planMeals.map(cartItemFromMeal));
+  const mealIds=new Set(MENU.map(m=>m.id));
+  const addonIds=new Set(ADDONS.map(a=>'sar-addon-'+a.k));
+  cart=cart.filter(c=>!mealIds.has(c.uid)&&!addonIds.has(c.uid)).concat(planMeals.map(cartItemFromMeal));
   ADDONS.filter(a=>selectedAddons.has(a.k)).forEach(a=>{
     const uid='sar-addon-'+a.k;
     cart=cart.filter(c=>c.uid!==uid).concat({uid,source:'sar-signature-temp',code:uid,name:a.title,name_bn:a.title,meal:'addon',mealBn:'Add-on',day:'SAR Signature Week',cat:'AI',courses:['Weekly add-on'],courseDetail:[{name:'Weekly add-on',items:[a.sub]}],courseCount:1,ingredients:[a.sub],benefits:a.sub,price:a.price,basePrice:a.price,qty:1,kcal:0,protein:0,fiber:0});
