@@ -93,14 +93,31 @@ exports.handler = async (event) => {
         return reply(200, { items: Array.isArray(d) ? d : [] });
       }
 
-      // ── 2. customer_metrics (250 fields) ────────────────────
+      // ── 2. customer_metrics (250 fields) + customers.sar_category ──
+      // The disease category lives in the customers table (sar_category,
+      // e.g. "DM" or "DM,OB"). We fetch both in parallel and merge that
+      // category into the metrics object so meal-score.html can read it.
       case 'metrics': {
         const cid = encodeURIComponent(p.customer_id);
-        const url = `${SUPABASE_URL}/rest/v1/customer_metrics`
+        const mUrl = `${SUPABASE_URL}/rest/v1/customer_metrics`
           + `?customer_id=eq.${cid}&select=*&limit=1`;
-        const r = await fetch(url, { headers: SB });
-        const d = await r.json();
-        return reply(200, { metrics: (Array.isArray(d) && d[0]) || {} });
+        const cUrl = `${SUPABASE_URL}/rest/v1/customers`
+          + `?id=eq.${cid}&select=sar_category,full_name&limit=1`;
+        const [mr, cr] = await Promise.all([
+          fetch(mUrl, { headers: SB }),
+          fetch(cUrl, { headers: SB }),
+        ]);
+        const md = await mr.json().catch(() => []);
+        const cd = await cr.json().catch(() => []);
+        const metrics = (Array.isArray(md) && md[0]) || {};
+        const cust    = (Array.isArray(cd) && cd[0]) || {};
+        // bring the customers.sar_category in. We expose it under BOTH
+        // names so old and new code paths can read it without breaking.
+        if (cust.sar_category != null && cust.sar_category !== '') {
+          metrics.sar_category = cust.sar_category;
+          if (!metrics.sar_category_interest) metrics.sar_category_interest = cust.sar_category;
+        }
+        return reply(200, { metrics });
       }
 
       // ── 3. save meal score → ai_analysis table ──────────────
@@ -122,6 +139,26 @@ exports.handler = async (event) => {
         });
         const d = await r.json();
         return reply(r.ok ? 200 : 400, { saved: r.ok, data: d });
+      }
+
+      // ── 3b. fetch TODAY's saved analysis (saved-first render) ──
+      // meal-score.html calls this on load: if the 6 AM cron already
+      // produced today's row, the page renders from it instead of
+      // recomputing. Matches by created_at being on/after today 00:00
+      // so it works whether or not result_json carries a score_date.
+      case 'todayScore': {
+        const cid = encodeURIComponent(p.customer_id || '');
+        const today = (p.date || new Date().toISOString().slice(0, 10));
+        const since = encodeURIComponent(today + 'T00:00:00');
+        const url = `${SUPABASE_URL}/rest/v1/ai_analysis`
+          + `?customer_id=eq.${cid}`
+          + `&analysis_type=eq.meal_score`
+          + `&created_at=gte.${since}`
+          + `&select=*&order=created_at.desc&limit=1`;
+        const r = await fetch(url, { headers: SB });
+        const d = await r.json();
+        const row = (Array.isArray(d) && d[0]) || null;
+        return reply(200, { found: !!row, analysis: row });
       }
 
       // ── 4. place order → orders (+ order_items) ─────────────
@@ -360,6 +397,7 @@ exports.handler = async (event) => {
         return reply(ok ? 200 : 400, { ok });
       }
 
+      case 'kitchenVerify': {
         const realId = String(p.id || '');
         const session = await K.validateSession(SUPABASE_URL, SB, p.token);
         if (!session) return reply(401, { ok: false, error: 'unauthorized' });
@@ -620,15 +658,41 @@ exports.handler = async (event) => {
   }
 };
 
+// ── normalize ANY category spelling → standard code ──
+// Handles: codes (DM/OB/FL/IB/PR/GENERAL), English words,
+// Bengali words, and comma/space strings ("DM,OB" → "DM").
+// Returns '' if nothing valid is found (so callers can decide).
+function normalizeCat(v) {
+  if (!v) return '';
+  // if a comma/space list, take the FIRST token only
+  const first = String(v).split(/[,\s]+/).filter(Boolean)[0] || '';
+  const s = first.trim().toUpperCase();
+  if (['DM', 'OB', 'FL', 'IB', 'PR', 'GENERAL'].includes(s)) return s;
+  const map = {
+    'DIABETES': 'DM', 'DIABETIC': 'DM', 'ডায়াবেটিস': 'DM',
+    'OBESITY': 'OB', 'OBESE': 'OB', 'স্থূলতা': 'OB', 'ওজন': 'OB',
+    'FATTY': 'FL', 'FATTYLIVER': 'FL', 'LIVER': 'FL', 'ফ্যাটিলিভার': 'FL', 'ফ্যাটি': 'FL', 'লিভার': 'FL',
+    'IBS': 'IB', 'GASTRIC': 'IB', 'গ্যাস্ট্রিক': 'IB', 'আইবিএস': 'IB',
+    'PREGNANCY': 'PR', 'PRENATAL': 'PR', 'PREGNANT': 'PR', 'গর্ভাবস্থা': 'PR', 'গর্ভ': 'PR',
+    'GEN': 'GENERAL', 'NORMAL': 'GENERAL', 'সাধারণ': 'GENERAL',
+  };
+  // try the uppercased token, then the raw bengali first-token
+  return map[s] || map[first.trim()] || '';
+}
+
 // ── server-side category picker (mirrors the page) ──
+// Order: explicit saved interest → disease flags → BMI → GENERAL.
+// IMPORTANT: never silently falls back to Diabetes; if nothing
+// is known the category is GENERAL so the UI can ask for metrics.
 function pickCat(m) {
-  if (m.sar_category_interest) return m.sar_category_interest;
+  const explicit = normalizeCat(m.sar_category_interest);
+  if (explicit) return explicit;
   if (m.pregnancy_status && m.pregnancy_status !== 'না') return 'PR';
   if (m.diabetes_type && m.diabetes_type !== 'না') return 'DM';
   if (m.fatty_liver_grade && m.fatty_liver_grade !== 'না') return 'FL';
   if (m.ibs_type && m.ibs_type !== 'না') return 'IB';
   if (m.bmi && +m.bmi >= 25) return 'OB';
-  return 'DM';
+  return 'GENERAL';   // ← was 'DM'; no more silent Diabetes default
 }
 
 // ── server-side deterministic score (mirrors the page) ──
@@ -639,6 +703,7 @@ function localScore(m, cat) {
     FL: 'লিভার ডিটক্স · ALT হ্রাস',
     IB: 'গাট হিলিং · Low-FODMAP',
     PR: 'আয়রন ও ফোলেট · ক্যালসিয়াম',
+    GENERAL: 'সুষম পুষ্টি · নারীর সাধারণ সুস্থতা',
   };
   const bmi = +m.bmi || 23;
   const mood = (m.stress_level != null) ? (10 - +m.stress_level) : 7;
