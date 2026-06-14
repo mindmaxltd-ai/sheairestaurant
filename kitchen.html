@@ -129,10 +129,20 @@ header{display:flex;align-items:center;gap:1rem;padding:.8rem 1.2rem;
   .recipe{display:block!important}
   .card{break-inside:avoid;border:1px solid #999;margin-bottom:10px;background:#fff;color:#000}
 }
+/* tablet / narrow desktop: 3 columns get cramped → stack to scroll */
+@media (max-width:1100px) and (min-width:761px){
+  body{height:auto;overflow:auto}
+  .board{grid-template-columns:repeat(2,1fr)}
+  .col{overflow:visible}
+  .col-body{max-height:none;overflow:visible}
+  /* the 3rd column wraps to a full-width row below the first two */
+  .col.ready{grid-column:1 / -1}
+}
 @media (max-width:760px){
   body{height:auto;overflow:auto}
   .board{grid-template-columns:1fr;gap:1px}
-  .col-body{max-height:none}
+  .col{overflow:visible}
+  .col-body{max-height:none;overflow:visible}
 }
 </style>
 </head>
@@ -310,10 +320,20 @@ function recipeHTML(t){
     const mealKey=it.meal||it.meal_type||'lunch';
     const meal=MEALS.find(m=>m.key===mealKey)||MEALS[1];
     const di=(it.day_index!=null?it.day_index:ix);
-    const courseCount=it.courseCount||it.course_count||(it.courses?it.courses.length:3);
-    let src=(it.courseDetail&&it.courseDetail.length)?it.courseDetail
-          :(it.courses&&it.courses.length&&typeof it.courses[0]==='object')?it.courses
-          :rebuildCourses(cat,di,mealKey,t._metrics).slice(0,courseCount);
+    // how many courses to show — default to a full 5 when the order
+    // didn't carry a count (older orders saved no course detail)
+    let courseCount=it.courseCount||it.course_count||0;
+    if(!courseCount) courseCount=5;
+    // pick the richest available source of ingredients:
+    //  1) explicit courseDetail with items  2) parsed courses that
+    //  actually contain ingredients  3) rebuild from disease pools.
+    const hasDetail = it.courseDetail&&it.courseDetail.length;
+    const parsedHasIngs = it.courses&&it.courses.length&&typeof it.courses[0]==='object'
+        && it.courses.some(c=>(c.items&&c.items.length)||(c.ingredients&&c.ingredients.length));
+    let src = hasDetail ? it.courseDetail
+            : parsedHasIngs ? it.courses
+            : rebuildCourses(cat,di,mealKey,t._metrics).slice(0,courseCount);
+    if(!src||!src.length) src=rebuildCourses(cat,di,mealKey,t._metrics).slice(0,courseCount);
     const courses=src.map((co,idx)=>{
       const cIdx=idx, st=STATION[cIdx]||'steam';
       const grams=SLOT_G[cIdx]||SLOT_G[0];
@@ -401,7 +421,7 @@ function fill(colId,list,nId){
   const el=document.getElementById(colId);
   document.getElementById(nId).textContent=bn(list.length);
   if(!list.length){el.innerHTML='<div class="col-empty">কোনো অর্ডার নেই</div>';return;}
-  list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));   // newest first
+  list.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));   // oldest first (FIFO)
   el.innerHTML=list.map(card).join('');
 }
 
