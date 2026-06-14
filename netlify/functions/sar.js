@@ -204,6 +204,48 @@ exports.handler = async (event) => {
         return reply(200, { ok: true, order });
       }
 
+      // ── 4b. getOrder — kitchen.html recipe ticket ───────────
+      // Reads one order and returns it with items_json exposed as
+      // `items` (the shape kitchen.html expects). No token needed:
+      // this is a read used by the recipe-ticket page after its own
+      // simple (admin-style) login gate on the client side.
+      case 'getOrder': {
+        const oid = encodeURIComponent(p.order_id || '');
+        if (!oid) return reply(400, { ok: false, error: 'no_order_id' });
+        // match by id OR order_number so links like ?order=SAR-1042 work
+        const url = `${SUPABASE_URL}/rest/v1/orders`
+          + `?or=(id.eq.${oid},order_number.eq.${oid})`
+          + `&select=*&limit=1`;
+        const r = await fetch(url, { headers: SB });
+        const d = await r.json().catch(() => []);
+        const row = (Array.isArray(d) && d[0]) || null;
+        if (!row) return reply(200, { ok: false, order: null });
+        // expose items_json as items (+ keep meal_date/note aliases)
+        const order = Object.assign({}, row, {
+          items:     Array.isArray(row.items_json) ? row.items_json : (row.items || []),
+          total:     row.total_amount != null ? row.total_amount : row.total,
+          meal_date: row.meal_date || (row.created_at ? String(row.created_at).slice(0, 10) : null),
+          note:      row.special_instructions || row.note || '',
+        });
+        return reply(200, { ok: true, order });
+      }
+
+      // ── 4c. getScore — kitchen.html personalization factor ──
+      // Latest saved meal-score analysis for a customer (used to
+      // recover the 6 AM kcal factor). Read-only, no token.
+      case 'getScore': {
+        const cid = encodeURIComponent(p.customer_id || '');
+        if (!cid) return reply(200, { ok: false, score: null });
+        const url = `${SUPABASE_URL}/rest/v1/ai_analysis`
+          + `?customer_id=eq.${cid}`
+          + `&analysis_type=eq.meal_score`
+          + `&select=*&order=created_at.desc&limit=1`;
+        const r = await fetch(url, { headers: SB });
+        const d = await r.json().catch(() => []);
+        const row = (Array.isArray(d) && d[0]) || null;
+        return reply(200, { ok: !!row, score: row });
+      }
+
 
       // ═══ রান্নাঘর v2 — unified kitchen system ═══
 
