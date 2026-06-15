@@ -180,7 +180,7 @@ exports.handler = async (event) => {
           status: verified ? 'SUCCESS' : 'PROCESSING',
           verification_status: verified ? 'VERIFIED' : 'UNVERIFIED',
           verified_at: verified ? new Date().toISOString() : null,
-          verified_by: verified ? 'system' : null,
+          verified_by: verified ? (p.verified_by || 'system') : null,
         };
         await sbUpdate('payments', `id=eq.${enc(pay.id)}`, upd);
 
