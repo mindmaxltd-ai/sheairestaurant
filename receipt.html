@@ -4,1012 +4,428 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>রিসিট — SAR She AI Restaurant</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* ── Palette matches meal-score.html (warm cream, printable) ── */
 :root{
-  --rose:#E91E8C;--rose2:#FF6BB5;--plum:#880E4F;--plum2:#C2185B;
-  --purple:#6B21A8;--purple2:#A855F7;--green:#006A4E;--green2:#00A878;
-  --gold:#F5C842;--blue:#005BAA;--blue-bg:#E3F2FD;
-  --ink:#241018;--ink2:#7A6068;--paper:#FFF4FA;--paper2:#FFEAF4;
-  --line:#F6C9DF;--line2:#EBA9C6;--rule:#E7B7CF;
-  --red:#C30B2E;--red2:#E11D48;--inkgreen:#147A3A;
+  --orange:#E8821E;--orange-d:#B85C0C;--orange-soft:#FBEBD6;
+  --gold:#C9A24B;--gold-d:#9C7A2E;--gold-soft:#F6EEDC;
+  --green:#2C8C63;--green-d:#1A6645;--green-soft:#E2F2EA;
+  --pink:#E91E8C;--pink-d:#B01068;
+  --ink:#231E27;--ink-2:#6E6675;
+  --cream:#FCFAF6;--card:#FFFFFF;--line:#EDE5DA;--line-2:#E3D8C9;
+  --shadow:0 2px 14px rgba(40,30,20,.06);
+  --shadow-lg:0 14px 50px rgba(40,30,20,.12);
+  --grad:linear-gradient(135deg,var(--orange),var(--pink));
+  --gold-line:linear-gradient(90deg,transparent,#C9A24B,transparent);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Hind Siliguri',sans-serif;background:#15101A;color:#fff;min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;padding:1.1rem .8rem 3rem;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(600px 400px at 12% -5%,rgba(233,30,140,.10),transparent 60%),
-             radial-gradient(500px 380px at 92% 8%,rgba(107,33,168,.10),transparent 55%)}
+body{font-family:'Hind Siliguri',-apple-system,'Segoe UI',sans-serif;background:var(--cream);
+  color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;padding:18px 0 60px}
+.num{font-family:'Space Mono',monospace}
+.wrap{max-width:620px;margin:0 auto;padding:0 16px}
 
-/* top toolbar (screen only) */
-.bar{position:relative;z-index:5;width:100%;max-width:200mm;display:flex;justify-content:space-between;
-  align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
-.brand{display:flex;align-items:center;gap:.55rem;text-decoration:none}
-.brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--rose),var(--purple));
-  display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.85rem}
-.brand-txt{font-family:'Playfair Display',serif;font-size:1rem;
-  background:linear-gradient(90deg,var(--rose2),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.brand-txt small{display:block;font-family:'Hind Siliguri';font-size:.56rem;letter-spacing:.14em;
-  color:rgba(255,255,255,.4);text-transform:uppercase}
-.actions{display:flex;gap:.45rem;flex-wrap:wrap}
-.act{border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;
-  font-family:inherit;font-size:.78rem;font-weight:600;padding:.45rem .9rem;border-radius:30px;cursor:pointer;
-  text-decoration:none;display:inline-flex;align-items:center;gap:.3rem;transition:all .2s}
-.act:hover{background:rgba(255,255,255,.12)}
-.act-print{background:linear-gradient(135deg,var(--rose),var(--purple));border:none}
-.act-wa{background:#25D366;border:none;color:#063}
-.act-mail{background:#5B6CFF;border:none}
-
-/* ───────── A4 ECR RECEIPT PAPER ───────── */
-.sheet{position:relative;z-index:5;width:200mm;max-width:100%;min-height:auto;
-  background:var(--paper);color:var(--ink);border-radius:10px;overflow:hidden;
-  box-shadow:0 24px 70px rgba(0,0,0,.5);font-size:10px;line-height:1.35}
-.pad{padding:7mm 10mm 6mm}
-
-/* receipt header — centered ECR style */
-.rhead{text-align:center;border-bottom:1.5px dashed var(--rule);padding-bottom:4px;margin-bottom:5px}
-.rhead .logo-mark{width:52px;height:52px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 2px;
-  border:1px solid var(--rule)}
-.rhead .logo{font-family:'Playfair Display',serif;font-weight:900;font-size:24px;letter-spacing:.06em;color:var(--plum);line-height:1}
-.rhead .brandline{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--plum2);letter-spacing:.02em;margin-top:1px}
-.rhead .tagline{font-size:8.5px;font-weight:700;color:var(--plum2);margin-top:2px;line-height:1.35;
-  max-width:150mm;margin-left:auto;margin-right:auto}
-.rhead .addr{font-size:9px;color:var(--ink2);margin-top:2px;line-height:1.35}
-.rhead .tags{margin-top:2px;font-size:8px;color:var(--inkgreen);font-weight:700;letter-spacing:.01em}
-
-/* dotted divider with optional centered label */
-.dline{border:0;border-top:1.5px dashed var(--rule);margin:4px 0}
-.dlabel{text-align:center;font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--plum);margin:5px 0 3px;position:relative}
-.dlabel::before,.dlabel::after{content:'';position:absolute;top:50%;width:24%;height:0;border-top:1.5px dashed var(--rule)}
-.dlabel::before{left:0}.dlabel::after{right:0}
-
-/* meta two-col compact */
-.meta2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;font-size:9px}
-.mrow{display:flex;justify-content:space-between;gap:6px;padding:1px 0}
-.mrow .k{color:var(--ink2)}
-.mrow .v{font-weight:700;text-align:right}
-.mono{font-family:'Space Mono',monospace}
-
-/* item lines — ECR ticket style */
-.lines{margin:1px 0}
-.li{padding:3px 0;border-bottom:1px dotted var(--rule)}
-.li:last-child{border-bottom:0}
-.li-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.li-n{font-weight:700;font-size:10.5px;color:var(--ink);flex:1}
-.li-n .meal{font-weight:400;font-size:8.5px;color:var(--green)}
-.li-amt{font-family:'Space Mono',monospace;font-weight:700;font-size:10.5px;color:var(--plum);white-space:nowrap}
-.li-sub{font-size:8.5px;color:#6b5560;margin:0}
-.li-sub .qx{color:var(--ink2)}
-.crs{font-size:8.5px;color:#5a4750;margin-top:1px;line-height:1.4}
-.crs b{color:var(--plum)}
-.crs .ig{color:#897680}
-.chips{margin-top:1px;line-height:1.6}
-.chip{display:inline-block;font-size:7.5px;color:var(--blue);background:var(--blue-bg);border:.5px solid #BBDEFB;
-  border-radius:3px;padding:0 4px;margin:0 2px 1px 0;text-decoration:none}
-.nut{font-size:8.5px;color:var(--ink2);margin-top:1px}
-.nut b{color:var(--plum);font-family:'Space Mono',monospace}
-.med2{font-size:8.5px;color:var(--purple);margin-top:1px}
-.ben{font-size:8.5px;color:var(--inkgreen);margin-top:1px}
-.bc1{font-size:8px;color:var(--blue);text-decoration:none}
-
-/* totals — right aligned ECR */
-.tot{margin-top:3px}
-.trow{display:flex;justify-content:space-between;font-size:9.5px;padding:1px 0}
-.trow .num{font-family:'Space Mono',monospace}
-.trow.grand{font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--plum),var(--purple));
-  border-radius:5px;padding:4px 9px;margin-top:3px}
-.trow.nutri{color:var(--inkgreen);font-size:8.5px;margin-top:2px;border-top:1px dotted var(--rule);padding-top:2px}
-
-/* ✦ MAGICAL MESSAGE — the emotional AI marketing centerpiece */
-.magic{background:linear-gradient(135deg,#FFFFFF,#FFF0F7);border:1px solid var(--line2);
-  border-radius:7px;padding:7px 10px;margin:4px 0;position:relative;overflow:hidden}
-.magic::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(180deg,var(--red),var(--rose),var(--inkgreen))}
-.magic .mh{font-size:9px;font-weight:800;color:var(--plum);margin-bottom:2px;letter-spacing:.02em;
-  display:flex;align-items:center;gap:4px}
-.magic .mb{font-size:10.5px;color:#3a2630;line-height:1.55;font-style:italic}
-.magic .mb .hi{font-style:normal;font-weight:800;color:var(--red)}
-.magic .mb .go{font-style:normal;font-weight:800;color:var(--inkgreen)}
-.magic .by{font-size:7.5px;color:var(--ink2);margin-top:2px;text-align:right;letter-spacing:.03em}
-
-.advice2{background:#F2F9EC;border:1px solid #C9E2AE;border-left:3px solid #3E8E2E;border-radius:6px;
-  padding:5px 9px;margin:3px 0;font-size:9px;color:#33402c;line-height:1.45}
-.advice2 b{color:#2E7D32}
-
-/* persuasive engagement — red + green ink, tight */
-.persuade{border:1px dashed var(--line2);border-radius:7px;padding:6px 9px;margin:3px 0;background:var(--paper2)}
-.persuade .ph{font-size:9px;font-weight:800;color:var(--red);margin-bottom:2px;letter-spacing:.02em}
-.pmsg{font-size:9px;line-height:1.45;margin:2px 0}
-.pmsg.red{color:var(--red)}.pmsg.green{color:var(--inkgreen)}
-.pmsg b{font-weight:800}.pmsg .em{font-style:italic}
-.recap{font-size:8.5px;color:#5a4750;line-height:1.4;margin:2px 0;padding:3px 6px;background:#fff;border:.5px dotted var(--line2);border-radius:5px}
-.recap .rh{font-weight:800;color:var(--plum);font-size:8px;letter-spacing:.05em;text-transform:uppercase}
-.ask{font-size:9px;color:#3a2630;margin:3px 0;line-height:1.4}
-.ask b{font-weight:800}
-.fbrow{display:flex;gap:6px;margin:3px 0}
-.fb{flex:1;text-align:center;border:1px solid var(--line2);border-radius:5px;padding:2px;font-size:8.5px;background:#fff}
-.fb.happy{border-color:var(--inkgreen);color:var(--inkgreen)}
-.fb.advice{border-color:var(--red);color:var(--red)}
-.sign{border-bottom:1px dotted var(--rule);height:11px;margin:2px 0}
-
-/* instructions — compact */
-.instr{font-size:8.5px;color:#4a3a44;margin:3px 0;line-height:1.4}
-.instr .ih{font-size:8.5px;font-weight:800;color:var(--plum);margin-bottom:1px}
-.instr ul{list-style:none}
-.instr li{padding-left:10px;position:relative}
-.instr li::before{content:'•';position:absolute;left:2px;color:var(--rose)}
-
-/* QR row — two small codes + audit */
-.qrrow{display:flex;gap:14px;justify-content:center;align-items:flex-start;margin:3px 0}
-.qrb{text-align:center}
-.qrb > div:first-child{display:inline-block}
-.qrb canvas,.qrb img{width:74px!important;height:74px!important}
-.qrb .qt{font-size:8px;font-weight:800;color:var(--plum);margin-top:1px}
-.qrb .qs{font-size:7px;color:var(--ink2)}
-.audit{font-size:8px;color:var(--ink2);text-align:center;margin-top:3px;line-height:1.4}
-.audit .badge{display:inline-block;background:#E8F5E9;color:var(--inkgreen);border:.5px solid #A5D6A7;
-  border-radius:20px;padding:0 6px;font-weight:700}
-
-/* footer */
-.rfoot{text-align:center;font-size:8px;color:var(--plum);line-height:1.5;margin-top:4px;
-  border-top:1.5px dashed var(--rule);padding-top:4px}
-.rfoot .b{font-weight:800}
-.rfoot .thanks{font-family:'Playfair Display',serif;font-size:12px;color:var(--plum2);margin-bottom:1px}
-
-/* ── staff scanner (screen only) ── */
-.scanner{position:relative;z-index:5;width:200mm;max-width:100%;margin-top:1rem;
-  background:rgba(20,16,26,.92);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:1rem 1.2rem}
-.scanner h3{font-size:.92rem;color:#fff;margin-bottom:.25rem;display:flex;align-items:center;gap:.4rem}
-.scanner .ssub{font-size:.74rem;color:rgba(255,255,255,.45);margin-bottom:.7rem}
-.scan-input-row{display:flex;gap:.45rem;flex-wrap:wrap}
-.scan-input{flex:1;min-width:200px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);
-  border-radius:9px;padding:.6rem .85rem;color:#fff;font-family:'Space Mono',monospace;font-size:.88rem;outline:none}
-.scan-input:focus{border-color:var(--rose)}
-.scan-btn{background:linear-gradient(135deg,var(--rose),var(--purple));border:none;color:#fff;
-  font-family:inherit;font-weight:700;font-size:.82rem;padding:.6rem 1.1rem;border-radius:9px;cursor:pointer}
-.scan-cam-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;
-  font-family:inherit;font-size:.82rem;padding:.6rem .95rem;border-radius:9px;cursor:pointer}
-#scanVideo{width:100%;max-width:320px;border-radius:10px;margin-top:.6rem;display:none;background:#000}
-.scan-result{margin-top:.6rem;font-size:.8rem;color:rgba(255,255,255,.8);min-height:1.1rem}
-.scan-result.ok{color:#34D399}.scan-result.err{color:#F87171}
-.scan-match{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;
-  padding:.6rem .85rem;margin-top:.5rem;display:none}
-.scan-match .mn{font-weight:700;color:#fff;font-size:.88rem}
-.scan-match .mm{font-size:.74rem;color:rgba(255,255,255,.5);margin:.18rem 0 .45rem}
-.scan-place{background:#25D366;border:none;color:#063;font-family:inherit;font-weight:700;
-  padding:.45rem 1rem;border-radius:7px;cursor:pointer;font-size:.8rem}
-
-.loading{position:fixed;inset:0;z-index:50;background:#15101A;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:1rem;text-align:center}
-.loading.hide{display:none}
-.spin{width:42px;height:42px;border:3px solid rgba(233,30,140,.2);border-top-color:var(--rose);
-  border-radius:50%;animation:sp 1s linear infinite}
+/* States */
+.state{text-align:center;padding:60px 20px;color:var(--ink-2)}
+.spin{width:42px;height:42px;border:4px solid var(--orange-soft);border-top-color:var(--orange);
+  border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 16px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.loading p{color:rgba(255,255,255,.6);font-size:.9rem}
+.skip{display:none}
 
-/* ───────── PRINT / PDF : exact A4, no page breaks inside ───────── */
-@page{size:A4 portrait;margin:0}
+/* Receipt sheet */
+.sheet{background:var(--card);border:1px solid var(--line-2);border-radius:22px;
+  box-shadow:var(--shadow-lg);overflow:hidden;position:relative}
+.sheet::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+
+.r-head{text-align:center;padding:26px 22px 18px;border-bottom:1px dashed var(--line-2)}
+.r-logo{font-size:30px;font-weight:700;letter-spacing:1px;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.r-logo small{display:block;font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-d);-webkit-text-fill-color:var(--gold-d);margin-top:2px}
+.r-paid{display:inline-flex;align-items:center;gap:7px;background:var(--green-soft);
+  color:var(--green-d);font-weight:700;font-size:13px;padding:7px 16px;border-radius:30px;margin-top:14px}
+
+.r-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;padding:18px 22px;
+  font-size:13px;border-bottom:1px solid var(--line)}
+.r-meta .k{color:var(--ink-2)}
+.r-meta .v{font-weight:600;text-align:right}
+.r-meta .row{display:flex;justify-content:space-between}
+
+.r-section{padding:18px 22px;border-bottom:1px solid var(--line)}
+.panel-h{font-size:11px;font-weight:700;color:var(--ink-2);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:.6rem;display:flex;align-items:center;gap:.45rem}
+.panel-h::before{content:'';width:16px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--gold),var(--orange))}
+
+/* Item block */
+.item{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;background:#fff}
+.item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.item-name{font-weight:700;font-size:15px}
+.item-sub{font-size:12px;color:var(--ink-2);margin-top:2px}
+.item-price{font-weight:700;white-space:nowrap;color:var(--orange-d)}
+.cat-chip{display:inline-block;font-size:11px;padding:1px 9px;border-radius:30px;
+  background:var(--orange-soft);color:var(--orange-d);font-weight:600;margin-top:4px}
+
+/* ── Nutrition Panel — EXACT meal-score markup/CSS ── */
+.nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem;margin:.5rem 0 .8rem}
+.n-pill{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:.5rem .3rem;text-align:center}
+.n-pill .nv{font-weight:700;font-size:.92rem}
+.n-pill .nk{font-size:.58rem;color:var(--ink-2)}
+.n-pill.cal{background:var(--orange-soft);border-color:transparent}
+.n-pill.cal .nv{color:var(--orange-d)}
+
+/* ── Daily Requirement Coverage — EXACT meal-score markup/CSS ── */
+.drc{display:flex;flex-direction:column;gap:.4rem}
+.dr-line{display:flex;align-items:center;gap:.5rem;font-size:.82rem}
+.dr-bar{flex:1;height:7px;border-radius:5px;background:var(--green-soft);overflow:hidden}
+.dr-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green),var(--orange))}
+.dr-line .dl{width:84px;color:var(--ink-2)}
+.dr-line .dp{width:38px;text-align:right;font-weight:700;color:var(--green-d)}
+
+/* benefits + medicinal */
+.benefits{display:flex;flex-wrap:wrap;gap:.4rem}
+.bchip{font-size:.74rem;background:var(--green-soft);color:var(--green-d);padding:.2rem .6rem;border-radius:20px}
+.med{display:flex;flex-direction:column;gap:.35rem;font-size:.78rem}
+.med-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.med-row .ml{width:120px;color:var(--ink-2);font-size:.72rem}
+.pw{font-size:.72rem;padding:.12rem .55rem;border-radius:14px}
+.pw.dis{background:#fde8e8;color:#b91c1c}.pw.con{background:#f3e8ff;color:#6b21a8}
+.pw.top{background:var(--gold-soft);color:var(--gold-d)}.pw.chu{background:var(--green-soft);color:var(--green-d)}
+.bchain{display:flex;justify-content:space-between;align-items:center;margin-top:.6rem;
+  font-size:.74rem;color:var(--ink-2)}
+.bchain a{color:#005BAA;text-decoration:none;font-weight:600}
+
+/* totals */
+.line{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}
+.line .v{font-family:'Space Mono'}
+.line.total{border-top:2px solid var(--line-2);margin-top:8px;padding-top:12px;
+  font-size:18px;font-weight:700}
+.line.total .v{color:var(--pink-d)}
+
+.r-foot{text-align:center;padding:20px;font-size:12px;color:var(--ink-2);background:var(--cream)}
+.r-foot .big{font-weight:700;color:var(--ink);margin-bottom:4px}
+
+/* action buttons (hidden on print) */
+.actions{display:flex;gap:10px;margin-top:18px}
+.btn{flex:1;padding:14px;border:none;border-radius:12px;cursor:pointer;font-family:inherit;
+  font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-print{background:var(--ink);color:#fff}
+.btn-wa{background:#25D366;color:#fff}
+.btn-home{background:#fff;border:1px solid var(--line-2);color:var(--ink)}
+
 @media print{
-  html,body{background:#fff!important;padding:0!important;margin:0!important}
-  .bar,.loading,.scanner{display:none!important}
-  body::before{display:none}
-  .sheet{width:210mm!important;max-width:210mm!important;box-shadow:none!important;border-radius:0!important;
-    margin:0 auto!important}
-  .pad{padding:8mm 12mm!important}
-  /* never split these blocks across pages */
-  .magic,.persuade,.advice2,.instr,.qrrow,.rhead,.rfoot,.li,.tot,.meta2{break-inside:avoid;page-break-inside:avoid}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
-@media(max-width:560px){
-  .sheet{width:100%;font-size:11px}.pad{padding:5mm 5mm}
-  .meta2{grid-template-columns:1fr}
+  body{padding:0;background:#fff}
+  .actions,.no-print{display:none!important}
+  .sheet{box-shadow:none;border:none}
 }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="loading" id="loading">
-  <div class="spin"></div>
-  <p id="loadTxt">রিসিট তৈরি হচ্ছে…</p>
+  <!-- Loading -->
+  <div id="loadingView" class="state">
+    <div class="spin"></div>
+    রিসিট লোড হচ্ছে...
+  </div>
+
+  <!-- Error -->
+  <div id="errorView" class="state skip">
+    <div style="font-size:42px;margin-bottom:10px">🔍</div>
+    <div id="errMsg" style="font-size:15px;color:var(--ink)">রিসিট পাওয়া যায়নি।</div>
+    <div style="font-size:13px;margin-top:8px">পেমেন্ট সম্পন্ন হলে রিসিট তৈরি হয়। যাচাই চলমান থাকলে কিছুক্ষণ পর আবার চেষ্টা করুন।</div>
+    <div class="actions" style="max-width:300px;margin:20px auto 0">
+      <button class="btn btn-home" onclick="location.href='order.html'">অর্ডার পেজ</button>
+      <button class="btn btn-print" onclick="location.reload()">আবার দেখুন</button>
+    </div>
+  </div>
+
+  <!-- Receipt -->
+  <div id="receiptView" class="skip">
+    <div class="sheet">
+      <div class="r-head">
+        <div class="r-logo">SAR<small>She AI Restaurant</small></div>
+        <div class="r-paid">✅ পেমেন্ট সম্পন্ন · যাচাইকৃত</div>
+      </div>
+
+      <div class="r-meta">
+        <div class="row"><span class="k">রিসিট নং</span><span class="v num" id="mRcp">—</span></div>
+        <div class="row"><span class="k">তারিখ</span><span class="v" id="mDate">—</span></div>
+        <div class="row"><span class="k">গ্রাহক</span><span class="v" id="mCust">—</span></div>
+        <div class="row"><span class="k">Txn ID</span><span class="v num" id="mTxn" style="font-size:11px">—</span></div>
+      </div>
+
+      <!-- Items with full nutrition -->
+      <div class="r-section">
+        <div class="panel-h">খাবার · পুষ্টিমান · দৈনিক চাহিদা</div>
+        <div id="itemsBox"></div>
+      </div>
+
+      <!-- Daily total coverage -->
+      <div class="r-section" id="totalCoverSection">
+        <div class="panel-h">আজকের মোট দৈনিক চাহিদা পূরণ</div>
+        <div class="drc" id="totalDrc"></div>
+        <div style="font-size:11px;color:var(--ink-2);margin-top:8px">
+          *২০০০ kcal দৈনিক রেফারেন্স ভিত্তিক আনুমানিক হিসাব। এটি চিকিৎসা পরামর্শ নয়।
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="r-section">
+        <div class="line"><span>সাবটোটাল</span><span class="v" id="tSub">৳ 0</span></div>
+        <div class="line" id="tDelRow"><span>ডেলিভারি</span><span class="v" id="tDel">৳ 0</span></div>
+        <div class="line"><span>ভ্যাট (৫%)</span><span class="v" id="tVat">৳ 0</span></div>
+        <div class="line total"><span>সর্বমোট পরিশোধিত</span><span class="v" id="tTotal">৳ 0</span></div>
+      </div>
+
+      <div class="r-foot">
+        <div class="big">ধন্যবাদ — সুস্থ থাকুন 🌸</div>
+        তেলমুক্ত · চিনিমুক্ত · লবণমুক্ত (পিংক সল্ট) · দুধমুক্ত · আয়ুর্বেদিক · অর্গানিক<br>
+        📞 01346098892 · sheairestaurant.com
+      </div>
+    </div>
+
+    <div class="actions no-print">
+      <button class="btn btn-home" onclick="location.href='order.html'">🏠 হোম</button>
+      <button class="btn btn-wa" id="waBtn">📲 WhatsApp</button>
+      <button class="btn btn-print" onclick="window.print()">🖨️ প্রিন্ট</button>
+    </div>
+  </div>
+
 </div>
 
-<div class="bar">
-  <a class="brand" href="dashboard.html">
-    <span class="brand-mark">SAR</span>
-    <span class="brand-txt">She AI Restaurant<small>Women-Led · For Women</small></span>
-  </a>
-  <div class="actions">
-    <button class="act act-print" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>
-    <button class="act act-wa" onclick="sendWA()">💬 WhatsApp</button>
-    <button class="act act-mail" onclick="sendEmail()">✉️ ইমেইল</button>
-    <a class="act" href="order.html">← নতুন অর্ডার</a>
-  </div>
-</div>
-
-<div class="sheet" id="sheet"><!-- filled by JS --></div>
-
-<!-- ═══ STAFF: scan food QR / barcode to place an order for this customer ═══ -->
-<div class="scanner" id="scanner">
-  <h3>🔎 স্টাফ স্ক্যানার — খাবারের QR/বারকোড স্ক্যান করে অর্ডার</h3>
-  <div class="sub">USB বারকোড স্ক্যানার দিয়ে স্ক্যান করুন (কোড টাইপ হয়ে Enter চাপবে), অথবা ক্যামেরা চালু করুন। মিল পেলে Enter/OK চেপে অর্ডার বসান।</div>
-  <div class="scan-input-row">
-    <input class="scan-input" id="scanInput" placeholder="QR / বারকোড এখানে স্ক্যান বা টাইপ করুন…" autocomplete="off">
-    <button class="scan-btn" onclick="resolveScan(document.getElementById('scanInput').value)">খুঁজুন / OK</button>
-    <button class="scan-cam-btn" id="camBtn" onclick="toggleCamera()">📷 ক্যামেরা</button>
-  </div>
-  <video id="scanVideo" playsinline></video>
-  <div class="scan-result" id="scanResult"></div>
-  <div class="scan-match" id="scanMatch">
-    <div class="mn" id="matchName"></div>
-    <div class="mm" id="matchMeta"></div>
-    <button class="scan-place" id="placeBtn">✓ অর্ডার বসান (Enter)</button>
-  </div>
-</div>
-
-<!-- qrcodejs (vendored inline, no CDN dependency) -->
 <script>
-var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this.parsedData=[];for(var b=[],d=0,e=this.data.length;e>d;d++){var f=this.data.charCodeAt(d);f>65536?(b[0]=240|(1835008&f)>>>18,b[1]=128|(258048&f)>>>12,b[2]=128|(4032&f)>>>6,b[3]=128|63&f):f>2048?(b[0]=224|(61440&f)>>>12,b[1]=128|(4032&f)>>>6,b[2]=128|63&f):f>128?(b[0]=192|(1984&f)>>>6,b[1]=128|63&f):b[0]=f,this.parsedData=this.parsedData.concat(b)}this.parsedData.length!=this.data.length&&(this.parsedData.unshift(191),this.parsedData.unshift(187),this.parsedData.unshift(239))}function b(a,b){this.typeNumber=a,this.errorCorrectLevel=b,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}function i(a,b){if(void 0==a.length)throw new Error(a.length+"/"+b);for(var c=0;c<a.length&&0==a[c];)c++;this.num=new Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}function j(a,b){this.totalCount=a,this.dataCount=b}function k(){this.buffer=[],this.length=0}function m(){return"undefined"!=typeof CanvasRenderingContext2D}function n(){var a=!1,b=navigator.userAgent;return/android/i.test(b)&&(a=!0,aMat=b.toString().match(/android ([0-9]\.[0-9])/i),aMat&&aMat[1]&&(a=parseFloat(aMat[1]))),a}function r(a,b){for(var c=1,e=s(a),f=0,g=l.length;g>=f;f++){var h=0;switch(b){case d.L:h=l[f][0];break;case d.M:h=l[f][1];break;case d.Q:h=l[f][2];break;case d.H:h=l[f][3]}if(h>=e)break;c++}if(c>l.length)throw new Error("Too long data");return c}function s(a){var b=encodeURI(a).toString().replace(/\%[0-9a-fA-F]{2}/g,"a");return b.length+(b.length!=a?3:0)}a.prototype={getLength:function(){return this.parsedData.length},write:function(a){for(var b=0,c=this.parsedData.length;c>b;b++)a.put(this.parsedData[b],8)}},b.prototype={addData:function(b){var c=new a(b);this.dataList.push(c),this.dataCache=null},isDark:function(a,b){if(0>a||this.moduleCount<=a||0>b||this.moduleCount<=b)throw new Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(a,c){this.moduleCount=4*this.typeNumber+17,this.modules=new Array(this.moduleCount);for(var d=0;d<this.moduleCount;d++){this.modules[d]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[d][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(a,c),this.typeNumber>=7&&this.setupTypeNumber(a),null==this.dataCache&&(this.dataCache=b.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,c)},setupPositionProbePattern:function(a,b){for(var c=-1;7>=c;c++)if(!(-1>=a+c||this.moduleCount<=a+c))for(var d=-1;7>=d;d++)-1>=b+d||this.moduleCount<=b+d||(this.modules[a+c][b+d]=c>=0&&6>=c&&(0==d||6==d)||d>=0&&6>=d&&(0==c||6==c)||c>=2&&4>=c&&d>=2&&4>=d?!0:!1)},getBestMaskPattern:function(){for(var a=0,b=0,c=0;8>c;c++){this.makeImpl(!0,c);var d=f.getLostPoint(this);(0==c||a>d)&&(a=d,b=c)}return b},createMovieClip:function(a,b,c){var d=a.createEmptyMovieClip(b,c),e=1;this.make();for(var f=0;f<this.modules.length;f++)for(var g=f*e,h=0;h<this.modules[f].length;h++){var i=h*e,j=this.modules[f][h];j&&(d.beginFill(0,100),d.moveTo(i,g),d.lineTo(i+e,g),d.lineTo(i+e,g+e),d.lineTo(i,g+e),d.endFill())}return d},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)null==this.modules[a][6]&&(this.modules[a][6]=0==a%2);for(var b=8;b<this.moduleCount-8;b++)null==this.modules[6][b]&&(this.modules[6][b]=0==b%2)},setupPositionAdjustPattern:function(){for(var a=f.getPatternPosition(this.typeNumber),b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(null==this.modules[d][e])for(var g=-2;2>=g;g++)for(var h=-2;2>=h;h++)this.modules[d+g][e+h]=-2==g||2==g||-2==h||2==h||0==g&&0==h?!0:!1}},setupTypeNumber:function(a){for(var b=f.getBCHTypeNumber(this.typeNumber),c=0;18>c;c++){var d=!a&&1==(1&b>>c);this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=d}for(var c=0;18>c;c++){var d=!a&&1==(1&b>>c);this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=d}},setupTypeInfo:function(a,b){for(var c=this.errorCorrectLevel<<3|b,d=f.getBCHTypeInfo(c),e=0;15>e;e++){var g=!a&&1==(1&d>>e);6>e?this.modules[e][8]=g:8>e?this.modules[e+1][8]=g:this.modules[this.moduleCount-15+e][8]=g}for(var e=0;15>e;e++){var g=!a&&1==(1&d>>e);8>e?this.modules[8][this.moduleCount-e-1]=g:9>e?this.modules[8][15-e-1+1]=g:this.modules[8][15-e-1]=g}this.modules[this.moduleCount-8][8]=!a},mapData:function(a,b){for(var c=-1,d=this.moduleCount-1,e=7,g=0,h=this.moduleCount-1;h>0;h-=2)for(6==h&&h--;;){for(var i=0;2>i;i++)if(null==this.modules[d][h-i]){var j=!1;g<a.length&&(j=1==(1&a[g]>>>e));var k=f.getMask(b,d,h-i);k&&(j=!j),this.modules[d][h-i]=j,e--,-1==e&&(g++,e=7)}if(d+=c,0>d||this.moduleCount<=d){d-=c,c=-c;break}}}},b.PAD0=236,b.PAD1=17,b.createData=function(a,c,d){for(var e=j.getRSBlocks(a,c),g=new k,h=0;h<d.length;h++){var i=d[h];g.put(i.mode,4),g.put(i.getLength(),f.getLengthInBits(i.mode,a)),i.write(g)}for(var l=0,h=0;h<e.length;h++)l+=e[h].dataCount;if(g.getLengthInBits()>8*l)throw new Error("code length overflow. ("+g.getLengthInBits()+">"+8*l+")");for(g.getLengthInBits()+4<=8*l&&g.put(0,4);0!=g.getLengthInBits()%8;)g.putBit(!1);for(;;){if(g.getLengthInBits()>=8*l)break;if(g.put(b.PAD0,8),g.getLengthInBits()>=8*l)break;g.put(b.PAD1,8)}return b.createBytes(g,e)},b.createBytes=function(a,b){for(var c=0,d=0,e=0,g=new Array(b.length),h=new Array(b.length),j=0;j<b.length;j++){var k=b[j].dataCount,l=b[j].totalCount-k;d=Math.max(d,k),e=Math.max(e,l),g[j]=new Array(k);for(var m=0;m<g[j].length;m++)g[j][m]=255&a.buffer[m+c];c+=k;var n=f.getErrorCorrectPolynomial(l),o=new i(g[j],n.getLength()-1),p=o.mod(n);h[j]=new Array(n.getLength()-1);for(var m=0;m<h[j].length;m++){var q=m+p.getLength()-h[j].length;h[j][m]=q>=0?p.get(q):0}}for(var r=0,m=0;m<b.length;m++)r+=b[m].totalCount;for(var s=new Array(r),t=0,m=0;d>m;m++)for(var j=0;j<b.length;j++)m<g[j].length&&(s[t++]=g[j][m]);for(var m=0;e>m;m++)for(var j=0;j<b.length;j++)m<h[j].length&&(s[t++]=h[j][m]);return s};for(var c={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8},d={L:1,M:0,Q:3,H:2},e={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7},f={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(a){for(var b=a<<10;f.getBCHDigit(b)-f.getBCHDigit(f.G15)>=0;)b^=f.G15<<f.getBCHDigit(b)-f.getBCHDigit(f.G15);return(a<<10|b)^f.G15_MASK},getBCHTypeNumber:function(a){for(var b=a<<12;f.getBCHDigit(b)-f.getBCHDigit(f.G18)>=0;)b^=f.G18<<f.getBCHDigit(b)-f.getBCHDigit(f.G18);return a<<12|b},getBCHDigit:function(a){for(var b=0;0!=a;)b++,a>>>=1;return b},getPatternPosition:function(a){return f.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case e.PATTERN000:return 0==(b+c)%2;case e.PATTERN001:return 0==b%2;case e.PATTERN010:return 0==c%3;case e.PATTERN011:return 0==(b+c)%3;case e.PATTERN100:return 0==(Math.floor(b/2)+Math.floor(c/3))%2;case e.PATTERN101:return 0==b*c%2+b*c%3;case e.PATTERN110:return 0==(b*c%2+b*c%3)%2;case e.PATTERN111:return 0==(b*c%3+(b+c)%2)%2;default:throw new Error("bad maskPattern:"+a)}},getErrorCorrectPolynomial:function(a){for(var b=new i([1],0),c=0;a>c;c++)b=b.multiply(new i([1,g.gexp(c)],0));return b},getLengthInBits:function(a,b){if(b>=1&&10>b)switch(a){case c.MODE_NUMBER:return 10;case c.MODE_ALPHA_NUM:return 9;case c.MODE_8BIT_BYTE:return 8;case c.MODE_KANJI:return 8;default:throw new Error("mode:"+a)}else if(27>b)switch(a){case c.MODE_NUMBER:return 12;case c.MODE_ALPHA_NUM:return 11;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 10;default:throw new Error("mode:"+a)}else{if(!(41>b))throw new Error("type:"+b);switch(a){case c.MODE_NUMBER:return 14;case c.MODE_ALPHA_NUM:return 13;case c.MODE_8BIT_BYTE:return 16;case c.MODE_KANJI:return 12;default:throw new Error("mode:"+a)}}},getLostPoint:function(a){for(var b=a.getModuleCount(),c=0,d=0;b>d;d++)for(var e=0;b>e;e++){for(var f=0,g=a.isDark(d,e),h=-1;1>=h;h++)if(!(0>d+h||d+h>=b))for(var i=-1;1>=i;i++)0>e+i||e+i>=b||(0!=h||0!=i)&&g==a.isDark(d+h,e+i)&&f++;f>5&&(c+=3+f-5)}for(var d=0;b-1>d;d++)for(var e=0;b-1>e;e++){var j=0;a.isDark(d,e)&&j++,a.isDark(d+1,e)&&j++,a.isDark(d,e+1)&&j++,a.isDark(d+1,e+1)&&j++,(0==j||4==j)&&(c+=3)}for(var d=0;b>d;d++)for(var e=0;b-6>e;e++)a.isDark(d,e)&&!a.isDark(d,e+1)&&a.isDark(d,e+2)&&a.isDark(d,e+3)&&a.isDark(d,e+4)&&!a.isDark(d,e+5)&&a.isDark(d,e+6)&&(c+=40);for(var e=0;b>e;e++)for(var d=0;b-6>d;d++)a.isDark(d,e)&&!a.isDark(d+1,e)&&a.isDark(d+2,e)&&a.isDark(d+3,e)&&a.isDark(d+4,e)&&!a.isDark(d+5,e)&&a.isDark(d+6,e)&&(c+=40);for(var k=0,e=0;b>e;e++)for(var d=0;b>d;d++)a.isDark(d,e)&&k++;var l=Math.abs(100*k/b/b-50)/5;return c+=10*l}},g={glog:function(a){if(1>a)throw new Error("glog("+a+")");return g.LOG_TABLE[a]},gexp:function(a){for(;0>a;)a+=255;for(;a>=256;)a-=255;return g.EXP_TABLE[a]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)},h=0;8>h;h++)g.EXP_TABLE[h]=1<<h;for(var h=8;256>h;h++)g.EXP_TABLE[h]=g.EXP_TABLE[h-4]^g.EXP_TABLE[h-5]^g.EXP_TABLE[h-6]^g.EXP_TABLE[h-8];for(var h=0;255>h;h++)g.LOG_TABLE[g.EXP_TABLE[h]]=h;i.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){for(var b=new Array(this.getLength()+a.getLength()-1),c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=g.gexp(g.glog(this.get(c))+g.glog(a.get(d)));return new i(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;for(var b=g.glog(this.get(0))-g.glog(a.get(0)),c=new Array(this.getLength()),d=0;d<this.getLength();d++)c[d]=this.get(d);for(var d=0;d<a.getLength();d++)c[d]^=g.gexp(g.glog(a.get(d))+b);return new i(c,0).mod(a)}},j.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],j.getRSBlocks=function(a,b){var c=j.getRsBlockTable(a,b);if(void 0==c)throw new Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);for(var d=c.length/3,e=[],f=0;d>f;f++)for(var g=c[3*f+0],h=c[3*f+1],i=c[3*f+2],k=0;g>k;k++)e.push(new j(h,i));return e},j.getRsBlockTable=function(a,b){switch(b){case d.L:return j.RS_BLOCK_TABLE[4*(a-1)+0];case d.M:return j.RS_BLOCK_TABLE[4*(a-1)+1];case d.Q:return j.RS_BLOCK_TABLE[4*(a-1)+2];case d.H:return j.RS_BLOCK_TABLE[4*(a-1)+3];default:return void 0}},k.prototype={get:function(a){var b=Math.floor(a/8);return 1==(1&this.buffer[b]>>>7-a%8)},put:function(a,b){for(var c=0;b>c;c++)this.putBit(1==(1&a>>>b-c-1))},getLengthInBits:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);this.buffer.length<=b&&this.buffer.push(0),a&&(this.buffer[b]|=128>>>this.length%8),this.length++}};var l=[[17,14,11,7],[32,26,20,14],[53,42,32,24],[78,62,46,34],[106,84,60,44],[134,106,74,58],[154,122,86,64],[192,152,108,84],[230,180,130,98],[271,213,151,119],[321,251,177,137],[367,287,203,155],[425,331,241,177],[458,362,258,194],[520,412,292,220],[586,450,322,250],[644,504,364,280],[718,560,394,310],[792,624,442,338],[858,666,482,382],[929,711,509,403],[1003,779,565,439],[1091,857,611,461],[1171,911,661,511],[1273,997,715,535],[1367,1059,751,593],[1465,1125,805,625],[1528,1190,868,658],[1628,1264,908,698],[1732,1370,982,742],[1840,1452,1030,790],[1952,1538,1112,842],[2068,1628,1168,898],[2188,1722,1228,958],[2303,1809,1283,983],[2431,1911,1351,1051],[2563,1989,1423,1093],[2699,2099,1499,1139],[2809,2213,1579,1219],[2953,2331,1663,1273]],o=function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){function g(a,b){var c=document.createElementNS("http://www.w3.org/2000/svg",a);for(var d in b)b.hasOwnProperty(d)&&c.setAttribute(d,b[d]);return c}var b=this._htOption,c=this._el,d=a.getModuleCount();Math.floor(b.width/d),Math.floor(b.height/d),this.clear();var h=g("svg",{viewBox:"0 0 "+String(d)+" "+String(d),width:"100%",height:"100%",fill:b.colorLight});h.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink"),c.appendChild(h),h.appendChild(g("rect",{fill:b.colorDark,width:"1",height:"1",id:"template"}));for(var i=0;d>i;i++)for(var j=0;d>j;j++)if(a.isDark(i,j)){var k=g("use",{x:String(i),y:String(j)});k.setAttributeNS("http://www.w3.org/1999/xlink","href","#template"),h.appendChild(k)}},a.prototype.clear=function(){for(;this._el.hasChildNodes();)this._el.removeChild(this._el.lastChild)},a}(),p="svg"===document.documentElement.tagName.toLowerCase(),q=p?o:m()?function(){function a(){this._elImage.src=this._elCanvas.toDataURL("image/png"),this._elImage.style.display="block",this._elCanvas.style.display="none"}function d(a,b){var c=this;if(c._fFail=b,c._fSuccess=a,null===c._bSupportDataURI){var d=document.createElement("img"),e=function(){c._bSupportDataURI=!1,c._fFail&&_fFail.call(c)},f=function(){c._bSupportDataURI=!0,c._fSuccess&&c._fSuccess.call(c)};return d.onabort=e,d.onerror=e,d.onload=f,d.src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",void 0}c._bSupportDataURI===!0&&c._fSuccess?c._fSuccess.call(c):c._bSupportDataURI===!1&&c._fFail&&c._fFail.call(c)}if(this._android&&this._android<=2.1){var b=1/window.devicePixelRatio,c=CanvasRenderingContext2D.prototype.drawImage;CanvasRenderingContext2D.prototype.drawImage=function(a,d,e,f,g,h,i,j){if("nodeName"in a&&/img/i.test(a.nodeName))for(var l=arguments.length-1;l>=1;l--)arguments[l]=arguments[l]*b;else"undefined"==typeof j&&(arguments[1]*=b,arguments[2]*=b,arguments[3]*=b,arguments[4]*=b);c.apply(this,arguments)}}var e=function(a,b){this._bIsPainted=!1,this._android=n(),this._htOption=b,this._elCanvas=document.createElement("canvas"),this._elCanvas.width=b.width,this._elCanvas.height=b.height,a.appendChild(this._elCanvas),this._el=a,this._oContext=this._elCanvas.getContext("2d"),this._bIsPainted=!1,this._elImage=document.createElement("img"),this._elImage.style.display="none",this._el.appendChild(this._elImage),this._bSupportDataURI=null};return e.prototype.draw=function(a){var b=this._elImage,c=this._oContext,d=this._htOption,e=a.getModuleCount(),f=d.width/e,g=d.height/e,h=Math.round(f),i=Math.round(g);b.style.display="none",this.clear();for(var j=0;e>j;j++)for(var k=0;e>k;k++){var l=a.isDark(j,k),m=k*f,n=j*g;c.strokeStyle=l?d.colorDark:d.colorLight,c.lineWidth=1,c.fillStyle=l?d.colorDark:d.colorLight,c.fillRect(m,n,f,g),c.strokeRect(Math.floor(m)+.5,Math.floor(n)+.5,h,i),c.strokeRect(Math.ceil(m)-.5,Math.ceil(n)-.5,h,i)}this._bIsPainted=!0},e.prototype.makeImage=function(){this._bIsPainted&&d.call(this,a)},e.prototype.isPainted=function(){return this._bIsPainted},e.prototype.clear=function(){this._oContext.clearRect(0,0,this._elCanvas.width,this._elCanvas.height),this._bIsPainted=!1},e.prototype.round=function(a){return a?Math.floor(1e3*a)/1e3:a},e}():function(){var a=function(a,b){this._el=a,this._htOption=b};return a.prototype.draw=function(a){for(var b=this._htOption,c=this._el,d=a.getModuleCount(),e=Math.floor(b.width/d),f=Math.floor(b.height/d),g=['<table style="border:0;border-collapse:collapse;">'],h=0;d>h;h++){g.push("<tr>");for(var i=0;d>i;i++)g.push('<td style="border:0;border-collapse:collapse;padding:0;margin:0;width:'+e+"px;height:"+f+"px;background-color:"+(a.isDark(h,i)?b.colorDark:b.colorLight)+';"></td>');g.push("</tr>")}g.push("</table>"),c.innerHTML=g.join("");var j=c.childNodes[0],k=(b.width-j.offsetWidth)/2,l=(b.height-j.offsetHeight)/2;k>0&&l>0&&(j.style.margin=l+"px "+k+"px")},a.prototype.clear=function(){this._el.innerHTML=""},a}();QRCode=function(a,b){if(this._htOption={width:256,height:256,typeNumber:4,colorDark:"#000000",colorLight:"#ffffff",correctLevel:d.H},"string"==typeof b&&(b={text:b}),b)for(var c in b)this._htOption[c]=b[c];"string"==typeof a&&(a=document.getElementById(a)),this._android=n(),this._el=a,this._oQRCode=null,this._oDrawing=new q(this._el,this._htOption),this._htOption.text&&this.makeCode(this._htOption.text)},QRCode.prototype.makeCode=function(a){this._oQRCode=new b(r(a,this._htOption.correctLevel),this._htOption.correctLevel),this._oQRCode.addData(a),this._oQRCode.make(),this._el.title=a,this._oDrawing.draw(this._oQRCode),this.makeImage()},QRCode.prototype.makeImage=function(){"function"==typeof this._oDrawing.makeImage&&(!this._android||this._android>=3)&&this._oDrawing.makeImage()},QRCode.prototype.clear=function(){this._oDrawing.clear()},QRCode.CorrectLevel=d}();
-</script>
+// ═══════════════════════════════════════════════════
+// CONFIG — সব কল secure orchestrator (payment.js) দিয়ে
+// ═══════════════════════════════════════════════════
+const FN = '/.netlify/functions/payment';
+const params = new URLSearchParams(location.search);
+const TXN  = params.get('txn');
+const RCP  = params.get('rcp');
+const INV  = params.get('inv');
+const OID  = params.get('oid');           // legacy order link
 
-<!-- html2pdf: client-side PDF generation for Supabase storage + dashboard list -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+const _sc   = JSON.parse(localStorage.getItem('sar_customer') || '{}');
+const CNAME = _sc.full_name || localStorage.getItem('sar_customer_name') || 'গ্রাহক';
 
-<script>
-// ════════════════════════════════════════════════════
-// SAR RECEIPT  —  reads order by ?oid= (Supabase) or
-// falls back to the locally-saved last order. Renders the
-// FULL structured menu detail handed over by meal-score →
-// cart → order: every course, ingredient (blockchain-linked),
-// nutrition + %DV, daily-requirement coverage, benefits,
-// general instructions, and the AI "magical message" produced
-// by the 6:00 AM daily analysis (ai_analysis table).
-// ════════════════════════════════════════════════════
-const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
-const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
-const H = {apikey:KEY, Authorization:'Bearer '+KEY};
+const $  = id => document.getElementById(id);
+const bn = n => Number(n||0).toLocaleString('bn-BD');
+const taka = n => '৳ ' + bn(n);
 
-const DAILY = {kcal:2000, protein:50, carb:260, fat:65, fiber:25, iron:18};
-const MEAL_BN = {breakfast:'সকাল', lunch:'দুপুর', dinner:'রাত'};
-const CAT_BN  = {DM:'ডায়াবেটিস', OB:'স্থূলতা', FL:'ফ্যাটি লিভার', IB:'IBS/গ্যাস্ট্রিক', PR:'গর্ভাবস্থা'};
-const CAT_EMO = {DM:'🩸', OB:'⚖️', FL:'🫀', IB:'🌿', PR:'🤱'};
-
-// rotating magical-message pool (used when AI has no message yet for today)
-const MAGIC_FALLBACK = [
-  'আপনি যা খান, তা-ই আপনি হয়ে ওঠেন — আজকের প্রতিটি কোর্স আপনার ভেতরের আরোগ্যকে জাগিয়ে তুলছে। 🌸',
-  'নিজের যত্ন নেওয়া স্বার্থপরতা নয়, এটি শক্তি। আজ এক প্লেট ভালোবাসা নিজেকে উপহার দিলেন। ✨',
-  'প্রতিটি বীজ, প্রতিটি পাতা — প্রকৃতির হাতে গড়া আপনার সুস্থতার গল্প। আজ সেই গল্পের একটি অধ্যায় লিখলেন। 🌿',
-  'আজকের খাবার শুধু শরীর নয়, মনকেও পুষ্টি দিচ্ছে। ধীরে খান, কৃতজ্ঞ থাকুন, ভালো থাকুন। 💗',
-  'ছোট ছোট সুস্থ পছন্দই একদিন বড় পরিবর্তন আনে। আজকের প্লেট সেই যাত্রার আরেকটি সাহসী পদক্ষেপ। 🌼'
-];
-function pickMagic(){
-  const d = new Date(); const idx = d.getDate() % MAGIC_FALLBACK.length;
-  return MAGIC_FALLBACK[idx];
+async function api(body){
+  const r = await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
 }
+function show(v){ ['loadingView','errorView','receiptView'].forEach(x=>$(x).classList.add('skip')); $(v).classList.remove('skip'); }
+function fail(m){ $('errMsg').textContent = m; show('errorView'); }
 
-// ── read a metric value across several likely column names (250-metric set
-//    has no single fixed schema, so we look defensively and only USE a value
-//    when it is actually present & meaningful) ──
-function metricVal(m, keys){
-  for(const k of keys){
-    if(m && m[k] != null && String(m[k]).trim() !== '' &&
-       !['না','no','none','nil','n/a','০','0'].includes(String(m[k]).trim().toLowerCase())){
-      return m[k];
-    }
-  }
-  return null;
-}
-function truthyMetric(v){
-  if(v == null) return false;
-  const s = String(v).trim().toLowerCase();
-  return !['না','no','none','nil','n/a','false','০','0',''].includes(s);
-}
-
-// Disease label for the "how are you going with your ___" check-in
-const DISEASE_CHECKIN = {
-  DM:'ডায়াবেটিস', OB:'ওজন নিয়ন্ত্রণ', FL:'ফ্যাটি লিভার',
-  IB:'গ্যাস্ট্রিক/IBS', PR:'গর্ভকালীন যত্ন'
-};
-
-// ── Build the personalized, persuasive engagement block from REAL data.
-//    Tone: supportive, women-to-women, never alarming or shaming. We prompt
-//    check-ups and self-care; we never assert a diagnosis. ──
-function buildEngagement(ctx){
-  const {metrics:m, prevOrder, cat, weather, name} = ctx;
-  const red = (t)=>`<div class="pmsg red">${t}</div>`;
-  const grn = (t)=>`<div class="pmsg green">${t}</div>`;
-  let html = '';
-
-  // 1) previous-order short 3-sentence recap
-  if(prevOrder && prevOrder.summary){
-    html += `<div class="recap"><div class="rh">🧾 আপনার আগের অর্ডার</div>${prevOrder.summary}</div>`;
-  }
-
-  // 2) satisfaction + advice ask (green = positive, red = "tell us")
-  html += `<div class="ask">😊 SAR-এর খাবার ও সেবায় <b>আপনি কি সন্তুষ্ট</b>, ${name||'আপা'}? SAR-কে আরও ভালো করতে আপনার <b>পরামর্শ</b> আমাদের কাছে অমূল্য।</div>`;
-  html += `<div class="fbrow">
-    <span class="fb happy">💚 হ্যাঁ, আমি খুশি</span>
-    <span class="fb advice">✍️ আমার পরামর্শ আছে</span>
-  </div><div class="sign"></div>`;
-
-  // 3) disease check-in — uses HER real category
-  const dl = DISEASE_CHECKIN[cat] || 'স্বাস্থ্য';
-  html += grn(`<b>${dl}</b> নিয়ে আপনি এখন কেমন আছেন? নিয়মিত SAR থেরাপিউটিক মিল আপনার যাত্রাকে সহজ করছে — চালিয়ে যান, পরিবর্তন আসবেই। 🌿`);
-
-  // 4) weather-tied symptom check-in (only if both weather hint AND the metric exist)
-  const hot = weather && /গরম|উষ্ণ|hot|heat|৩[০-৯]|3[0-9]°/i.test(weather);
-  const groin = metricVal(m, ['groin_itching','groin_itch','intertrigo','skin_itching_groin','fungal_groin','groin']);
-  if(hot && truthyMetric(groin)){
-    html += red(`গতকাল আবহাওয়া বেশ <b>গরম</b> ছিল — এই সময়ে ভাঁজে চুলকানি/র‍্যাশ বেড়ে যায়। আপনার <b>গ্রোয়িন চুলকানির</b> অবস্থা এখন কেমন? প্রয়োজনে SAR-এর অ্যান্টি-ফাঙ্গাল আয়ুর্বেদিক কন্ডিশন পাউডার যোগ করতে পারি।`);
-  } else if(truthyMetric(groin)){
-    html += red(`আপনার <b>গ্রোয়িন চুলকানির</b> অবস্থা এখন কেমন? গরমে এটি বাড়তে পারে — SAR-এর কুলিং আয়ুর্বেদিক লেয়ার সাহায্য করতে পারে।`);
-  }
-
-  // 5) PCOS awareness — educational, check-up prompt (shown for weight/DM/age-relevant,
-  //    or when an explicit pcos metric exists). Framed as awareness, not diagnosis.
-  const pcos = metricVal(m, ['pcos','pcod','polycystic','pcos_status','menstrual_irregular','irregular_period']);
-  if(truthyMetric(pcos) || cat==='OB' || cat==='DM'){
-    html += red(`<span class="em">আপনি কি কখনও <b>PCOS</b> (পলিসিস্টিক ওভারি সিনড্রোম) পরীক্ষা করিয়েছেন?</span> জানেন কি — এটি জরায়ুর একটি সাধারণ হরমোনজনিত সমস্যা, যা থেকে ওজন বৃদ্ধি, ব্রণ ও অনিয়মিত মাসিক হতে পারে। SAR-এর তেল-চিনি-মুক্ত আয়ুর্বেদিক মিল PCOS ব্যবস্থাপনায় সহায়ক। একবার ডাক্তারের সাথে কথা বলে দেখুন — সচেতনতাই প্রথম যত্ন। 💗`);
-  }
-
-  // 6) family care — only if metrics indicate a sick spouse/child. Soft, free outreach.
-  const spouseIll = metricVal(m, ['husband_illness','spouse_illness','husband_health','spouse_sick','husband_condition']);
-  const childIll  = metricVal(m, ['child_illness','children_illness','child_health','child_sick','kids_health']);
-  if(truthyMetric(spouseIll) || truthyMetric(childIll)){
-    const who = truthyMetric(spouseIll) && truthyMetric(childIll) ? 'আপনার স্বামী ও সন্তানের'
-              : truthyMetric(spouseIll) ? 'আপনার স্বামীর' : 'আপনার সন্তানের';
-    html += grn(`আপনার যত্নে পরিবারও সুস্থ থাকুক — <b>${who} শরীর এখন কেমন আছে?</b> চাইলে SAR থেকে তাঁদের জন্যও স্বাস্থ্যকর খাবারের পরামর্শ নিতে পারেন। 🤍`);
-  }
-
-  // 7) closing credibility line
-  html += grn(`✦ <b>৫,০০০+ নারী</b> SAR-এর সাথে তাঁদের সুস্থতার যাত্রা শুরু করেছেন। আপনি একা নন — আমরা প্রতিদিন আপনার পাশে আছি।`);
-
-  return html;
-}
-
-// ── Build a ≤3-sentence recap of the customer's previous order ──
-function summarizePrevOrder(o){
-  if(!o) return null;
-  let items = [];
-  try{ items = Array.isArray(o.items_json) ? o.items_json : []; }catch(e){}
-  const names = items.map(i => i.name || i.name_bn).filter(Boolean).slice(0,3);
-  const date = o.created_at ? new Date(o.created_at).toLocaleDateString('bn-BD') : '';
-  const kcal = items.reduce((s,i)=> s + (parseInt(i.kcal||i.calories||0)||0)*(i.qty||1), 0);
-  if(!names.length) return null;
-  const s1 = `${date?date+'-এ ':''}আপনি অর্ডার করেছিলেন ${names.join(', ')}${items.length>3?' সহ আরও':''}।`;
-  const s2 = `মোট প্রায় ${bn(kcal)} kcal পুষ্টি, সম্পূর্ণ তেল-চিনি-লবণ-মুক্ত ও আয়ুর্বেদিক।`;
-  const s3 = `সেই ধারাবাহিকতাই আজও বজায় রাখলেন — অসাধারণ! 🌸`;
-  return { summary: `${s1} ${s2} ${s3}`, names };
-}
-
-// ── pure-JS QR (no dependency) fallback if qrcodejs CDN is blocked ──
-function drawQRFallback(el, text){
-  el.innerHTML = `<div style="width:74px;height:74px;display:flex;align-items:center;
-    justify-content:center;border:1.5px dashed #C2185B;border-radius:6px;font-size:.45rem;
-    color:#880E4F;text-align:center;padding:4px;word-break:break-all">${text.slice(0,28)}</div>`;
-}
-function makeQR(el, text){
-  try{
-    el.innerHTML = '';
-    if(window.QRCode){ new QRCode(el, {text, width:74, height:74, colorDark:'#880E4F', colorLight:'#ffffff'}); }
-    else drawQRFallback(el, text);
-  }catch(e){ drawQRFallback(el, text); }
-}
-
-const bn = n => String(n).replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]);
-
-// ── normalize a stored item (handles both rich & db-json shapes) ──
-function norm(i){
-  i = i || {};
-  const courseDetail = Array.isArray(i.course_detail) ? i.course_detail
-    : Array.isArray(i.courseDetail) ? i.courseDetail
-    : (Array.isArray(i.courses) ? i.courses.map(c => typeof c==='string'?{name:c,items:[]}:c) : []);
-  const ingredients = Array.isArray(i.ingredients) ? i.ingredients
-    : [].concat(...courseDetail.map(c => Array.isArray(c.items)?c.items:[])).filter((v,k,a)=>v&&a.indexOf(v)===k);
-  return {
-    name: i.name || i.name_bn || 'SAR মেনু',
-    meal: i.meal || 'lunch',
-    mealBn: i.meal_bn || i.mealBn || MEAL_BN[i.meal] || '',
-    cat: i.cat || 'DM',
-    day: i.day || '',
-    code: i.code || i.blockchain_code || i.menu_item_id || i.name,
-    qty: i.qty || i.quantity || 1,
-    price: i.unit_price || i.price || 0,
-    courseCount: i.course_count || i.courseCount || courseDetail.length || 1,
-    courseDetail, ingredients,
-    diseasePowders: i.disease_powders || i.diseasePowders || [],
-    conditionPowders: i.condition_powders || i.conditionPowders || [],
-    chutney: i.chutney || '',
-    topping: i.topping || '',
-    mix: !!i.mix,
-    benefits: Array.isArray(i.benefits) ? i.benefits.join(' · ') : (i.benefits || ''),
-    kcal: parseInt(i.kcal||i.calories||0)||0,
-    protein: parseFloat(i.protein||0)||0,
-    fiber: parseFloat(i.fiber||0)||0,
-    fat: parseFloat(i.fat||0)||0,
-    carb: parseFloat(i.carb||0)||0
-  };
-}
-
-async function load(){
-  const params = new URLSearchParams(location.search);
-  const oid = params.get('oid');
-  let order = null, items = [], cust = {};
-
-  // customer (for name/phone/category)
-  try { cust = JSON.parse(localStorage.getItem('sar_customer') || '{}'); } catch(e){}
-
-  if(oid){
-    try{
-      const r = await fetch(`${SUPA}/rest/v1/orders?id=eq.${oid}&select=*`, {headers:H});
-      const arr = await r.json();
-      order = arr && arr[0];
-    }catch(e){}
-  }
-
-  // items: from order.items_json, else order_items rows, else local snapshot
-  if(order && Array.isArray(order.items_json) && order.items_json.length){
-    items = order.items_json;
-  } else if(order){
-    try{
-      const r = await fetch(`${SUPA}/rest/v1/order_items?order_id=eq.${order.id}&select=*`, {headers:H});
-      const rows = await r.json();
-      items = (rows||[]).map(row => Object.assign(
-        {name:row.menu_name_bn, qty:row.quantity, unit_price:row.unit_price, note:row.special_note},
-        row.nutrition_json || {}
-      ));
-    }catch(e){}
-  }
-  if(!items.length){
-    try{ items = JSON.parse(localStorage.getItem('sar_last_order_items') || '[]'); }catch(e){ items=[]; }
-  }
-
-  const norms = items.map(norm);
-
-  // AI magical message + advice + weather (the 6 AM daily analysis row)
-  let magic = '', advice = '', weather = '', analysisRow = null;
-  const cid = cust.id || localStorage.getItem('sar_customer_id');
-  if(cid){
-    try{
-      const r = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=created_at.desc&limit=1`, {headers:H});
-      const a = await r.json();
-      if(a && a[0]){
-        analysisRow = a[0];
-        const rj = a[0].result_json || {};
-        magic   = a[0].magical_message || rj.magical_message || rj.magic || '';
-        advice  = a[0].analysis_bn || a[0].recommendations || rj.note || a[0].focus || '';
-        weather = rj.weather || a[0].weather || '';
-      }
-    }catch(e){}
-  }
-  if(!magic){
-    try{ const ls = JSON.parse(localStorage.getItem('sar_last_analysis')||'{}');
-      magic = ls.magical_message || ''; weather = weather || ls.weather || ''; }catch(e){}
-  }
-
-  // customer 250-metrics (for personalized AI + persuasive engagement)
-  let metrics = {};
-  if(cid){
-    try{
-      const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${cid}&select=*&limit=1`, {headers:H});
-      const d = await r.json(); metrics = (d && d[0]) || {};
-    }catch(e){}
-  }
-
-  // previous order (the one BEFORE this receipt's order) for the recap + AI context
-  let prevOrder = null, prevRaw = null;
-  if(cid){
-    try{
-      const excl = (order && order.id) ? `&id=neq.${order.id}` : '';
-      const r = await fetch(`${SUPA}/rest/v1/orders?customer_id=eq.${cid}${excl}&order=created_at.desc&limit=1&select=*`, {headers:H});
-      const d = await r.json();
-      prevRaw = d && d[0];
-      prevOrder = summarizePrevOrder(prevRaw);
-    }catch(e){}
-  }
-
-  const cat = (cust.sar_category) || (norms[0] && norms[0].cat) || metrics.disease_category || 'DM';
-
-  // ── AI MAGICAL MESSAGE ──
-  // Priority: (1) message already AI-generated & stored at 6AM in ai_analysis;
-  //           (2) live AI call to the SAR worker using ALL her data (best effort);
-  //           (3) rich local persuasive generator from real metrics + order.
-  if(!magic){
-    magic = await generateMagicMessage({cust, metrics, items:norms, prevOrder, cat, weather, grandHint:order});
-  }
-  if(!magic) magic = localMagic({cust, metrics, items:norms, prevOrder, cat, weather});
-
-  render(order, norms, cust, {magic, advice, weather}, oid, {metrics, prevOrder, cat});
-
-  // ── store payment-receipt details in Supabase for 1 month (audit/verification) ──
-  storeReceiptAudit(order, norms, cust, oid);
-
-  // ── generate PDF, upload to Supabase Storage, save link for dashboard list ──
-  setTimeout(()=>savePdfToSupabase(order, oid), 400); // let QR/render settle first
-
-  document.getElementById('loading').classList.add('hide');
-}
-
-// ── Live AI generation of the emotional, persuasive magical message,
-//    grounded in ALL the customer's data. Uses the SAR worker's `analyze`
-//    action (same Claude proxy meal-score uses). Returns '' on any failure
-//    so the caller can fall back to the local generator. ──
-const SAR_API = '/.netlify/functions/sar';
-async function generateMagicMessage(ctx){
-  try{
-    const prompt = buildMagicPrompt(ctx);
-    const r = await fetch(SAR_API, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action:'analyze', prompt})
-    });
-    if(!r.ok) return '';
-    const d = await r.json();
-    if(!d || !d.ai) return '';
-    // worker returns a JSON string; expect {"magic":"..."}
-    let obj; try{ obj = JSON.parse(d.ai); }catch(e){ obj = null; }
-    let msg = obj ? (obj.magic || obj.magical_message || obj.message || '') : '';
-    if(!msg && typeof d.ai === 'string' && d.ai.length < 600 && d.ai.indexOf('{')<0) msg = d.ai;
-    return (msg||'').trim();
-  }catch(e){ return ''; }
-}
-
-function buildMagicPrompt(ctx){
-  const {cust, metrics:m, items, prevOrder, cat, weather} = ctx;
-  const name = (cust.full_name||'আপা');
-  const itemNames = (items||[]).map(i=>i.name).filter(Boolean).join(', ');
-  const data = {
-    নাম:name, বিভাগ:(CAT_BN[cat]||cat),
-    BMI:m.bmi, স্ট্রেস:m.stress_level, ঘুম:m.sleep_hours, মুড:m.mood,
-    কার্যকলাপ:m.activity_level, গর্ভাবস্থা:m.pregnancy_status,
-    ডায়াবেটিস:m.diabetes_type, ফ্যাটিলিভার:m.fatty_liver_grade, IBS:m.ibs_type,
-    আবহাওয়া:weather, আজকের_অর্ডার:itemNames,
-    আগের_অর্ডার:(prevOrder&&prevOrder.names?prevOrder.names.join(', '):'')
-  };
-  // keep only present fields
-  const present = Object.entries(data).filter(([k,v])=> v!=null && String(v).trim()!=='' && String(v).trim()!=='না')
-    .map(([k,v])=>`${k}: ${v}`).join(' | ');
+// ── Daily Requirement Coverage (EXACT meal-score formula) ──
+function drcFor(item){
+  const cnt  = item.course_count || item.courseCount || (item.courses?item.courses.length:3) || 3;
+  const prot = parseFloat(item.protein)||0;
+  const fib  = parseFloat(item.fiber)||0;
   return [
-    'তুমি SAR (She AI Restaurant)-এর আবেগময় ও প্রেরণাদায়ী মার্কেটিং কপিরাইটার, যিনি একজন বাংলাদেশি নারীকে তাঁর সুস্থতার যাত্রায় উৎসাহ দেন।',
-    'নিচের তথ্য বিশ্লেষণ করে আজকের রিসিটের জন্য একটি "জাদুকরী বার্তা" লেখো:',
-    present,
-    'নিয়ম: (১) বাংলায়, উষ্ণ, ব্যক্তিগত ও আবেগময়; নাম ধরে সম্বোধন করো। (২) তার বিভাগ/কন্ডিশন ও আজকের অর্ডারকে স্পর্শ করো। (৩) ২–৩ বাক্য, সর্বোচ্চ ৬০ শব্দ। (৪) ভয় নয়, ভরসা ও গর্ব জাগাও; নিজের যত্নের জন্য তাকে প্রশংসা করো। (৫) ১টি উপযুক্ত ইমোজি দিয়ে শেষ করো। (৬) কোনো রোগ-নির্ণয় বা মিথ্যা প্রতিশ্রুতি নয়।',
-    'শুধু একটি JSON অবজেক্ট দাও, অন্য কিছু নয়: {"magic":"<বার্তা>"}'
-  ].join('\n');
-}
-
-// ── Rich local persuasive generator (fallback) — composes an emotional,
-//    data-aware Bengali message from her real metrics + order. ──
-function localMagic(ctx){
-  const {cust, metrics:m, items, prevOrder, cat} = ctx;
-  const first = (cust.full_name||'আপা').split(' ')[0];
-  const dl = (CAT_BN[cat]||'সুস্থতা');
-  const todays = (items||[]).map(i=>i.name).filter(Boolean)[0] || 'আজকের থেরাপিউটিক মিল';
-  const stress = +(''+(m.stress_level||'')).replace(/[^0-9.]/g,'') || null;
-  const repeat = prevOrder && prevOrder.names && prevOrder.names.length;
-
-  const openers = [
-    `${first}, আজও নিজের জন্য সঠিক পছন্দটাই করলেন।`,
-    `${first} আপা, এই এক প্লেট যত্ন আপনার ভেতরের শক্তিরই প্রতিচ্ছবি।`,
-    `${first}, সুস্থতার পথে আপনার প্রতিটি পদক্ষেপ আমাদের গর্বিত করে।`
+    ['প্রোটিন',   Math.min(99, Math.round(prot/0.6))],
+    ['আয়রন',     Math.min(99, 22 + cnt*4)],
+    ['ফাইবার',    Math.min(99, Math.round(fib/0.25))],
+    ['ভিটামিন C', Math.min(99, 30 + cnt*5)],
   ];
-  const opener = openers[(new Date().getDate())%openers.length];
-
-  let mid;
-  if(stress!=null && stress>=7) mid = `জানি দিনগুলো চাপের, তবু "${todays}" বেছে নিয়ে আপনি নিজের মন ও শরীর দুটোকেই ভালোবাসা দিলেন।`;
-  else if(repeat) mid = `"${todays}" দিয়ে আপনি ${dl} ব্যবস্থাপনার ধারাবাহিকতা ধরে রাখলেন — এই অধ্যবসায়ই আসল পরিবর্তন আনে।`;
-  else mid = `"${todays}" — সম্পূর্ণ তেল-চিনি-লবণ-মুক্ত, আয়ুর্বেদিক; ${dl}-এর যত্নে প্রকৃতির হাতে গড়া।`;
-
-  const closer = `চালিয়ে যান, আমরা প্রতিদিন আপনার পাশে আছি। 🌸`;
-  return `${opener} ${mid} ${closer}`;
+}
+function drcHTML(dr){
+  return '<div class="drc">' + dr.map(d =>
+    '<div class="dr-line"><span class="dl">'+d[0]+'</span>'+
+    '<span class="dr-bar"><i style="width:'+d[1]+'%"></i></span>'+
+    '<span class="dp num">'+bn(d[1])+'%</span></div>').join('') + '</div>';
 }
 
-// Write a 1-month-retained audit record of this receipt (non-blocking)
-async function storeReceiptAudit(order, items, cust, oid){
-  try{
-    const cid = cust.id || localStorage.getItem('sar_customer_id');
-    const now = new Date();
-    const expires = new Date(now.getTime() + 31*24*60*60*1000); // ~1 month
-    const row = {
-      order_id: (order && order.id) || oid || null,
-      customer_id: cid || null,
-      customer_name: cust.full_name || localStorage.getItem('sar_customer_name') || null,
-      receipt_number: (window._rcp && window._rcp.rcpNum) || null,
-      order_number: (order && order.order_number) || localStorage.getItem('sar_last_order_num') || null,
-      payment_method: (order && order.payment_method) || null,
-      payment_status: (order && order.payment_status) || null,
-      total_amount: (order && order.total_amount) || null,
-      items_json: items,
-      generated_at: now.toISOString(),
-      retain_until: expires.toISOString(),
-      purpose: 'audit_verification_1month'
-    };
-    await fetch(`${SUPA}/rest/v1/receipt_audit`, {
-      method:'POST',
-      headers:{...H, 'Content-Type':'application/json', Prefer:'return=minimal'},
-      body: JSON.stringify(row)
-    });
-  }catch(e){ /* audit is best-effort, never blocks the receipt */ }
+// ── Nutrition panel (EXACT meal-score markup) ──
+function nutriHTML(item){
+  const kcal=parseInt(item.kcal)||0, prot=parseFloat(item.protein)||0;
+  const fat =parseFloat(item.fat)||Math.round(kcal*0.25/9);
+  const carb=parseFloat(item.carb)||Math.round(kcal*0.4/4);
+  const fib =parseFloat(item.fiber)||0;
+  return '<div class="nutri">'+
+    '<div class="n-pill cal"><div class="nv num">'+bn(kcal)+'</div><div class="nk">kcal</div></div>'+
+    '<div class="n-pill"><div class="nv num">'+bn(prot)+'g</div><div class="nk">প্রোটিন</div></div>'+
+    '<div class="n-pill"><div class="nv num">'+bn(fat)+'g</div><div class="nk">ফ্যাট</div></div>'+
+    '<div class="n-pill"><div class="nv num">'+bn(carb)+'g</div><div class="nk">নেট কার্ব</div></div>'+
+    '<div class="n-pill"><div class="nv num">'+bn(fib)+'g</div><div class="nk">ফাইবার</div></div>'+
+  '</div>';
 }
 
-// ── Ensure a receipts row exists for this order (always), then best-effort
-//    generate + upload the PDF and attach its public link. The dashboard
-//    lists from orders and shows the PDF link when present. Non-blocking. ──
-async function savePdfToSupabase(order, oid){
-  const d = window._rcp || {};
-  const cid = d.cid || localStorage.getItem('sar_customer_id');
-  const rcpNum = d.rcpNum || ('RCP-'+Date.now());
-  const oidv = (order && order.id) || oid;
+const CAT_BN = {DM:'ডায়াবেটিস',OB:'স্থূলতা',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
+const MEAL_BN = {breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
 
-  // 1) ALWAYS make sure a receipts row exists (so the dashboard has a record),
-  //    independent of whether PDF generation/upload works.
-  if(oidv){
-    try{
-      const chk = await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}&select=id`, {headers:H});
-      const exists = await chk.json();
-      if(Array.isArray(exists) && exists.length){
-        await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}`, {
-          method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-          body: JSON.stringify({ receipt_number:rcpNum })
-        }).catch(()=>{});
-      }else{
-        await fetch(`${SUPA}/rest/v1/receipts`, {
-          method:'POST', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-          body: JSON.stringify({ order_id:oidv, customer_id:cid, customer_name:d.name, receipt_number:rcpNum })
-        }).catch(()=>{});
-      }
-    }catch(e){ /* keep going */ }
+function renderItem(item){
+  const qty   = item.qty || 1;
+  const price = (item.unit_price || item.price || 0) * qty;
+  const dPow  = item.disease_powders || item.diseasePowders || [];
+  const cPow  = item.condition_powders || item.conditionPowders || [];
+  let ben = item.benefits || '';
+  if(Array.isArray(ben)) ben = ben;
+  else ben = String(ben).split(/[•,·]/).map(s=>s.trim()).filter(Boolean);
+  const benHTML = ben.length ? '<div style="margin-top:.6rem"><div class="panel-h">উপকারিতা</div>'+
+    '<div class="benefits">'+ben.map(b=>'<span class="bchip">✓ '+b+'</span>').join('')+'</div></div>' : '';
+  const medHTML = (dPow.length||cPow.length||item.chutney||item.topping) ?
+    '<div style="margin-top:.6rem"><div class="panel-h">Medicinal Layer</div><div class="med">'+
+      (dPow.length?'<div class="med-row"><span class="ml">Disease Powders</span>'+dPow.map(p=>'<span class="pw dis">'+p+'</span>').join('')+'</div>':'')+
+      (cPow.length?'<div class="med-row"><span class="ml">Condition Powders</span>'+cPow.map(p=>'<span class="pw con">'+p+'</span>').join('')+'</div>':'')+
+      (item.topping?'<div class="med-row"><span class="ml">Topping</span><span class="pw top">'+item.topping+'</span></div>':'')+
+      (item.chutney?'<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+item.chutney+'</span></div>':'')+
+    '</div></div>' : '';
+  const courseLines = (Array.isArray(item.course_detail)&&item.course_detail.length) ?
+    '<div style="margin:.4rem 0;font-size:.78rem;color:var(--ink-2)">'+item.course_detail.map((c,i)=>
+      '<div><b style="color:var(--green-d)">'+(i+1)+'.</b> '+(c.name||c.n||'')+
+      ((c.items&&c.items.length)?'<span style="color:#999"> — '+c.items.join(', ')+'</span>':'')+'</div>').join('')+'</div>' : '';
+  const bcRef = item.code || item.name || '';
+
+  return '<div class="item">'+
+    '<div class="item-top"><div>'+
+      '<div class="item-name">'+(item.name||'SAR মেনু')+'</div>'+
+      '<div class="item-sub">'+(MEAL_BN[item.meal]||item.meal_bn||'')+(item.day?' · '+item.day:'')+
+        (item.course_count?' · '+bn(item.course_count)+' কোর্স':'')+'</div>'+
+      (item.cat?'<span class="cat-chip">'+(CAT_BN[item.cat]||item.cat)+'</span>':'')+
+    '</div><div class="item-price">'+taka(price)+'</div></div>'+
+    courseLines +
+    '<div class="panel-h">Nutrition Information</div>'+ nutriHTML(item) +
+    '<div class="panel-h">Daily Requirement Coverage</div>'+ drcHTML(drcFor(item)) +
+    benHTML + medHTML +
+    '<div class="bchain"><span>⛓ Blockchain Verified</span>'+
+      '<a href="blockchain.html?meal='+encodeURIComponent(bcRef)+'" target="_blank">যাচাই করুন →</a></div>'+
+  '</div>';
+}
+
+function renderReceipt(receipt, invoice){
+  $('mRcp').textContent  = receipt.receipt_number || '—';
+  $('mDate').textContent = new Date(receipt.created_at||receipt.verified_at||Date.now()).toLocaleDateString('bn-BD');
+  $('mCust').textContent = CNAME;
+  $('mTxn').textContent  = receipt.transaction_id || '—';
+
+  // items: invoice.meta_json.items (MEAL_ORDER) বা localStorage fallback
+  let items = invoice?.meta_json?.items || [];
+  if(!items.length){
+    items = JSON.parse(localStorage.getItem('sar_last_order_items')||'[]');
   }
 
-  // 2) Best-effort: render PDF → upload to Storage → attach pdf_url.
-  try{
-    if(typeof html2pdf === 'undefined') return;            // lib not loaded → row already saved above
-    const sheet = document.getElementById('sheet');
-    if(!sheet) return;
-
-    const opt = {
-      margin:0, filename:`${rcpNum}.pdf`,
-      image:{type:'jpeg', quality:0.96},
-      html2canvas:{scale:2, useCORS:true, backgroundColor:'#FFF4FA'},
-      jsPDF:{unit:'mm', format:'a4', orientation:'portrait'}
-    };
-    const blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
-
-    const path = `${cid||'guest'}/${rcpNum}.pdf`;
-    const up = await fetch(`${SUPA}/storage/v1/object/receipts/${encodeURIComponent(path)}`, {
-      method:'POST',
-      headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/pdf', 'x-upsert':'true' },
-      body: blob
-    });
-    if(!up.ok) return;                                      // row stays without pdf_url; dashboard still lists it
-    const pdfUrl = `${SUPA}/storage/v1/object/public/receipts/${path}`;
-
-    if(oidv){
-      await fetch(`${SUPA}/rest/v1/receipts?order_id=eq.${oidv}`, {
-        method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-        body: JSON.stringify({ pdf_url:pdfUrl, receipt_number:rcpNum })
-      }).catch(()=>{});
-      await fetch(`${SUPA}/rest/v1/receipt_audit?order_id=eq.${oidv}`, {
-        method:'PATCH', headers:{...H,'Content-Type':'application/json',Prefer:'return=minimal'},
-        body: JSON.stringify({ pdf_url:pdfUrl })
-      }).catch(()=>{});
-    }
-  }catch(e){ /* pdf storage is best-effort */ }
-}
-
-function render(order, items, cust, ai, oid, eng){
-  eng = eng || {};
-  const rcpNum = 'RCP-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + String(Math.floor(1000+Math.random()*9000));
-  const orderNum = (order && order.order_number) || localStorage.getItem('sar_last_order_num') || '—';
-  const cat = (cust.sar_category) || (items[0] && items[0].cat) || 'DM';
-  const today = new Date();
-  const payMethod = (order && order.payment_method) || localStorage.getItem('sar_pay_method') || '—';
-  const orderType = (order && order.order_type) || 'dine_in';
-  const typeBn = {dine_in:'ডাইন-ইন', delivery:'ডেলিভারি', takeaway:'টেকঅ্যাওয়ে'}[orderType] || orderType;
+  if(items.length){
+    $('itemsBox').innerHTML = items.map(renderItem).join('');
+    // daily total coverage (sum)
+    const tot = items.reduce((a,i)=>{
+      const q=i.qty||1;
+      a.prot += (parseFloat(i.protein)||0)*q;
+      a.fib  += (parseFloat(i.fiber)||0)*q;
+      a.cnt  += (i.course_count||i.courseCount||3);
+      return a;
+    },{prot:0,fib:0,cnt:0});
+    const totalDr = [
+      ['প্রোটিন',   Math.min(99, Math.round(tot.prot/0.6))],
+      ['আয়রন',     Math.min(99, 22 + tot.cnt*4)],
+      ['ফাইবার',    Math.min(99, Math.round(tot.fib/0.25))],
+      ['ভিটামিন C', Math.min(99, 30 + tot.cnt*5)],
+    ];
+    $('totalDrc').innerHTML = totalDr.map(d=>
+      '<div class="dr-line"><span class="dl">'+d[0]+'</span>'+
+      '<span class="dr-bar"><i style="width:'+d[1]+'%"></i></span>'+
+      '<span class="dp num">'+bn(d[1])+'%</span></div>').join('');
+  } else {
+    // registration/subscription — no food items
+    $('itemsBox').innerHTML = '<div class="item"><div class="item-top"><div>'+
+      '<div class="item-name">'+(receipt.package_name||'SAR পেমেন্ট')+'</div>'+
+      '<div class="item-sub">'+({registration:'রেজিস্ট্রেশন ফি',subscription:'সাবস্ক্রিপশন'}[receipt.receipt_type]||'')+'</div>'+
+      '</div><div class="item-price">'+taka(receipt.amount)+'</div></div></div>';
+    $('totalCoverSection').style.display = 'none';
+  }
 
   // totals
-  const sub = items.reduce((s,i)=> s + i.price*i.qty, 0);
-  const del = (order && order.delivery_fee) != null ? order.delivery_fee : (orderType==='delivery'?50:0);
-  const vat = (order && order.tax) != null ? order.tax : Math.round((sub+del)*0.05);
-  const grand = (order && order.total_amount) != null ? order.total_amount : sub+del+vat;
+  const meta = invoice?.meta_json || {};
+  const total = receipt.amount || invoice?.total_amount || 0;
+  const del   = meta.delivery_fee || 0;
+  const vat   = invoice?.vat || Math.round((total-del)/1.05*0.05);
+  const sub   = (invoice?.amount != null) ? invoice.amount : (total - del - vat);
+  $('tSub').textContent   = taka(sub);
+  if(del>0){ $('tDel').textContent = taka(del); } else { $('tDelRow').style.display='none'; }
+  $('tVat').textContent   = taka(vat);
+  $('tTotal').textContent = taka(total);
 
-  let totalKcal = 0, totalProt = 0;
+  // WhatsApp button
+  const phone = (_sc.phone||'').replace(/\D/g,'');
+  $('waBtn').onclick = () => {
+    const msg = '🌸 SAR রিসিট\nরিসিট: '+(receipt.receipt_number||'')+'\nমোট: '+taka(total)+'\nTxn: '+(receipt.transaction_id||'')+'\n\n✅ পেমেন্ট সম্পন্ন\nsheairestaurant.com';
+    const intl = phone.startsWith('0') ? '88'+phone : phone;
+    window.open('https://wa.me/'+intl+'?text='+encodeURIComponent(msg),'_blank');
+  };
 
-  const itemHTML = items.map(it => {
-    totalKcal += it.kcal*it.qty; totalProt += it.protein*it.qty;
-    const carb = it.carb || Math.round(it.kcal*0.4/4);
-    const fat  = it.fat  || Math.round(it.kcal*0.25/9);
-    const fib  = it.fiber|| Math.max(6, it.courseCount*3);
-    const pct = (v,d)=> v? Math.min(99, Math.round(v/d*100)) : 0;
+  // remember for payment.html history
+  localStorage.setItem('sar_last_receipt', JSON.stringify({
+    receipt_number: receipt.receipt_number, transaction_id: receipt.transaction_id,
+    amount: total, package_name: receipt.package_name,
+  }));
 
-    const crs = it.courseDetail.length ? `<div class="crs">${
-      it.courseDetail.map((c,k)=>`${bn(k+1)}. ${c.name}${(c.items&&c.items.length)?` <span class="ig">(${c.items.join(', ')})</span>`:''}`).join(' · ')}</div>` : '';
-
-    const chips = it.ingredients.length ? `<div class="chips">${
-      it.ingredients.map(g=>`<a class="chip" target="_blank" href="blockchain.html?ing=${encodeURIComponent(g)}">⛓${g}</a>`).join('')}</div>` : '';
-
-    const nut = `<div class="nut"><b>${bn(it.kcal)}</b> kcal (${bn(pct(it.kcal,DAILY.kcal))}%) · প্রোটিন <b>${bn(it.protein)}g</b> (${bn(pct(it.protein,DAILY.protein))}%) · কার্ব ${bn(carb)}g · ফ্যাট ${bn(fat)}g · ফাইবার ${bn(fib)}g</div>`;
-
-    const dPow = it.diseasePowders, cPow = it.conditionPowders;
-    const med = (dPow.length||cPow.length||it.chutney||it.topping) ?
-      `<div class="med2">🌿 ${[...dPow,...cPow].join(', ')}${it.chutney?` · 🥄 ${it.chutney}`:''}${it.topping?` · 🎯 ${it.topping}`:''}</div>` : '';
-
-    return `<div class="li">
-      <div class="li-h">
-        <div class="li-n">${CAT_EMO[it.cat]||'🍽️'} ${it.name}${it.mealBn?` <span class="meal">· ${it.mealBn}${it.day?'/'+it.day:''}</span>`:''}</div>
-        <div class="li-amt">৳${bn(it.price*it.qty)}</div>
-      </div>
-      <div class="li-sub"><span class="qx">${bn(it.qty)} × ৳${bn(it.price)} · ${bn(it.courseCount)} কোর্স</span></div>
-      ${crs}
-      ${chips}
-      ${nut}
-      ${it.benefits?`<div class="ben">✦ ${it.benefits}</div>`:''}
-      ${med}
-      <a class="bc1" target="_blank" href="blockchain.html?meal=${encodeURIComponent(it.code)}">⛓️ Traceability →</a>
-    </div>`;
-  }).join('');
-
-  const pTotKcal = Math.min(99, Math.round(totalKcal/DAILY.kcal*100));
-  const pTotProt = Math.min(99, Math.round(totalProt/DAILY.protein*100));
-
-  const html = `
-    <div class="pad">
-      <div class="rhead">
-        <img class="logo-mark" src="data:image/jpeg;base64,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" alt="SAR">
-        <div class="logo">SAR</div>
-        <div class="brandline">She AI Revolution</div>
-        <div class="tagline">World's first AI + EI + Blockchain based women-led, women-run & women-only wellness platform</div>
-        <div class="addr">📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com</div>
-        <div class="tags">তেলমুক্ত · চিনিমুক্ত · লবণমুক্ত(পিংক সল্ট) · রংমুক্ত · দুধমুক্ত · আয়ুর্বেদিক · অর্গানিক</div>
-      </div>
-
-      <div class="meta2">
-        <div class="mrow"><span class="k">গ্রাহক</span><span class="v">${cust.full_name || localStorage.getItem('sar_customer_name') || 'গ্রাহক'}</span></div>
-        <div class="mrow"><span class="k">রিসিট#</span><span class="v mono">${rcpNum}</span></div>
-        <div class="mrow"><span class="k">ফোন</span><span class="v mono">${cust.phone || '—'}</span></div>
-        <div class="mrow"><span class="k">অর্ডার#</span><span class="v mono">${orderNum}</span></div>
-        <div class="mrow"><span class="k">তারিখ</span><span class="v">${today.toLocaleDateString('bn-BD')} ${today.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})}</span></div>
-        <div class="mrow"><span class="k">বিভাগ</span><span class="v">${CAT_EMO[cat]||''} ${CAT_BN[cat]||cat}</span></div>
-        <div class="mrow"><span class="k">ধরন</span><span class="v">${typeBn}</span></div>
-        <div class="mrow"><span class="k">পেমেন্ট</span><span class="v">${String(payMethod).toUpperCase()}</span></div>
-      </div>
-
-      <div class="dlabel">অর্ডার বিবরণ · পুষ্টি · Blockchain</div>
-      <div class="lines">
-        ${itemHTML || '<div style="text-align:center;color:#999;padding:8px">কোনো আইটেম পাওয়া যায়নি।</div>'}
-      </div>
-
-      <div class="tot">
-        <div class="trow"><span>সাবটোটাল</span><span class="num">৳ ${bn(sub)}</span></div>
-        ${del?`<div class="trow"><span>ডেলিভারি ফি</span><span class="num">৳ ${bn(del)}</span></div>`:''}
-        <div class="trow"><span>ভ্যাট (৫%)</span><span class="num">৳ ${bn(vat)}</span></div>
-        <div class="trow grand"><span>সর্বমোট পরিশোধিত</span><span class="num">৳ ${bn(grand)}</span></div>
-        <div class="trow nutri"><span>📊 মোট পুষ্টি</span><span>${bn(totalKcal)} kcal (${bn(pTotKcal)}%DV) · প্রোটিন ${bn(Math.round(totalProt))}g (${bn(pTotProt)}%DV)</span></div>
-      </div>
-
-      <div class="dlabel">✦ আপনার জন্য SAR-এর বার্তা ✦</div>
-
-      <div class="magic">
-        <div class="mh">✨ আজকের জাদুকরী বার্তা</div>
-        <div class="mb">${ai.magic}</div>
-        <div class="by">— SAR AI · আপনার সব তথ্য বিশ্লেষণ করে রচিত</div>
-      </div>
-
-      ${ai.advice?`<div class="advice2">🤖 <b>AI স্বাস্থ্য পরামর্শ:</b> ${ai.advice}</div>`:''}
-
-      <div class="persuade">
-        <div class="ph">💌 SAR থেকে বিশেষ বার্তা</div>
-        ${buildEngagement({metrics: eng.metrics||{}, prevOrder: eng.prevOrder, cat: eng.cat||cat,
-                            weather: ai.weather, name: (cust.full_name||'').split(' ')[0]})}
-      </div>
-
-      <div class="instr">
-        <div class="ih">📋 সাধারণ নির্দেশনা</div>
-        <ul>
-          <li>আগুনমুক্ত পদ্ধতিতে (স্টিম/বেক/এয়ার-ফ্রাই) প্রস্তুত — গরম পরিবেশন করুন।</li>
-          <li>থেরাপিউটিক ও কন্ডিশন পাউডার খাবারের উপর ছিটিয়ে নিন; চাটনি পাশে রাখুন।</li>
-          <li>প্রতিটি উপাদান blockchain-এ যাচাইযোগ্য — ⛓ চিপে ট্যাপ করুন। ৩০ মিনিটে গ্রহণ করুন।</li>
-        </ul>
-      </div>
-
-      <div class="dline"></div>
-      <div class="qrrow">
-        <div class="qrb"><div id="qrPay"></div><div class="qt">💳 পেমেন্ট QR</div><div class="qs">স্ক্যান করে পরিশোধ</div></div>
-        <div class="qrb"><div id="qrRec"></div><div class="qt">🧾 রেকর্ড QR</div><div class="qs">রিসিট যাচাই</div></div>
-      </div>
-      <div class="audit"><span class="badge">🔒 অডিট সুরক্ষিত</span> পেমেন্ট ও রিসিটের তথ্য যাচাই/নিরীক্ষার জন্য <b>১ মাস</b> Supabase-এ সংরক্ষিত। ⛓️ সব উপাদান blockchain-নথিভুক্ত।</div>
-
-      <div class="rfoot">
-        <div class="thanks">ধন্যবাদ, ${(cust.full_name||'আপা').split(' ')[0]} 🌸</div>
-        <div class="b">SAR She AI Restaurant · Women-Led · Women-Run · For Women Only</div>
-        📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com · রিসিট #${rcpNum}
-      </div>
-    </div>`;
-
-  document.getElementById('sheet').innerHTML = html;
-  window._rcp = {rcpNum, orderNum, grand, phone: cust.phone, name: cust.full_name,
-                 oid: (order&&order.id)||oid, cid: cust.id||localStorage.getItem('sar_customer_id')};
-
-  // payment + record QR codes
-  const payRef = orderNum !== '—' ? orderNum : rcpNum;
-  const payData = `SAR-PAY|order=${payRef}|amount=${grand}|to=01346098892`;
-  const recData = `https://sheairestaurant.com/receipt.html?oid=${(order&&order.id)||oid||''}`;
-  makeQR(document.getElementById('qrPay'), payData);
-  makeQR(document.getElementById('qrRec'), recData);
+  show('receiptView');
 }
 
-function sendWA(){
-  const d = window._rcp || {};
-  if(!d.phone){ alert('গ্রাহকের ফোন নম্বর পাওয়া যায়নি।'); return; }
-  const link = d.oid ? `https://sheairestaurant.com/receipt.html?oid=${d.oid}` : 'https://sheairestaurant.com';
-  const msg = `🌸 SAR রিসিট\nনাম: ${d.name||'গ্রাহক'}\nঅর্ডার: ${d.orderNum||'—'}\nরিসিট: ${d.rcpNum}\nমোট: ৳${d.grand||0}\n📄 সম্পূর্ণ রিসিট: ${link}\n✅ ধন্যবাদ — SAR She AI Restaurant\n📞 01346098892`;
-  const clean = String(d.phone).replace(/\D/g,'');
-  const intl = clean.startsWith('0') ? '88'+clean : clean;
-  window.open(`https://wa.me/${intl}?text=${encodeURIComponent(msg)}`, '_blank');
-}
+// ── LOAD: poll for receipt (webhook/verify may finish a moment later) ──
+async function load(){
+  if(!TXN && !RCP && !INV && !OID){ fail('কোনো রিসিট নির্দিষ্ট করা হয়নি।'); return; }
 
-function sendEmail(){
-  const d = window._rcp || {};
-  const cust = (()=>{ try{return JSON.parse(localStorage.getItem('sar_customer')||'{}');}catch(e){return {};} })();
-  const to = cust.email || '';
-  const link = d.oid ? `https://sheairestaurant.com/receipt.html?oid=${d.oid}` : 'https://sheairestaurant.com';
-  const subject = `SAR রিসিট ${d.rcpNum||''} — She AI Restaurant`;
-  const body = [
-    `প্রিয় ${d.name||'আপা'},`, '',
-    `SAR She AI Restaurant-এ আপনার অর্ডারের জন্য ধন্যবাদ। 🌸`, '',
-    `অর্ডার নম্বর: ${d.orderNum||'—'}`,
-    `রিসিট নম্বর: ${d.rcpNum||'—'}`,
-    `মোট পরিশোধিত: ৳${d.grand||0}`, '',
-    `📄 আপনার সম্পূর্ণ রিসিট (পুষ্টিমান, blockchain যাচাই ও স্বাস্থ্য বার্তাসহ) এখানে দেখুন বা PDF হিসেবে সংরক্ষণ করুন:`,
-    link, '',
-    `টিপ: রিসিট পেজে "প্রিন্ট / PDF" বাটন থেকে A4 PDF সংরক্ষণ করা যায়।`, '',
-    `Women-Led · Women-Run · For Women Only`,
-    `📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com`
-  ].join('\n');
-  window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
+  let receipt = null, invoice = null;
 
-// ════════════════════════════════════════════════════
-// STAFF SCANNER — scan a food QR/barcode to place an
-// order on behalf of the customer. Works with:
-//  • USB barcode scanners (act as keyboards: type code + Enter)
-//  • phone/laptop camera via BarcodeDetector API
-//  • manual typing + "খুঁজুন/OK" button or Enter
-// A matched code → shows the item → Enter or OK places the order.
-// ════════════════════════════════════════════════════
-let _menuCache = [], _pendingMatch = null, _camStream = null, _camLoop = null;
-
-async function getMenu(){
-  if(_menuCache.length) return _menuCache;
-  try{
-    const r = await fetch(`${SUPA}/rest/v1/menu_items?is_available=eq.true&select=*&order=menu_code`, {headers:H});
-    _menuCache = await r.json() || [];
-  }catch(e){ _menuCache = []; }
-  return _menuCache;
-}
-
-function normCode(s){ return String(s||'').trim().toLowerCase().replace(/^sar-(menu|item|food)[:|-]?/,''); }
-
-async function resolveScan(raw){
-  const code = normCode(raw);
-  const resEl = document.getElementById('scanResult');
-  const matchEl = document.getElementById('scanMatch');
-  if(!code){ resEl.className='scan-result err'; resEl.textContent='কোনো কোড পাওয়া যায়নি।'; return; }
-  resEl.className='scan-result'; resEl.textContent='খুঁজছি…';
-  const menu = await getMenu();
-  // match on menu_code, id, barcode, qr_code, or name
-  const hit = menu.find(m =>
-    normCode(m.menu_code)===code || normCode(m.id)===code ||
-    normCode(m.barcode)===code || normCode(m.qr_code)===code ||
-    (m.name_bn && normCode(m.name_bn)===code) || (m.name_en && normCode(m.name_en)===code)
-  );
-  if(!hit){
-    resEl.className='scan-result err';
-    resEl.textContent=`❌ "${raw.trim()}" — কোনো মিল পাওয়া যায়নি। আবার স্ক্যান করুন।`;
-    matchEl.style.display='none'; _pendingMatch=null; return;
-  }
-  _pendingMatch = hit;
-  resEl.className='scan-result ok';
-  resEl.textContent='✓ মিল পাওয়া গেছে — Enter বা OK চেপে অর্ডার বসান।';
-  document.getElementById('matchName').textContent = (hit.name_bn || hit.name_en || hit.menu_code);
-  document.getElementById('matchMeta').textContent =
-    `${hit.menu_code||''} · ${hit.calories||'—'} kcal · ${hit.disease_category||''} · ৳${hit.price||(hit.course_count?hit.course_count*200:200)}`;
-  matchEl.style.display='block';
-}
-
-async function placeScannedOrder(){
-  const hit = _pendingMatch;
-  const resEl = document.getElementById('scanResult');
-  if(!hit){ resEl.className='scan-result err'; resEl.textContent='আগে একটি কোড স্ক্যান করুন।'; return; }
-  const d = window._rcp || {};
-  const cid = d.cid || localStorage.getItem('sar_customer_id');
-  if(!cid){ resEl.className='scan-result err'; resEl.textContent='গ্রাহক শনাক্ত করা যায়নি।'; return; }
-  const price = hit.price || (hit.course_count ? hit.course_count*200 : 200);
-  const orderNum = 'ORD-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(1000+Math.random()*9000);
-  const itemJson = [{
-    id: hit.id, code: hit.menu_code, name: hit.name_bn || hit.name_en, name_bn: hit.name_bn,
-    cat: hit.disease_category, meal: hit.meal_type, qty: 1, unit_price: price,
-    courses: [hit.course_1_bn, hit.course_2_bn, hit.course_3_bn].filter(Boolean),
-    kcal: hit.calories, protein: hit.protein_g, fiber: hit.fiber_g, benefits: hit.benefits, scanned: true
-  }];
-  resEl.className='scan-result'; resEl.textContent='অর্ডার বসানো হচ্ছে…';
-  try{
-    const r = await fetch(`${SUPA}/rest/v1/orders`, {
-      method:'POST',
-      headers:{...H, 'Content-Type':'application/json', Prefer:'return=representation'},
-      body: JSON.stringify({
-        order_number: orderNum, customer_id: cid, order_type:'dine_in', status:'confirmed',
-        items_json: itemJson, subtotal: price, tax: Math.round(price*0.05),
-        total_amount: price + Math.round(price*0.05), payment_method:'cash',
-        payment_status:'pending', is_voice_order:false,
-        special_instructions:'স্টাফ স্ক্যান অর্ডার (QR/বারকোড)'
-      })
-    });
-    if(!r.ok){ const e=await r.json(); throw new Error(e.message||'order failed'); }
-    const arr = await r.json(); const ord = arr[0];
-    resEl.className='scan-result ok';
-    resEl.innerHTML = `✅ অর্ডার বসানো হয়েছে — <b>${orderNum}</b>। <a href="receipt.html?oid=${ord.id}" style="color:#34D399">নতুন রিসিট →</a>`;
-    document.getElementById('scanMatch').style.display='none';
-    document.getElementById('scanInput').value='';
-    _pendingMatch=null;
-  }catch(e){
-    resEl.className='scan-result err'; resEl.textContent='❌ অর্ডার ব্যর্থ: '+e.message;
-  }
-}
-
-// USB barcode scanners type fast then send Enter; also handle manual Enter/OK.
-function initScannerInput(){
-  const input = document.getElementById('scanInput');
-  input.addEventListener('keydown', e => {
-    if(e.key === 'Enter'){
-      e.preventDefault();
-      if(_pendingMatch && normCode(input.value)===normCode(_pendingMatch.menu_code)) placeScannedOrder();
-      else resolveScan(input.value);
+  // INV দেওয়া থাকলে আগে invoice আনি + finalize নিশ্চিত করি
+  if (INV && !TXN && !RCP) {
+    const ir = await api({action:'getInvoice', invoice_number:INV});
+    if (ir.ok && ir.invoice) {
+      invoice = ir.invoice;
+      await api({action:'finalize', invoice_id:invoice.id}).catch(()=>{});
     }
-  });
-  document.getElementById('placeBtn').addEventListener('click', placeScannedOrder);
-  // global Enter places a pending match even if focus left the input (OK press)
-  document.addEventListener('keydown', e => {
-    if(e.key==='Enter' && _pendingMatch && document.activeElement!==input){ placeScannedOrder(); }
-  });
-}
+  }
 
-async function toggleCamera(){
-  const video = document.getElementById('scanVideo');
-  const btn = document.getElementById('camBtn');
-  const resEl = document.getElementById('scanResult');
-  if(_camStream){ stopCamera(); btn.textContent='📷 ক্যামেরা'; return; }
-  if(!('BarcodeDetector' in window)){
-    resEl.className='scan-result err';
-    resEl.textContent='এই ব্রাউজারে ক্যামেরা-স্ক্যান নেই — USB স্ক্যানার বা টাইপ করুন।';
+  // receipt পোল করি (webhook/finalize একটু পরে শেষ হতে পারে)
+  for (let attempt=0; attempt<6 && !receipt; attempt++){
+    try{
+      if (TXN || RCP){
+        const r = await api({action:'getReceipt', ...(TXN?{transaction_id:TXN}:{receipt_number:RCP})});
+        if (r.ok && r.receipt) receipt = r.receipt;
+      } else if (invoice){
+        // invoice দিয়ে রসিদ খুঁজি (finalize রসিদের transaction_id = payment txn)
+        const pr = await api({action:'getReceipt', receipt_number: invoice.invoice_number}); // try by number-ish
+        if (pr.ok && pr.receipt) receipt = pr.receipt;
+        if (!receipt) {
+          // finalize আবার চেষ্টা (idempotent) — receipt তৈরি হলে পরের লুপে পাব
+          const f = await api({action:'finalize', invoice_id:invoice.id});
+          if (f.ok && f.receipt_number){
+            const rr = await api({action:'getReceipt', receipt_number:f.receipt_number});
+            if (rr.ok && rr.receipt) receipt = rr.receipt;
+          }
+        }
+      }
+    }catch(e){ /* retry */ }
+    if (!receipt && attempt<5) await new Promise(r=>setTimeout(r, 1500));
+  }
+
+  if(!receipt){
+    // legacy oid বা এখনো যাচাই হয়নি — localStorage fallback দেখাই
+    const last = JSON.parse(localStorage.getItem('sar_last_receipt')||'null');
+    const items = JSON.parse(localStorage.getItem('sar_last_order_items')||'[]');
+    if(items.length){
+      renderReceipt({
+        receipt_number: localStorage.getItem('sar_last_order_num')||'—',
+        transaction_id: TXN||'—', amount: 0, receipt_type:'meal_order',
+        created_at: new Date().toISOString(),
+      }, {meta_json:{items}});
+      return;
+    }
+    fail('রিসিট এখনো তৈরি হয়নি। পেমেন্ট যাচাই চলছে — কিছুক্ষণ পর আবার দেখুন।');
     return;
   }
-  try{
-    _camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    video.srcObject = _camStream; video.style.display='block'; await video.play();
-    btn.textContent='⏹ বন্ধ করুন';
-    const detector = new BarcodeDetector({formats:['qr_code','code_128','ean_13','ean_8','code_39','upc_a']});
-    _camLoop = setInterval(async ()=>{
-      try{
-        const codes = await detector.detect(video);
-        if(codes && codes.length){
-          const val = codes[0].rawValue;
-          stopCamera(); btn.textContent='📷 ক্যামেরা';
-          document.getElementById('scanInput').value = val;
-          resolveScan(val);
-        }
-      }catch(e){}
-    }, 500);
-  }catch(e){
-    resEl.className='scan-result err'; resEl.textContent='ক্যামেরা চালু করা যায়নি: '+e.message;
+
+  // receipt পেলে invoice-ও আনি (items + totals-এর জন্য)
+  if(!invoice && receipt.invoice_id){
+    const ir = await api({action:'getInvoice', invoice_id:receipt.invoice_id});
+    if(ir.ok) invoice = ir.invoice;
   }
-}
-function stopCamera(){
-  if(_camLoop){ clearInterval(_camLoop); _camLoop=null; }
-  if(_camStream){ _camStream.getTracks().forEach(t=>t.stop()); _camStream=null; }
-  const v=document.getElementById('scanVideo'); v.style.display='none'; v.srcObject=null;
+  renderReceipt(receipt, invoice);
 }
 
-initScannerInput();
 load();
 </script>
 </body>
