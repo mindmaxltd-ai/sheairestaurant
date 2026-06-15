@@ -205,7 +205,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="psp-grid">
           <div class="psp" onclick="selPSP(this,'sslcommerz')"><div class="logo lg-ssl">SSLCommerz</div><div class="nm">সব ব্যাংক</div></div>
           <div class="psp" onclick="selPSP(this,'internet_banking')"><div class="logo lg-bank">i-Banking</div><div class="nm">নেট ব্যাংকিং</div></div>
-          <div class="psp" id="codTile" onclick="selPSP(this,'cod')"><div class="logo lg-cod">💵 COD</div><div class="nm">ক্যাশ অন ডেলিভারি</div></div>
+          <div class="psp" id="codTile" onclick="selPSP(this,'cod')"><div class="logo lg-cod">💵 <span id="codLabel">ক্যাশ</span></div><div class="nm" id="codDesc">রেস্তোরাঁয় ক্যাশ</div></div>
         </div>
       </div>
     </div>
@@ -273,7 +273,13 @@ function render(inv){
   $('mOrder').textContent=meta.order_number||'—';
 
   // COD only for delivery
-  $('codTile').style.display = (meta.order_type==='delivery') ? 'flex' : 'none';
+  // Cash/COD সবসময় দেখাবে; delivery হলে "COD", নাহলে রেস্তোরাঁয় "ক্যাশ"
+  $('codTile').style.display = 'flex';
+  if(meta.order_type==='delivery'){
+    $('codLabel').textContent = 'COD'; $('codDesc').textContent = 'ক্যাশ অন ডেলিভারি';
+  } else {
+    $('codLabel').textContent = 'ক্যাশ'; $('codDesc').textContent = 'রেস্তোরাঁয় ক্যাশ';
+  }
 
   const items=meta.items||[];
   $('itemsBox').innerHTML = items.length ? items.map(it=>{
@@ -305,7 +311,8 @@ function selPSP(el,method){
   el.classList.add('sel'); selMethod=method;
   const btn=$('payBtn');
   btn.disabled=false;
-  const label = method==='cod' ? '✅ অর্ডার নিশ্চিত করুন (COD) · ' : '💳 এখন পরিশোধ করুন · ';
+  const isDel = (_invoice.meta_json||{}).order_type==='delivery';
+  const label = method==='cod' ? (isDel ? '✅ COD অর্ডার নিশ্চিত · ' : '✅ ক্যাশ অর্ডার নিশ্চিত · ') : '💳 এখন পরিশোধ করুন · ';
   btn.innerHTML = label + '<span id="payAmt">' + taka(_invoice.total_amount) + '</span>';
 }
 
@@ -313,18 +320,20 @@ async function payNow(){
   if(!selMethod){ alert('একটি পেমেন্ট পদ্ধতি বাছুন।'); return; }
   const btn=$('payBtn'); btn.disabled=true;
 
-  // ── COD: কোনো গেটওয়ে নয়; অর্ডার নিশ্চিত, ডেলিভারিতে ক্যাশ ──
+  // ── COD/Cash: গেটওয়ে নয়; super admin প্যানেল থেকে যাচাই হবে ──
   if(selMethod==='cod'){
-    setStatus('⏳ COD অর্ডার নিশ্চিত হচ্ছে...', 's-wait');
+    const isDelivery = (_invoice.meta_json||{}).order_type==='delivery';
+    setStatus('⏳ অর্ডার নিশ্চিত হচ্ছে...', 's-wait');
     try{
       const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:'cod'});
       if(!pr.ok) throw new Error('রেকর্ড তৈরি হয়নি।');
       const txn=pr.transaction_id;
-      // COD: পেমেন্ট ডেলিভারিতে; এখন অর্ডার confirmed ধরা হয় (verified=delivery-তে)
-      await api({action:'verifyPayment', invoice_id:_invoice.id, transaction_id:txn, customer_id:CID, paid_amount:_invoice.total_amount, auto:true});
-      await api({action:'finalize', invoice_id:_invoice.id});
-      setStatus('✅ COD অর্ডার নিশ্চিত! ডেলিভারির সময় ক্যাশ পরিশোধ করবেন। রিসিটে নিয়ে যাওয়া হচ্ছে...', 's-ok');
-      setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1600);
+      // auto-verify নয় — PENDING থাকবে, super admin প্যানেল থেকে যাচাই করবে
+      const waitMsg = isDelivery
+        ? '✅ COD অর্ডার গৃহীত! ডেলিভারির সময় ক্যাশ পরিশোধ করবেন। অ্যাডমিন যাচাইয়ের পর রিসিট পাকা হবে।'
+        : '✅ ক্যাশ অর্ডার গৃহীত! রেস্তোরাঁয় ক্যাশ পরিশোধ করুন। অ্যাডমিন যাচাইয়ের পর রিসিট পাকা হবে।';
+      setStatus(waitMsg + ' রিসিটে নিয়ে যাওয়া হচ্ছে...', 's-ok');
+      setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1900);
     }catch(e){ setStatus('❌ '+e.message,'s-err'); btn.disabled=false; }
     return;
   }
