@@ -1017,6 +1017,16 @@ const H    = {'apikey':KEY,'Authorization':'Bearer '+KEY,
 const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}'); const CID=_sc.id||localStorage.getItem('sar_customer_id');
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'গ্রাহক';
 
+// Secure payment orchestrator (payment.js Netlify function).
+// invoices/finalize এই পথে যায় — কোনো key ব্রাউজারে নেই।
+const FN = '/.netlify/functions/payment';
+async function payApi(body){
+  try{
+    const r = await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    return await r.json();
+  }catch(e){ return {ok:false, error:String(e.message||e)}; }
+}
+
 if (!CID) { window.location.href = 'login.html'; }
 
 // Approval gate
@@ -1210,6 +1220,46 @@ function goToPayment() {
 // ═══════════════════════════════════════
 // RENDER CART
 // ═══════════════════════════════════════
+// ── Cart: compact nutrition facts table (matches invoice) ──────
+function cartNutritionTable(item){
+  const qty  = item.qty || 1;
+  const kcal = (parseInt(item.kcal)||0) * qty;
+  const prot = (parseFloat(item.protein)||0) * qty;
+  const carb = (parseFloat(item.carb)|| Math.round((parseInt(item.kcal)||0)*0.5/4)) * qty;
+  const fat  = (parseFloat(item.fat) || Math.round((parseInt(item.kcal)||0)*0.3/9)) * qty;
+  const fib  = (parseFloat(item.fiber)|| 0) * qty;
+  if(!kcal && !prot && !fib) return ''; // কোনো পুষ্টিমান না থাকলে দেখাবে না
+  const pct = (v,ref)=> v ? Math.min(99, Math.round(v/ref*100)) : 0;
+  const cell = (v)=>`<td style="padding:3px 6px;border:1px solid var(--border);font-family:'Space Mono'">${v}</td>`;
+  const dv   = (v)=>`<td style="padding:3px 6px;border:1px solid var(--border);color:var(--pink2);font-size:.62rem">${v}% DV</td>`;
+  return `
+    <table style="width:100%;border-collapse:collapse;margin:.45rem 0;font-size:.66rem;color:rgba(255,255,255,.78)">
+      <tr style="background:rgba(255,255,255,.03)">
+        <td style="padding:3px 6px;border:1px solid var(--border)">🔥 ক্যালরি</td>${cell(kcal+' kcal')}${dv(pct(kcal,2000))}
+        <td style="padding:3px 6px;border:1px solid var(--border)">💪 প্রোটিন</td>${cell(prot.toFixed(0)+'g')}${dv(pct(prot,50))}
+      </tr>
+      <tr>
+        <td style="padding:3px 6px;border:1px solid var(--border)">🌾 ফাইবার</td>${cell(fib.toFixed(0)+'g')}${dv(pct(fib,25))}
+        <td style="padding:3px 6px;border:1px solid var(--border)">🍚 কার্ব</td>${cell(carb.toFixed(0)+'g')}${dv(pct(carb,260))}
+      </tr>
+      <tr style="background:rgba(255,255,255,.03)">
+        <td style="padding:3px 6px;border:1px solid var(--border)">🫒 ফ্যাট</td>${cell(fat.toFixed(0)+'g')}${dv(pct(fat,65))}
+        <td colspan="3" style="padding:3px 6px;border:1px solid var(--border);color:rgba(255,255,255,.4);font-size:.6rem">*২০০০ kcal দৈনিক চাহিদা ভিত্তিক</td>
+      </tr>
+    </table>`;
+}
+
+// ── Cart: benefits line (matches invoice; falls back to disease library) ──
+function cartBenefitsLine(item){
+  const cat = item.cat || (JSON.parse(localStorage.getItem('sar_customer')||'{}').sar_category) || 'DM';
+  const lib = DISEASE_BENEFITS[cat] || DISEASE_BENEFITS.DM;
+  let b = item.benefits || item.desc || lib.benefits.slice(0,2).join(' · ');
+  if(Array.isArray(b)) b = b.join(' · ');
+  if(!b) return '';
+  return `<div style="font-size:.7rem;color:var(--green2);margin:.3rem 0">
+    ✦ <b>উপকার:</b> ${b}</div>`;
+}
+
 function renderCartStep() {
   const list = document.getElementById('cartList');
   if (!cart.length) {
@@ -1258,12 +1308,8 @@ function renderCartStep() {
             background:rgba(233,30,140,.12);color:var(--pink2)">${CAT_BN[item.cat]||item.cat}</span>`:''}
         </div>
         ${courseHTML}
-        <div class="nutr-chips">
-          ${item.kcal?`<span class="nc">🔥 ${item.kcal} kcal</span>`:''}
-          ${item.protein?`<span class="nc">💪 ${item.protein}g প্রোটিন</span>`:''}
-          ${item.fiber?`<span class="nc">🌾 ${item.fiber}g ফাইবার</span>`:''}
-          ${item.mix?`<span class="nc" style="color:var(--pink2)">➕ ২৫% মিশ্রণ</span>`:''}
-        </div>
+        ${cartNutritionTable(item)}
+        ${cartBenefitsLine(item)}
         ${medHTML}
         ${bcHTML}
         <div class="ci-qty-row">
@@ -1486,7 +1532,6 @@ async function processOrder() {
         customer_id: CID,
         order_type: orderType,
         status: 'confirmed',
-        kitchen_status: 'queued',
         items_json: itemsJson,
         subtotal: sub,
         tax: vat,
@@ -1506,6 +1551,38 @@ async function processOrder() {
     const oArr = await oRes.json();
     const order = oArr[0];
     createdOrderId = order.id;
+
+    // 1b. Create a real INVOICE row (architecture state machine) via the
+    //     secure orchestrator. Carries full nutrition + benefits in meta_json
+    //     so receipt/kitchen can render everything. Non-blocking on failure.
+    let invoiceNumber = null;
+    try {
+      const invRes = await payApi({
+        action: 'createInvoice',
+        customer_id: CID,
+        type: 'MEAL_ORDER',
+        package_code: 'MEAL',
+        package_name: `খাবার অর্ডার · ${cart.length}টি আইটেম`,
+        amount: sub,
+        discount: 0,
+        vat: vat,
+        total_amount: grand,
+        order_id: order.id,
+        meta: {
+          order_number: orderNum,
+          order_type: orderType,
+          delivery_fee: del,
+          items: itemsJson,                 // পূর্ণ পুষ্টি + উপকার + কোর্স
+          total_kcal: cart.reduce((s,i)=>s+(parseInt(i.kcal)||0)*(i.qty||1),0),
+          total_protein: cart.reduce((s,i)=>s+(parseFloat(i.protein)||0)*(i.qty||1),0),
+        },
+      });
+      if (invRes && invRes.ok && invRes.invoice) {
+        invoiceNumber = invRes.invoice.invoice_number;
+        localStorage.setItem('sar_last_invoice_id', invRes.invoice.id);
+        localStorage.setItem('sar_last_invoice_num', invoiceNumber);
+      }
+    } catch(_) { /* invoice non-critical to order flow */ }
 
     // 2. Create order_items rows
     showLoader('আইটেম সংরক্ষণ হচ্ছে...');
@@ -1619,13 +1696,23 @@ async function processOrder() {
     // 8. Route to SSLCommerz hosted payment page (non-cash only)
     if (payMethod !== 'cash') {
       showLoader('নিরাপদ পেমেন্ট পেজে নিয়ে যাওয়া হচ্ছে...');
-      // Persist context so success/receipt pages work on return from gateway
+      // Persist context so success/receipt pages work on return from gateway.
+      // invoice_id রাখা হলো — গেটওয়ে থেকে ফিরে finalize কল করা যাবে।
       localStorage.setItem('sar_pending_payment', JSON.stringify({
         order_id: order.id, order_num: orderNum, txn: txnId,
+        invoice_id: localStorage.getItem('sar_last_invoice_id') || null,
         amount: grand, method: payMethod, eta: eta, order_type: orderType
       }));
       window.location.href = 'https://pay.sslcommerz.com/3a2056256871eec779ebd94ee8bf33a3467108be';
       return;
+    }
+
+    // 8b. Cash order: invoice immediately SUCCESS+VERIFIED → finalize
+    //     (receipt row + kitchen_queue তৈরি হয় orchestrator-এ)
+    const invId = localStorage.getItem('sar_last_invoice_id');
+    if (invId) {
+      await payApi({ action:'verifyPayment', invoice_id:invId, transaction_id:txnId, customer_id:CID, paid_amount:grand, auto:true });
+      await payApi({ action:'finalize', invoice_id:invId });
     }
 
     hideLoader();
