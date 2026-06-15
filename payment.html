@@ -248,7 +248,7 @@ async function startPayment(){
     });
     if(!res.ok || !res.invoice){ throw new Error('ইনভয়েস তৈরি হয়নি।'); }
     // সরাসরি পেমেন্ট মডালে যান
-    location.href = `payment-modal.html?inv=${res.invoice.invoice_number}`;
+    location.href = `invoice.html?inv=${res.invoice.invoice_number}`;
   }catch(e){
     hideLoader();
     $('payBtn').disabled = false;
@@ -302,7 +302,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // যদি কোনো invoice নিয়ে এই পেজে ফিরে আসে (modal থেকে), সরাসরি মডালে পাঠাও
   const inv = new URLSearchParams(location.search).get('inv');
-  if(inv){ location.href = `payment-modal.html?inv=${inv}`; }
+  if(inv){ location.href = `invoice.html?inv=${inv}`; }
 });
 </script>
 </body>
