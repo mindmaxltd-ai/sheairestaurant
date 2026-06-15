@@ -623,11 +623,51 @@ textarea{resize:vertical;min-height:72px}
           </div>
 
           <div class="msg" id="m1"></div>
-          <button class="btn-invoice-preview" onclick="showInvoicePreview('preview')">
-            🧾 Invoice Preview দেখুন (ঐচ্ছিক)
-          </button>
-          <button class="btn-primary" onclick="goToDelivery()" id="nextBtn1">
-            পরবর্তী — ডেলিভারি তথ্য →
+
+          <!-- ORDER TYPE (moved into cart) -->
+          <div class="ocard" style="margin-top:.5rem">
+            <div class="ocard-hd"><span class="ocard-title">🏷️ অর্ডারের ধরন বাছুন</span></div>
+            <div class="ocard-body">
+              <div class="order-type-grid">
+                <div class="otype selected" id="ot-dine" onclick="selectOrderType('dine_in',this)">
+                  <span class="otype-icon">🪑</span>
+                  <div class="otype-name">ডাইন-ইন</div>
+                  <div class="otype-desc">রেস্তোরাঁয় বসে</div>
+                </div>
+                <div class="otype" id="ot-takeaway" onclick="selectOrderType('takeaway',this)">
+                  <span class="otype-icon">🥡</span>
+                  <div class="otype-name">টেকঅ্যাওয়ে</div>
+                  <div class="otype-desc">নিজে নিয়ে যাবেন</div>
+                </div>
+                <div class="otype" id="ot-delivery" onclick="selectOrderType('delivery',this)">
+                  <span class="otype-icon">🛵</span>
+                  <div class="otype-name">ডেলিভারি</div>
+                  <div class="otype-desc">বাড়িতে পাঠানো</div>
+                </div>
+              </div>
+              <!-- delivery fields (shown only for delivery) -->
+              <div id="cartDeliveryFields" style="display:none;margin-top:.7rem">
+                <div class="fld" style="margin-bottom:.5rem">
+                  <label>ডেলিভারি ঠিকানা</label>
+                  <input type="text" id="deliveryAddress" placeholder="বাসা/রোড/এলাকা">
+                </div>
+                <div class="fld">
+                  <label>ফোন নম্বর</label>
+                  <input type="text" id="deliveryPhone" placeholder="01XXXXXXXXX">
+                </div>
+              </div>
+              <!-- dine-in field -->
+              <div id="cartDineField" style="margin-top:.7rem">
+                <div class="fld">
+                  <label>টেবিল নম্বর (ঐচ্ছিক)</label>
+                  <input type="text" id="tableNumber" placeholder="যেমন: T-05">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="confirmFromCart()" id="nextBtn1">
+            ✓ অর্ডার নিশ্চিত করুন →
           </button>
         </div>
 
@@ -671,17 +711,17 @@ textarea{resize:vertical;min-height:72px}
             <div class="ocard-hd"><span class="ocard-title">🏷️ অর্ডারের ধরন</span></div>
             <div class="ocard-body">
               <div class="order-type-grid">
-                <div class="otype selected" id="ot-dine" onclick="selectOrderType('dine_in',this)">
+                <div class="otype selected" id="ot-dine2" onclick="selectOrderType('dine_in',this)">
                   <span class="otype-icon">🪑</span>
                   <div class="otype-name">ডাইন-ইন</div>
                   <div class="otype-desc">রেস্তোরাঁয় বসে খাবেন</div>
                 </div>
-                <div class="otype" id="ot-delivery" onclick="selectOrderType('delivery',this)">
+                <div class="otype" id="ot-delivery2" onclick="selectOrderType('delivery',this)">
                   <span class="otype-icon">🛵</span>
                   <div class="otype-name">ডেলিভারি</div>
                   <div class="otype-desc">বাড়িতে পাঠানো হবে</div>
                 </div>
-                <div class="otype" id="ot-takeaway" onclick="selectOrderType('takeaway',this)">
+                <div class="otype" id="ot-takeaway2" onclick="selectOrderType('takeaway',this)">
                   <span class="otype-icon">🥡</span>
                   <div class="otype-name">টেকঅ্যাওয়ে</div>
                   <div class="otype-desc">নিজে নিয়ে যাবেন</div>
@@ -697,7 +737,7 @@ textarea{resize:vertical;min-height:72px}
               <div class="frow">
                 <div class="fld">
                   <label>টেবিল নম্বর</label>
-                  <input type="text" id="tableNumber" placeholder="যেমন: T-05">
+                  <input type="text" id="tableNumber2" placeholder="যেমন: T-05">
                 </div>
                 <div class="fld">
                   <label>আসন সংখ্যা</label>
@@ -720,14 +760,14 @@ textarea{resize:vertical;min-height:72px}
               <div class="frow one">
                 <div class="fld">
                   <label>সম্পূর্ণ ঠিকানা <span style="color:var(--pink);font-size:.67rem">*</span></label>
-                  <textarea id="deliveryAddress" rows="2"
+                  <textarea id="deliveryAddress2" rows="2"
                     placeholder="বাড়ি নং, রোড, এলাকা, থানা, জেলা..."></textarea>
                 </div>
               </div>
               <div class="frow">
                 <div class="fld">
                   <label>ফোন নম্বর <span style="color:var(--pink);font-size:.67rem">*</span></label>
-                  <input type="tel" id="deliveryPhone" placeholder="01XXXXXXXXX">
+                  <input type="tel" id="deliveryPhone2" placeholder="01XXXXXXXXX">
                 </div>
                 <div class="fld">
                   <label>ডেলিভারি নির্দেশনা</label>
@@ -1159,6 +1199,7 @@ function loadCart(){
 // State
 let cart        = loadCart();
 let orderType   = 'dine_in';
+let _routeToInvoice = false;   // cart → invoice.html flow flag
 let payMethod   = 'ssl';
 let createdOrderId    = null;
 let currentStep       = 1;
@@ -1369,8 +1410,16 @@ function selectOrderType(type, el) {
   orderType = type;
   document.querySelectorAll('.otype').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('dineInFields').style.display   = type === 'dine_in'  ? 'block' : 'none';
-  document.getElementById('deliveryFields').style.display = type === 'delivery' ? 'block' : 'none';
+  // new cart fields
+  const cdf = document.getElementById('cartDeliveryFields');
+  const cnf = document.getElementById('cartDineField');
+  if (cdf) cdf.style.display = type === 'delivery' ? 'block' : 'none';
+  if (cnf) cnf.style.display = type === 'dine_in'  ? 'block' : 'none';
+  // legacy step-2 fields (guarded — may not be reached anymore)
+  const dif = document.getElementById('dineInFields');
+  const def = document.getElementById('deliveryFields');
+  if (dif) dif.style.display = type === 'dine_in'  ? 'block' : 'none';
+  if (def) def.style.display = type === 'delivery' ? 'block' : 'none';
   // Show/hide delivery fee
   const showDel = type === 'delivery';
   ['deliveryRow','delRow2','delRow3'].forEach(id => {
@@ -1379,6 +1428,22 @@ function selectOrderType(type, el) {
   });
   updateAllSummaries();
 }
+
+// ── Confirm from cart → create order + invoice → invoice.html ──
+async function confirmFromCart() {
+  if (!cart.length) { showMsg('m1','কার্ট খালি। মেনু থেকে আইটেম যোগ করুন।','err'); return; }
+  if (orderType === 'delivery') {
+    const addr = document.getElementById('deliveryAddress')?.value.trim();
+    const ph   = document.getElementById('deliveryPhone')?.value.trim();
+    if (!addr) { showMsg('m1','ডেলিভারি ঠিকানা দিন।','err'); return; }
+    if (!ph || !/^01[3-9]\d{8}$/.test(ph)) { showMsg('m1','সঠিক ফোন নম্বর দিন।','err'); return; }
+  }
+  updateAllSummaries();
+  // processOrder() creates order+invoice+items+payment+kitchen, then (new) routes to invoice.html
+  _routeToInvoice = true;
+  await processOrder();
+}
+
 
 // ═══════════════════════════════════════
 // SUMMARIES
@@ -1581,8 +1646,19 @@ async function processOrder() {
         invoiceNumber = invRes.invoice.invoice_number;
         localStorage.setItem('sar_last_invoice_id', invRes.invoice.id);
         localStorage.setItem('sar_last_invoice_num', invoiceNumber);
+      } else if (_routeToInvoice) {
+        // invoice তৈরি ব্যর্থ — কারণ দেখাই (function down / env var / schema)
+        console.error('createInvoice failed:', invRes);
       }
-    } catch(_) { /* invoice non-critical to order flow */ }
+    } catch(err) {
+      if (_routeToInvoice) console.error('createInvoice error:', err);
+      /* invoice non-critical to order flow */
+    }
+    // আগের stale invoice মুছে দিই যাতে এই অর্ডারের সঠিকটাই যায়
+    if (!invoiceNumber && _routeToInvoice) {
+      localStorage.removeItem('sar_last_invoice_id');
+      localStorage.removeItem('sar_last_invoice_num');
+    }
 
     // 2. Create order_items rows
     showLoader('আইটেম সংরক্ষণ হচ্ছে...');
@@ -1692,6 +1768,18 @@ async function processOrder() {
     localStorage.setItem('sar_last_order_id', order.id);
     localStorage.setItem('sar_last_order_num', orderNum);
     cart = [];
+
+    // NEW FLOW: cart → Confirm → invoice.html (payment happens there)
+    if (_routeToInvoice) {
+      const invNum = localStorage.getItem('sar_last_invoice_num');
+      const invId  = localStorage.getItem('sar_last_invoice_id');
+      if (invNum || invId) {
+        showLoader('ইনভয়েসে নিয়ে যাওয়া হচ্ছে...');
+        window.location.href = invNum ? `invoice.html?inv=${invNum}` : `invoice.html?id=${invId}`;
+        return;
+      }
+      // invoice তৈরি না হলে (function down) — পুরনো success দেখাই, আটকাবো না
+    }
 
     // 8. Route to SSLCommerz hosted payment page (non-cash only)
     if (payMethod !== 'cash') {
