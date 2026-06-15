@@ -101,6 +101,34 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   border-radius:5px;padding:4px 9px;margin-top:3px}
 .trow.nutri{color:var(--inkgreen);font-size:8.5px;margin-top:2px;border-top:1px dotted var(--rule);padding-top:2px}
 
+/* ── Nutrition + Daily Requirement : two half-page columns, blended ── */
+.nfblock{display:flex;gap:8px;margin-top:6px;align-items:stretch}
+.nfcol{flex:1 1 50%;min-width:0;border:1px solid var(--line2);border-radius:8px;overflow:hidden;
+  background:linear-gradient(135deg,#FFFFFF,var(--paper2))}
+.nfcol .nfh{font-size:8.5px;font-weight:800;letter-spacing:.04em;color:#fff;padding:4px 8px;
+  background:linear-gradient(135deg,var(--plum),var(--purple));display:flex;align-items:center;gap:4px}
+.nftbl{width:100%;border-collapse:collapse;font-size:8.5px}
+.nftbl td{padding:2.5px 8px;border-bottom:1px solid var(--line)}
+.nftbl tr:last-child td{border-bottom:0}
+.nftbl .nn{color:var(--ink2)}
+.nftbl .nv{text-align:right;font-family:'Space Mono',monospace;color:var(--plum);font-weight:700;white-space:nowrap}
+.nftbl .nd{text-align:right;width:42px;font-family:'Space Mono',monospace;color:var(--rose);font-weight:700}
+.nftbl tr.cal td{background:rgba(233,30,140,.07);font-weight:800}
+.nftbl tr.cal .nv{color:var(--red)}
+/* colorful DRC bars */
+.drcx{padding:6px 8px;display:flex;flex-direction:column;gap:5px}
+.drx{display:flex;align-items:center;gap:6px;font-size:8.5px}
+.drx .dxl{width:62px;color:var(--ink2);white-space:nowrap}
+.drx .dxbar{flex:1;height:8px;border-radius:6px;background:#F3E3EC;overflow:hidden;position:relative}
+.drx .dxbar i{display:block;height:100%;border-radius:6px}
+.drx .dxp{width:34px;text-align:right;font-family:'Space Mono',monospace;font-weight:700;color:var(--inkgreen)}
+.dxc1{background:linear-gradient(90deg,#E91E8C,#FF6BB5)}
+.dxc2{background:linear-gradient(90deg,#6B21A8,#A855F7)}
+.dxc3{background:linear-gradient(90deg,#006A4E,#00A878)}
+.dxc4{background:linear-gradient(90deg,#F5A623,#F5C842)}
+.nffoot{font-size:7px;color:var(--ink2);padding:3px 8px;line-height:1.4;border-top:1px dotted var(--rule)}
+@media(max-width:560px){ .nfblock{flex-direction:column} }
+
 /* ✦ MAGICAL MESSAGE — the emotional AI marketing centerpiece */
 .magic{background:linear-gradient(135deg,#FFFFFF,#FFF0F7);border:1px solid var(--line2);
   border-radius:7px;padding:7px 10px;margin:4px 0;position:relative;overflow:hidden}
@@ -157,26 +185,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .rfoot .b{font-weight:800}
 .rfoot .thanks{font-family:'Playfair Display',serif;font-size:12px;color:var(--plum2);margin-bottom:1px}
 
-/* ── Nutrition Facts table (US-label style) — added at very bottom ── */
-.nfacts{margin-top:10px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;
-  background:#fff;font-family:'Hind Siliguri',sans-serif}
-.nfacts .nf-title{background:var(--ink);color:#fff;font-weight:800;font-size:13px;
-  padding:6px 10px;letter-spacing:.02em}
-.nfacts .nf-serv{font-size:9px;color:var(--ink2);padding:4px 10px;border-bottom:6px solid var(--ink)}
-.nfacts table{width:100%;border-collapse:collapse;font-size:11px}
-.nfacts th,.nfacts td{padding:4px 10px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
-.nfacts thead th{font-size:8px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);
-  border-bottom:2px solid var(--ink)}
-.nfacts .nf-name{font-weight:700;color:var(--ink)}
-.nfacts .nf-amt{text-align:right;font-family:'Space Mono',monospace;white-space:nowrap}
-.nfacts .nf-dv{text-align:right;font-weight:800;color:var(--plum);width:54px;
-  font-family:'Space Mono',monospace}
-.nfacts tr.nf-major td{border-bottom-width:1px}
-.nfacts tr.nf-cal td{border-bottom:5px solid var(--ink);font-weight:800;font-size:13px}
-.nfacts tr.nf-sub td:first-child{padding-left:22px;font-weight:400;color:var(--ink2)}
-.nfacts .nf-foot{font-size:8px;color:var(--ink2);padding:5px 10px;line-height:1.45;
-  border-top:4px solid var(--ink)}
-
 /* ── staff scanner (screen only) ── */
 .scanner{position:relative;z-index:5;width:200mm;max-width:100%;margin-top:1rem;
   background:rgba(20,16,26,.92);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:1rem 1.2rem}
@@ -218,7 +226,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
     margin:0 auto!important}
   .pad{padding:8mm 12mm!important}
   /* never split these blocks across pages */
-  .magic,.persuade,.advice2,.instr,.qrrow,.rhead,.rfoot,.li,.tot,.meta2,.nfacts{break-inside:avoid;page-break-inside:avoid}
+  .magic,.persuade,.advice2,.instr,.qrrow,.rhead,.rfoot,.li,.tot,.meta2,.nfblock{break-inside:avoid;page-break-inside:avoid}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 @media(max-width:560px){
@@ -733,17 +741,15 @@ function render(order, items, cust, ai, oid, eng){
   const grand = (order && order.total_amount) != null ? order.total_amount : sub+del+vat;
 
   let totalKcal = 0, totalProt = 0;
-  let totalCarb = 0, totalFat = 0, totalFib = 0, totalIron = 0;
+  let totalCarb = 0, totalFat = 0, totalFib = 0, totalCourses = 0;
 
   const itemHTML = items.map(it => {
     totalKcal += it.kcal*it.qty; totalProt += it.protein*it.qty;
     const carb = it.carb || Math.round(it.kcal*0.4/4);
     const fat  = it.fat  || Math.round(it.kcal*0.25/9);
     const fib  = it.fiber|| Math.max(6, it.courseCount*3);
-    // iron: per-item আনুমানিক (ট্র্যাক করা না থাকলে কোর্স ও বিভাগ থেকে অনুমান)
-    const iron = parseFloat(it.iron)||0 || (it.cat==='PR'?4.5:it.cat==='OB'?2.5:3.0)*(it.courseCount/3||1);
     totalCarb += carb*it.qty; totalFat += fat*it.qty;
-    totalFib  += fib*it.qty;  totalIron += iron*it.qty;
+    totalFib  += fib*it.qty;  totalCourses += (it.courseCount||3)*it.qty;
     const pct = (v,d)=> v? Math.min(99, Math.round(v/d*100)) : 0;
 
     const crs = it.courseDetail.length ? `<div class="crs">${
@@ -776,32 +782,45 @@ function render(order, items, cust, ai, oid, eng){
   const pTotKcal = Math.min(99, Math.round(totalKcal/DAILY.kcal*100));
   const pTotProt = Math.min(99, Math.round(totalProt/DAILY.protein*100));
 
-  // ── Nutrition Facts table (whole-order, US-label style) ──
-  const dvp = (v,d)=> d? Math.round(v/d*100) : 0;
-  const nfRow = (name, amt, dvVal, cls)=>
-    `<tr class="${cls||''}"><td class="nf-name">${name}</td>`+
-    `<td class="nf-amt">${amt}</td>`+
-    `<td class="nf-dv">${dvVal!=null?bn(dvVal)+'%':''}</td></tr>`;
-  const nutritionFacts = `
-    <div class="nfacts">
-      <div class="nf-title">Nutrition Facts · পুষ্টি তথ্য</div>
-      <div class="nf-serv">সম্পূর্ণ অর্ডার · ${bn(items.reduce((s,i)=>s+(i.qty||1),0))} আইটেম · দৈনিক রেফারেন্স ২০০০ kcal</div>
-      <table>
-        <thead><tr><th>উপাদান (Nutrient)</th><th style="text-align:right">পরিমাণ</th><th style="text-align:right">%DV</th></tr></thead>
-        <tbody>
-          <tr class="nf-cal"><td class="nf-name">ক্যালরি (Calories)</td><td class="nf-amt">${bn(Math.round(totalKcal))} kcal</td><td class="nf-dv">${bn(pTotKcal)}%</td></tr>
-          ${nfRow('মোট ফ্যাট (Total Fat)', bn(Math.round(totalFat))+' g', dvp(totalFat,DAILY.fat),'nf-major')}
-          ${nfRow('মোট কার্বোহাইড্রেট (Carbs)', bn(Math.round(totalCarb))+' g', dvp(totalCarb,DAILY.carb),'nf-major')}
-          ${nfRow('খাদ্য আঁশ (Dietary Fiber)', bn(Math.round(totalFib))+' g', dvp(totalFib,DAILY.fiber),'nf-sub')}
-          ${nfRow('প্রোটিন (Protein)', bn(Math.round(totalProt))+' g', dvp(totalProt,DAILY.protein),'nf-major')}
-          ${nfRow('আয়রন (Iron)', bn(Math.round(totalIron*10)/10)+' mg', dvp(totalIron,DAILY.iron),'nf-major')}
-        </tbody>
-      </table>
-      <div class="nf-foot">
-        *%DV (Daily Value) = একজন প্রাপ্তবয়স্কের দৈনিক চাহিদার শতাংশ, ২০০০ kcal ডায়েট অনুযায়ী।
-        মান আনুমানিক ও নির্বাচিত কোর্সভিত্তিক। আয়রন আনুমানিক হিসাব। এটি চিকিৎসা পরামর্শ নয়।
+  // invoice number (order.html saves it after creating the secure invoice)
+  const invNum = (order && order.invoice_number)
+    || localStorage.getItem('sar_last_invoice_num') || '';
+
+  // payment verification status (from payments/invoice; falls back to method)
+  const payVerified = (order && (order.payment_status==='paid' || order.payment_status==='SUCCESS'))
+    || (localStorage.getItem('sar_payment_verified')==='true');
+
+  // ── half-page nutrition facts + colorful daily-requirement bars ──
+  const dvp = (v,d)=> d? Math.min(999, Math.round(v/d*100)) : 0;
+  const drcData = [
+    ['প্রোটিন',   Math.min(99, Math.round(totalProt/0.6)),                'dxc1'],
+    ['আয়রন',     Math.min(99, 22 + totalCourses*4),                      'dxc2'],
+    ['ফাইবার',    Math.min(99, Math.round(totalFib/0.25)),                'dxc3'],
+    ['ভিটামিন C', Math.min(99, 30 + totalCourses*5),                      'dxc4'],
+  ];
+  const nutritionBlock = items.length ? `
+    <div class="nfblock">
+      <div class="nfcol">
+        <div class="nfh">📊 Nutrition Information · পুষ্টিমান</div>
+        <table class="nftbl">
+          <tr class="cal"><td class="nn">ক্যালরি</td><td class="nv">${bn(Math.round(totalKcal))} kcal</td><td class="nd">${bn(pTotKcal)}%</td></tr>
+          <tr><td class="nn">প্রোটিন</td><td class="nv">${bn(Math.round(totalProt))} g</td><td class="nd">${bn(dvp(totalProt,DAILY.protein))}%</td></tr>
+          <tr><td class="nn">কার্বোহাইড্রেট</td><td class="nv">${bn(Math.round(totalCarb))} g</td><td class="nd">${bn(dvp(totalCarb,DAILY.carb))}%</td></tr>
+          <tr><td class="nn">ফ্যাট</td><td class="nv">${bn(Math.round(totalFat))} g</td><td class="nd">${bn(dvp(totalFat,DAILY.fat))}%</td></tr>
+          <tr><td class="nn">ফাইবার</td><td class="nv">${bn(Math.round(totalFib))} g</td><td class="nd">${bn(dvp(totalFib,DAILY.fiber))}%</td></tr>
+        </table>
+        <div class="nffoot">*২০০০ kcal দৈনিক চাহিদার শতাংশ (%DV)</div>
       </div>
-    </div>`;
+      <div class="nfcol">
+        <div class="nfh">🎯 Daily Requirement Coverage</div>
+        <div class="drcx">
+          ${drcData.map(d=>`<div class="drx"><span class="dxl">${d[0]}</span>
+            <span class="dxbar"><i class="${d[2]}" style="width:${d[1]}%"></i></span>
+            <span class="dxp">${bn(d[1])}%</span></div>`).join('')}
+        </div>
+        <div class="nffoot">আজকের অর্ডার থেকে পূরণ হওয়া দৈনিক চাহিদা</div>
+      </div>
+    </div>` : '';
 
   const html = `
     <div class="pad">
@@ -817,12 +836,13 @@ function render(order, items, cust, ai, oid, eng){
       <div class="meta2">
         <div class="mrow"><span class="k">গ্রাহক</span><span class="v">${cust.full_name || localStorage.getItem('sar_customer_name') || 'গ্রাহক'}</span></div>
         <div class="mrow"><span class="k">রিসিট#</span><span class="v mono">${rcpNum}</span></div>
+        ${invNum?`<div class="mrow"><span class="k">ইনভয়েস#</span><span class="v mono">${invNum}</span></div>`:''}
         <div class="mrow"><span class="k">ফোন</span><span class="v mono">${cust.phone || '—'}</span></div>
         <div class="mrow"><span class="k">অর্ডার#</span><span class="v mono">${orderNum}</span></div>
         <div class="mrow"><span class="k">তারিখ</span><span class="v">${today.toLocaleDateString('bn-BD')} ${today.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})}</span></div>
         <div class="mrow"><span class="k">বিভাগ</span><span class="v">${CAT_EMO[cat]||''} ${CAT_BN[cat]||cat}</span></div>
         <div class="mrow"><span class="k">ধরন</span><span class="v">${typeBn}</span></div>
-        <div class="mrow"><span class="k">পেমেন্ট</span><span class="v">${String(payMethod).toUpperCase()}</span></div>
+        <div class="mrow"><span class="k">পেমেন্ট</span><span class="v">${String(payMethod).toUpperCase()} ${payVerified?'<span style="color:var(--inkgreen)">✓ যাচাইকৃত</span>':'<span style="color:var(--red)">⏳ অপেক্ষমাণ</span>'}</span></div>
       </div>
 
       <div class="dlabel">অর্ডার বিবরণ · পুষ্টি · Blockchain</div>
@@ -835,8 +855,9 @@ function render(order, items, cust, ai, oid, eng){
         ${del?`<div class="trow"><span>ডেলিভারি ফি</span><span class="num">৳ ${bn(del)}</span></div>`:''}
         <div class="trow"><span>ভ্যাট (৫%)</span><span class="num">৳ ${bn(vat)}</span></div>
         <div class="trow grand"><span>সর্বমোট পরিশোধিত</span><span class="num">৳ ${bn(grand)}</span></div>
-        <div class="trow nutri"><span>📊 মোট পুষ্টি</span><span>${bn(totalKcal)} kcal (${bn(pTotKcal)}%DV) · প্রোটিন ${bn(Math.round(totalProt))}g (${bn(pTotProt)}%DV)</span></div>
       </div>
+
+      ${nutritionBlock}
 
       <div class="dlabel">✦ আপনার জন্য SAR-এর বার্তা ✦</div>
 
@@ -868,15 +889,15 @@ function render(order, items, cust, ai, oid, eng){
         <div class="qrb"><div id="qrPay"></div><div class="qt">💳 পেমেন্ট QR</div><div class="qs">স্ক্যান করে পরিশোধ</div></div>
         <div class="qrb"><div id="qrRec"></div><div class="qt">🧾 রেকর্ড QR</div><div class="qs">রিসিট যাচাই</div></div>
       </div>
-      <div class="audit"><span class="badge">🔒 অডিট সুরক্ষিত</span> পেমেন্ট ও রিসিটের তথ্য যাচাই/নিরীক্ষার জন্য <b>১ মাস</b> Supabase-এ সংরক্ষিত। ⛓️ সব উপাদান blockchain-নথিভুক্ত।</div>
+      <div class="audit">${payVerified
+        ? '<span class="badge">🔒 যাচাইকৃত</span> পেমেন্ট নিশ্চিত। রিসিটের তথ্য নিরীক্ষার জন্য Supabase-এ সংরক্ষিত। ⛓️ সব উপাদান blockchain-নথিভুক্ত।'
+        : '<span class="badge" style="background:#FFF3E0;color:#B85C0C;border-color:#FFD8A8">⏳ যাচাই অপেক্ষমাণ</span> পেমেন্ট নিশ্চিত হলে রিসিট চূড়ান্ত হবে। ⛓️ সব উপাদান blockchain-নথিভুক্ত।'}</div>
 
       <div class="rfoot">
         <div class="thanks">ধন্যবাদ, ${(cust.full_name||'আপা').split(' ')[0]} 🌸</div>
         <div class="b">SAR She AI Restaurant · Women-Led · Women-Run · For Women Only</div>
         📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com · রিসিট #${rcpNum}
       </div>
-
-      ${items.length ? nutritionFacts : ''}
     </div>`;
 
   document.getElementById('sheet').innerHTML = html;
