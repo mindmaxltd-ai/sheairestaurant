@@ -120,6 +120,37 @@ exports.handler = async (event) => {
         return reply(200, { added: rows.length });
       }
 
+      // ── 3. KB_LIST: কোন কোন ফাইল আপলোড হয়েছে, টুকরো গুনে দেখাও ──
+      case 'kb_list': {
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/knowledge_base`
+          + `?select=title,source,lang&order=created_at.desc&limit=2000`,
+          { headers: SB });
+        const rows = await r.json().catch(() => []);
+        if (!Array.isArray(rows)) return reply(200, { files: [] });
+
+        // title অনুযায়ী গুনে একত্র করি (কয়টা টুকরো প্রতি ফাইলে)
+        const map = {};
+        for (const x of rows) {
+          const key = x.title || 'untitled';
+          if (!map[key]) map[key] = { title: key, source: x.source, lang: x.lang, chunks: 0 };
+          map[key].chunks++;
+        }
+        return reply(200, { files: Object.values(map), total: rows.length });
+      }
+
+      // ── 4. KB_DELETE: একটি ফাইলের সব টুকরো মুছে ফেলো ──────────
+      case 'kb_delete': {
+        const title = p.title || '';
+        if (!title) return reply(400, { error: 'no title' });
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/knowledge_base`
+          + `?title=eq.${encodeURIComponent(title)}`,
+          { method: 'DELETE', headers: { ...SB, Prefer: 'return=minimal' } });
+        if (!r.ok) return reply(500, { error: 'delete failed', detail: await r.text() });
+        return reply(200, { deleted: title });
+      }
+
       default:
         return reply(400, { error: 'unknown action: ' + p.action });
     }
