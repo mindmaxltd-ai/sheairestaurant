@@ -341,124 +341,81 @@ function render(){
 const VAT_RATE=0.05, DELIVERY=50;
 const API='/.netlify/functions/sar';
 const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
-const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
+const CID=_sc.id||localStorage.getItem('sar_customer_id');
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
+
+// ── Registration gate: not registered → go to login ──
+if(!CID){ window.location.href='login.html'; }
+
+// ── Approval gate: registered but not approved → block menu ──
+const _menuApproved = _sc?.admin_approved === true || localStorage.getItem('sar_admin_approved') === 'true';
+if(CID && !_menuApproved){
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.innerHTML = `<div style="min-height:100vh;background:linear-gradient(135deg,#FDEEF3,#E6F6EE);display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:'SolaimanLipi',sans-serif">
+      <div style="max-width:480px;background:#fff;border:1px solid #EBD9E1;border-radius:24px;padding:2.5rem 2rem;box-shadow:0 24px 70px rgba(196,91,124,.16)">
+        <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;background:linear-gradient(120deg,#E8607A,#F2C24B);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.75rem">মেনু দেখতে অনুমোদন দরকার</h2>
+        <p style="color:#7A6E78;font-size:.9rem;line-height:1.8;margin-bottom:1.5rem">সুপার অ্যাডমিন আপনার অ্যাকাউন্ট সক্রিয় করার পরে মেনু দেখতে ও অর্ডার করতে পারবেন।<br><br>নিবন্ধন ফি পরিশোধ করে WhatsApp-এ স্ক্রিনশট পাঠান:<br><strong style="color:#C45B7C;font-size:1.1rem">01346098892</strong></p>
+        <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+          <a href="dashboard.html" style="background:linear-gradient(120deg,#E8607A,#F4A6BD);border:none;border-radius:26px;padding:.8rem 1.5rem;color:#fff;text-decoration:none;font-size:.9rem;font-weight:700;box-shadow:0 8px 22px rgba(232,96,122,.3)">← ড্যাশবোর্ডে যান</a>
+          <a href="payment.html" style="background:#FCF3D6;border:1px solid #f3e4b8;border-radius:26px;padding:.8rem 1.5rem;color:#B8902B;text-decoration:none;font-size:.9rem;font-weight:700">💳 পেমেন্ট করুন</a>
+        </div>
+      </div>
+    </div>`;
+  });
+}
 async function api(action,body){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action},body||{}))});if(!r.ok)throw new Error(action+' '+r.status);return r.json();}
 let cart=JSON.parse(localStorage.getItem('sar_sig_cart')||'[]');
-let step=0, payMethod='ssl', orderId=null;
-const STEPS=[['কার্ট','🛒'],['বিশ্লেষণ','📊'],['নিশ্চিত','✅'],['ইনভয়েস','🧾'],['পেমেন্ট','💳']];
 
 function findMeal(n){return MEALS.find(m=>m.n===n);}
 function saveCart(){localStorage.setItem('sar_sig_cart',JSON.stringify(cart));updateCount();}
 function updateCount(){const c=cart.reduce((s,x)=>s+x.qty,0);const el=document.getElementById('cartCount');if(el)el.textContent=bn(c);}
-function addToCart(n){const ex=cart.find(c=>c.n===n);if(ex)ex.qty++;else{const m=findMeal(n);cart.push({n,qty:1,name:m.name,name_bn:m.name_bn,meal:m.meal,cat:m.cat,code:m.code,price:m.price,img:m.img,kcal:m.kcal,protein:m.protein,fiber:m.fiber});}saveCart();const b=event&&event.target;if(b){b.textContent='✓ যোগ হয়েছে';b.classList.add('added');setTimeout(()=>{b.textContent='＋ যোগ';b.classList.remove('added');},1400);}toast('✓ "'+findMeal(n).name_bn+'" কার্টে যোগ হয়েছে');}
-function orderNow(n){const ex=cart.find(c=>c.n===n);if(ex)ex.qty++;else{const m=findMeal(n);cart.push({n,qty:1,name:m.name,name_bn:m.name_bn,meal:m.meal,cat:m.cat,code:m.code,price:m.price,img:m.img,kcal:m.kcal,protein:m.protein,fiber:m.fiber});}saveCart();step=0;openOrder();}
-function chQty(n,d){const c=cart.find(x=>x.n===n);if(!c)return;c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.n!==n);saveCart();renderStep();}
-function removeItem(n){cart=cart.filter(x=>x.n!==n);saveCart();renderStep();}
-function totals(){const qty=cart.reduce((s,x)=>s+x.qty,0);const sub=cart.reduce((s,x)=>s+x.qty*x.price,0);const del=(payMethod==='cash'&&qty)?DELIVERY:0;const vat=Math.round(sub*VAT_RATE);return{qty,sub,del,vat,grand:sub+del+vat};}
+function addToCart(n){const ex=cart.find(c=>c.n===n);if(ex)ex.qty++;else{const m=findMeal(n);cart.push({n,qty:1,name:m.name,name_bn:m.name_bn,meal:m.meal,cat:m.cat,code:m.code,price:m.price,img:m.img,kcal:m.kcal,protein:m.protein,fiber:m.fiber});}saveCart();renderCart();const b=event&&event.target;if(b){b.textContent='✓ যোগ হয়েছে';b.classList.add('added');setTimeout(()=>{b.textContent='＋ যোগ';b.classList.remove('added');},1400);}toast('✓ "'+findMeal(n).name_bn+'" কার্টে যোগ হয়েছে');}
+function orderNow(n){addToCartSilent(n);openOrder();}
+function addToCartSilent(n){const ex=cart.find(c=>c.n===n);if(ex)ex.qty++;else{const m=findMeal(n);cart.push({n,qty:1,name:m.name,name_bn:m.name_bn,meal:m.meal,cat:m.cat,code:m.code,price:m.price,img:m.img,kcal:m.kcal,protein:m.protein,fiber:m.fiber});}saveCart();}
+function chQty(n,d){const c=cart.find(x=>x.n===n);if(!c)return;c.qty+=d;if(c.qty<=0)cart=cart.filter(x=>x.n!==n);saveCart();renderCart();}
+function removeItem(n){cart=cart.filter(x=>x.n!==n);saveCart();renderCart();}
+function totals(){const qty=cart.reduce((s,x)=>s+x.qty,0);const sub=cart.reduce((s,x)=>s+x.qty*x.price,0);const vat=Math.round(sub*VAT_RATE);return{qty,sub,vat,grand:sub+vat};}
 
-function openOrder(){if(!cart.length){toast('কার্ট খালি — একটি মিল যোগ করুন');return;}renderStep();document.getElementById('modal').classList.add('show');document.getElementById('ov').classList.add('show');}
+function openOrder(){if(!cart.length){toast('কার্ট খালি — একটি মিল যোগ করুন');return;}renderCart();document.getElementById('modal').classList.add('show');document.getElementById('ov').classList.add('show');}
 function closeOrder(){document.getElementById('modal').classList.remove('show');document.getElementById('ov').classList.remove('show');}
-function go(s){step=s;renderStep();document.getElementById('mBody').scrollTop=0;}
-function selPM(el,pm){payMethod=pm;document.querySelectorAll('.pm').forEach(p=>p.classList.remove('selected'));el.classList.add('selected');renderStep();}
 
-function stepsBar(){
-  let h='';STEPS.forEach((s,i)=>{const cls=i<step?'done':i===step?'active':'';
-    h+='<div class="stp '+cls+'"><div class="sc">'+(i<step?'✓':bn(i+1))+'</div><span class="sl">'+s[0]+'</span></div>';
-    if(i<STEPS.length-1)h+='<div class="stp-line '+(i<step?'fill':'')+'"></div>';});
-  return h;
-}
-
-function renderStep(){
+// Simple cart drawer; full cart-analysis → confirmation → invoice → payment happens in order.html
+function renderCart(){
   const t=totals();
-  document.getElementById('steps').innerHTML=stepsBar();
   const body=document.getElementById('mBody'),foot=document.getElementById('mFoot'),ttl=document.getElementById('mTitle');
-
-  if(step===0){ // CART
-    ttl.textContent='আপনার কার্ট পর্যালোচনা';
-    if(!cart.length){body.innerHTML='<div class="m-empty">🛒 কার্ট খালি।</div>';foot.innerHTML='<button class="btn-ghost" onclick="closeOrder()">বন্ধ করুন</button>';return;}
-    body.innerHTML=cart.map(c=>'<div class="ci"><img class="ci-img" src="'+c.img+'"><div class="ci-main">'+
-      '<div class="ci-top"><div><div class="ci-name">'+c.name_bn+'</div><div class="ci-meal">'+MEAL_BN[c.meal]+' · '+c.code+' · ৳'+bn(c.price)+'</div></div>'+
-      '<button class="ci-del" onclick="removeItem('+c.n+')">🗑️</button></div>'+
-      '<div class="ci-line"><div class="qty"><button class="qbtn" onclick="chQty('+c.n+',-1)">−</button><span class="qn">'+bn(c.qty)+'</span><button class="qbtn" onclick="chQty('+c.n+',1)">+</button></div>'+
-      '<b>৳ '+bn(c.qty*c.price)+'</b></div></div></div>').join('')+
-      '<div class="sumc"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-      '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-      '<div class="sum total"><span>মোট</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="closeOrder()">← কেনাকাটা চালিয়ে যান</button><button class="btn-primary" onclick="go(1)">পরবর্তী — বিশ্লেষণ →</button>';
-
-  }else if(step===1){ // ANALYSIS
-    ttl.textContent='অর্ডার বিশ্লেষণ';
-    const tk=cart.reduce((s,c)=>s+c.qty*c.kcal,0), tp=cart.reduce((s,c)=>s+c.qty*c.protein,0), tf=cart.reduce((s,c)=>s+c.qty*c.fiber,0);
-    const catCount={};cart.forEach(c=>catCount[c.cat]=(catCount[c.cat]||0)+c.qty);
-    const catRows=Object.keys(catCount).map(k=>'<span class="cat-tag" style="background:'+CAT_INFO[k].color+'">'+CAT_INFO[k].bn+' ×'+bn(catCount[k])+'</span>').join(' ');
-    const dr=[['প্রোটিন',Math.min(99,Math.round(tp/0.6))],['ফাইবার',Math.min(99,Math.round(tf/0.28))],['আয়রন',Math.min(99,40+t.qty*6)],['ভিটামিন',Math.min(99,45+t.qty*5)]];
-    body.innerHTML='<div class="sec-card"><h4>🤖 AI পুষ্টি বিশ্লেষণ</h4>'+
-      '<div class="an-grid"><div class="an-pill k"><div class="av">'+bn(tk)+'</div><div class="al">মোট kcal</div></div>'+
-      '<div class="an-pill p"><div class="av">'+bn(tp)+'g</div><div class="al">প্রোটিন</div></div>'+
-      '<div class="an-pill f"><div class="av">'+bn(tf)+'g</div><div class="al">ফাইবার</div></div></div></div>'+
-      '<div class="sec-card"><h4>📊 দৈনিক চাহিদা কভারেজ</h4><div class="an-bars">'+
-        dr.map(d=>'<div class="an-bar"><span class="bl2">'+d[0]+'</span><span class="bt"><i style="width:'+d[1]+'%"></i></span><span class="bp">'+bn(d[1])+'%</span></div>').join('')+'</div></div>'+
-      '<div class="sec-card"><h4>🎯 থেরাপিউটিক ফোকাস</h4><div style="margin-bottom:.7rem">'+catRows+'</div>'+
-        '<div class="an-note"><span>✓</span><span>আপনার অর্ডারের সব মিল তেলমুক্ত, চিনিমুক্ত, পিংক সল্ট, দুধমুক্ত ও আয়ুর্বেদিক নীতিমালা অনুসরণ করে। AI আপনার নির্বাচিত মিলগুলো নারীস্বাস্থ্যের জন্য সুষম বলে নিশ্চিত করেছে।</span></div></div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="go(0)">← কার্ট</button><button class="btn-primary" onclick="go(2)">পরবর্তী — নিশ্চিত →</button>';
-
-  }else if(step===2){ // CONFIRM
-    ttl.textContent='অর্ডার নিশ্চিতকরণ';
-    body.innerHTML='<div class="sec-card"><h4>👤 গ্রাহক</h4><div style="font-size:.9rem;color:var(--ink-2)">নাম: <b style="color:var(--plum)">'+CNAME+'</b><br>গ্রাহক আইডি: <span class="num">'+CID+'</span></div></div>'+
-      '<div class="sec-card"><h4>🥗 নির্বাচিত মিল ('+bn(t.qty)+'টি)</h4>'+
-        cart.map(c=>'<div style="display:flex;justify-content:space-between;font-size:.88rem;padding:.35rem 0;border-bottom:1px dashed var(--line)"><span>'+c.name_bn+' <span style="color:var(--ink-2)">×'+bn(c.qty)+'</span></span><b class="num">৳ '+bn(c.qty*c.price)+'</b></div>').join('')+
-      '</div>'+
-      '<div class="sumc"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-      '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-      '<div class="sum total"><span>মোট</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div>'+
-      '<div class="disclaim"><b>⚕️ গুরুত্বপূর্ণ:</b> SAR কোনো চিকিৎসা প্রতিষ্ঠান নয়। এই খাবার থেরাপিউটিক সচেতনতার জন্য। স্বাস্থ্য সমস্যায় নিবন্ধিত চিকিৎসকের পরামর্শ নিন। নিজে নিজে ওষুধ সেবন করবেন না।</div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="go(1)">← বিশ্লেষণ</button><button class="btn-primary" onclick="go(3)">নিশ্চিত — ইনভয়েস দেখুন →</button>';
-
-  }else if(step===3){ // INVOICE
-    ttl.textContent='ইনভয়েস';
-    const today=new Date().toLocaleDateString('bn-BD');
-    const prov='INV-'+Date.now().toString().slice(-6);
-    body.innerHTML='<div class="inv"><div class="inv-hd"><div class="il"><b>SAR</b><small>She AI Revolution</small></div>'+
-      '<div class="ir"><b>'+prov+'</b>তারিখ: '+today+'<br>গ্রাহক: '+CNAME+'</div></div>'+
-      '<table class="inv-tbl"><thead><tr><th>মিল</th><th class="r">দাম</th><th class="r">পরিমাণ</th><th class="r">মোট</th></tr></thead><tbody>'+
-        cart.map(c=>'<tr><td>'+c.name_bn+'<br><span style="font-size:.7rem;color:var(--ink-2)">'+MEAL_BN[c.meal]+' · '+c.code+'</span></td><td class="r">৳'+bn(c.price)+'</td><td class="r">'+bn(c.qty)+'</td><td class="r">৳'+bn(c.qty*c.price)+'</td></tr>').join('')+
-      '</tbody></table><div class="inv-tot"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-        '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-        '<div class="sum total"><span>সর্বমোট (ডেলিভারি ছাড়া)</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div></div>'+
-      '<div class="disclaim"><b>🧾 নোট:</b> এটি প্রাথমিক ইনভয়েস। পেমেন্ট সম্পন্ন হলে চূড়ান্ত রিসিটে পুষ্টিমান, ঔষধি পরামর্শ ও ডিসক্লেইমার থাকবে।</div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="go(2)">← নিশ্চিত</button><button class="btn-primary" onclick="go(4)">পরবর্তী — পেমেন্ট →</button>';
-
-  }else if(step===4){ // PAYMENT
-    ttl.textContent='পেমেন্ট';
-    body.innerHTML='<div class="sec-card"><h4>💳 পেমেন্ট পদ্ধতি</h4><div class="pm-grid">'+
-      '<div class="pm '+(payMethod==='ssl'?'selected':'')+'" onclick="selPM(this,\'ssl\')"><span class="pm-icon">🔐</span><span>SSLCommerz — অনলাইন পেমেন্ট</span></div>'+
-      '<div class="pm '+(payMethod==='cash'?'selected':'')+'" onclick="selPM(this,\'cash\')"><span class="pm-icon">💵</span><span>ক্যাশ অন ডেলিভারি</span></div></div>'+
-      '<div class="pm-note">🔐 পরের ধাপে SSLCommerz পেজে bKash, Nagad, Rocket, Visa/Mastercard সহ সব মাধ্যমে নিরাপদে পেমেন্ট করতে পারবেন। ডেলিভারি তথ্য, ডেলিভারি চার্জ ও চূড়ান্ত পেমেন্ট order পেজে সম্পন্ন হবে।</div></div>'+
-      '<div class="sumc"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-        '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-        '<div class="sum total"><span>মোট (ডেলিভারি ছাড়া)</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="go(3)">← ইনভয়েস</button><button class="btn-primary" id="payBtn" onclick="goCheckout()">🔒 পেমেন্টে এগিয়ে যান — ৳ '+bn(t.sub+t.vat)+'</button>';
-  }
+  document.getElementById('steps').innerHTML='';
+  ttl.textContent='আপনার কার্ট ('+bn(t.qty)+')';
+  if(!cart.length){body.innerHTML='<div class="m-empty">🛒 কার্ট খালি।<br>যেকোনো মিলের "＋ যোগ" বা "অর্ডার" চাপুন।</div>';foot.innerHTML='<button class="btn-ghost" onclick="closeOrder()">বন্ধ করুন</button>';return;}
+  body.innerHTML=cart.map(c=>'<div class="ci"><img class="ci-img" src="'+c.img+'"><div class="ci-main">'+
+    '<div class="ci-top"><div><div class="ci-name">'+c.name_bn+'</div><div class="ci-meal">'+MEAL_BN[c.meal]+' · '+c.code+' · ৳'+bn(c.price)+'</div></div>'+
+    '<button class="ci-del" onclick="removeItem('+c.n+')">🗑️</button></div>'+
+    '<div class="ci-line"><div class="qty"><button class="qbtn" onclick="chQty('+c.n+',-1)">−</button><span class="qn">'+bn(c.qty)+'</span><button class="qbtn" onclick="chQty('+c.n+',1)">+</button></div>'+
+    '<b>৳ '+bn(c.qty*c.price)+'</b></div></div></div>').join('')+
+    '<div class="sumc"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
+    '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
+    '<div class="sum total"><span>মোট (ডেলিভারি ছাড়া)</span><span>৳ '+bn(t.grand)+'</span></div></div>'+
+    '<div class="disclaim"><b>ℹ️</b> পরবর্তী ধাপে order পেজে কার্ট পর্যালোচনা, AI বিশ্লেষণ, অর্ডার নিশ্চিতকরণ, ইনভয়েস ও পেমেন্ট (SSLCommerz / ক্যাশ) সম্পন্ন হবে। ডেলিভারি চার্জ সেখানে যোগ হবে।</div>';
+  foot.innerHTML='<button class="btn-ghost" onclick="closeOrder()">← কেনাকাটা চালিয়ে যান</button><button class="btn-primary" id="coBtn" onclick="goCheckout()">অর্ডার করুন → order পেজে যান</button>';
 }
 
-// Order confirm → save order → order.html (payment handled there, same as meal-score.html)
+// Order confirm → save order → order.html (cart review, analysis, confirmation, invoice, payment all there — same as meal-score.html)
 async function goCheckout(){
   const t=totals();if(!t.qty)return;
-  const btn=document.getElementById('payBtn');if(btn){btn.disabled=true;btn.textContent='Order সংরক্ষণ হচ্ছে…';}
-  // build cart in the shape order.html expects: {name, name_bn, meal, cat, price, qty, kcal, protein, code, img, note}
+  const btn=document.getElementById('coBtn');if(btn){btn.disabled=true;btn.textContent='Order সংরক্ষণ হচ্ছে…';}
+  // build cart in the shape order.html expects
   const orderCart=cart.map(c=>({name:c.name_bn||c.name,name_en:c.name,name_bn:c.name_bn,meal:c.meal,cat:c.cat,
     price:c.price,qty:c.qty,kcal:c.kcal,protein:c.protein+'g',code:c.code,note:''}));
-  const payload={customer_id:CID,items:orderCart,subtotal:t.sub,vat:t.vat,total:t.sub+t.vat,
-    payment_method:payMethod,meal_date:new Date().toISOString().slice(0,10),note:'Signature Meal Order · '+payMethod};
-  // hand off to order.html (it re-confirms + does delivery/payment), and save now
+  const payload={customer_id:CID,items:orderCart,subtotal:t.sub,vat:t.vat,total:t.grand,
+    meal_date:new Date().toISOString().slice(0,10),note:'Signature Meal Order'};
   localStorage.setItem('sar_cart',JSON.stringify(orderCart));
   localStorage.setItem('sar_order_payload',JSON.stringify(payload));
   try{const r=await api('placeOrder',payload);if(r&&r.ok&&r.order&&r.order.id){localStorage.setItem('sar_last_order_id',r.order.id);}}catch(e){}
   localStorage.removeItem('sar_sig_cart');cart=[];updateCount();
-  toast('✓ Order সংরক্ষিত — পেমেন্ট পেজে নিয়ে যাচ্ছি');
+  toast('✓ Order সংরক্ষিত — order পেজে নিয়ে যাচ্ছি');
   setTimeout(()=>window.location.href='order.html',800);
 }
+
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600);}
 
 catTabs();mealTabs();render();updateCount();
