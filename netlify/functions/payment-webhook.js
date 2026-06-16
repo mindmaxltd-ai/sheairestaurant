@@ -15,7 +15,12 @@
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xlkrggspepnysbouatec.supabase.co';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
-const SSLCZ_PASSWD = process.env.SSLCZ_STORE_PASSWD || '';
+const SSLCZ_PASSWD = process.env.SSLC_STORE_PWD || process.env.SSLCZ_STORE_PASSWD || 'mindm6a3106b7b4ee1@ssl';
+const SSLC_IS_LIVE = process.env.SSLC_IS_LIVE === 'true';
+const SSLC_VALIDATE = SSLC_IS_LIVE
+  ? 'https://securepay.sslcommerz.com/validator/api/validationserverAPI.php'
+  : 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php';
+const SITE_URL = process.env.SITE_URL || 'https://sheairestaurant.com';
 
 const SB = {
   apikey: SERVICE_KEY,
@@ -23,6 +28,20 @@ const SB = {
   'Content-Type': 'application/json',
 };
 const enc = (v) => encodeURIComponent(v);
+
+// ── গ্রাহকের ব্রাউজারকে নির্দিষ্ট পেজে পাঠানোর HTML ──
+function redirectHtml(url, msg) {
+  return `<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">
+<meta http-equiv="refresh" content="1;url=${url}">
+<style>body{font-family:sans-serif;background:#15101A;color:#fff;display:flex;flex-direction:column;
+align-items:center;justify-content:center;height:100vh;margin:0;text-align:center}
+.s{width:42px;height:42px;border:3px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
+border-radius:50%;animation:sp .8s linear infinite;margin-bottom:18px}
+@keyframes sp{to{transform:rotate(360deg)}}a{color:#FF6BB5}</style></head>
+<body><div class="s"></div><p>${msg}</p>
+<p style="font-size:13px;opacity:.6">স্বয়ংক্রিয়ভাবে না গেলে <a href="${url}">এখানে ক্লিক করুন</a></p>
+<script>setTimeout(function(){location.href=${JSON.stringify(url)}},1000)</script></body></html>`;
+}
 
 const reply = (status, body, isHtml) => ({
   statusCode: status,
@@ -65,8 +84,11 @@ async function sbInsert(table, row) {
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return reply(200, {});
-  if (event.httpMethod !== 'POST') return reply(405, { error: 'POST only' });
   if (!SERVICE_KEY) return reply(500, { error: 'Missing SUPABASE_SERVICE_KEY' });
+
+  // SSLCommerz success/fail/cancel গ্রাহকের ব্রাউজারকে এখানে redirect করে (POST বা GET)
+  const qs = event.queryStringParameters || {};
+  const isBrowserRedirect = qs.redirect === 'success' || qs.redirect === 'fail';
 
   const data = parseBody(event);
 
@@ -90,13 +112,28 @@ exports.handler = async (event) => {
     // ── payment খুঁজি ──
     const pay = (await sbSelect('payments',
       `transaction_id=eq.${enc(txnId)}&select=*&order=created_at.desc&limit=1`))[0];
-    if (!pay) return reply(404, { ok: false, error: 'payment not found for ' + txnId });
+    if (!pay) {
+      if (isBrowserRedirect) return reply(200, redirectHtml(`${SITE_URL}/receipt.html?txn=${enc(txnId)}`, 'রিসিট খোঁজা হচ্ছে...'), true);
+      return reply(404, { ok: false, error: 'payment not found for ' + txnId });
+    }
 
-    // ── (ঐচ্ছিক) SSLCommerz signature যাচাই ──
-    // প্রকৃত deployment-এ এখানে SSLCommerz validation API কল করে val_id যাচাই করুন।
-    // উদাহরণ: https://securepay.sslcommerz.com/validator/api/validationserverAPI.php?val_id=...&store_passwd=...
-    // এখানে আমরা amount mismatch ধরি — উদ্দিষ্ট amount-এর সাথে না মিললে FAILED।
+    // ── SSLCommerz validation API দিয়ে val_id যাচাই (প্রকৃত নিশ্চিতকরণ) ──
     let verifiedOk = isSuccess;
+    if (data.val_id && SSLCZ_PASSWD) {
+      try {
+        const vurl = `${SSLC_VALIDATE}?val_id=${enc(data.val_id)}&store_id=${enc(data.store_id || process.env.SSLC_STORE_ID || 'mindm6a3106b7b4ee1')}&store_passwd=${enc(SSLCZ_PASSWD)}&format=json`;
+        const vr = await fetch(vurl).then(r => r.json()).catch(() => null);
+        if (vr) {
+          verifiedOk = /valid/i.test(String(vr.status));
+          // validated amount mismatch ধরি
+          if (verifiedOk && vr.amount != null) {
+            const expected = Number(pay.final_amount || 0);
+            if (expected > 0 && Math.abs(expected - Number(vr.amount)) > 1) verifiedOk = false;
+          }
+        }
+      } catch (_) { /* validation fail হলে নিচের amount-check fallback */ }
+    }
+    // fallback amount check (val_id না থাকলে)
     if (verifiedOk && paidAmount != null) {
       const expected = Number(pay.final_amount || 0);
       const got = Number(paidAmount);
@@ -116,7 +153,12 @@ exports.handler = async (event) => {
     await sbUpdate('invoices', `id=eq.${enc(pay.invoice_id)}`,
       { status: verifiedOk ? 'SUCCESS' : 'FAILED', updated_at: new Date().toISOString() });
 
-    if (!verifiedOk) return reply(200, { ok: true, verified: false, status: 'FAILED' });
+    if (!verifiedOk) {
+      if (isBrowserRedirect) {
+        return reply(200, redirectHtml(`${SITE_URL}/invoice.html?txn=${enc(txnId)}&failed=1`, '❌ পেমেন্ট সম্পন্ন হয়নি'), true);
+      }
+      return reply(200, { ok: true, verified: false, status: 'FAILED' });
+    }
 
     // ── SUCCESS → receipt + customer/subscription/kitchen ──
     const inv = (await sbSelect('invoices', `id=eq.${enc(pay.invoice_id)}&select=*&limit=1`))[0];
@@ -162,7 +204,10 @@ exports.handler = async (event) => {
       }
     }
 
-    // গেটওয়ে অনেক সময় HTTP 200 ও সাধারণ রেসপন্স চায়
+    // গেটওয়ে অনেক সময় HTTP 200 ও সাধারণ রেসপন্স চায় (IPN)
+    if (isBrowserRedirect) {
+      return reply(200, redirectHtml(`${SITE_URL}/receipt.html?txn=${enc(txnId)}`, '✅ পেমেন্ট সফল! রিসিট প্রস্তুত হচ্ছে...'), true);
+    }
     return reply(200, { ok: true, verified: true, status: 'SUCCESS' });
   } catch (err) {
     return reply(500, { error: String((err && err.message) || err) });
