@@ -346,9 +346,22 @@ async function payNow(){
     localStorage.setItem('sar_pending_txn', txn);
 
     if(REDIRECT.includes(selMethod)){
-      setStatus('🌐 নিরাপদ গেটওয়েতে নিয়ে যাওয়া হচ্ছে...', 's-wait');
+      setStatus('🌐 নিরাপদ গেটওয়ে প্রস্তুত হচ্ছে...', 's-wait');
       localStorage.setItem('sar_pending_payment', JSON.stringify({invoice_id:_invoice.id, txn, amount:_invoice.total_amount, method:selMethod}));
-      setTimeout(()=>{ window.location.href='https://pay.sslcommerz.com/3a2056256871eec779ebd94ee8bf33a3467108be'; }, 800);
+      // আসল SSLCommerz session তৈরি (server-side, payment.js)
+      const ss = await api({
+        action:'createSession',
+        invoice_id:_invoice.id,
+        transaction_id:txn,
+        customer:{ full_name:CNAME, phone:(_sc.phone||''), email:(_sc.email||'') }
+      });
+      if(ss.ok && ss.GatewayPageURL){
+        setStatus('🌐 SSLCommerz গেটওয়েতে নিয়ে যাওয়া হচ্ছে...', 's-wait');
+        window.location.href = ss.GatewayPageURL;
+      } else {
+        setStatus('❌ গেটওয়ে সমস্যা: ' + (ss.error||'session তৈরি হয়নি') , 's-err');
+        btn.disabled=false;
+      }
       return;
     }
     // mobile banking: manual verify (admin/webhook)
