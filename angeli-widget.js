@@ -45,8 +45,16 @@
   css.textContent = `
   #ang-fab{position:fixed;right:20px;bottom:20px;width:62px;height:62px;border-radius:50%;
     background:#D4537E;color:#fff;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);
-    font-size:30px;z-index:99999;display:flex;align-items:center;justify-content:center}
+    z-index:99999;display:flex;align-items:center;justify-content:center;position:fixed}
+  #ang-fab svg{width:42px;height:42px}
   #ang-fab:hover{transform:scale(1.05)}
+  #ang-fab.speaking{animation:ang-talk 1.1s ease-in-out infinite}
+  #ang-spk{position:absolute;top:-3px;right:-3px;width:20px;height:20px;border-radius:50%;
+    background:#fff;border:1.5px solid #D4537E;display:none;align-items:center;
+    justify-content:center;font-size:11px;color:#D4537E}
+  #ang-fab.speaking #ang-spk{display:flex}
+  @keyframes ang-talk{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  #ang-head .av svg{width:30px;height:30px}
   #ang-win{position:fixed;right:20px;bottom:92px;width:340px;max-width:calc(100vw - 40px);
     height:520px;max-height:calc(100vh - 120px);background:#fff;border-radius:18px;
     box-shadow:0 8px 30px rgba(0,0,0,.28);z-index:99999;display:none;flex-direction:column;
@@ -79,14 +87,30 @@
   document.head.appendChild(css);
 
   // ── DOM তৈরি ───────────────────────────────────────────────
+  // ছোট মেয়ের মুখ (Angeli) — আঁকা SVG, আলাদা ছবি ফাইল লাগে না
+  var GIRL_SVG =
+    '<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<path d="M10 18a12 12 0 0 1 24 0c0 1.6 1.1 2 1.1 3.8 0 1.7-1.6 2.6-2.2 2.6l-1 .2c-.7 4.6-4.6 8.2-9.9 8.2s-9.2-3.6-9.9-8.2l-1-.2c-.6 0-2.2-.9-2.2-2.6 0-1.8 1.1-2.2 1.1-3.8Z" fill="#F8D3B0"/>' +
+    '<path d="M22 2.5c7 0 12 5 12 13 0 1-.1 2-.3 2.6-.6-2.4-1.3-4.2-1.9-4.9-3.3 1-10 1.3-13.8-.6-.7 1.8-2.6 3.4-4.9 4-1.3-9.2 1.8-14.1 8.9-14.1Z" fill="#7A4A28"/>' +
+    '<path d="M8.5 18.5c-1.6.5-3.2 2.4-3.2 4.8 0 3 2.2 5.3 4.8 5.5" fill="none" stroke="#7A4A28" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<path d="M35.5 18.5c1.6.5 3.2 2.4 3.2 4.8 0 3-2.2 5.3-4.8 5.5" fill="none" stroke="#7A4A28" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<circle cx="16.8" cy="20.5" r="2.9" fill="#3A2A1A"/><circle cx="27.2" cy="20.5" r="2.9" fill="#3A2A1A"/>' +
+    '<circle cx="17.9" cy="19.4" r="1" fill="#fff"/><circle cx="28.3" cy="19.4" r="1" fill="#fff"/>' +
+    '<circle cx="13" cy="24.5" r="2.2" fill="#F2A0B4" opacity=".7"/><circle cx="31" cy="24.5" r="2.2" fill="#F2A0B4" opacity=".7"/>' +
+    '<path d="M19 26.5q3 2.2 6 0" fill="none" stroke="#C0566B" stroke-width="1.8" stroke-linecap="round"/>' +
+    '<circle cx="32.5" cy="9.5" r="2" fill="#FF6FA3"/><circle cx="35.5" cy="11" r="2" fill="#FF6FA3"/><circle cx="33" cy="12.8" r="2" fill="#FF6FA3"/><circle cx="30.2" cy="11.2" r="2" fill="#FF6FA3"/><circle cx="32.8" cy="10.8" r="1.4" fill="#FFE08A"/>' +
+    '<path d="M13 33c2.6 4.2 5.4 6.2 9 6.2s6.4-2 9-6.2c2.6 1 5 3 5 8H8c0-5 2.4-7 5-8Z" fill="#5DCAA5"/></svg>';
+
   var fab = document.createElement('button');
-  fab.id = 'ang-fab'; fab.innerHTML = '🌸'; fab.setAttribute('aria-label', 'Angeli চ্যাট');
+  fab.id = 'ang-fab';
+  fab.innerHTML = GIRL_SVG + '<span id="ang-spk">🔊</span>';
+  fab.setAttribute('aria-label', 'Angeli চ্যাট');
 
   var win = document.createElement('div');
   win.id = 'ang-win';
   win.innerHTML =
     '<div id="ang-head">' +
-      '<div class="av">🌸</div>' +
+      '<div class="av">' + GIRL_SVG + '</div>' +
       '<div><div class="nm">Angeli</div><div class="st" id="ang-st">● অনলাইন</div></div>' +
       '<select id="ang-lang">' +
         '<option value="bn">বাংলা</option><option value="en">EN</option>' +
@@ -138,6 +162,8 @@
       speechSynthesis.cancel();   // আগের কথা থামাও, যেন একসাথে দুটো না বাজে
       var u = new SpeechSynthesisUtterance(text);
       u.lang = L[lang].voice;
+      u.onstart = function () { fab.classList.add('speaking'); };   // কথা শুরু → আইকন নড়ে
+      u.onend   = function () { fab.classList.remove('speaking'); }; // কথা শেষ → থামে
       speechSynthesis.speak(u);
     } catch (e) {}
   }
