@@ -346,7 +346,7 @@ const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা
 async function api(action,body){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({action},body||{}))});if(!r.ok)throw new Error(action+' '+r.status);return r.json();}
 let cart=JSON.parse(localStorage.getItem('sar_sig_cart')||'[]');
 let step=0, payMethod='ssl', orderId=null;
-const STEPS=[['কার্ট','🛒'],['বিশ্লেষণ','📊'],['নিশ্চিত','✅'],['ইনভয়েস','🧾'],['পেমেন্ট','💳'],['সম্পন্ন','🎉']];
+const STEPS=[['কার্ট','🛒'],['বিশ্লেষণ','📊'],['নিশ্চিত','✅'],['ইনভয়েস','🧾'],['পেমেন্ট','💳']];
 
 function findMeal(n){return MEALS.find(m=>m.n===n);}
 function saveCart(){localStorage.setItem('sar_sig_cart',JSON.stringify(cart));updateCount();}
@@ -424,9 +424,8 @@ function renderStep(){
       '<table class="inv-tbl"><thead><tr><th>মিল</th><th class="r">দাম</th><th class="r">পরিমাণ</th><th class="r">মোট</th></tr></thead><tbody>'+
         cart.map(c=>'<tr><td>'+c.name_bn+'<br><span style="font-size:.7rem;color:var(--ink-2)">'+MEAL_BN[c.meal]+' · '+c.code+'</span></td><td class="r">৳'+bn(c.price)+'</td><td class="r">'+bn(c.qty)+'</td><td class="r">৳'+bn(c.qty*c.price)+'</td></tr>').join('')+
       '</tbody></table><div class="inv-tot"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-        (t.del?'<div class="sum"><span>ডেলিভারি</span><span>৳ '+bn(t.del)+'</span></div>':'')+
         '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-        '<div class="sum total"><span>সর্বমোট</span><span>৳ '+bn(t.grand)+'</span></div></div></div>'+
+        '<div class="sum total"><span>সর্বমোট (ডেলিভারি ছাড়া)</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div></div>'+
       '<div class="disclaim"><b>🧾 নোট:</b> এটি প্রাথমিক ইনভয়েস। পেমেন্ট সম্পন্ন হলে চূড়ান্ত রিসিটে পুষ্টিমান, ঔষধি পরামর্শ ও ডিসক্লেইমার থাকবে।</div>';
     foot.innerHTML='<button class="btn-ghost" onclick="go(2)">← নিশ্চিত</button><button class="btn-primary" onclick="go(4)">পরবর্তী — পেমেন্ট →</button>';
 
@@ -435,38 +434,31 @@ function renderStep(){
     body.innerHTML='<div class="sec-card"><h4>💳 পেমেন্ট পদ্ধতি</h4><div class="pm-grid">'+
       '<div class="pm '+(payMethod==='ssl'?'selected':'')+'" onclick="selPM(this,\'ssl\')"><span class="pm-icon">🔐</span><span>SSLCommerz — অনলাইন পেমেন্ট</span></div>'+
       '<div class="pm '+(payMethod==='cash'?'selected':'')+'" onclick="selPM(this,\'cash\')"><span class="pm-icon">💵</span><span>ক্যাশ অন ডেলিভারি</span></div></div>'+
-      '<div class="pm-note">🔐 SSLCommerz পেজে bKash, Nagad, Rocket, Visa/Mastercard সহ সব মাধ্যমে নিরাপদে পেমেন্ট করতে পারবেন।'+(payMethod==='cash'?'<br>💵 ক্যাশ অন ডেলিভারিতে ৳'+bn(DELIVERY)+' ডেলিভারি চার্জ যোগ হবে।':'')+'</div></div>'+
+      '<div class="pm-note">🔐 পরের ধাপে SSLCommerz পেজে bKash, Nagad, Rocket, Visa/Mastercard সহ সব মাধ্যমে নিরাপদে পেমেন্ট করতে পারবেন। ডেলিভারি তথ্য, ডেলিভারি চার্জ ও চূড়ান্ত পেমেন্ট order পেজে সম্পন্ন হবে।</div></div>'+
       '<div class="sumc"><div class="sum"><span>সাবটোটাল</span><span>৳ '+bn(t.sub)+'</span></div>'+
-        (t.del?'<div class="sum"><span>ডেলিভারি</span><span>৳ '+bn(t.del)+'</span></div>':'')+
         '<div class="sum"><span>ভ্যাট (৫%)</span><span>৳ '+bn(t.vat)+'</span></div>'+
-        '<div class="sum total"><span>মোট পরিশোধযোগ্য</span><span>৳ '+bn(t.grand)+'</span></div></div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="go(3)">← ইনভয়েস</button><button class="btn-primary" id="payBtn" onclick="processOrder()">🔒 অর্ডার নিশ্চিত করুন — ৳ '+bn(t.grand)+'</button>';
-
-  }else if(step===5){ // DONE
-    ttl.textContent='অর্ডার সম্পন্ন';
-    body.innerHTML='<div class="suc"><div class="suc-ring">✓</div><div class="suc-title">অর্ডার নিশ্চিত হয়েছে!</div>'+
-      '<p class="suc-txt">আপনার অর্ডার সফলভাবে নেওয়া হয়েছে। রান্নাঘর প্রস্তুত করছে। WhatsApp ও ইমেইলে নিশ্চিতকরণ পাঠানো হবে।</p>'+
-      '<div class="suc-id">'+(orderId||'ORD-—')+'</div>'+
-      '<div class="track"><div class="tk on"><div class="td">✓</div><span>নিশ্চিত</span></div>'+
-        '<div class="tk on"><div class="td">👩‍🍳</div><span>রান্নাঘরে</span></div>'+
-        '<div class="tk"><div class="td">📦</div><span>প্যাকিং</span></div>'+
-        '<div class="tk"><div class="td">🛵</div><span>পথে</span></div>'+
-        '<div class="tk"><div class="td">🏡</div><span>ডেলিভারি</span></div></div></div>';
-    foot.innerHTML='<button class="btn-ghost" onclick="closeOrder()">বন্ধ করুন</button><button class="btn-primary" onclick="resetAll()">নতুন অর্ডার</button>';
+        '<div class="sum total"><span>মোট (ডেলিভারি ছাড়া)</span><span>৳ '+bn(t.sub+t.vat)+'</span></div></div>';
+    foot.innerHTML='<button class="btn-ghost" onclick="go(3)">← ইনভয়েস</button><button class="btn-primary" id="payBtn" onclick="goCheckout()">🔒 পেমেন্টে এগিয়ে যান — ৳ '+bn(t.sub+t.vat)+'</button>';
   }
 }
 
-async function processOrder(){
+// Order confirm → save order → order.html (payment handled there, same as meal-score.html)
+async function goCheckout(){
   const t=totals();if(!t.qty)return;
-  const btn=document.getElementById('payBtn');if(btn){btn.disabled=true;btn.textContent='অর্ডার সংরক্ষণ হচ্ছে…';}
-  const payload={customer_id:CID,items:cart.map(c=>({menu_code:c.code,name:c.name,name_bn:c.name_bn,qty:c.qty,price:c.price,meal:c.meal,cat:c.cat})),
-    subtotal:t.sub,delivery:t.del,vat:t.vat,total:t.grand,payment_method:payMethod,meal_date:new Date().toISOString().slice(0,10),note:'Signature Meal Order ('+payMethod+')'};
-  localStorage.setItem('sar_sig_order_payload',JSON.stringify(payload));
-  orderId='ORD-'+Date.now().toString().slice(-6);
-  try{const r=await api('placeOrder',payload);if(r&&r.ok&&r.order&&r.order.id){orderId=r.order.id;localStorage.setItem('sar_last_order_id',orderId);}}catch(e){}
-  cart=[];saveCart();step=5;renderStep();toast('✓ অর্ডার নিশ্চিত — '+orderId);
+  const btn=document.getElementById('payBtn');if(btn){btn.disabled=true;btn.textContent='Order সংরক্ষণ হচ্ছে…';}
+  // build cart in the shape order.html expects: {name, name_bn, meal, cat, price, qty, kcal, protein, code, img, note}
+  const orderCart=cart.map(c=>({name:c.name_bn||c.name,name_en:c.name,name_bn:c.name_bn,meal:c.meal,cat:c.cat,
+    price:c.price,qty:c.qty,kcal:c.kcal,protein:c.protein+'g',code:c.code,note:''}));
+  const payload={customer_id:CID,items:orderCart,subtotal:t.sub,vat:t.vat,total:t.sub+t.vat,
+    payment_method:payMethod,meal_date:new Date().toISOString().slice(0,10),note:'Signature Meal Order · '+payMethod};
+  // hand off to order.html (it re-confirms + does delivery/payment), and save now
+  localStorage.setItem('sar_cart',JSON.stringify(orderCart));
+  localStorage.setItem('sar_order_payload',JSON.stringify(payload));
+  try{const r=await api('placeOrder',payload);if(r&&r.ok&&r.order&&r.order.id){localStorage.setItem('sar_last_order_id',r.order.id);}}catch(e){}
+  localStorage.removeItem('sar_sig_cart');cart=[];updateCount();
+  toast('✓ Order সংরক্ষিত — পেমেন্ট পেজে নিয়ে যাচ্ছি');
+  setTimeout(()=>window.location.href='order.html',800);
 }
-function resetAll(){step=0;orderId=null;closeOrder();}
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2600);}
 
 catTabs();mealTabs();render();updateCount();
