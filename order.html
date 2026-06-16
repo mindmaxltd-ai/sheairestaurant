@@ -1555,7 +1555,7 @@ function selPM(el, method) {
 // ═══════════════════════════════════════
 async function processOrder() {
   const btn = document.getElementById('payOrderBtn');
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
   showLoader('অর্ডার প্রক্রিয়া করা হচ্ছে...');
 
   const {sub, del, vat, grand} = calcTotals();
@@ -1809,7 +1809,7 @@ async function processOrder() {
     }
 
     hideLoader();
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
 
     // Show success
     document.getElementById('orderIdDisplay').textContent = orderNum;
@@ -1827,8 +1827,8 @@ async function processOrder() {
 
   } catch (e) {
     hideLoader();
-    btn.disabled = false;
-    showMsg('m3', '❌ অর্ডার সমস্যা: ' + e.message, 'err');
+    if (btn) btn.disabled = false;
+    showMsg(_routeToInvoice ? 'm1' : 'm3', '❌ অর্ডার সমস্যা: ' + e.message, 'err');
     console.error(e);
   }
 }
