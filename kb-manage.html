@@ -40,6 +40,47 @@
 </head>
 <body>
 
+<div id="kbLogin" style="position:fixed;inset:0;z-index:9999;background:#faf7f5;
+  display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border:1px solid #eee;border-radius:16px;padding:32px;width:320px;max-width:90vw">
+    <h2 style="color:#D4537E;text-align:center;margin:0 0 4px">🔒 লগইন</h2>
+    <p style="text-align:center;color:#888;font-size:13px;margin:0 0 20px">Angeli Knowledge Base — শুধু অ্যাডমিন</p>
+    <input id="kbUser" type="text" placeholder="ইউজার আইডি"
+      style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-size:14px">
+    <input id="kbPass" type="password" placeholder="পাসওয়ার্ড"
+      onkeydown="if(event.key==='Enter')kbDoLogin()"
+      style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;font-size:14px">
+    <p id="kbErr" style="color:#e24b4a;font-size:13px;margin:0 0 10px;display:none"></p>
+    <button onclick="kbDoLogin()"
+      style="width:100%;background:#D4537E;color:#fff;border:none;border-radius:8px;padding:11px;font-size:15px;font-weight:600;cursor:pointer">প্রবেশ করুন</button>
+  </div>
+</div>
+
+<script>
+var KB_CREDS = [
+  { user:'tutul',         pass:'aimthm@2008', name:'Tutul (Super Admin)' },
+  { user:'sar_dietitian', pass:'sar2024',      name:'SAR ডায়েটিশিয়ান' },
+  { user:'sar_nutrition', pass:'sar2024',      name:'SAR নিউট্রিশনিস্ট' },
+];
+function kbDoLogin(){
+  var u = (document.getElementById('kbUser').value||'').trim();
+  var p = document.getElementById('kbPass').value||'';
+  var err = document.getElementById('kbErr');
+  var found = KB_CREDS.find(function(c){ return c.user===u && c.pass===p; });
+  if(found){
+    sessionStorage.setItem('sar_admin', JSON.stringify(found));
+    document.getElementById('kbLogin').style.display='none';
+  } else {
+    err.textContent = '❌ ভুল ইউজার আইডি বা পাসওয়ার্ড।';
+    err.style.display='block';
+    document.getElementById('kbPass').value='';
+  }
+}
+if(sessionStorage.getItem('sar_admin')){
+  document.getElementById('kbLogin').style.display='none';
+}
+</script>
+
 <h1>🌸 Angeli — Knowledge Base ব্যবস্থাপনা</h1>
 <p class="small">Angeli এখন যা জানে তার তালিকা। ভুল তথ্য থাকলে এখান থেকে মুছে ফেলতে পারেন।
 নতুন তথ্য যোগ করতে → <a href="/kb-upload.html">আপলোড পেজে যান</a></p>
