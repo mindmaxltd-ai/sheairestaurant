@@ -12,6 +12,18 @@
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xlkrggspepnysbouatec.supabase.co';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 
+// ── SSLCommerz config (sandbox default; production env var দিয়ে override) ──
+const SSLC_STORE_ID  = process.env.SSLC_STORE_ID  || 'mindm6a3106b7b4ee1';
+const SSLC_STORE_PWD = process.env.SSLC_STORE_PWD || 'mindm6a3106b7b4ee1@ssl';
+const SSLC_IS_LIVE   = process.env.SSLC_IS_LIVE === 'true'; // false = sandbox
+const SSLC_API = SSLC_IS_LIVE
+  ? 'https://securepay.sslcommerz.com/gwprocess/v4/api.php'
+  : 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php';
+const SSLC_VALIDATE = SSLC_IS_LIVE
+  ? 'https://securepay.sslcommerz.com/validator/api/validationserverAPI.php'
+  : 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php';
+const SITE_URL = process.env.SITE_URL || 'https://sheairestaurant.com';
+
 const SB = {
   apikey: SERVICE_KEY,
   Authorization: 'Bearer ' + SERVICE_KEY,
@@ -145,6 +157,73 @@ exports.handler = async (event) => {
 
         await sbUpdate('invoices', `id=eq.${enc(inv.id)}`, { status: 'PROCESSING', updated_at: new Date().toISOString() });
         return reply(200, { ok: true, payment, transaction_id: txnId });
+      }
+
+      // ══════════════════════════════════════════════════════
+      // 3b. createSession — SSLCommerz hosted page session তৈরি
+      //     body: { invoice_id, transaction_id, customer? }
+      //     returns: { ok, GatewayPageURL }
+      // ══════════════════════════════════════════════════════
+      case 'createSession': {
+        if (!p.invoice_id || !p.transaction_id)
+          return reply(400, { error: 'invoice_id ও transaction_id লাগবে' });
+
+        const inv = (await sbSelect('invoices', `id=eq.${enc(p.invoice_id)}&select=*&limit=1`))[0];
+        if (!inv) return reply(404, { ok: false, error: 'Invoice not found' });
+
+        const cust = p.customer || {};
+        const meta = inv.meta_json || {};
+
+        // SSLCommerz form-encoded payload
+        const form = {
+          store_id:     SSLC_STORE_ID,
+          store_passwd: SSLC_STORE_PWD,
+          total_amount: Number(inv.total_amount).toFixed(2),
+          currency:     'BDT',
+          tran_id:      p.transaction_id,
+          // gateway → এই URL-গুলোতে গ্রাহককে ফেরত পাঠাবে
+          success_url:  `${SITE_URL}/.netlify/functions/payment-webhook?redirect=success`,
+          fail_url:     `${SITE_URL}/.netlify/functions/payment-webhook?redirect=fail`,
+          cancel_url:   `${SITE_URL}/invoice.html?inv=${enc(inv.invoice_number)}`,
+          ipn_url:      `${SITE_URL}/.netlify/functions/payment-webhook`,
+          // গ্রাহক তথ্য
+          cus_name:  cust.full_name || 'SAR গ্রাহক',
+          cus_email: cust.email || 'guest@sheairestaurant.com',
+          cus_phone: cust.phone || '01700000000',
+          cus_add1:  meta.delivery_address || 'Dhaka',
+          cus_city:  'Dhaka',
+          cus_country: 'Bangladesh',
+          // পণ্য তথ্য (SSLCommerz এগুলো বাধ্যতামূলক করে)
+          shipping_method: meta.order_type === 'delivery' ? 'Courier' : 'NO',
+          product_name:    'SAR Meal Order',
+          product_category: 'Food',
+          product_profile: 'general',
+          num_of_item: (meta.items || []).length || 1,
+          value_a: inv.invoice_number,   // আমাদের রেফারেন্স (webhook-এ ফেরত আসবে)
+          value_b: inv.id,
+        };
+
+        const body = new URLSearchParams(form).toString();
+        let sslRes;
+        try {
+          const r = await fetch(SSLC_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+          });
+          sslRes = await r.json();
+        } catch (e) {
+          return reply(502, { ok: false, error: 'SSLCommerz সংযোগ ব্যর্থ: ' + e.message });
+        }
+
+        if (sslRes.status === 'SUCCESS' && sslRes.GatewayPageURL) {
+          // session id সংরক্ষণ (পরে validate করার জন্য)
+          await sbUpdate('payments', `transaction_id=eq.${enc(p.transaction_id)}`, {
+            gateway_response_json: { sessionkey: sslRes.sessionkey, gateway: 'sslcommerz', created_at: new Date().toISOString() },
+          }).catch(() => {});
+          return reply(200, { ok: true, GatewayPageURL: sslRes.GatewayPageURL, sessionkey: sslRes.sessionkey });
+        }
+        return reply(400, { ok: false, error: sslRes.failedreason || 'SSLCommerz session তৈরি হয়নি', raw: sslRes });
       }
 
       // ══════════════════════════════════════════════════════
