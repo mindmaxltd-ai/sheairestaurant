@@ -254,6 +254,7 @@ function setStatus(m,c){ const s=$('status'); if(!m){s.classList.remove('show');
 const OTYPE_BN={dine_in:'🪑 ডাইন-ইন',delivery:'🛵 ডেলিভারি',takeaway:'🥡 টেকঅ্যাওয়ে'};
 const MEAL_BN={breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
 const REDIRECT=['sslcommerz','visa','mastercard','amex','internet_banking'];
+const MOBILE=['bkash','nagad','rocket','upay'];
 
 async function load(){
   if(!INVOICE_ID && !INVOICE_NO){ fail('কোনো ইনভয়েস নির্দিষ্ট করা হয়নি।'); return; }
@@ -338,6 +339,13 @@ async function payNow(){
     return;
   }
 
+  // ── মোবাইল ব্যাংকিং: নিজস্ব নম্বরে Send Money পেজে পাঠাই (এখানে রেকর্ড তৈরি নয়) ──
+  if(MOBILE.includes(selMethod)){
+    const ref = _invoice.invoice_number ? `inv=${encodeURIComponent(_invoice.invoice_number)}` : `id=${_invoice.id}`;
+    location.href = `mobile-payment.html?${ref}&gw=${selMethod}`;
+    return;
+  }
+
   setStatus('⏳ পেমেন্ট প্রস্তুত হচ্ছে...', 's-wait');
   try{
     const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:selMethod});
@@ -364,9 +372,9 @@ async function payNow(){
       }
       return;
     }
-    // mobile banking: manual verify (admin/webhook)
+    // অন্য কোনো পদ্ধতি (fallback): admin যাচাইয়ের জন্য PENDING
     await api({action:'verifyPayment', invoice_id:_invoice.id, transaction_id:txn, customer_id:CID, paid_amount:_invoice.total_amount, auto:false});
-    setStatus('✅ অনুরোধ জমা হয়েছে! যাচাইয়ের পর রিসিট পাবেন। রিসিট পেজে নিয়ে যাওয়া হচ্ছে...', 's-ok');
+    setStatus('✅ অনুরোধ জমা হয়েছে! অ্যাডমিন যাচাইয়ের পর রিসিট পাবেন। রিসিট পেজে নিয়ে যাওয়া হচ্ছে...', 's-ok');
     setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1600);
   }catch(e){ setStatus('❌ '+e.message,'s-err'); btn.disabled=false; }
 }
