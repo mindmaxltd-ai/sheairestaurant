@@ -253,8 +253,9 @@ function setStatus(m,c){ const s=$('status'); if(!m){s.classList.remove('show');
 
 const OTYPE_BN={dine_in:'🪑 ডাইন-ইন',delivery:'🛵 ডেলিভারি',takeaway:'🥡 টেকঅ্যাওয়ে'};
 const MEAL_BN={breakfast:'সকাল',lunch:'দুপুর',dinner:'রাত'};
-const REDIRECT=['sslcommerz','visa','mastercard','amex','internet_banking'];
-const MOBILE=['bkash','nagad','rocket','upay'];
+// মোবাইল ব্যাংকিংও SSLCommerz gateway দিয়ে (স্বয়ংক্রিয় যাচাই)
+const REDIRECT=['sslcommerz','visa','mastercard','amex','internet_banking','bkash','nagad','rocket','upay'];
+const MOBILE=[]; // আর আলাদা Send Money পেজ নয়
 
 async function load(){
   if(!INVOICE_ID && !INVOICE_NO){ fail('কোনো ইনভয়েস নির্দিষ্ট করা হয়নি।'); return; }
@@ -361,6 +362,7 @@ async function payNow(){
         action:'createSession',
         invoice_id:_invoice.id,
         transaction_id:txn,
+        gateway:selMethod,
         customer:{ full_name:CNAME, phone:(_sc.phone||''), email:(_sc.email||'') }
       });
       if(ss.ok && ss.GatewayPageURL){
