@@ -210,6 +210,14 @@ exports.handler = async (event) => {
           value_b: inv.id,
         };
 
+        // গ্রাহকের বাছাই করা মাধ্যম সরাসরি খোলে (multi_card_name)
+        const GW_MAP = {
+          bkash:'bkash', nagad:'nagad', rocket:'dbblmobilebanking', upay:'upay',
+          visa:'visacard', mastercard:'mastercard', amex:'amexcard',
+          internet_banking:'ibbl',  // উদাহরণ; খালি রাখলে সব অপশন দেখাবে
+        };
+        if (p.gateway && GW_MAP[p.gateway]) form.multi_card_name = GW_MAP[p.gateway];
+
         const body = new URLSearchParams(form).toString();
         let sslRes;
         try {
@@ -310,14 +318,33 @@ exports.handler = async (event) => {
       //    body: { transaction_id } বা { receipt_number }
       // ══════════════════════════════════════════════════════
       case 'getReceipt': {
-        let q;
-        if (p.transaction_id)      q = `transaction_id=eq.${enc(p.transaction_id)}`;
-        else if (p.receipt_number) q = `receipt_number=eq.${enc(p.receipt_number)}`;
-        else return reply(400, { error: 'transaction_id or receipt_number required' });
+        // txn / receipt_number / invoice_number — যেকোনো একটি দিয়ে খোঁজা যায়
+        let payment = null, invoice = null, receipt = null;
 
-        const rows = await sbSelect('payment_receipts', `${q}&select=*&limit=1`);
-        if (!rows.length) return reply(404, { ok: false, error: 'Receipt not found' });
-        return reply(200, { ok: true, receipt: rows[0] });
+        if (p.transaction_id) {
+          payment = (await sbSelect('payments', `transaction_id=eq.${enc(p.transaction_id)}&select=*&order=created_at.desc&limit=1`))[0] || null;
+        }
+        if (!payment && p.receipt_number) {
+          receipt = (await sbSelect('payment_receipts', `receipt_number=eq.${enc(p.receipt_number)}&select=*&limit=1`))[0] || null;
+          if (receipt && receipt.transaction_id)
+            payment = (await sbSelect('payments', `transaction_id=eq.${enc(receipt.transaction_id)}&select=*&limit=1`))[0] || null;
+        }
+        if (!payment && p.invoice_number) {
+          invoice = (await sbSelect('invoices', `invoice_number=eq.${enc(p.invoice_number)}&select=*&limit=1`))[0] || null;
+          if (invoice)
+            payment = (await sbSelect('payments', `invoice_id=eq.${enc(invoice.id)}&select=*&order=created_at.desc&limit=1`))[0] || null;
+        }
+
+        // payment থেকে invoice + receipt পূরণ
+        if (payment && !invoice && payment.invoice_id)
+          invoice = (await sbSelect('invoices', `id=eq.${enc(payment.invoice_id)}&select=*&limit=1`))[0] || null;
+        if (payment && !receipt)
+          receipt = (await sbSelect('payment_receipts', `transaction_id=eq.${enc(payment.transaction_id)}&select=*&limit=1`))[0] || null;
+
+        if (!payment && !invoice && !receipt)
+          return reply(404, { ok: false, error: 'Not found' });
+
+        return reply(200, { ok: true, payment, invoice, receipt });
       }
 
       // ══════════════════════════════════════════════════════
