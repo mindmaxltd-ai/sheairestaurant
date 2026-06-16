@@ -141,7 +141,7 @@ exports.handler = async (event) => {
         const row = {
           customer_id:   inv.customer_id,
           invoice_id:    inv.id,
-          payment_type:  inv.type.toLowerCase(),
+          payment_type:  (inv.type || 'meal_order').toLowerCase(),
           gateway:       p.gateway || 'manual',
           payment_method: p.gateway || 'manual',
           amount:        inv.amount,
@@ -152,7 +152,7 @@ exports.handler = async (event) => {
           gateway_response_json: { gateway: p.gateway, started_at: new Date().toISOString() },
         };
         const res = await sbInsert('payments', row);
-        if (!res.ok) return reply(400, { ok: false, error: res.data });
+        if (!res.ok) return reply(400, { ok: false, error: res.data, detail: 'payments insert failed' });
         const payment = Array.isArray(res.data) ? res.data[0] : res.data;
 
         await sbUpdate('invoices', `id=eq.${enc(inv.id)}`, { status: 'PROCESSING', updated_at: new Date().toISOString() });
@@ -195,6 +195,13 @@ exports.handler = async (event) => {
           cus_country: 'Bangladesh',
           // পণ্য তথ্য (SSLCommerz এগুলো বাধ্যতামূলক করে)
           shipping_method: meta.order_type === 'delivery' ? 'Courier' : 'NO',
+          // shipping_method='Courier' হলে নিচের ship_* ফিল্ডগুলো বাধ্যতামূলক
+          ship_name:     cust.full_name || 'SAR গ্রাহক',
+          ship_add1:     meta.delivery_address || 'Dhaka',
+          ship_city:     'Dhaka',
+          ship_state:    'Dhaka',
+          ship_postcode: '1200',
+          ship_country:  'Bangladesh',
           product_name:    'SAR Meal Order',
           product_category: 'Food',
           product_profile: 'general',
