@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>মোবাইল ব্যাংকিং পেমেন্ট — SAR She AI Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Playfair+Display:wght@600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#E91E8C;--rose2:#FF6BB5;--plum:#880E4F;--plum2:#C2185B;
+  --purple:#6B21A8;--orange:#E8821E;--orange-d:#C06410;
+  --ink:#241018;--ink2:#7A6068;--paper:#FFF4FA;--paper2:#FFEAF4;
+  --line:#F6C9DF;--line2:#EBA9C6;--rule:#E7B7CF;
+  --red:#C30B2E;--inkgreen:#147A3A;
+  --grad:linear-gradient(135deg,var(--rose),var(--orange));
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Hind Siliguri',sans-serif;background:#15101A;color:#fff;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;padding:1.1rem .8rem 3rem;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 12% -5%,rgba(233,30,140,.10),transparent 60%),
+             radial-gradient(500px 380px at 92% 8%,rgba(232,130,30,.10),transparent 55%)}
+.bar{position:relative;z-index:5;width:100%;max-width:150mm;display:flex;justify-content:space-between;
+  align-items:center;margin-bottom:1rem}
+.brand{display:flex;align-items:center;gap:.55rem;text-decoration:none}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--grad);
+  display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.85rem}
+.brand-txt{font-family:'Playfair Display',serif;font-size:1rem;
+  background:linear-gradient(90deg,var(--rose2),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-txt small{display:block;font-family:'Hind Siliguri';font-size:.56rem;letter-spacing:.14em;color:rgba(255,255,255,.4);text-transform:uppercase}
+
+.sheet{position:relative;z-index:5;width:150mm;max-width:100%;background:var(--paper);color:var(--ink);
+  border-radius:14px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.head{background:var(--grad);color:#fff;padding:16px 18px;text-align:center}
+.head .ttl{font-family:'Playfair Display',serif;font-size:18px;font-weight:800}
+.head .amt{font-family:'Space Mono';font-size:26px;font-weight:700;margin-top:4px}
+.head .inv{font-size:11px;opacity:.9;margin-top:2px}
+.pad{padding:16px 18px 18px}
+
+.gw-pick{display:flex;gap:8px;margin-bottom:14px}
+.gw{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:9px 4px;text-align:center;cursor:pointer;background:#fff;transition:.15s}
+.gw.sel{border-color:var(--rose);background:var(--paper2);box-shadow:0 0 0 2px var(--paper2)}
+.gw .nm{font-weight:800;font-size:13px}
+.gw.bkash .nm{color:#E2136E}.gw.nagad .nm{color:#EE7C1B}.gw.rocket .nm{color:#8B2A8B}.gw.upay .nm{color:#E63946}
+
+.steps{counter-reset:s;margin-bottom:14px}
+.stp{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--rule)}
+.stp:last-child{border-bottom:0}
+.stp .n{counter-increment:s;flex:none;width:24px;height:24px;border-radius:50%;background:var(--grad);color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:12px;font-family:'Space Mono'}
+.stp .n::before{content:counter(s)}
+.stp .tx{font-size:12.5px;line-height:1.5}
+.stp .tx b{color:var(--plum)}
+
+.numbox{background:var(--paper2);border:1px dashed var(--line2);border-radius:10px;padding:11px 13px;margin:6px 0;
+  display:flex;justify-content:space-between;align-items:center;gap:8px}
+.numbox .lbl{font-size:11px;color:var(--ink2)}
+.numbox .val{font-family:'Space Mono';font-size:17px;font-weight:700;color:var(--plum)}
+.copy{background:var(--grad);color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.fld input{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;color:var(--ink);background:#fff}
+.fld input:focus{outline:none;border-color:var(--rose)}
+.fld .hint{font-size:10.5px;color:var(--ink2);margin-top:3px}
+
+.pay{width:100%;padding:14px;border:none;border-radius:11px;cursor:pointer;color:#fff;margin-top:4px;
+  font-family:'Hind Siliguri';font-size:15px;font-weight:800;background:var(--grad);
+  box-shadow:0 8px 22px rgba(233,30,140,.3);transition:.15s}
+.pay:hover{transform:translateY(-2px)}
+.pay:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.note{text-align:center;font-size:11px;color:var(--ink2);margin-top:11px;line-height:1.6}
+.status{margin-top:11px;padding:11px;border-radius:9px;font-size:12.5px;display:none;text-align:center}
+.status.show{display:block}
+.s-wait{background:#FFF3DD;border:1px solid #F2C98A;color:var(--orange-d)}
+.s-ok{background:#E2F2EA;border:1px solid #A5D6B0;color:var(--inkgreen)}
+.s-err{background:#FCE8E8;border:1px solid #F0B4B4;color:var(--red)}
+
+.state{position:relative;z-index:5;text-align:center;padding:60px 20px;color:rgba(255,255,255,.7)}
+.spin{width:40px;height:40px;border:3px solid rgba(233,30,140,.2);border-top-color:var(--rose);
+  border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.skip{display:none}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a class="brand" href="order.html">
+    <span class="brand-mark">SAR</span>
+    <span class="brand-txt">She AI Restaurant<small>Mobile Payment</small></span>
+  </a>
+</div>
+
+<div id="loadingView" class="state"><div class="spin"></div>লোড হচ্ছে...</div>
+
+<div id="errorView" class="state skip">
+  <p id="errMsg" style="color:#FFB4B4">সমস্যা হয়েছে।</p>
+  <button class="pay" style="max-width:280px;margin:16px auto 0" onclick="location.href='order.html'">ফিরে যান</button>
+</div>
+
+<div id="payView" class="sheet skip">
+  <div class="head">
+    <div class="ttl">📱 মোবাইল ব্যাংকিং পেমেন্ট</div>
+    <div class="amt" id="hAmt">৳ ০</div>
+    <div class="inv" id="hInv">—</div>
+  </div>
+  <div class="pad">
+    <!-- gateway picker -->
+    <div class="gw-pick" id="gwPick"></div>
+
+    <div class="steps">
+      <div class="stp"><span class="n"></span><span class="tx">আপনার <b id="gwName">bKash</b> অ্যাপ খুলে <b>Send Money</b> করুন।</span></div>
+      <div class="stp"><span class="n"></span><span class="tx">নিচের নম্বরে ঠিক <b id="sAmt">৳০</b> পাঠান:
+        <div class="numbox"><span><span class="lbl">নম্বর</span><br><span class="val" id="payNumber">01346098892</span></span>
+          <button class="copy" onclick="copyNum()">📋 কপি</button></div>
+      </span></div>
+      <div class="stp"><span class="n"></span><span class="tx">পাঠানোর পর যে <b>Transaction ID (TrxID)</b> পাবেন, সেটি নিচে লিখুন।</span></div>
+    </div>
+
+    <div class="fld">
+      <label>Transaction ID (TrxID)</label>
+      <input type="text" id="trxId" placeholder="যেমন: 9ABC1D2E3F" maxlength="40" oninput="checkForm()">
+      <div class="hint">যে নম্বর থেকে পাঠিয়েছেন তার শেষ অংশ নয় — অ্যাপে পাওয়া TrxID দিন।</div>
+    </div>
+    <div class="fld">
+      <label>যে নম্বর থেকে পাঠিয়েছেন</label>
+      <input type="text" id="senderNo" placeholder="01XXXXXXXXX" maxlength="11" oninput="checkForm()">
+    </div>
+
+    <button class="pay" id="submitBtn" onclick="submitPayment()" disabled>✅ পেমেন্ট জমা দিন</button>
+    <div class="note">💡 জমা দেওয়ার পর আপনার পেমেন্ট <b>যাচাইয়ের জন্য</b> পাঠানো হবে। অ্যাডমিন নিশ্চিত করলে রিসিট পাকা হবে।</div>
+    <div class="status" id="status"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// ⚙️ এখানে আপনার Send Money নম্বরগুলো বসান (পরে সহজে বদলানো যাবে)
+// ════════════════════════════════════════════════════
+const PAY_NUMBERS = {
+  bkash:  { label:'bKash',  number:'01346098892', type:'Personal' },
+  nagad:  { label:'Nagad',  number:'01346098892', type:'Personal' },
+  rocket: { label:'Rocket', number:'01346098892', type:'Personal' },
+  upay:   { label:'Upay',   number:'01346098892', type:'Personal' },
+};
+// ════════════════════════════════════════════════════
+
+const FN = '/.netlify/functions/payment';
+const params = new URLSearchParams(location.search);
+const INVOICE_ID = params.get('id');
+const INVOICE_NO = params.get('inv');
+let GATEWAY = params.get('gw') || 'bkash';
+
+const _sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+const CID = _sc.id || localStorage.getItem('sar_customer_id');
+
+let _invoice=null, _txn=null;
+const $=id=>document.getElementById(id);
+const bn=n=>Number(n||0).toLocaleString('bn-BD');
+const taka=n=>'৳ '+bn(n);
+async function api(b){const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return r.json();}
+function show(v){['loadingView','errorView','payView'].forEach(x=>$(x).classList.add('skip'));$(v).classList.remove('skip');}
+function fail(m){$('errMsg').textContent=m;show('errorView');}
+function setStatus(m,c){const s=$('status');if(!m){s.classList.remove('show');return;}s.className='status show '+(c||'');s.textContent=m;}
+
+async function load(){
+  if(!INVOICE_ID && !INVOICE_NO){ fail('কোনো ইনভয়েস নির্দিষ্ট নেই।'); return; }
+  try{
+    const res=await api({action:'getInvoice', ...(INVOICE_ID?{invoice_id:INVOICE_ID}:{invoice_number:INVOICE_NO})});
+    if(!res.ok||!res.invoice){ fail('ইনভয়েস পাওয়া যায়নি।'); return; }
+    _invoice=res.invoice;
+    if(_invoice.status==='SUCCESS'){ location.href=`receipt.html?inv=${_invoice.invoice_number}`; return; }
+    render();
+  }catch(e){ fail('সংযোগ সমস্যা: '+e.message); }
+}
+
+function render(){
+  $('hAmt').textContent=taka(_invoice.total_amount);
+  $('sAmt').textContent=taka(_invoice.total_amount);
+  $('hInv').textContent='ইনভয়েস: '+(_invoice.invoice_number||'—');
+  // gateway picker
+  $('gwPick').innerHTML = Object.keys(PAY_NUMBERS).map(g=>
+    `<div class="gw ${g} ${g===GATEWAY?'sel':''}" onclick="pickGw('${g}')"><div class="nm">${PAY_NUMBERS[g].label}</div></div>`
+  ).join('');
+  applyGw();
+  show('payView');
+}
+function pickGw(g){ GATEWAY=g; document.querySelectorAll('.gw').forEach(x=>x.classList.toggle('sel',x.classList.contains(g))); applyGw(); }
+function applyGw(){
+  const info=PAY_NUMBERS[GATEWAY];
+  $('gwName').textContent=info.label;
+  $('payNumber').textContent=info.number;
+}
+function copyNum(){ navigator.clipboard?.writeText(PAY_NUMBERS[GATEWAY].number); setStatus('📋 নম্বর কপি হয়েছে!','s-ok'); setTimeout(()=>setStatus(''),1500); }
+function checkForm(){
+  const trx=$('trxId').value.trim(), snd=$('senderNo').value.trim();
+  $('submitBtn').disabled = !(trx.length>=4 && /^01[3-9]\d{8}$/.test(snd));
+}
+
+async function submitPayment(){
+  const trx=$('trxId').value.trim(), snd=$('senderNo').value.trim();
+  const btn=$('submitBtn'); btn.disabled=true;
+  setStatus('⏳ জমা হচ্ছে...','s-wait');
+  try{
+    // 1. payment record (PROCESSING) — gateway = mobile method
+    const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:GATEWAY});
+    if(!pr.ok){ throw new Error(pr.detail||(pr.error&&pr.error.message)||pr.error||'রেকর্ড তৈরি হয়নি'); }
+    _txn=pr.transaction_id;
+    // 2. submit TrxID for admin verification (auto:false → PENDING, admin verify)
+    await api({action:'verifyPayment', invoice_id:_invoice.id, transaction_id:_txn, customer_id:CID,
+               paid_amount:_invoice.total_amount, auto:false,
+               gateway_txn_id:trx, sender_number:snd});
+    setStatus('✅ পেমেন্ট জমা হয়েছে! অ্যাডমিন যাচাইয়ের পর রিসিট পাকা হবে। রিসিটে নিয়ে যাওয়া হচ্ছে...','s-ok');
+    setTimeout(()=>location.href=`receipt.html?txn=${_txn}`,1900);
+  }catch(e){ setStatus('❌ '+e.message,'s-err'); btn.disabled=false; }
+}
+
+load();
+</script>
+</body>
+</html>
