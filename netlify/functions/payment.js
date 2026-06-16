@@ -267,6 +267,11 @@ exports.handler = async (event) => {
           verification_status: verified ? 'VERIFIED' : 'UNVERIFIED',
           verified_at: verified ? new Date().toISOString() : null,
           verified_by: verified ? (p.verified_by || 'system') : null,
+          gateway_response_json: {
+            ...(pay.gateway_response_json || {}),
+            ...(p.sender_number ? { sender_number: p.sender_number } : {}),
+            ...(p.gateway_txn_id ? { customer_trxid: p.gateway_txn_id } : {}),
+          },
         };
         await sbUpdate('payments', `id=eq.${enc(pay.id)}`, upd);
 
