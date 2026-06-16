@@ -1596,14 +1596,14 @@ async function processOrder() {
         order_number: orderNum,
         customer_id: CID,
         order_type: orderType,
-        status: 'confirmed',
+        status: (payMethod === 'cash' || payMethod === 'cod') ? 'confirmed' : 'pending_payment',
         items_json: itemsJson,
         subtotal: sub,
         tax: vat,
         delivery_fee: del,
         total_amount: grand,
         payment_method: payMethod,
-        payment_status: payMethod === 'cash' ? 'pending' : 'paid',
+        payment_status: 'pending',
         payment_transaction_id: txnId,
         special_instructions: fullInstructions || null,
         table_number: tbl || null,
@@ -1703,29 +1703,34 @@ async function processOrder() {
       })
     });
 
-    // 4. Kitchen display entry
-    showLoader('রান্নাঘরে পাঠানো হচ্ছে...');
-    await fetch(`${SUPA}/rest/v1/kitchen_display`, {
-      method: 'POST', headers: H,
-      body: JSON.stringify({
-        order_id: order.id, station: 'hot',
-        status: 'queued', priority_level: 'normal'
-      })
-    });
-    // Also write to kitchen_orders (new table)
-    await fetch(`${SUPA}/rest/v1/kitchen_orders`, {
-      method: 'POST',
-      headers: { ...H, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        order_id:      order.id,
-        order_number:  orderNum,
-        customer_id:   CID,
-        customer_name: CNAME,
-        items_json:    itemsJson,
-        status:        'pending',
-        expires_at:    new Date(Date.now() + 7*24*60*60*1000).toISOString()
-      })
-    }).catch(() => {}); // non-critical
+    // 4. Kitchen display entry — শুধু COD/ক্যাশ হলে এখনই পাঠাই।
+    //    অনলাইন পেমেন্টে (গেটওয়ে/মোবাইল) পেমেন্ট verify হলে তবেই
+    //    payment.js/webhook থেকে kitchen-এ যাবে — তার আগে নয়।
+    const _isCashOrder = (payMethod === 'cash' || payMethod === 'cod');
+    if (_isCashOrder) {
+      showLoader('রান্নাঘরে পাঠানো হচ্ছে...');
+      await fetch(`${SUPA}/rest/v1/kitchen_display`, {
+        method: 'POST', headers: H,
+        body: JSON.stringify({
+          order_id: order.id, station: 'hot',
+          status: 'queued', priority_level: 'normal'
+        })
+      }).catch(() => {});
+      // Also write to kitchen_orders (new table)
+      await fetch(`${SUPA}/rest/v1/kitchen_orders`, {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({
+          order_id:      order.id,
+          order_number:  orderNum,
+          customer_id:   CID,
+          customer_name: CNAME,
+          items_json:    itemsJson,
+          status:        'pending',
+          expires_at:    new Date(Date.now() + 7*24*60*60*1000).toISOString()
+        })
+      }).catch(() => {}); // non-critical
+    }
 
     // 5. Notification log
     await fetch(`${SUPA}/rest/v1/notifications_log`, {
