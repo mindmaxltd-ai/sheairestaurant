@@ -16,13 +16,21 @@
   // ভাষা অনুযায়ী লেবেল ও voice কোড
   var L = {
     bn: { name: 'Angeli', hi: 'নমস্কার! আমি Angeli 🌸 SAR সম্পর্কে যা জানতে চান জিজ্ঞেস করুন।',
-          ph: 'লিখুন অথবা মাইক চাপুন...', voice: 'bn-BD', online: 'অনলাইন' },
+          ph: 'লিখুন অথবা মাইক চাপুন...', voice: 'bn-BD', online: 'অনলাইন',
+          micDenied: 'মাইকের অনুমতি দেওয়া হয়নি। ব্রাউজারের ঠিকানা-বারে 🔒 চিহ্নে ক্লিক করে মাইক চালু করুন, অথবা লিখে জিজ্ঞেস করুন।',
+          micErr: 'মাইকে সমস্যা হলো। আবার চেষ্টা করুন বা লিখুন।', listening: '🎙️ শুনছি...' },
     en: { name: 'Angeli', hi: "Hello! I'm Angeli. Ask me anything about SAR.",
-          ph: 'Type or tap the mic...', voice: 'en-US', online: 'Online' },
+          ph: 'Type or tap the mic...', voice: 'en-US', online: 'Online',
+          micDenied: 'Microphone permission was denied. Click the 🔒 icon in the address bar to allow it, or just type your question.',
+          micErr: 'Mic had a problem. Please try again or type.', listening: '🎙️ Listening...' },
     hi: { name: 'Angeli', hi: 'नमस्ते! मैं Angeli हूँ। SAR के बारे में पूछिए।',
-          ph: 'लिखें या माइक दबाएँ...', voice: 'hi-IN', online: 'ऑनलाइन' },
+          ph: 'लिखें या माइक दबाएँ...', voice: 'hi-IN', online: 'ऑनलाइन',
+          micDenied: 'माइक की अनुमति नहीं दी गई। पता-बार में 🔒 पर क्लिक करके माइक चालू करें, या लिखकर पूछें।',
+          micErr: 'माइक में समस्या हुई। फिर कोशिश करें या लिखें।', listening: '🎙️ सुन रही हूँ...' },
     ar: { name: 'Angeli', hi: 'مرحبا! أنا Angeli. اسألني عن SAR.',
-          ph: 'اكتب أو اضغط الميكروفون...', voice: 'ar-SA', online: 'متصل' },
+          ph: 'اكتب أو اضغط الميكروفون...', voice: 'ar-SA', online: 'متصل',
+          micDenied: 'لم يتم منح إذن الميكروفون. انقر على 🔒 في شريط العنوان للسماح، أو اكتب سؤالك.',
+          micErr: 'حدثت مشكلة في الميكروفون. حاول مرة أخرى أو اكتب.', listening: '🎙️ أستمع...' },
   };
 
   var lang = 'bn';
@@ -127,6 +135,7 @@
   function speak(text) {
     if (!('speechSynthesis' in window)) return;
     try {
+      speechSynthesis.cancel();   // আগের কথা থামাও, যেন একসাথে দুটো না বাজে
       var u = new SpeechSynthesisUtterance(text);
       u.lang = L[lang].voice;
       speechSynthesis.speak(u);
@@ -179,9 +188,18 @@
       var said = e.results[0][0].transcript;
       send(said, 'verbal');
     };
+    r.onerror = function (e) {
+      recognizing = false;
+      win.querySelector('#ang-mic').classList.remove('rec');
+      input.placeholder = L[lang].ph;
+      var msg = (e && (e.error === 'not-allowed' || e.error === 'service-not-allowed'))
+        ? L[lang].micDenied : L[lang].micErr;
+      addMsg(msg, 'angeli');
+    };
     r.onend = function () {
       recognizing = false;
       win.querySelector('#ang-mic').classList.remove('rec');
+      input.placeholder = L[lang].ph;
     };
     return r;
   }
@@ -197,6 +215,7 @@
     recog.lang = L[lang].voice;
     recognizing = true;
     win.querySelector('#ang-mic').classList.add('rec');
+    input.placeholder = L[lang].listening;
     try { recog.start(); } catch (e) {}
   }
 
