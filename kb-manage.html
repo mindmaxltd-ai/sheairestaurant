@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angeli Knowledge Base — তথ্য দেখুন ও মুছুন</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, 'Noto Sans Bengali', sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 24px;
+    background: #faf7f5; color: #2c2c2a; line-height: 1.6;
+  }
+  h1 { color: #D4537E; font-size: 22px; }
+  a { color: #D4537E; }
+  .card {
+    background: #fff; border: 1px solid #eee; border-radius: 12px;
+    padding: 20px; margin-bottom: 18px;
+  }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border-radius: 8px; margin-bottom: 8px; background: #fff; border: 1px solid #eee;
+  }
+  .row .info { flex: 1; }
+  .row .ttl { font-weight: 600; font-size: 14px; }
+  .row .meta { color: #888; font-size: 12px; }
+  .badge {
+    background: #fce8f0; color: #D4537E; border-radius: 20px;
+    padding: 2px 10px; font-size: 12px; font-weight: 600;
+  }
+  button.del {
+    background: #fff; color: #e24b4a; border: 1px solid #e24b4a;
+    border-radius: 8px; padding: 7px 14px; font-size: 13px; cursor: pointer;
+  }
+  button.del:hover { background: #e24b4a; color: #fff; }
+  .empty { text-align: center; color: #999; padding: 30px; }
+  .small { color: #888; font-size: 13px; }
+  .total { font-weight: 600; color: #1d9e75; }
+</style>
+</head>
+<body>
+
+<h1>🌸 Angeli — Knowledge Base ব্যবস্থাপনা</h1>
+<p class="small">Angeli এখন যা জানে তার তালিকা। ভুল তথ্য থাকলে এখান থেকে মুছে ফেলতে পারেন।
+নতুন তথ্য যোগ করতে → <a href="/kb-upload.html">আপলোড পেজে যান</a></p>
+
+<div class="card">
+  <p id="summary" class="small">লোড হচ্ছে...</p>
+  <div id="list"></div>
+</div>
+
+<script>
+const API = '/.netlify/functions/angeli';
+const listEl = document.getElementById('list');
+const sumEl  = document.getElementById('summary');
+
+// ── তালিকা লোড করা ─────────────────────────────────────────
+async function load() {
+  listEl.innerHTML = '';
+  sumEl.textContent = 'লোড হচ্ছে...';
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'kb_list' }),
+    });
+    const d = await r.json();
+    const files = d.files || [];
+
+    if (!files.length) {
+      sumEl.textContent = '';
+      listEl.innerHTML =
+        '<div class="empty">এখনো কোনো তথ্য নেই।<br>' +
+        '<a href="/kb-upload.html">প্রথম ফাইল আপলোড করুন</a></div>';
+      return;
+    }
+
+    sumEl.innerHTML = 'মোট <span class="total">' + files.length +
+      'টি ফাইল</span>, <span class="total">' + (d.total || 0) +
+      'টি টুকরো</span> — Angeli এসব থেকে উত্তর দেয়।';
+
+    for (const f of files) {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML =
+        '<div class="info">' +
+          '<div class="ttl">' + escapeHtml(f.title) + '</div>' +
+          '<div class="meta">' + (f.source || '?') + ' · ' + (f.lang || 'bn') + '</div>' +
+        '</div>' +
+        '<span class="badge">' + f.chunks + ' টুকরো</span>' +
+        '<button class="del">মুছুন</button>';
+      row.querySelector('.del').onclick = () => del(f.title, row);
+      listEl.appendChild(row);
+    }
+  } catch (e) {
+    sumEl.textContent = 'লোড করতে সমস্যা: ' + (e.message || e);
+  }
+}
+
+// ── একটি ফাইল মোছা ─────────────────────────────────────────
+async function del(title, row) {
+  if (!confirm('"' + title + '" এর সব তথ্য মুছে ফেলবেন? Angeli আর এটা জানবে না।')) return;
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'kb_delete', title: title }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    row.remove();
+    load();  // তালিকা নতুন করে গুনে দেখাও
+  } catch (e) {
+    alert('মুছতে সমস্যা: ' + (e.message || e));
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+load();
+</script>
+
+</body>
+</html>

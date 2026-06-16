@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angeli Knowledge Base — তথ্য আপলোড</title>
+
+<!-- PDF পড়ার লাইব্রেরি (pdf.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- Word (.docx) পড়ার লাইব্রেরি (mammoth.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, 'Noto Sans Bengali', sans-serif;
+    max-width: 760px; margin: 0 auto; padding: 24px;
+    background: #faf7f5; color: #2c2c2a; line-height: 1.6;
+  }
+  h1 { color: #D4537E; font-size: 22px; }
+  .card {
+    background: #fff; border: 1px solid #eee; border-radius: 12px;
+    padding: 20px; margin-bottom: 18px;
+  }
+  label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 14px; }
+  select, input[type=text] {
+    width: 100%; padding: 9px 12px; border: 1px solid #ddd;
+    border-radius: 8px; font-size: 14px; margin-bottom: 14px;
+  }
+  #drop {
+    border: 2px dashed #D4537E; border-radius: 12px; padding: 40px 20px;
+    text-align: center; color: #999; cursor: pointer; background: #fff;
+    transition: background .2s;
+  }
+  #drop.over { background: #fce8f0; color: #D4537E; }
+  #drop b { color: #D4537E; }
+  button {
+    background: #D4537E; color: #fff; border: none; border-radius: 8px;
+    padding: 11px 22px; font-size: 15px; cursor: pointer; font-weight: 600;
+  }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  #log {
+    margin-top: 16px; font-size: 13px; max-height: 280px; overflow-y: auto;
+  }
+  .row {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-radius: 8px; margin-bottom: 6px; background: #fff; border: 1px solid #eee;
+  }
+  .ok   { border-left: 4px solid #1d9e75; }
+  .err  { border-left: 4px solid #e24b4a; }
+  .work { border-left: 4px solid #ef9f27; }
+  .small { color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>🌸 Angeli — তথ্য আপলোড (Knowledge Base)</h1>
+<p class="small">এখানে SAR-এর PDF, Word (.docx) বা HTML ফাইল আপলোড করুন।
+Angeli এই তথ্য থেকেই কাস্টমারদের উত্তর দেবে।</p>
+
+<div class="card">
+  <label>তথ্য কোন ভাষায়?</label>
+  <select id="lang">
+    <option value="bn">বাংলা</option>
+    <option value="en">English</option>
+    <option value="hi">हिन्दी</option>
+    <option value="ar">العربية</option>
+  </select>
+
+  <label>উৎস টাইপ (নিজে নিজে শনাক্ত হবে, চাইলে বদলান)</label>
+  <select id="source">
+    <option value="pdf">PDF</option>
+    <option value="word">Word</option>
+    <option value="html">HTML</option>
+  </select>
+
+  <div id="drop">
+    📄 ফাইল এখানে <b>টেনে এনে ছাড়ুন</b><br>অথবা ক্লিক করে বেছে নিন<br>
+    <span class="small">(PDF, .docx, .html — একসাথে কয়েকটাও দিতে পারেন)</span>
+  </div>
+  <input type="file" id="file" accept=".pdf,.docx,.html,.htm,.txt" multiple hidden>
+</div>
+
+<div class="card">
+  <div id="log"></div>
+</div>
+
+<script>
+// আপনার Netlify function-এর ঠিকানা
+const API = '/.netlify/functions/angeli';
+
+const drop   = document.getElementById('drop');
+const fileEl = document.getElementById('file');
+const log    = document.getElementById('log');
+
+// ── টেনে আনা ও ক্লিক ───────────────────────────────────────
+drop.onclick = () => fileEl.click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => {
+  e.preventDefault(); drop.classList.remove('over');
+  handleFiles(e.dataTransfer.files);
+};
+fileEl.onchange = () => handleFiles(fileEl.files);
+
+// ── একটা লাইন log-এ দেখানো ─────────────────────────────────
+function addRow(text, cls) {
+  const d = document.createElement('div');
+  d.className = 'row ' + (cls || '');
+  d.innerHTML = text;
+  log.prepend(d);
+  return d;
+}
+
+// ── ফাইলগুলো একটা একটা করে প্রসেস করা ──────────────────────
+async function handleFiles(files) {
+  for (const f of files) {
+    const row = addRow('⏳ পড়া হচ্ছে: <b>' + f.name + '</b>', 'work');
+    try {
+      const text = await extractText(f);
+      if (!text || text.trim().length < 20) {
+        row.className = 'row err';
+        row.innerHTML = '⚠️ <b>' + f.name + '</b> — কোনো লেখা পাওয়া যায়নি';
+        continue;
+      }
+      const chunks = chunkText(text);
+      await sendChunks(chunks, f.name, detectSource(f));
+      row.className = 'row ok';
+      row.innerHTML = '✅ <b>' + f.name + '</b> — ' + chunks.length +
+        'টি টুকরো সেভ হয়েছে';
+    } catch (err) {
+      row.className = 'row err';
+      row.innerHTML = '❌ <b>' + f.name + '</b> — সমস্যা: ' + (err.message || err);
+    }
+  }
+}
+
+// ── উৎস টাইপ শনাক্ত ─────────────────────────────────────────
+function detectSource(f) {
+  const n = f.name.toLowerCase();
+  if (n.endsWith('.pdf')) return 'pdf';
+  if (n.endsWith('.docx')) return 'word';
+  if (n.endsWith('.html') || n.endsWith('.htm')) return 'html';
+  return document.getElementById('source').value;
+}
+
+// ── ফাইল থেকে টেক্সট বের করা ────────────────────────────────
+async function extractText(f) {
+  const n = f.name.toLowerCase();
+
+  // PDF
+  if (n.endsWith('.pdf')) {
+    const buf = await f.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let out = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      out += content.items.map(it => it.str).join(' ') + '\n';
+    }
+    return out;
+  }
+
+  // Word (.docx)
+  if (n.endsWith('.docx')) {
+    const buf = await f.arrayBuffer();
+    const res = await mammoth.extractRawText({ arrayBuffer: buf });
+    return res.value;
+  }
+
+  // HTML — ট্যাগ বাদ দিয়ে শুধু লেখা
+  if (n.endsWith('.html') || n.endsWith('.htm')) {
+    const html = await f.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    doc.querySelectorAll('script,style').forEach(e => e.remove());
+    return doc.body ? doc.body.innerText : doc.documentElement.innerText;
+  }
+
+  // সাধারণ টেক্সট
+  return await f.text();
+}
+
+// ── বড় লেখা ছোট টুকরোয় ভাগ (প্রায় ৫০০ অক্ষর করে) ──────────
+function chunkText(text) {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  const sentences = clean.split(/(?<=[।.!?])\s+/);  // বাংলা দাঁড়ি ও ইংরেজি দাঁড়ি
+  const chunks = [];
+  let cur = '';
+  for (const s of sentences) {
+    if ((cur + ' ' + s).length > 500) {
+      if (cur) chunks.push(cur.trim());
+      cur = s;
+    } else {
+      cur += ' ' + s;
+    }
+  }
+  if (cur.trim()) chunks.push(cur.trim());
+  return chunks;
+}
+
+// ── টুকরোগুলো angeli.js-এ পাঠানো ───────────────────────────
+async function sendChunks(chunks, title, source) {
+  const lang = document.getElementById('lang').value;
+  const r = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'add_knowledge',
+      chunks: chunks,
+      title: title,
+      source: source,
+      lang: lang,
+    }),
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error('সার্ভার: ' + t);
+  }
+}
+
+// ── PDF.js worker সেট ──────────────────────────────────────
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
+
+</body>
+</html>
