@@ -360,6 +360,7 @@ exports.handler = async (event) => {
         return reply(ok ? 200 : 400, { ok });
       }
 
+      case 'kitchenVerify': {
         const realId = String(p.id || '');
         const session = await K.validateSession(SUPABASE_URL, SB, p.token);
         if (!session) return reply(401, { ok: false, error: 'unauthorized' });
