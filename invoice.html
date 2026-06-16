@@ -326,7 +326,7 @@ async function payNow(){
     setStatus('⏳ অর্ডার নিশ্চিত হচ্ছে...', 's-wait');
     try{
       const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:'cod'});
-      if(!pr.ok) throw new Error('রেকর্ড তৈরি হয়নি।');
+      if(!pr.ok){ console.error('createPayment(cod) failed:', pr); throw new Error('রেকর্ড তৈরি হয়নি। (' + (pr.detail||(pr.error&&pr.error.message)||pr.error||'অজানা') + ')'); }
       const txn=pr.transaction_id;
       // auto-verify নয় — PENDING থাকবে, super admin প্যানেল থেকে যাচাই করবে
       const waitMsg = isDelivery
@@ -341,7 +341,7 @@ async function payNow(){
   setStatus('⏳ পেমেন্ট প্রস্তুত হচ্ছে...', 's-wait');
   try{
     const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:selMethod});
-    if(!pr.ok) throw new Error('পেমেন্ট রেকর্ড তৈরি হয়নি।');
+    if(!pr.ok){ console.error('createPayment failed:', pr); throw new Error('পেমেন্ট রেকর্ড তৈরি হয়নি। (' + (pr.detail||(pr.error&&pr.error.message)||pr.error||'অজানা') + ')'); }
     const txn=pr.transaction_id;
     localStorage.setItem('sar_pending_txn', txn);
 
