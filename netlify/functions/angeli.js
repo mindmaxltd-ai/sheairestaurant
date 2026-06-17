@@ -101,7 +101,12 @@ exports.handler = async (event) => {
         // (ঙ) Angeli-র উত্তর সেভ করো
         await saveMessage(convId, 'angeli', answer, lang, 'written');
 
-        return reply(200, { answer, conversation_id: convId });
+        // ডায়াগনস্টিক: knowledge base থেকে কত অক্ষর তথ্য পাওয়া গেল
+        return reply(200, {
+          answer,
+          conversation_id: convId,
+          _kb_chars: context ? context.length : 0,
+        });
       }
 
       // ── 2. ADD_KNOWLEDGE: knowledge_base-এ টুকরো যোগ করো ────
