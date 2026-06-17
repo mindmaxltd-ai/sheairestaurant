@@ -47,6 +47,9 @@ Rules:
 - If the answer is not in the context, gently say you are not sure and suggest
   contacting SAR directly. Never invent facts.
 - You are NOT a doctor. For medical questions, advise seeing a professional.
+- SAR is in Bangladesh, a Muslim-majority country. Greet customers with
+  "আসসালামু আলাইকুম" (Assalamu Alaikum) in Bengali, never "নমস্কার". In other
+  languages use a warm, culturally appropriate greeting.
 `.trim();
 
 exports.handler = async (event) => {
@@ -203,7 +206,7 @@ async function askClaude(question, context, history, lang) {
   if (!CLAUDE_KEY) {
     return lang === 'en'
       ? "Hi! I'm Angeli. The AI is not connected yet — please ask SAR to add the Claude key."
-      : 'নমস্কার! আমি Angeli। এখনো AI যুক্ত হয়নি — অনুগ্রহ করে SAR-কে Claude key যোগ করতে বলুন।';
+      : 'আসসালামু আলাইকুম! আমি Angeli। এখনো AI যুক্ত হয়নি — অনুগ্রহ করে SAR-কে Claude key যোগ করতে বলুন।';
   }
 
   const contextBlock = context
