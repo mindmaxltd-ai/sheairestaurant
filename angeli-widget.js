@@ -15,7 +15,7 @@
 
   // ভাষা অনুযায়ী লেবেল ও voice কোড
   var L = {
-    bn: { name: 'Angeli', hi: 'নমস্কার! আমি Angeli 🌸 SAR সম্পর্কে যা জানতে চান জিজ্ঞেস করুন।',
+    bn: { name: 'Angeli', hi: 'আসসালামু আলাইকুম! আমি Angeli 🌸 SAR সম্পর্কে যা জানতে চান জিজ্ঞেস করুন।',
           ph: 'লিখুন অথবা মাইক চাপুন...', voice: 'bn-BD', online: 'অনলাইন',
           micDenied: 'মাইকের অনুমতি দেওয়া হয়নি। ব্রাউজারের ঠিকানা-বারে 🔒 চিহ্নে ক্লিক করে মাইক চালু করুন, অথবা লিখে জিজ্ঞেস করুন।',
           micErr: 'মাইকে সমস্যা হলো। আবার চেষ্টা করুন বা লিখুন।', listening: '🎙️ শুনছি...' },
@@ -140,9 +140,22 @@
   function addMsg(text, who) {
     var d = document.createElement('div');
     d.className = 'ang-msg ' + (who === 'user' ? 'ang-u' : 'ang-a');
-    d.textContent = text;
+    if (who === 'user') {
+      d.textContent = text;            // কাস্টমারের লেখা — সাধারণ টেক্সট
+    } else {
+      d.innerHTML = formatAngeli(text); // Angeli-র উত্তর — বোল্ড ও নতুন লাইনসহ
+    }
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
+  }
+
+  // Angeli-র উত্তর সুন্দর করে দেখানো: HTML নিরাপদ করা, **বোল্ড**, নতুন লাইন
+  function formatAngeli(text) {
+    var safe = String(text)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // ক্ষতিকর কোড আটকাও
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>'); // **বোল্ড** → <b>বোল্ড</b>
+    safe = safe.replace(/\n/g, '<br>');                   // নতুন লাইন → <br>
+    return safe;
   }
 
   function showTyping() {
@@ -160,7 +173,9 @@
     if (!('speechSynthesis' in window)) return;
     try {
       speechSynthesis.cancel();   // আগের কথা থামাও, যেন একসাথে দুটো না বাজে
-      var u = new SpeechSynthesisUtterance(text);
+      // পড়ার আগে ** আর নতুন-লাইন চিহ্ন সরাও, যাতে "তারা" না বলে
+      var clean = String(text).replace(/\*\*/g, '').replace(/\n+/g, '. ');
+      var u = new SpeechSynthesisUtterance(clean);
       u.lang = L[lang].voice;
       u.onstart = function () { fab.classList.add('speaking'); };   // কথা শুরু → আইকন নড়ে
       u.onend   = function () { fab.classList.remove('speaking'); }; // কথা শেষ → থামে
