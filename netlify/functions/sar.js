@@ -748,7 +748,7 @@ exports.handler = async (event) => {
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: 'claude-sonnet-4-6',
             max_tokens: 1000,
             system: 'তুমি শুধুমাত্র বৈধ JSON অবজেক্ট ফেরত দেবে — কোনো markdown, ব্যাখ্যা বা ```-fence ছাড়া।',
             messages: [{ role: 'user', content: p.prompt }],
