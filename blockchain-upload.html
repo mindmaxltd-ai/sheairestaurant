@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SAR Blockchain — ভিডিও ও গল্প আপলোড</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:#2E8B57; --green-dark:#1F6B43; --green-soft:#E8F5EC;
+      --orange:#FF8C42; --orange-soft:#FFF1E6; --orange-line:#FFD9B8;
+      --ink:#2B2B2B; --muted:#7A7A7A;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(160deg, #FFF7EF 0%, #F2FBF5 100%);
+      color: var(--ink); min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+      padding: 1.4rem 2rem; display: flex; align-items: center; gap: 1rem;
+      color: #fff; box-shadow: 0 4px 14px rgba(46,139,87,.25);
+    }
+    .header h1 { font-size: 1.35rem; }
+    .header p { font-size:.82rem; opacity:.85; }
+    .header a { color:#FFE9D6; text-decoration:none; font-size:.85rem; }
+    .header a:hover { text-decoration:underline; }
+    .container { padding: 2rem; max-width: 760px; margin: 0 auto; }
+    .card {
+      background: #fff; border: 1px solid var(--orange-line);
+      border-radius: 14px; padding: 1.6rem; margin-bottom: 1.25rem;
+      box-shadow: 0 6px 18px rgba(255,140,66,.08);
+    }
+    label { display: block; font-size:.83rem; font-weight:600; color: var(--green-dark); margin-bottom:.4rem; }
+    input[type=text], input[type=password], textarea {
+      width: 100%; background: #fff;
+      border: 1.5px solid var(--orange-line); border-radius: 10px;
+      padding:.75rem .95rem; color: var(--ink); font-family: inherit; font-size:.92rem;
+      margin-bottom: 1rem; transition: border-color .15s, box-shadow .15s;
+    }
+    input[type=text]:focus, input[type=password]:focus, textarea:focus {
+      outline:none; border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255,140,66,.15);
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .file-row {
+      background: var(--green-soft); border: 1.5px dashed rgba(46,139,87,.4);
+      border-radius: 10px; padding:.8rem .95rem; margin-bottom:.7rem;
+    }
+    .file-row .step-title { font-size:.86rem; font-weight:700; color: var(--green-dark); margin-bottom:.5rem; }
+    .file-row.pdf { background: var(--orange-soft); border-color: rgba(255,140,66,.5); }
+    .file-row.pdf .step-title { color:#C25E10; }
+    input[type=file] { font-size:.8rem; color: var(--muted); width: 100%; }
+    input[type=file]::file-selector-button {
+      background: var(--green); color:#fff; border:none; border-radius:7px;
+      padding:.4rem .8rem; margin-right:.6rem; cursor:pointer; font-family:inherit; font-size:.8rem;
+    }
+    .section-title { color:#C25E10; font-size:1.05rem; margin-bottom:1rem; font-weight:700; }
+    .btn {
+      background: linear-gradient(135deg, var(--orange) 0%, #F2722B 100%);
+      border:none; border-radius:11px; padding:.85rem 1.5rem; color:#fff;
+      cursor:pointer; font-family:inherit; font-size:.98rem; font-weight:700; width:100%;
+      box-shadow: 0 5px 14px rgba(255,140,66,.3); transition: transform .1s, box-shadow .15s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 7px 18px rgba(255,140,66,.4); }
+    .btn:disabled { opacity:.55; cursor:not-allowed; }
+    .btn-green { background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%); box-shadow:0 5px 14px rgba(46,139,87,.3); }
+    .btn-green:hover:not(:disabled){ box-shadow:0 7px 18px rgba(46,139,87,.4); }
+    .progress { font-size:.85rem; color:#C25E10; margin-top:.85rem; min-height:1.2rem; font-weight:600; }
+    .ok  { color: var(--green-dark); }
+    .err { color:#D63B3B; }
+    .gate { display:flex; align-items:center; justify-content:center; padding:3.5rem 1rem; min-height:70vh; }
+    .login-card { width:100%; max-width:390px; }
+    .login-icon {
+      width:60px; height:60px; border-radius:50%; margin:0 auto 1rem;
+      background: linear-gradient(135deg, var(--green), var(--orange));
+      display:flex; align-items:center; justify-content:center; font-size:1.6rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:1.6rem">⬆️</div>
+  <div>
+    <h1>SAR Blockchain — আপলোড</h1>
+    <p>প্রতিটি উপাদানের ৫টি ধাপের ভিডিও ও গল্প সংরক্ষণ করুন</p>
+  </div>
+  <a href="blockchain.html" style="margin-left:auto">⛓️ Blockchain পেজ</a>
+  <a href="#" onclick="logout();return false">লগআউট</a>
+</div>
+
+<!-- ───── লগইন স্ক্রিন ───── -->
+<div id="gate" class="gate" style="display:none">
+  <div class="card login-card">
+    <div class="login-icon">🔒</div>
+    <h2 style="text-align:center;color:var(--green-dark);margin-bottom:.35rem">Admin লগইন</h2>
+    <p style="text-align:center;color:var(--muted);font-size:.82rem;margin-bottom:1.5rem">
+      Blockchain আপলোড পেজ — শুধু Admin-দের জন্য
+    </p>
+
+    <label>ইউজারনেম</label>
+    <input type="text" id="loginUser" placeholder="username" autocomplete="username"
+      onkeydown="if(event.key==='Enter')doLogin()">
+
+    <label>পাসওয়ার্ড</label>
+    <input type="password" id="loginPass" placeholder="password" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')doLogin()">
+
+    <button class="btn btn-green" onclick="doLogin()">লগইন করুন</button>
+    <div class="progress err" id="loginErr" style="text-align:center"></div>
+  </div>
+</div>
+
+<!-- ───── আপলোড ফর্ম ───── -->
+<div id="app" class="container" style="display:none">
+
+  <div class="card">
+    <label>উপাদানের নাম (বাংলা) *</label>
+    <input type="text" id="nameBn" placeholder="যেমন: লাল চাল">
+
+    <label>উপাদানের নাম (English)</label>
+    <input type="text" id="nameEn" placeholder="e.g. Red Rice">
+
+    <label>📖 উৎপাদনের গল্প (লেখা)</label>
+    <textarea id="storyText" placeholder="এই উপাদান কোথা থেকে আসে, কীভাবে তৈরি হয়..."></textarea>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">📹 ৫টি ধাপের ভিডিও</h3>
+
+    <div class="file-row">
+      <div class="step-title">🌱 ১. উৎস/সংগ্রহ</div>
+      <input type="file" id="v_source" accept="video/*">
+    </div>
+    <div class="file-row">
+      <div class="step-title">🔄 ২. প্রস্তুতি</div>
+      <input type="file" id="v_prep" accept="video/*">
+    </div>
+    <div class="file-row">
+      <div class="step-title">📦 ৩. প্যাকেজিং</div>
+      <input type="file" id="v_package" accept="video/*">
+    </div>
+    <div class="file-row">
+      <div class="step-title">🚚 ৪. পরিবহন</div>
+      <input type="file" id="v_transport" accept="video/*">
+    </div>
+    <div class="file-row">
+      <div class="step-title">🏪 ৫. সংরক্ষণ</div>
+      <input type="file" id="v_storage" accept="video/*">
+    </div>
+
+    <div class="file-row pdf">
+      <div class="step-title">📄 গল্পের PDF (ঐচ্ছিক)</div>
+      <input type="file" id="f_pdf" accept="application/pdf">
+    </div>
+  </div>
+
+  <button class="btn" id="saveBtn" onclick="saveAll()">⛓️ Blockchain-এ সংরক্ষণ করুন</button>
+  <div class="progress" id="progress"></div>
+
+</div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const BUCKET = 'blockchain';
+
+// ── Admin credentials (admin.html-এর সাথে মিল রেখে) ──
+const ADMIN_CREDS = [
+  { user:'tutul',         pass:'aimthm@2008', name:'Tutul (Super Admin)' },
+  { user:'sar_dietitian', pass:'sar2024',     name:'SAR ডায়েটিশিয়ান' },
+  { user:'sar_nutrition', pass:'sar2024',     name:'SAR নিউট্রিশনিস্ট' },
+];
+
+function showApp(){
+  document.getElementById('app').style.display  = 'block';
+  document.getElementById('gate').style.display = 'none';
+}
+
+// ── ইতিমধ্যে লগইন থাকলে সরাসরি ঢুকবে ──
+(function gate(){
+  if (localStorage.getItem('sar_bc_admin') === 'true') { showApp(); }
+  else { document.getElementById('gate').style.display = 'flex'; }
+})();
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginErr');
+  const match = ADMIN_CREDS.find(c => c.user === u && c.pass === p);
+  if (match) {
+    localStorage.setItem('sar_bc_admin', 'true');
+    err.textContent = '';
+    showApp();
+  } else {
+    err.textContent = '❌ ভুল ইউজারনেম বা পাসওয়ার্ড';
+  }
+}
+
+function logout(){
+  localStorage.removeItem('sar_bc_admin');
+  location.reload();
+}
+
+const prog = document.getElementById('progress');
+function setProg(msg, cls){ prog.className = 'progress ' + (cls||''); prog.textContent = msg; }
+
+// ── একটি ফাইল bucket-এ আপলোড করে public URL ফেরত দেয় ──
+async function uploadFile(file, prefix){
+  if (!file) return null;
+  const safe = file.name.replace(/[^\w.\-]/g, '_');
+  const path = `${prefix}/${Date.now()}_${safe}`;
+  const r = await fetch(`${SUPA}/storage/v1/object/${BUCKET}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: KEY,
+      Authorization: 'Bearer ' + KEY,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error('আপলোড ব্যর্থ (' + file.name + '): ' + t);
+  }
+  return `${SUPA}/storage/v1/object/public/${BUCKET}/${path}`;
+}
+
+async function saveAll(){
+  const nameBn = document.getElementById('nameBn').value.trim();
+  if (!nameBn) { setProg('⚠️ উপাদানের বাংলা নাম দিন।', 'err'); return; }
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+
+  try {
+    const slug = nameBn.replace(/\s+/g, '_');
+
+    setProg('⏳ ভিডিও আপলোড হচ্ছে...');
+    const source_video    = await uploadFile(document.getElementById('v_source').files[0],    slug);
+    const prep_video      = await uploadFile(document.getElementById('v_prep').files[0],       slug);
+    const package_video   = await uploadFile(document.getElementById('v_package').files[0],    slug);
+    const transport_video = await uploadFile(document.getElementById('v_transport').files[0],  slug);
+    const storage_video   = await uploadFile(document.getElementById('v_storage').files[0],    slug);
+
+    setProg('⏳ PDF আপলোড হচ্ছে...');
+    const story_pdf_url   = await uploadFile(document.getElementById('f_pdf').files[0],         slug);
+
+    // সরল blockchain hash (স্বচ্ছতার রেফারেন্স)
+    const hashSrc = nameBn + '|' + Date.now() + '|' + [source_video,prep_video,package_video,transport_video,storage_video].join('|');
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(hashSrc));
+    const blockchain_hash = '0x' + Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+
+    setProg('⏳ ডাটাবেসে সংরক্ষণ হচ্ছে...');
+    const row = {
+      name_bn: nameBn,
+      name_en: document.getElementById('nameEn').value.trim() || null,
+      story_text: document.getElementById('storyText').value.trim() || null,
+      source_video, prep_video, package_video, transport_video, storage_video,
+      story_pdf_url, blockchain_hash
+    };
+
+    const r = await fetch(`${SUPA}/rest/v1/blockchain_ingredients`, {
+      method: 'POST',
+      headers: {
+        apikey: KEY,
+        Authorization: 'Bearer ' + KEY,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify(row)
+    });
+
+    if (!r.ok) { throw new Error('DB সংরক্ষণ ব্যর্থ: ' + await r.text()); }
+
+    setProg('✅ সফলভাবে সংরক্ষিত! Hash: ' + blockchain_hash.slice(0,18) + '...', 'ok');
+
+    ['nameBn','nameEn','storyText'].forEach(id => document.getElementById(id).value = '');
+    ['v_source','v_prep','v_package','v_transport','v_storage','f_pdf'].forEach(id => document.getElementById(id).value = '');
+
+  } catch (e) {
+    console.error(e);
+    setProg('❌ ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
