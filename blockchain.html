@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>SAR Blockchain — উপাদান ও মেনু যাচাই</title>
+  <title>SAR Blockchain — উপাদান যাচাই</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -40,18 +40,6 @@
       border-color: #00A878;
       transform: translateY(-2px);
     }
-    .menu-card {
-      background: #111;
-      border: 1px solid rgba(233,30,140,.3);
-      border-radius: 12px;
-      padding: 1rem;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .menu-card:hover {
-      border-color: #E91E8C;
-      transform: translateY(-2px);
-    }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -79,39 +67,16 @@
       font-weight: 700;
       flex-shrink: 0;
     }
-    .link-row {
-      display: flex;
-      gap: .5rem;
-      flex-wrap: wrap;
-      margin-top: .6rem;
-    }
-    .media-link {
-      display: inline-flex;
-      align-items: center;
-      gap: .3rem;
+    .btn {
+      background: #E91E8C;
+      border: none;
       border-radius: 8px;
-      padding: .35rem .7rem;
-      font-size: .78rem;
-      text-decoration: none;
-      cursor: pointer;
-      border: 1px solid;
-    }
-    .ml-video  { color:#00A878; border-color:rgba(0,168,120,.4);  background:rgba(0,168,120,.1);  }
-    .media-link.ml-photo  { color:#5AB7FF; border-color:rgba(90,183,255,.4);  background:rgba(90,183,255,.1); }
-    .media-link.ml-story  { color:#F5C842; border-color:rgba(245,200,66,.4);  background:rgba(245,200,66,.1); }
-    .media-link.disabled { color:rgba(255,255,255,.25); border-color:rgba(255,255,255,.1); background:transparent; cursor:not-allowed; }
-    .tabs { display:flex; gap:.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
-    .tab {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 10px;
       padding: .55rem 1.2rem;
       color: #fff;
       cursor: pointer;
       font-family: inherit;
-      font-size: .9rem;
+      font-size: .88rem;
     }
-    .tab.active { background:#00A878; border-color:#00A878; font-weight:700; }
     .search-bar {
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.15);
@@ -123,16 +88,6 @@
       font-family: inherit;
       font-size: .9rem;
     }
-    .origin-pill {
-      display:inline-block;
-      margin-top:.5rem;
-      font-size:.72rem;
-      color:#FFE082;
-      background:rgba(255,224,130,.1);
-      border:1px solid rgba(255,224,130,.25);
-      border-radius:6px;
-      padding:.2rem .5rem;
-    }
   </style>
 </head>
 <body>
@@ -140,7 +95,7 @@
   <div class="header">
     <div>⛓️</div>
     <div>
-      <h1>SAR Blockchain — উপাদান ও মেনু যাচাই</h1>
+      <h1>SAR Blockchain — উপাদান যাচাই</h1>
       <p style="font-size:.85rem;opacity:.7">
         উৎস থেকে রান্না পর্যন্ত — প্রতিটি ধাপ স্বচ্ছ
       </p>
@@ -154,15 +109,15 @@
 
     <!-- Search -->
     <div style="margin-bottom:1.5rem">
-      <input type="text" class="search-bar" id="searchBox"
-        placeholder="🔍 খুঁজুন..."
-        oninput="onSearch(this.value)">
+      <input type="text" class="search-bar"
+        placeholder="🔍 উপাদান খুঁজুন..."
+        oninput="filterIngredients(this.value)">
     </div>
 
     <!-- Stats -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem">
       <div class="card" style="text-align:center">
-        <div style="font-size:1.8rem;font-weight:700;color:#00A878" id="statIng">১০০</div>
+        <div style="font-size:1.8rem;font-weight:700;color:#00A878">১০০</div>
         <div style="font-size:.82rem;color:rgba(255,255,255,.5)">উপাদান</div>
       </div>
       <div class="card" style="text-align:center">
@@ -170,7 +125,7 @@
         <div style="font-size:.82rem;color:rgba(255,255,255,.5)">উপাদান ভিডিও</div>
       </div>
       <div class="card" style="text-align:center">
-        <div style="font-size:1.8rem;font-weight:700;color:#F5C842" id="statMenu">১০৫</div>
+        <div style="font-size:1.8rem;font-weight:700;color:#F5C842">১০৫</div>
         <div style="font-size:.82rem;color:rgba(255,255,255,.5)">মেনু</div>
       </div>
       <div class="card" style="text-align:center">
@@ -179,55 +134,34 @@
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active" id="tabIng"  onclick="switchTab('ingredients')">🌾 উপাদান (১০০)</div>
-      <div class="tab"        id="tabMenu" onclick="switchTab('menus')">🍽️ মেনু (১০৫)</div>
+    <!-- Ingredients Grid -->
+    <h2 style="margin-bottom:1rem;color:#00A878">🌾 উপাদানসমূহ</h2>
+    <div class="grid" id="ingredientsGrid">
+      <!-- JavaScript-এ load হবে -->
     </div>
 
-    <!-- ============ INGREDIENTS VIEW ============ -->
-    <div id="ingredientsView">
-      <h2 style="margin-bottom:1rem;color:#00A878">🌾 উপাদানসমূহ</h2>
-      <div class="grid" id="ingredientsGrid"></div>
-
-      <div id="ingredientDetail" style="display:none;margin-top:2rem">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-            <h3 id="detailName" style="color:#00A878"></h3>
-            <button onclick="closeDetail('ingredientDetail')" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer">✕</button>
-          </div>
-
-          <div id="detailOrigin" style="margin-bottom:1rem"></div>
-
-          <div style="margin-bottom:1rem">
-            <h4 style="color:#F5C842;margin-bottom:.75rem">📹 উপাদানের ৫টি ধাপ</h4>
-            <div id="ingredientSteps"></div>
-          </div>
-
-          <div style="margin-bottom:1rem">
-            <h4 style="color:#F5C842;margin-bottom:.5rem">🔗 মিডিয়া</h4>
-            <div id="ingredientMedia" class="link-row"></div>
-          </div>
+    <!-- Selected Ingredient Detail -->
+    <div id="ingredientDetail" style="display:none;margin-top:2rem">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <h3 id="detailName" style="color:#00A878"></h3>
+          <button onclick="closeDetail()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer">✕</button>
         </div>
-      </div>
-    </div>
 
-    <!-- ============ MENUS VIEW ============ -->
-    <div id="menusView" style="display:none">
-      <h2 style="margin-bottom:1rem;color:#E91E8C">🍽️ মেনুসমূহ (১০৫)</h2>
-      <div class="grid" id="menusGrid"></div>
+        <div style="margin-bottom:1rem">
+          <h4 style="color:#F5C842;margin-bottom:.75rem">📹 উপাদানের ৫টি ধাপ</h4>
+          <div id="ingredientSteps"></div>
+        </div>
 
-      <div id="menuDetail" style="display:none;margin-top:2rem">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-            <h3 id="menuDetailName" style="color:#E91E8C"></h3>
-            <button onclick="closeDetail('menuDetail')" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:1.2rem;cursor:pointer">✕</button>
-          </div>
-          <div id="menuDetailMeta" style="margin-bottom:1rem"></div>
-          <div>
-            <h4 style="color:#F5C842;margin-bottom:.5rem">🔗 মিডিয়া</h4>
-            <div id="menuMedia" class="link-row"></div>
-          </div>
+        <div id="storySection" style="margin-top:1rem">
+          <h4 style="color:#F5C842;margin-bottom:.5rem">📖 উৎপাদনের গল্প</h4>
+          <p id="storyText" style="color:rgba(255,255,255,.6);font-size:.88rem;line-height:1.7"></p>
+          <a id="storyPdfLink" href="#" target="_blank"
+            style="display:inline-block;margin-top:.5rem;background:rgba(245,200,66,.15);
+            border:1px solid rgba(245,200,66,.3);border-radius:8px;
+            padding:.4rem .85rem;color:#F5C842;text-decoration:none;font-size:.82rem">
+            📄 PDF পড়ুন
+          </a>
         </div>
       </div>
     </div>
@@ -235,30 +169,8 @@
   </div>
 
   <script>
-    /* =====================================================================
-       SAR BLOCKCHAIN — read-only verification page.
-       All data lives in Supabase and is added / edited / deleted ONLY from
-       the Admin → Blockchain panel. This page just displays the latest state.
-
-       Required Supabase columns
-       --------------------------
-       blockchain_ingredients:
-         id, name_bn, name_en,
-         origin            (উৎস / source text, e.g. "বরিশাল — স্থানীয় খামার")
-         source_video, prep_video, package_video, transport_video, storage_video
-         photo_url         (উপাদানের ছবি)
-         story_pdf_url      (উৎপাদনের গল্প — PDF / link)
-       blockchain_menus:
-         id, name_bn, name_en,
-         category          (DM / OB / FL / IB / PR ...)
-         meal              (Breakfast / Lunch / Dinner)
-         video_url, photo_url, story_url
-       ===================================================================== */
-
     const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
-    const KEY  = 'eyJhbGci...'; // anon key — replace with your real anon key
-
-    const HEADERS = { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } };
+    const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 
     const stepLabels = [
       { icon: '🌱', label: 'উৎস/সংগ্রহ' },
@@ -269,43 +181,31 @@
     ];
 
     let allIngredients = [];
-    let allMenus = [];
-    let currentTab = 'ingredients';
 
-    /* ---- medium popup window helper (used by every link) ---- */
-    function openMedium(url, name) {
-      if (!url) return;
-      const w = 900, h = 650;
-      const left = (screen.width  - w) / 2;
-      const top  = (screen.height - h) / 2;
-      window.open(
-        url,
-        name || 'sarMedia',
-        `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`
-      );
-    }
-
-    /* ---- build a media link button (opens medium window) ---- */
-    function mediaLink(url, cls, label) {
-      if (!url) {
-        return `<span class="media-link ${cls} disabled">${label} — নেই</span>`;
-      }
-      const safe = String(url).replace(/'/g, "\\'");
-      return `<a class="media-link ${cls}" onclick="openMedium('${safe}')">${label}</a>`;
-    }
-
-    /* ================= INGREDIENTS ================= */
     async function loadIngredients() {
+      const grid = document.getElementById('ingredientsGrid');
       try {
         const r = await fetch(
           `${SUPA}/rest/v1/blockchain_ingredients?select=*&order=name_bn.asc`,
-          HEADERS
+          { headers: { apikey: KEY, Authorization: 'Bearer ' + KEY } }
         );
+        if (!r.ok) {
+          const t = await r.text();
+          throw new Error(r.status + ' — ' + t);
+        }
         allIngredients = await r.json();
-      } catch (e) { allIngredients = []; }
-      document.getElementById('statIng').textContent =
-        toBn(allIngredients.length || 100);
-      renderIngredients(allIngredients);
+        if (!Array.isArray(allIngredients)) {
+          throw new Error(JSON.stringify(allIngredients));
+        }
+        renderIngredients(allIngredients);
+      } catch (e) {
+        console.error('Blockchain load error:', e);
+        grid.innerHTML = `
+          <div style="grid-column:1/-1;text-align:center;padding:2rem;color:#ff6b6b">
+            ⚠️ ডেটা লোড করা যায়নি।<br>
+            <span style="font-size:.78rem;color:rgba(255,255,255,.4)">${e.message}</span>
+          </div>`;
+      }
     }
 
     function renderIngredients(items) {
@@ -314,163 +214,88 @@
         grid.innerHTML = `
           <div style="grid-column:1/-1;text-align:center;
             padding:2rem;color:rgba(255,255,255,.4)">
-            Admin → Blockchain থেকে উপাদান যোগ করুন।
+            Admin Panel থেকে উপাদান যোগ করুন।
           </div>`;
         return;
       }
       grid.innerHTML = items.map(ing => `
-        <div class="ingredient-card" onclick="showIngredient('${ing.id}')">
+        <div class="ingredient-card" onclick="showDetail('${ing.id}')">
           <div style="font-size:1.5rem;margin-bottom:.5rem">🌾</div>
           <div style="font-weight:700;color:#fff">${ing.name_bn || ''}</div>
           <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${ing.name_en || ''}</div>
-          ${ing.origin ? `<div class="origin-pill">📍 ${ing.origin}</div>` : ''}
           <div style="margin-top:.5rem;font-size:.75rem;color:#00A878">
-            ${[ing.source_video,ing.prep_video,ing.package_video,ing.transport_video,ing.storage_video].filter(Boolean).length}/5 ভিডিও
+            ${[
+              ing.source_video,
+              ing.prep_video,
+              ing.package_video,
+              ing.transport_video,
+              ing.storage_video
+            ].filter(Boolean).length}/5 ভিডিও
           </div>
         </div>
       `).join('');
     }
 
-    function showIngredient(id) {
-      const ing = allIngredients.find(i => i.id == id);
+    function filterIngredients(query) {
+      const filtered = allIngredients.filter(i =>
+        (i.name_bn || '').includes(query) ||
+        (i.name_en || '').toLowerCase().includes(query.toLowerCase())
+      );
+      renderIngredients(filtered);
+    }
+
+    function showDetail(id) {
+      const ing = allIngredients.find(i => i.id === id);
       if (!ing) return;
 
       document.getElementById('detailName').textContent =
-        (ing.name_bn || '') + (ing.name_en ? ' (' + ing.name_en + ')' : '');
-
-      document.getElementById('detailOrigin').innerHTML = ing.origin
-        ? `<span class="origin-pill" style="font-size:.85rem">📍 উৎস: ${ing.origin}</span>`
-        : '';
+        (ing.name_bn || '') + ' (' + (ing.name_en || '') + ')';
 
       const videos = [
-        ing.source_video, ing.prep_video, ing.package_video,
-        ing.transport_video, ing.storage_video
+        ing.source_video,
+        ing.prep_video,
+        ing.package_video,
+        ing.transport_video,
+        ing.storage_video
       ];
 
       document.getElementById('ingredientSteps').innerHTML =
         stepLabels.map((step, i) => `
           <div class="video-step">
-            <div class="step-badge">${toBn(i + 1)}</div>
+            <div class="step-badge">${i + 1}</div>
             <div style="flex:1">
               <div style="font-size:.88rem;font-weight:700;color:#fff">
                 ${step.icon} ${step.label}
               </div>
-              ${videos[i]
-                ? `<a onclick="openMedium('${String(videos[i]).replace(/'/g,"\\'")}')"
-                     style="color:#00A878;font-size:.8rem;text-decoration:none;cursor:pointer">▶ ভিডিও দেখুন</a>`
-                : `<span style="color:rgba(255,255,255,.3);font-size:.8rem">ভিডিও যোগ করা হয়নি</span>`}
+              ${videos[i] ?
+                `<a href="${videos[i]}" target="_blank"
+                  style="color:#00A878;font-size:.8rem;text-decoration:none">
+                  ▶ ভিডিও দেখুন
+                </a>` :
+                `<span style="color:rgba(255,255,255,.3);font-size:.8rem">
+                  ভিডিও যোগ করা হয়নি
+                </span>`
+              }
             </div>
-          </div>`).join('');
-
-      document.getElementById('ingredientMedia').innerHTML =
-        mediaLink(videos.find(Boolean), 'ml-video', '▶ ভিডিও') +
-        mediaLink(ing.photo_url,        'ml-photo', '🖼️ ছবি') +
-        mediaLink(ing.story_pdf_url,    'ml-story', '📖 উৎপাদনের গল্প');
-
-      const d = document.getElementById('ingredientDetail');
-      d.style.display = 'block';
-      d.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    /* ================= MENUS ================= */
-    async function loadMenus() {
-      try {
-        const r = await fetch(
-          `${SUPA}/rest/v1/blockchain_menus?select=*&order=category.asc`,
-          HEADERS
-        );
-        allMenus = await r.json();
-      } catch (e) { allMenus = []; }
-      document.getElementById('statMenu').textContent =
-        toBn(allMenus.length || 105);
-      renderMenus(allMenus);
-    }
-
-    function renderMenus(items) {
-      const grid = document.getElementById('menusGrid');
-      if (!items || items.length === 0) {
-        grid.innerHTML = `
-          <div style="grid-column:1/-1;text-align:center;
-            padding:2rem;color:rgba(255,255,255,.4)">
-            Admin → Blockchain থেকে মেনু যোগ করুন।
-          </div>`;
-        return;
-      }
-      grid.innerHTML = items.map(m => `
-        <div class="menu-card" onclick="showMenu('${m.id}')">
-          <div style="font-size:1.5rem;margin-bottom:.5rem">🍽️</div>
-          <div style="font-weight:700;color:#fff">${m.name_bn || ''}</div>
-          <div style="font-size:.78rem;color:rgba(255,255,255,.4)">${m.name_en || ''}</div>
-          <div style="margin-top:.4rem">
-            ${m.category ? `<span class="origin-pill" style="color:#E91E8C;background:rgba(233,30,140,.1);border-color:rgba(233,30,140,.25)">${m.category}</span>` : ''}
-            ${m.meal ? `<span class="origin-pill">${m.meal}</span>` : ''}
           </div>
-          <div style="margin-top:.5rem;font-size:.75rem;color:#E91E8C">
-            ${[m.video_url,m.photo_url,m.story_url].filter(Boolean).length}/3 লিংক
-          </div>
-        </div>
-      `).join('');
-    }
+        `).join('');
 
-    function showMenu(id) {
-      const m = allMenus.find(x => x.id == id);
-      if (!m) return;
-      document.getElementById('menuDetailName').textContent =
-        (m.name_bn || '') + (m.name_en ? ' (' + m.name_en + ')' : '');
-      document.getElementById('menuDetailMeta').innerHTML =
-        (m.category ? `<span class="origin-pill" style="color:#E91E8C;background:rgba(233,30,140,.1);border-color:rgba(233,30,140,.25)">${m.category}</span> ` : '') +
-        (m.meal ? `<span class="origin-pill">${m.meal}</span>` : '');
-      document.getElementById('menuMedia').innerHTML =
-        mediaLink(m.video_url, 'ml-video', '▶ ভিডিও') +
-        mediaLink(m.photo_url, 'ml-photo', '🖼️ ছবি') +
-        mediaLink(m.story_url, 'ml-story', '📖 গল্প');
-      const d = document.getElementById('menuDetail');
-      d.style.display = 'block';
-      d.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    /* ================= SHARED ================= */
-    function switchTab(tab) {
-      currentTab = tab;
-      const isIng = tab === 'ingredients';
-      document.getElementById('ingredientsView').style.display = isIng ? 'block' : 'none';
-      document.getElementById('menusView').style.display       = isIng ? 'none'  : 'block';
-      document.getElementById('tabIng').classList.toggle('active', isIng);
-      document.getElementById('tabMenu').classList.toggle('active', !isIng);
-      document.getElementById('searchBox').value = '';
-      document.getElementById('searchBox').placeholder =
-        isIng ? '🔍 উপাদান খুঁজুন...' : '🔍 মেনু খুঁজুন...';
-      if (isIng) renderIngredients(allIngredients); else renderMenus(allMenus);
-    }
-
-    function onSearch(q) {
-      const lc = q.toLowerCase();
-      if (currentTab === 'ingredients') {
-        renderIngredients(allIngredients.filter(i =>
-          (i.name_bn || '').includes(q) ||
-          (i.name_en || '').toLowerCase().includes(lc) ||
-          (i.origin  || '').toLowerCase().includes(lc)));
+      if (ing.story_pdf_url) {
+        document.getElementById('storyPdfLink').href = ing.story_pdf_url;
+        document.getElementById('storySection').style.display = 'block';
       } else {
-        renderMenus(allMenus.filter(m =>
-          (m.name_bn || '').includes(q) ||
-          (m.name_en || '').toLowerCase().includes(lc) ||
-          (m.category|| '').toLowerCase().includes(lc)));
+        document.getElementById('storySection').style.display = 'none';
       }
+
+      document.getElementById('ingredientDetail').style.display = 'block';
+      document.getElementById('ingredientDetail').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function closeDetail(elId) {
-      document.getElementById(elId).style.display = 'none';
+    function closeDetail() {
+      document.getElementById('ingredientDetail').style.display = 'none';
     }
 
-    /* English digits -> Bengali digits */
-    function toBn(n) {
-      const map = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-      return String(n).replace(/\d/g, d => map[d]);
-    }
-
-    /* init */
     loadIngredients();
-    loadMenus();
   </script>
 </body>
 </html>
