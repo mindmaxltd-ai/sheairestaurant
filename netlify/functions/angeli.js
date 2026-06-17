@@ -43,9 +43,12 @@ using AI and 250 health metrics of women.
 Rules:
 - Reply ONLY in the language the customer used (Bengali, English, Hindi, or Arabic).
 - Be friendly, short, and clear — like a kind little girl talking.
-- Answer using ONLY the SAR information provided in the CONTEXT below.
-- If the answer is not in the context, gently say you are not sure and suggest
-  contacting SAR directly. Never invent facts.
+- The CONTEXT below contains real SAR information (prices, menu, registration,
+  contact, etc.). READ IT CAREFULLY and answer from it. The information may use
+  different words than the customer's question (e.g. customer says "দাম", context
+  says "মূল্য") — match the meaning, not just the exact word.
+- Only if the answer is truly not in the CONTEXT, gently say you are not sure and
+  suggest contacting SAR (WhatsApp 01346098892). Never invent facts.
 - You are NOT a doctor. For medical questions, advise seeing a professional.
 - SAR is in Bangladesh, a Muslim-majority country. Greet customers with
   "আসসালামু আলাইকুম" (Assalamu Alaikum) in Bengali, never "নমস্কার". In other
@@ -164,27 +167,43 @@ exports.handler = async (event) => {
 
 
 // ── HELPER: knowledge_base খোঁজা ───────────────────────────────
+// কৌশল: আগে শব্দ-মিল দিয়ে প্রাসঙ্গিক টুকরো খুঁজি। না পেলে (বাংলায়
+// প্রায়ই শব্দ মেলে না), সাম্প্রতিক অনেকগুলো টুকরো এনে Angeli-কে দিই —
+// যাতে সে সব তথ্য জেনে উত্তর দিতে পারে। মোট তথ্য ছোট বলে এটা নিরাপদ।
 async function searchKnowledge(question) {
-  // কয়েকটা মূল শব্দ বের করি (ছোট শব্দ বাদ)
-  const words = question.split(/\s+/).filter(w => w.length > 2).slice(0, 6);
-  const orFilter = words
-    .map(w => `content_text.ilike.*${encodeURIComponent(w)}*`)
-    .join(',');
+  // (১) শব্দ-মিল চেষ্টা — ইংরেজি ও বড় শব্দের জন্য কাজে দেয়
+  const words = (question || '')
+    .split(/\s+/)
+    .filter(w => w.length > 1)
+    .slice(0, 8);
 
-  const url = `${SUPABASE_URL}/rest/v1/knowledge_base`
-    + `?select=title,content_text`
-    + (orFilter ? `&or=(${orFilter})` : '')
-    + `&limit=5`;
+  let rows = [];
+  if (words.length) {
+    const orFilter = words
+      .map(w => `content_text.ilike.*${encodeURIComponent(w)}*`)
+      .join(',');
+    const url = `${SUPABASE_URL}/rest/v1/knowledge_base`
+      + `?select=title,content_text`
+      + `&or=(${orFilter})`
+      + `&limit=8`;
+    const r = await fetch(url, { headers: SB }).catch(() => null);
+    if (r && r.ok) rows = await r.json().catch(() => []);
+  }
 
-  const r = await fetch(url, { headers: SB }).catch(() => null);
-  if (!r || !r.ok) return '';
-  const rows = await r.json().catch(() => []);
+  // (২) শব্দ-মিলে কিছু না পেলে — অনেকগুলো টুকরো এনে দিই (fallback)
+  if (!Array.isArray(rows) || rows.length === 0) {
+    const url = `${SUPABASE_URL}/rest/v1/knowledge_base`
+      + `?select=title,content_text&limit=40`;
+    const r = await fetch(url, { headers: SB }).catch(() => null);
+    if (r && r.ok) rows = await r.json().catch(() => []);
+  }
+
   if (!Array.isArray(rows) || !rows.length) return '';
 
   return rows
     .map(x => `[${x.title}] ${x.content_text}`)
     .join('\n\n')
-    .slice(0, 6000);
+    .slice(0, 9000);   // Claude-কে যথেষ্ট তথ্য দিই
 }
 
 // ── HELPER: একটি বার্তা সেভ করা ────────────────────────────────
