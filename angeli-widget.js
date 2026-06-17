@@ -70,7 +70,8 @@
   #ang-body{flex:1;padding:14px;overflow-y:auto;background:#faf7f5;display:flex;flex-direction:column;gap:8px}
   .ang-msg{max-width:80%;padding:8px 12px;border-radius:14px;font-size:14px;line-height:1.5;white-space:pre-wrap}
   .ang-u{align-self:flex-end;background:#D4537E;color:#fff;border-bottom-right-radius:4px}
-  .ang-a{align-self:flex-start;background:#fff;border:.5px solid #e4dcd8;border-bottom-left-radius:4px}
+  .ang-a{align-self:flex-start;background:#fce8f0;color:#1d7a4d;border:.5px solid #f5c6d8;border-bottom-left-radius:4px}
+  .ang-a b{color:#0f5c37}
   .ang-typing{align-self:flex-start;background:#fff;border:.5px solid #e4dcd8;border-radius:14px;
     padding:10px 14px;display:flex;gap:4px}
   .ang-typing i{width:6px;height:6px;border-radius:50%;background:#bbb;display:inline-block;
@@ -140,10 +141,14 @@
   function addMsg(text, who) {
     var d = document.createElement('div');
     d.className = 'ang-msg ' + (who === 'user' ? 'ang-u' : 'ang-a');
+    text = (text == null) ? '' : String(text);
     if (who === 'user') {
       d.textContent = text;            // কাস্টমারের লেখা — সাধারণ টেক্সট
     } else {
-      d.innerHTML = formatAngeli(text); // Angeli-র উত্তর — বোল্ড ও নতুন লাইনসহ
+      // Angeli-র উত্তর: আগে সাধারণ টেক্সট বসাই (যাতে লেখা কখনো হারায় না),
+      // তারপর বোল্ড ও নতুন লাইন সুন্দর করি
+      d.textContent = text;
+      try { d.innerHTML = formatAngeli(text); } catch (e) { /* টেক্সট তো আছেই */ }
     }
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
