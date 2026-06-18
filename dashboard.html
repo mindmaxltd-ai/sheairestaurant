@@ -8,46 +8,19 @@
 <style>
 :root{
   --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
-  --purple:#7C3AED;--purple2:#A855F7;--purple3:rgba(124,58,237,.12);
-  --yellow:#F97316;--yellow2:#FB923C;--yellow3:rgba(249,115,22,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
   --red:#DC2626;--red2:#F87171;
-  --green:#059669;--green2:#10B981;--green3:rgba(5,150,105,.12);
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
   --orange:#F97316;--orange2:#FB923C;
-  /* হালকা গোলাপি ব্যাকগ্রাউন্ড */
-  --dark:#FFF0F6;--dark2:#FFE3EF;--dark3:#FFD6E8;
-  --glass:rgba(255,255,255,.55);--glass2:rgba(255,255,255,.75);
-  --border:rgba(249,115,22,.30);--border2:rgba(249,115,22,.45);
-  --ink:#3A2233;        /* গাঢ় লেখা — হালকা ব্যাকগ্রাউন্ডে পড়ার জন্য */
-  --ink-soft:#6B4B5E;
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.14);
+  --ink:#fff;--ink-soft:rgba(255,255,255,.6);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
-
-/* ── হালকা থিম override: সাদা লেখা গাঢ় করা, রঙিন বোতাম ঠিক রাখা ── */
-.main, .panel, .dcard, .sb-item, .mem-row, .tier-row,
-h1, h2, h3, h4, p, span, label, div, td, th {
-  /* সাদা লেখা যেখানে ছিল, সেখানে গাঢ় কালি — তবে শুধু যেখানে নিজস্ব রঙ নেই */
-}
-/* গাঢ় ব্যাকগ্রাউন্ডের বোতাম/ব্যাজে সাদা লেখা ঠিক থাকবে */
-[style*="linear-gradient"], .sb-badge, .sb-avatar,
-button[style*="var(--pink)"], button[style*="var(--orange)"] { color:#fff; }
-/* কমলা প্রাইমারি বোতাম */
-.btn-primary, .m-btn.primary, .topbar-btn.primary {
-  background:linear-gradient(135deg,var(--orange),var(--orange2)) !important;
-  color:#fff !important; border:none !important;
-}
-/* কার্ড ও প্যানেল — হালকা সাদা কাঁচ, কমলা বর্ডার */
-.dcard, .panel, .glass-card, .mem-body, .loyalty-body {
-  background:var(--glass) !important;
-  border:1px solid var(--border) !important;
-  color:var(--ink) !important;
-}
-/* শিরোনাম — বেগুনি; সাধারণ লেখা — গাঢ় কালি */
-h1,h2,h3{ color:var(--purple) !important; }
-.main p, .main span:not([class]), .main label, .mem-k, .mem-v { color:var(--ink); }
-/* হালকা ব্যাকগ্রাউন্ডে রঙিন গোলক একটু নরম */
-.o1,.o2,.o3,.o4{ opacity:.18 !important; }
+body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── ANIMATED BG ── */
 .bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
