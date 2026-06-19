@@ -52,15 +52,46 @@ function normalizeNumbers(raw) {
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return reply(200, {});
 
-  // ── GET: দ্রুত status check ──
+  // ── GET: status check, অথবা ?to=...&msg=... দিলে আসল test SMS পাঠায় ──
   if (event.httpMethod === 'GET') {
+    const q = event.queryStringParameters || {};
+    // যদি query-তে to থাকে → আসল SMS পাঠাও (address bar থেকে test করার জন্য)
+    if (q.to) {
+      if (!SMS_API_KEY) return reply(500, { error: 'SMS key missing' });
+      const to  = normalizeNumbers(q.to);
+      const msg = q.msg || 'SAR test';
+      const form = new URLSearchParams();
+      form.append('api_key', SMS_API_KEY);
+      form.append('msg', msg);
+      form.append('to', to);
+      if (SMS_SENDER_ID) form.append('sender_id', SMS_SENDER_ID);
+      try {
+        const r = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: form.toString(),
+        });
+        const raw = await r.text();
+        let data; try { data = JSON.parse(raw); } catch { data = { raw }; }
+        return reply(200, {
+          test: true,
+          sent_to: to,
+          message_sent: msg,
+          http_status: r.status,
+          provider_response: data,
+        });
+      } catch (e) {
+        return reply(500, { test: true, error: String((e && e.message) || e) });
+      }
+    }
+    // নাহলে শুধু status
     return reply(200, {
       ok: true,
       function: 'send-sms',
       provider: 'sms.net.bd',
       sms_api_key: SMS_API_KEY ? 'set' : 'MISSING',
       sender_id: SMS_SENDER_ID || '(none — default sender)',
-      note: 'POST করুন { to, msg } দিয়ে SMS পাঠাতে।',
+      note: 'test: ?to=017XXXXXXXX&msg=SAR test',
     });
   }
 
