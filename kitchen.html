@@ -317,7 +317,11 @@ function recipeHTML(t){
   try{
   const items=Array.isArray(t.items)?t.items:[];
   if(!items.length) return '<div class="col-empty">রেসিপি তথ্য নেই</div>';
-  const f=t._factor||1;
+  // ── নিরাপত্তা: factor একটা প্রুডেন্ট সীমার মধ্যে আটকানো ──
+  // AI/score যাই বলুক, কখনো ০.৭ এর নিচে বা ১.৩ এর উপরে যাবে না।
+  // এতে কোনো গ্রাহকের খাবার বিপজ্জনকভাবে কম/বেশি হবে না।
+  const rawF = t._factor||1;
+  const f = Math.max(0.7, Math.min(1.3, rawF));
   return items.map((it,ix)=>{
     const cat=detectCatFromItem(it);
     const db=MEAL_DB[cat]||MEAL_DB.DM;
@@ -345,10 +349,18 @@ function recipeHTML(t){
                  :(co.ingredients&&co.ingredients.length)?co.ingredients.map(g=>typeof g==='string'?g:g.item)
                  :[(co.name||co.name_bn||'উপাদান')];
       const ings=names.map((nm,si)=>{
-        const exempt=(cIdx===4);
         const baseG=grams[si]!=null?grams[si]:(grams[grams.length-1]||50);
-        const g=exempt?baseG:Math.round(baseG*f);
-        return '<span class="ing">'+nm+' <b>'+bn(g)+'g</b>'+(exempt?'<span class="ex">ফল·fixed</span>':'')+'</span>';
+        // ── প্রুডেন্ট শ্রেণি-ভিত্তিক scaling (international dietetics নীতি) ──
+        // Course 0 (থেরাপিউটিক মেইন/স্টার্চ) → পূর্ণ factor
+        // Course 1 (প্রোটিন)               → অর্ধেক প্রভাব (প্রোটিন সুরক্ষিত)
+        // Course 2 (স্টিমড সবজি/আঁশ)        → স্থির (scale নয়)
+        // Course 3 (চাটনি/মশলা)            → স্থির
+        // Course 4 (ফল)                    → স্থির
+        let g, tag='';
+        if(cIdx===0){ g=Math.round(baseG*f); }                          // স্টার্চ — scale
+        else if(cIdx===1){ g=Math.round(baseG*(1+(f-1)*0.5)); tag='প্রোটিন·সুরক্ষিত'; } // প্রোটিন — অর্ধেক
+        else { g=baseG; tag = cIdx===4?'ফল·fixed':(cIdx===2?'আঁশ·fixed':'fixed'); }     // বাকি — স্থির
+        return '<span class="ing">'+nm+' <b>'+bn(g)+'g</b>'+(tag?'<span class="ex">'+tag+'</span>':'')+'</span>';
       }).join('');
       return '<div class="course"><div class="co-top">'+
         '<span class="co-slot" style="background:'+STCOLOR[st]+'">'+bn(cIdx+1)+'</span>'+
@@ -370,6 +382,7 @@ function recipeHTML(t){
         '<span class="dchip chu">Chutney: '+chut+'</span>'+
         '<span class="dchip chu">Topping: '+topping+'</span>'+
       '</div>'+
+      '<div style="font-size:.66rem;color:var(--ink-3);margin-top:.3rem;line-height:1.5">⚕️ ভেষজ/ঔষধি গুঁড়া স্থির থেরাপিউটিক ডোজ — কখনো কম/বেশি নয়। শুধু মেইন ও প্রোটিন কোর্স ক্যালরি অনুযায়ী সমন্বিত (×'+f.toFixed(2)+', সর্বোচ্চ সীমা ০.৭–১.৩)। চূড়ান্ত পরিমাণ পুষ্টিবিদ যাচাই করবেন।</div>'+
       '<ul class="steps">'+steps+'</ul>'+
     '</div>';
   }).join('')+
@@ -491,6 +504,21 @@ async function load(){
   try{
     const r=await api('kitchenBoard',{});
     const tk=r.tickets||[];
+
+    // ── প্রতিটা ticket এর জন্য 6AM meal-score থেকে _factor আনা ──
+    // getScore → ai_analysis এর daily_kcal; base 1800 kcal ধরে factor।
+    // prudent scaling (recipeHTML) এই factor কে ০.৭–১.৩ এ আটকায়।
+    const BASE_KCAL = 1800;
+    await Promise.all(tk.map(async t=>{
+      const cid = t.customer_id || t.customer || null;
+      if(!cid){ t._factor = 1; return; }
+      try{
+        const s = await api('getScore',{ customer_id: cid });
+        const kcal = s && s.score && s.score.daily_kcal;
+        t._factor = kcal ? (kcal / BASE_KCAL) : 1;
+      }catch(e){ t._factor = 1; }
+    }));
+
     const q=tk.filter(t=>['queued','claimed'].includes(t.status));
     const p=tk.filter(t=>t.status==='preparing');
     const rd=tk.filter(t=>['ready','out_for_delivery'].includes(t.status));
