@@ -330,7 +330,24 @@ textarea{resize:vertical;min-height:76px}
           </div>
           <div class="fld">
             <label>মোবাইল নম্বর <span class="req">⭐</span></label>
-            <input type="tel" id="phone" placeholder="01XXXXXXXXX" maxlength="11" required>
+            <input type="tel" id="phone" placeholder="01XXXXXXXXX" maxlength="11" required oninput="resetOtp()">
+          </div>
+          <div class="fld" id="otpBox" style="background:rgba(233,30,140,.05);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:.85rem;margin-bottom:1rem">
+            <div style="display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap">
+              <button type="button" id="otpSendBtn" onclick="sendOtp()"
+                style="background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;border:none;border-radius:9px;padding:.55rem 1rem;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+                📱 যাচাই কোড পাঠান
+              </button>
+              <div style="flex:1;min-width:120px">
+                <input type="tel" id="otpCode" placeholder="৬-সংখ্যার কোড" maxlength="6" disabled
+                  style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border,rgba(255,255,255,.15));border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Space Mono',monospace;font-size:.95rem;letter-spacing:.15em;text-align:center;outline:none">
+              </div>
+              <button type="button" id="otpVerifyBtn" onclick="verifyOtp()" disabled
+                style="background:rgba(5,150,105,.2);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:9px;padding:.55rem 1rem;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
+                ✓ যাচাই
+              </button>
+            </div>
+            <div id="otpMsg" style="font-size:.76rem;margin-top:.5rem;display:none"></div>
           </div>
           <div class="fld">
             <label>ইমেইল <span class="opt">(ঐচ্ছিক)</span></label>
@@ -622,6 +639,81 @@ function toggleRegPwd(id,btn){const el=document.getElementById(id);if(el.type===
 function gn(id){const v=g(id);return v?parseFloat(v):null}
 
 /* ── VALIDATION ── */
+/* ── OTP যাচাই ── */
+let phoneVerified = false;
+
+function showOtpMsg(txt, ok){
+  const m = document.getElementById('otpMsg');
+  if(!m) return;
+  m.style.display='block';
+  m.textContent = txt;
+  m.style.color = ok ? '#34D399' : '#F87171';
+}
+
+function resetOtp(){
+  // phone বদলালে যাচাই বাতিল
+  phoneVerified = false;
+  const code = document.getElementById('otpCode');
+  const vBtn = document.getElementById('otpVerifyBtn');
+  if(code){ code.value=''; code.disabled=true; }
+  if(vBtn) vBtn.disabled=true;
+  const m = document.getElementById('otpMsg'); if(m) m.style.display='none';
+}
+
+async function sendOtp(){
+  const phone = (document.getElementById('phone').value||'').trim();
+  if(!/^01[3-9]\d{8}$/.test(phone)){ showOtpMsg('⚠️ আগে সঠিক ১১-সংখ্যার নম্বর দিন', false); return; }
+  const btn = document.getElementById('otpSendBtn');
+  btn.disabled=true; btn.textContent='⏳ পাঠানো হচ্ছে...';
+  try{
+    const r = await fetch('/.netlify/functions/send-otp',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ action:'send', phone })
+    });
+    const d = await r.json().catch(()=>({}));
+    if(d && d.sent){
+      showOtpMsg('✅ কোড পাঠানো হয়েছে — SMS দেখুন (৫ মিনিট বৈধ)', true);
+      const code=document.getElementById('otpCode'), vBtn=document.getElementById('otpVerifyBtn');
+      if(code) code.disabled=false;
+      if(vBtn) vBtn.disabled=false;
+      btn.textContent='🔄 আবার পাঠান';
+    } else {
+      showOtpMsg('❌ কোড পাঠানো যায়নি: ' + ((d&&d.error)||'সমস্যা'), false);
+      btn.textContent='📱 যাচাই কোড পাঠান';
+    }
+  }catch(e){
+    showOtpMsg('❌ সংযোগ সমস্যা: ' + e.message, false);
+    btn.textContent='📱 যাচাই কোড পাঠান';
+  }
+  btn.disabled=false;
+}
+
+async function verifyOtp(){
+  const phone = (document.getElementById('phone').value||'').trim();
+  const code  = (document.getElementById('otpCode').value||'').trim();
+  if(!code){ showOtpMsg('⚠️ কোড লিখুন', false); return; }
+  const btn = document.getElementById('otpVerifyBtn');
+  btn.disabled=true; btn.textContent='⏳';
+  try{
+    const r = await fetch('/.netlify/functions/send-otp',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ action:'verify', phone, code })
+    });
+    const d = await r.json().catch(()=>({}));
+    if(d && d.verified){
+      phoneVerified = true;
+      showOtpMsg('✅ নম্বর যাচাই সম্পন্ন!', true);
+      document.getElementById('otpCode').disabled=true;
+      document.getElementById('otpSendBtn').disabled=true;
+      btn.textContent='✓ যাচাইকৃত';
+      return;
+    } else {
+      showOtpMsg('❌ ' + ((d&&d.error)||'কোড ভুল'), false);
+    }
+  }catch(e){ showOtpMsg('❌ সংযোগ সমস্যা: ' + e.message, false); }
+  btn.disabled=false; btn.textContent='✓ যাচাই';
+}
+
 function validateStep1(){
   const checks = [
     {id:'full_name',msg:'পূর্ণ নাম দিন'},
@@ -660,7 +752,11 @@ function validateStep1(){
 
 /* ── NAVIGATION ── */
 function go(s){
-  if(s===1){if(!validateStep1())return;fillSummary()}
+  if(s===1){
+    if(!validateStep1())return;
+    if(!phoneVerified){ showMsg('m1','⚠️ এগোনোর আগে মোবাইল নম্বর OTP দিয়ে যাচাই করুন','error'); return; }
+    fillSummary()
+  }
   if(s===2){if(!document.getElementById('consent').checked){showMsg('m2','⚠️ শর্তাবলীতে সম্মতি দিন','error');return}}
   document.getElementById('p'+s).classList.remove('active');
   step=s+1;
