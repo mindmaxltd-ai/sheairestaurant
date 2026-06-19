@@ -925,6 +925,41 @@ async function submitReg(){
           status:            'pending'
         })
       }).catch(e=>console.warn('Notification log:', e));
+      // 3b. স্বাগত SMS + Email পাঠাও (Netlify functions)
+      const memberId = cust.member_id || '';
+      const cName    = cust.full_name || custData.full_name || '';
+      const cPhone   = cust.phone || custData.phone || '';
+      const cEmail   = cust.email || custData.email || '';
+
+      // ── Welcome SMS (brand নাম সহ — sms.net.bd নিয়ম) ──
+      if(cPhone){
+        const smsMsg = `SAR: স্বাগতম ${cName}! আপনার সদস্য নং ${memberId}। আপনার দেওয়া password দিয়ে login করুন: sheairestaurant.com । এরপর স্বাস্থ্য তথ্য (metrics) পূরণ করুন।`;
+        fetch('/.netlify/functions/send-sms',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ to:cPhone, msg:smsMsg })
+        }).catch(e=>console.warn('Welcome SMS:', e));
+      }
+
+      // ── Welcome Email ──
+      if(cEmail){
+        const emailHtml = `
+          <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto">
+            <h2 style="color:#E91E8C">🌸 SAR — She AI Restaurant-এ স্বাগতম!</h2>
+            <p>প্রিয় <strong>${cName}</strong>,</p>
+            <p>আপনার নিবন্ধন সফল হয়েছে। 🎉</p>
+            <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:10px;padding:1rem;margin:1rem 0">
+              <p style="margin:.3rem 0"><strong>আপনার সদস্য নং (User ID):</strong> ${memberId}</p>
+              <p style="margin:.3rem 0"><strong>লগইন:</strong> sheairestaurant.com</p>
+              <p style="margin:.3rem 0;font-size:.9rem;color:#666">নিরাপত্তার জন্য আপনার password এই ইমেইলে পাঠানো হয়নি। নিবন্ধনের সময় আপনি যে password দিয়েছেন, সেটি দিয়েই login করুন।</p>
+            </div>
+            <p><strong>পরবর্তী ধাপ:</strong> login করে আপনার <strong>স্বাস্থ্য তথ্য (metrics)</strong> পূরণ করুন — তাহলে আপনার জন্য ব্যক্তিগত থেরাপিউটিক মেনু তৈরি হবে।</p>
+            <p style="color:#888;font-size:.8rem;margin-top:1.5rem">She AI Restaurant · women-only · women-run · women-led</p>
+          </div>`;
+        fetch('/.netlify/functions/send-email',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ to:cEmail, subject:`SAR-এ স্বাগতম — সদস্য নং ${memberId}`, html:emailHtml })
+        }).catch(e=>console.warn('Welcome Email:', e));
+      }
     }
 
     // 4. Store session
