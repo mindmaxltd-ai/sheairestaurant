@@ -616,18 +616,26 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <div class="settings-card-title">📨 বিজ্ঞপ্তি পাঠান</div>
           <div class="field-wrap" style="margin-bottom:.75rem">
             <label class="field-label">প্রাপক</label>
-            <select class="filter-select" style="width:100%">
-              <option>সব সক্রিয় গ্রাহক</option>
-              <option>ডায়াবেটিস গ্রাহক</option>
-              <option>গর্ভাবস্থা গ্রাহক</option>
-              <option>মেয়াদোত্তীর্ণ সদস্য</option>
+            <select class="filter-select" id="notifyTarget" style="width:100%">
+              <option value="active">সব সক্রিয় গ্রাহক</option>
+              <option value="DM">ডায়াবেটিস গ্রাহক</option>
+              <option value="OB">স্থূলতা গ্রাহক</option>
+              <option value="FL">ফ্যাটি লিভার গ্রাহক</option>
+              <option value="IB">IBS/গ্যাস্ট্রিক গ্রাহক</option>
+              <option value="PR">গর্ভাবস্থা গ্রাহক</option>
+              <option value="expired">মেয়াদোত্তীর্ণ সদস্য</option>
             </select>
           </div>
           <div class="field-wrap" style="margin-bottom:.75rem">
             <label class="field-label">বার্তা</label>
             <textarea class="field-input" rows="4" placeholder="আপনার বার্তা লিখুন..."></textarea>
           </div>
-          <div style="display:flex;gap:.75rem">
+          <div class="field-wrap" style="margin-bottom:.75rem">
+            <label class="field-label">SMS নম্বর (এক নম্বরে পাঠাতে — যেমন 01712345678)</label>
+            <input type="text" id="adminSmsNumber" class="field-input" placeholder="01XXXXXXXXX">
+          </div>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="topbar-btn primary" onclick="sendAdminSMS()">📩 SMS পাঠান</button>
             <button class="topbar-btn primary" onclick="sendAdminWhatsApp()">📱 WhatsApp পাঠান</button>
             <button class="topbar-btn ghost" onclick="sendAdminEmail()">📧 Email পাঠান</button>
           </div>
@@ -2522,6 +2530,36 @@ function saveSettings() {
 }
 
 // ── SEND WHATSAPP (uses Twilio API key from API Keys section) ──
+// ── SEND SMS (uses Netlify send-sms function → sms.net.bd) ──
+async function sendAdminSMS(){
+  const msgEl = document.querySelector('#sec-notifications textarea');
+  const numEl = document.getElementById('adminSmsNumber');
+  const msg = msgEl?.value?.trim();
+  const to  = numEl?.value?.trim();
+  if(!msg){ showToast('⚠️ বার্তা লিখুন'); return; }
+  if(!to){ showToast('⚠️ SMS নম্বর দিন'); return; }
+
+  showToast('⏳ SMS পাঠানো হচ্ছে...');
+
+  try {
+    const r = await fetch('/.netlify/functions/send-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: to, msg: msg })
+    });
+    const data = await r.json().catch(() => ({}));
+    if(data && data.sent){
+      showToast('✅ SMS পাঠানো হয়েছে!');
+      if(msgEl) msgEl.value = '';
+      if(numEl) numEl.value = '';
+    } else {
+      showToast('❌ SMS যায়নি: ' + ((data && data.error) || 'অজানা সমস্যা'), true);
+    }
+  } catch(e) {
+    showToast('❌ SMS function পাওয়া যায়নি: ' + e.message, true);
+  }
+}
+
 async function sendAdminWhatsApp(){
   const msgEl = document.querySelector('#sec-notifications textarea');
   const recipEl = document.querySelector('#sec-notifications select');
