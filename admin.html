@@ -630,10 +630,6 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             <label class="field-label">বার্তা</label>
             <textarea class="field-input" rows="4" placeholder="আপনার বার্তা লিখুন..."></textarea>
           </div>
-          <div class="field-wrap" style="margin-bottom:.75rem">
-            <label class="field-label">SMS নম্বর (এক নম্বরে পাঠাতে — যেমন 01712345678)</label>
-            <input type="text" id="adminSmsNumber" class="field-input" placeholder="01XXXXXXXXX">
-          </div>
           <div style="display:flex;gap:.75rem;flex-wrap:wrap">
             <button class="topbar-btn primary" onclick="sendAdminSMS()">📩 SMS পাঠান</button>
             <button class="topbar-btn primary" onclick="sendAdminWhatsApp()">📱 WhatsApp পাঠান</button>
@@ -935,6 +931,7 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
           <div id="bc-media-preview" style="margin-bottom:.75rem"></div>
 
           <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <button class="topbar-btn primary" onclick="sendBroadcast('sms')">📩 SMS পাঠান</button>
             <button class="topbar-btn primary" onclick="sendBroadcast('whatsapp')">📱 WhatsApp পাঠান</button>
             <button class="topbar-btn ghost" onclick="sendBroadcast('email')">📧 Email পাঠান</button>
             <button class="topbar-btn ghost" onclick="sendBroadcast('both')">📲 দুটোতেই পাঠান</button>
@@ -2284,10 +2281,39 @@ async function sendBroadcast(channel){
         headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
         body:JSON.stringify(payload) }); ok=true;
     }
+    if(channel==='sms'){
+      let sent=0, failed=0;
+      for(const c of recipients){
+        if(!c.phone){ failed++; continue; }
+        try{
+          const r = await fetch('/.netlify/functions/send-sms',{ method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ to:c.phone, msg:fullMsg }) });
+          const d = await r.json().catch(()=>({}));
+          if(d && d.sent) sent++; else failed++;
+        }catch(e){ failed++; }
+      }
+      ok = sent>0;
+      showToast(`📩 SMS: ${sent} সফল, ${failed} ব্যর্থ`, failed>0 && sent===0);
+    }
     if(channel==='email'||channel==='both'){
-      await fetch(`${SUPABASE_URL}/functions/v1/send-email`,{ method:'POST',
-        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},
-        body:JSON.stringify({...payload, template:'admin_broadcast_media'}) }); ok=true;
+      let sent=0, failed=0;
+      const htmlMsg = (title?`<h2>${title}</h2>`:'') +
+        `<p>${(msg||'').replace(/\n/g,'<br>')}</p>` +
+        (photo?`<p><img src="${photo}" style="max-width:100%"></p>`:'') +
+        (video?`<p>🎬 <a href="${video}">${video}</a></p>`:'');
+      for(const c of recipients){
+        if(!c.email){ failed++; continue; }
+        try{
+          const r = await fetch('/.netlify/functions/send-email',{ method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ to:c.email, subject:title||'SAR বার্তা', html:htmlMsg }) });
+          const d = await r.json().catch(()=>({}));
+          if(d && d.sent) sent++; else failed++;
+        }catch(e){ failed++; }
+      }
+      ok = ok || sent>0;
+      showToast(`📧 Email: ${sent} সফল, ${failed} ব্যর্থ`, failed>0 && sent===0);
     }
   }catch(e){ ok=false; }
 
@@ -2530,34 +2556,35 @@ function saveSettings() {
 }
 
 // ── SEND WHATSAPP (uses Twilio API key from API Keys section) ──
-// ── SEND SMS (uses Netlify send-sms function → sms.net.bd) ──
+// ── notification target → recipient list (group-based) ──
+function getNotifyRecipients(){
+  const t = document.getElementById('notifyTarget')?.value || 'active';
+  if(t==='active')  return allCustomers.filter(c=>c.is_active||c.monthly_sub_paid);
+  if(t==='expired') return allCustomers.filter(c=> c.monthly_sub_expiry_date && new Date(c.monthly_sub_expiry_date)<new Date());
+  return allCustomers.filter(c=>c.sar_category===t); // DM/OB/FL/IB/PR
+}
+
+// ── SEND SMS to selected GROUP (Netlify send-sms → sms.net.bd) ──
 async function sendAdminSMS(){
   const msgEl = document.querySelector('#sec-notifications textarea');
-  const numEl = document.getElementById('adminSmsNumber');
   const msg = msgEl?.value?.trim();
-  const to  = numEl?.value?.trim();
-  if(!msg){ showToast('⚠️ বার্তা লিখুন'); return; }
-  if(!to){ showToast('⚠️ SMS নম্বর দিন'); return; }
-
-  showToast('⏳ SMS পাঠানো হচ্ছে...');
-
-  try {
-    const r = await fetch('/.netlify/functions/send-sms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: to, msg: msg })
-    });
-    const data = await r.json().catch(() => ({}));
-    if(data && data.sent){
-      showToast('✅ SMS পাঠানো হয়েছে!');
-      if(msgEl) msgEl.value = '';
-      if(numEl) numEl.value = '';
-    } else {
-      showToast('❌ SMS যায়নি: ' + ((data && data.error) || 'অজানা সমস্যা'), true);
-    }
-  } catch(e) {
-    showToast('❌ SMS function পাওয়া যায়নি: ' + e.message, true);
+  if(!msg){ showToast('⚠️ বার্তা লিখুন', true); return; }
+  const recipients = getNotifyRecipients();
+  if(!recipients.length){ showToast('⚠️ এই গ্রুপে কোনো গ্রাহক নেই', true); return; }
+  showToast(`⏳ ${recipients.length} জনকে SMS পাঠানো হচ্ছে...`);
+  let sent=0, failed=0;
+  for(const c of recipients){
+    if(!c.phone){ failed++; continue; }
+    try{
+      const r = await fetch('/.netlify/functions/send-sms',{ method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ to:c.phone, msg }) });
+      const d = await r.json().catch(()=>({}));
+      if(d && d.sent) sent++; else failed++;
+    }catch(e){ failed++; }
   }
+  if(sent>0 && msgEl) msgEl.value='';
+  showToast(`📩 SMS: ${sent} সফল, ${failed} ব্যর্থ`, failed>0 && sent===0);
 }
 
 async function sendAdminWhatsApp(){
@@ -2599,8 +2626,31 @@ async function sendAdminWhatsApp(){
   }
 }
 
-// ── SEND EMAIL (uses Resend API key from API Keys section) ──
+// ── SEND EMAIL to selected GROUP (Netlify send-email → Resend) ──
 async function sendAdminEmail(){
+  const msgEl = document.querySelector('#sec-notifications textarea');
+  const msg = msgEl?.value?.trim();
+  if(!msg){ showToast('⚠️ বার্তা লিখুন', true); return; }
+  const recipients = getNotifyRecipients();
+  if(!recipients.length){ showToast('⚠️ এই গ্রুপে কোনো গ্রাহক নেই', true); return; }
+  showToast(`⏳ ${recipients.length} জনকে Email পাঠানো হচ্ছে...`);
+  const html = `<p>${msg.replace(/\n/g,'<br>')}</p>`;
+  let sent=0, failed=0;
+  for(const c of recipients){
+    if(!c.email){ failed++; continue; }
+    try{
+      const r = await fetch('/.netlify/functions/send-email',{ method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ to:c.email, subject:'SAR বার্তা', html }) });
+      const d = await r.json().catch(()=>({}));
+      if(d && d.sent) sent++; else failed++;
+    }catch(e){ failed++; }
+  }
+  if(sent>0 && msgEl) msgEl.value='';
+  showToast(`📧 Email: ${sent} সফল, ${failed} ব্যর্থ`, failed>0 && sent===0);
+}
+
+async function sendAdminEmail_OLD_UNUSED(){
   const msgEl = document.querySelector('#sec-notifications textarea');
   const msg = msgEl?.value?.trim();
   if(!msg){ showToast('⚠️ বার্তা লিখুন'); return; }
