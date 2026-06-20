@@ -153,6 +153,9 @@ img{max-width:100%;display:block}
 .dbadge{font-size:.65rem;font-weight:800;color:var(--green);background:var(--green-soft);border:1px solid #CBE6D9;padding:.22rem .55rem;border-radius:999px}
 .ings{display:flex;flex-wrap:wrap;gap:.35rem}
 .ing{font-size:.74rem;font-weight:800;color:var(--pink-d);background:#FFF2FA;border:1px solid #F4C7DF;padding:.25rem .58rem;border-radius:999px}
+.ing-verify{text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:.25rem;transition:all .12s}
+.ing-verify:hover{background:var(--green-soft);border-color:var(--green);color:var(--green-d)}
+.ing-chk{font-size:.66rem;opacity:.7}
 .adds{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
 .adds-l{font-size:.7rem;font-weight:700;color:var(--ink-2)}
 .addchip{font-size:.72rem;font-weight:800;color:var(--orange-d);background:var(--orange-soft);border:1px solid #FED7AA;padding:.22rem .55rem;border-radius:999px}
@@ -581,6 +584,22 @@ async function api(action,body){
   if(!r.ok) throw new Error(action+' '+r.status);
   return r.json();
 }
+// ── daily_health_log সরাসরি Supabase থেকে আনার জন্য ──
+const SUPA_URL='https://xlkrggspepnysbouatec.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const SUPA_H={apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY};
+async function fetchDailyLog(cid){
+  if(!cid||cid==='demo') return null;
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    let r=await fetch(`${SUPA_URL}/rest/v1/daily_health_log?customer_id=eq.${cid}&log_date=eq.${today}&limit=1`,{headers:SUPA_H});
+    let d=r.ok?await r.json():[];
+    if(Array.isArray(d)&&d.length) return d[0];
+    r=await fetch(`${SUPA_URL}/rest/v1/daily_health_log?customer_id=eq.${cid}&order=log_date.desc&limit=1`,{headers:SUPA_H});
+    d=r.ok?await r.json():[];
+    return (Array.isArray(d)&&d.length)?d[0]:null;
+  }catch(e){return null;}
+}
 const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
 const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
@@ -670,6 +689,7 @@ let aiTitles=null; // {breakfast:[...7], lunch:[...7], dinner:[...7]} from Claud
 
 // ── state ──
 let metrics={}, allMenu=[], myWeek={}, cardSel={};
+let dailyLog=null;
 let activeDay=0, myCats=['DM'], activeCat='DM', mixOn=false;
 let cart=JSON.parse(localStorage.getItem('sar_ms_cart')||'[]');
 let analysis=null;
@@ -677,6 +697,7 @@ let analysis=null;
 window.addEventListener('DOMContentLoaded',async()=>{
   showLoader('আপনার মেনু তৈরি হচ্ছে…');
   try{const m=await api('metrics',{customer_id:CID});metrics=m.metrics||{};}catch(e){metrics={};}
+  dailyLog=await fetchDailyLog(CID);
   myCats=detectCats(metrics);
 
   // RULE (per mentor): if NO disease is set, show NOTHING — no menu,
@@ -903,10 +924,21 @@ async function runAnalysis(silent){
 }
 function buildPrompt(cat){
   const m=metrics;
+  const L=dailyLog||{};
+  const yn=(v)=>(v===true||v==='হ্যাঁ'||v==='yes')?'হ্যাঁ':'না';
+  let logLine='';
+  if(dailyLog){
+    logLine='আজকের আপডেট → জ্বর:'+(L.fever?yn(L.fever)+(L.fever_temp?'('+L.fever_temp+'°F)':''):'না')+
+      ' | পেট খারাপ:'+yn(L.stomach_upset)+' | পাতলা পায়খানা:'+yn(L.loose_motion)+
+      ' | মাথাব্যথা:'+yn(L.headache)+' | মাসিক:'+yn(L.period_today)+(L.cramping?' (cramping '+(L.cramping_level||'?')+'/১০)':'')+
+      ' | মানসিক:'+(L.mental_condition||'?')+' | কফি:'+(L.coffee_cups||0)+'কাপ | পানি:'+(L.water_intake||'?')+'লি'+
+      ' | গতকাল খাবার:'+(L.food_eaten||'?')+' | পছন্দ:'+(L.food_preference_today||'কিছু বলেননি')+'\n';
+  }
   return 'তুমি SAR She AI Restaurant-এর পুষ্টি AI। নিচের বাংলাদেশি নারীর তথ্য বিশ্লেষণ করে আজকের ব্যক্তিগত মিল প্ল্যান হিসাব করো।\n'+
     'সব খাবার তেলমুক্ত, চিনিমুক্ত, রংমুক্ত, দুধমুক্ত, আগুনমুক্ত (steam/bake/air-fry), অর্গানিক, আয়ুর্বেদিক। অনুমোদিত: মাখন, টক দই, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম, মৌসুমি ফল।\n'+
     'নাম:'+CNAME+' | BMI:'+(m.bmi||'?')+' | রোগ:'+cat+' | স্ট্রেস:'+(m.stress_level||'?')+'/১০ | ঘুম:'+(m.sleep_hours||m.sleep||'?')+'ঘ | মুড:'+(m.mood||'?')+' | কার্যকলাপ:'+(m.activity_level||'?')+' | গর্ভাবস্থা:'+(m.pregnancy_status||'না')+' | সপ্তাহ:'+WEEK_SEED+'\n'+
-    'রোগ ও আজকের কন্ডিশন (স্ট্রেস/ঘুম/মুড) অনুযায়ী থেরাপিউটিক পাউডার, কন্ডিশন পাউডার ও চাটনি বেছে দাও।\n'+
+    logLine+
+    'রোগ ও আজকের কন্ডিশন (স্ট্রেস/ঘুম/মুড/জ্বর/মাসিক/পেট) অনুযায়ী থেরাপিউটিক পাউডার, কন্ডিশন পাউডার ও চাটনি বেছে দাও। জ্বর বা পেট খারাপ থাকলে হালকা সহজপাচ্য খাবার দাও।\n'+
     'শুধু JSON দাও (titles=এই সপ্তাহের ৭টি ইংরেজি মিল-নাম প্রতি বেলায়; daily=ঐচ্ছিক, প্রতিদিনের মেডিসিনাল লেয়ার):\n'+
     '{"score":<৫৫-৯৮>,"target":<kcal>,"protein":<g>,"split":{"breakfast":0.3,"lunch":0.4,"dinner":0.3},"focus":"<বাংলায়>","mood":"<বাংলায়>","weather":"<বাংলায়>","note":"<২ বাক্য বাংলায়>",'+
     '"titles":{"breakfast":["..7টি.."],"lunch":["..7টি.."],"dinner":["..7টি.."]},'+
@@ -1068,8 +1100,8 @@ function card(item,meal){
     '<div class="mc-body">'+
       '<div class="badges">'+DIET_BADGES.map(b=>'<span class="dbadge">'+b+'</span>').join('')+'</div>'+
       '<div class="adds"><span class="adds-l">অনুমোদিত:</span>'+ALLOWED_ADDS.map(a=>'<span class="addchip">'+a+'</span>').join('')+'</div>'+
-      '<div><div class="panel-h">প্রধান কোর্সের উপাদান</div><div class="ings">'+
-        allIngs.map(i=>'<span class="ing">'+i+'</span>').join('')+'</div></div>'+
+      '<div><div class="panel-h">প্রধান কোর্সের উপাদান <span style="font-size:.66rem;color:var(--green-d);font-weight:700">🔗 যাচাই করুন</span></div><div class="ings">'+
+        allIngs.map(i=>'<a class="ing ing-verify" href="blockchain.html?ing='+encodeURIComponent(i)+'" target="_blank" title="ব্লকচেইন ট্রেসেবিলিটি যাচাই করুন">'+i+' <span class="ing-chk">🔗</span></a>').join('')+'</div></div>'+
       '<div><div class="panel-h">Quick Nutrition Panel · নির্বাচিত কোর্স অনুযায়ী</div>'+
         '<div class="nutri">'+
           '<div class="n-pill cal"><div class="nv num">'+bn(kcal)+'</div><div class="nk">kcal</div></div>'+
