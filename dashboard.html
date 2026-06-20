@@ -2149,10 +2149,25 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
     });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const d  = await r.json();
-    const raw = d.text || '{}';
-    let parsed;
-    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch(e) { parsed = {health_score:65, analysis_bn: raw.substring(0,300)}; }
+
+    // analyze.js নিজেই parsed object + সব field spread করে ফেরত দেয় — সেটা আগে ব্যবহার করি
+    let parsed = null;
+    if (d.parsed && typeof d.parsed === 'object' && d.parsed.health_score != null) {
+      parsed = d.parsed;
+    } else if (d.health_score != null || d.analysis_bn) {
+      parsed = d;  // field গুলো top-level এ spread করা আছে
+    } else {
+      // fallback: কাঁচা text থেকে নিজে JSON বের করি (```fence বা বাড়তি লেখা থাকলেও)
+      const raw = d.text || '{}';
+      let clean = raw.replace(/```json|```/g,'').trim();
+      const a = clean.indexOf('{'), b = clean.lastIndexOf('}');
+      if (a > -1 && b > a) clean = clean.slice(a, b+1);
+      try { parsed = JSON.parse(clean); }
+      catch(e) {
+        console.error('JSON parse ব্যর্থ:', e.message, '| raw:', raw.slice(0,200));
+        parsed = { health_score: null, analysis_bn: clean.slice(0,300) };
+      }
+    }
     Object.assign(demo, parsed);
     toast('✅ AI বিশ্লেষণ সম্পন্ন!', true);
   } catch(e) {
