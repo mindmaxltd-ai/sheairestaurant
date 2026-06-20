@@ -8,7 +8,8 @@
 <style>
 :root{
   --pink:#E91E8C;--pink2:#FF6BB5;
-  --purple:#6B21A8;--purple2:#A855F7;
+  --purple:#F97316;--purple2:#FB923C;   /* orange accent (replaces purple) */
+  --orange:#F97316;--orange2:#FB923C;
   --yellow:#F59E0B;--yellow2:#FCD34D;
   --red:#DC2626;--red2:#F87171;
   --green:#059669;--green2:#34D399;
@@ -339,7 +340,7 @@ textarea{resize:vertical;min-height:76px}
           </div>
           <div class="fld">
             <label>জন্ম তারিখ <span class="req">⭐</span></label>
-            <input type="date" id="date_of_birth" required>
+            <input type="text" id="date_of_birth" placeholder="দিন-মাস-বছর (যেমন: 15-08-1995)" maxlength="10" inputmode="numeric" oninput="fmtDob(this)" required>
           </div>
           <div class="fld">
             <label>রক্তের গ্রুপ <span class="opt">(ঐচ্ছিক)</span></label>
@@ -501,7 +502,7 @@ textarea{resize:vertical;min-height:76px}
 
         <div class="fld" style="background:rgba(233,30,140,.05);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:1rem;margin-bottom:1rem">
           <button type="button" id="otpSendBtn" onclick="sendOtp()"
-            style="width:100%;background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;border:none;border-radius:10px;padding:.8rem 1rem;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:.85rem">
+            style="width:100%;background:linear-gradient(135deg,#E91E8C,#F97316);color:#fff;border:none;border-radius:10px;padding:.8rem 1rem;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:.85rem">
             📱 যাচাই কোড পাঠান
           </button>
           <div style="display:flex;gap:.5rem;align-items:stretch">
@@ -587,7 +588,7 @@ textarea{resize:vertical;min-height:76px}
             ✦ নিবন্ধন সম্পন্ন করুন — ৳ ১,০০০
           </button>
           <p style="text-align:center;font-size:.72rem;color:rgba(255,255,255,.28);margin-top:.65rem">
-            ShurjoPay নিরাপদ পেমেন্ট গেটওয়ে
+            🔐 SSLCommerz নিরাপদ পেমেন্ট গেটওয়ে — bKash, Nagad, Rocket, Visa/Mastercard
           </p>
         </div>
 
@@ -749,6 +750,11 @@ function validateStep1(){
   }
   const ph = g('phone');
   if(!/^01[3-9]\d{8}$/.test(ph)){showMsg('m1','⚠️ সঠিক মোবাইল নম্বর দিন (11 সংখ্যা)','error');return false}
+  // জন্ম তারিখ format যাচাই (দিন-মাস-বছর)
+  if(!dobToISO(g('date_of_birth'))){
+    showMsg('m1','⚠️ জন্ম তারিখ দিন-মাস-বছর ফরম্যাটে দিন (যেমন: 15-08-1995)','error');
+    document.getElementById('date_of_birth')?.focus();return false;
+  }
   // Password validation
   const pwd = document.getElementById('reg_password').value;
   const pwdC = document.getElementById('reg_password_confirm').value;
@@ -806,6 +812,24 @@ function back(s){
   document.getElementById('p'+step).classList.add('active');
   updateProg(step);
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── DOB (দিন-মাস-বছর) ── */
+// টাইপ করার সময় অটো dash বসায়: 15081995 → 15-08-1995
+function fmtDob(el){
+  let v = el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length >= 5) v = v.slice(0,2)+'-'+v.slice(2,4)+'-'+v.slice(4);
+  else if(v.length >= 3) v = v.slice(0,2)+'-'+v.slice(2);
+  el.value = v;
+}
+// dd-mm-yyyy → yyyy-mm-dd (Supabase date column-এর জন্য)। ভুল হলে null।
+function dobToISO(s){
+  if(!s) return null;
+  const m = String(s).trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if(!m) return null;
+  const dd=+m[1], mm=+m[2], yy=+m[3];
+  if(mm<1||mm>12||dd<1||dd>31) return null;
+  return `${m[3]}-${m[2]}-${m[1]}`;
 }
 
 /* ── BMI ── */
@@ -873,7 +897,7 @@ async function submitReg(){
       full_name:              g('full_name'),
       phone:                  g('phone'),
       email:                  g('email')||null,
-      date_of_birth:          g('date_of_birth')||null,
+      date_of_birth:          dobToISO(g('date_of_birth')),
       blood_group:            g('blood_group')||null,
       height_cm:              gn('height_cm')||null,
       weight_kg:              gn('weight_kg')||null,
@@ -933,6 +957,8 @@ async function submitReg(){
     lTxt.textContent='পেমেন্ট রেকর্ড করা হচ্ছে...';
 
     // 2. Payment record
+    const regTxnId = 'SARREG-' + Date.now() + '-' + Math.floor(Math.random()*9000+1000);
+    const payMethod = (typeof selPayMethod!=='undefined') ? selPayMethod : 'bkash';
     if(cust.id){
       await fetch(`${SUPA_URL}/rest/v1/payments`,{
         method:'POST',
@@ -944,8 +970,9 @@ async function submitReg(){
           discount_applied:1000,
           discount_reason: 'প্রথম ১ লাখ গ্রাহক ৫০% ছাড়',
           final_amount:    1000,
-          payment_method:  typeof selPayMethod!=='undefined'?selPayMethod:'bkash',
-          status:          'pending'
+          payment_method:  payMethod,
+          transaction_id:  regTxnId,
+          status:          payMethod==='cash' ? 'pending' : 'success'
         })
       }).catch(e=>console.warn('Payment record:', e));
 
@@ -1010,7 +1037,24 @@ async function submitReg(){
 
     loader.classList.remove('show');
 
-    // Show success with pending message
+    // ── SSLCommerz hosted payment page-এ পাঠাও (cash ছাড়া) ──
+    if(payMethod !== 'cash'){
+      loader.classList.add('show');
+      if(lTxt) lTxt.textContent='নিরাপদ পেমেন্ট পেজে নিয়ে যাওয়া হচ্ছে...';
+      // ফেরার পরে success/receipt পেজ যেন context পায়
+      localStorage.setItem('sar_pending_registration', JSON.stringify({
+        customer_id: cust.id || '',
+        member_id:   cust.member_id || '',
+        txn:         regTxnId,
+        amount:      1000,
+        method:      payMethod,
+        time:        new Date().toISOString()
+      }));
+      window.location.href = 'https://pay.sslcommerz.com/3a2056256871eec779ebd94ee8bf33a3467108be';
+      return;
+    }
+
+    // Show success with pending message (cash flow)
     document.getElementById('p4').classList.remove('active');
     const sp = document.getElementById('sucPanel');
     sp.style.display = 'block';
