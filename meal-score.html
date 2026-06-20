@@ -600,6 +600,15 @@ async function fetchDailyLog(cid){
     return (Array.isArray(d)&&d.length)?d[0]:null;
   }catch(e){return null;}
 }
+// customers টেবিল থেকে height/weight/bmi/sar_category আনে (customer_metrics-এ এগুলো নেই)
+async function fetchCustomerVitals(cid){
+  if(!cid||cid==='demo') return {};
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/customers?id=eq.${cid}&select=height_cm,weight_kg,bmi,date_of_birth,sar_category&limit=1`,{headers:SUPA_H});
+    const d=r.ok?await r.json():[];
+    return (Array.isArray(d)&&d.length)?d[0]:{};
+  }catch(e){return {};}
+}
 const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
 const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
@@ -697,6 +706,21 @@ let analysis=null;
 window.addEventListener('DOMContentLoaded',async()=>{
   showLoader('আপনার মেনু তৈরি হচ্ছে…');
   try{const m=await api('metrics',{customer_id:CID});metrics=m.metrics||{};}catch(e){metrics={};}
+  // customers টেবিল থেকে height/weight/bmi/sar_category এনে metrics-এ merge করি
+  // (এগুলো customer_metrics-এ নেই — customers টেবিলে থাকে)
+  try{
+    const v=await fetchCustomerVitals(CID);
+    if(v){
+      if(v.bmi!=null && (metrics.bmi==null||metrics.bmi==='')) metrics.bmi=v.bmi;
+      if(v.height_cm!=null) metrics.height_cm=v.height_cm;
+      if(v.weight_kg!=null) metrics.weight_kg=v.weight_kg;
+      if(v.sar_category && !metrics.sar_category) metrics.sar_category=v.sar_category;
+      // bmi না থাকলে height+weight থেকে হিসাব করি
+      if((metrics.bmi==null||metrics.bmi==='') && v.height_cm>0 && v.weight_kg>0){
+        const h=+v.height_cm/100; metrics.bmi=+(+v.weight_kg/(h*h)).toFixed(1);
+      }
+    }
+  }catch(e){}
   dailyLog=await fetchDailyLog(CID);
   myCats=detectCats(metrics);
 
@@ -883,7 +907,8 @@ async function runAnalysis(silent){
     const t=await api('latestScore',{customer_id:CID});
     if(t&&t.found&&t.analysis){
       const saved=t.analysis;
-      const rj=saved.result_json||{};
+      let rj=saved.result_json||{};
+      if(typeof rj==='string'){ try{rj=JSON.parse(rj);}catch(e){rj={};} }
       const savedCat=normalizeCat(saved.category)||activeCat;
       if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
       // আজকের কিনা যাচাই — তারিখ অনুযায়ী source লেখা
@@ -960,13 +985,24 @@ function localEngine(cat){
 }
 function applyPersonalization(a){
   const split=a.split||{breakfast:.3,lunch:.4,dinner:.3};
+  const dailyTarget=+a.target||1500;
+  const courseCount=a.course_count||{breakfast:3,lunch:4,dinner:4};
   // store a per-customer kcal factor so course kcal scales to her target
   const baseDaily=1500;
-  window._kcalFactor=Math.max(0.8,Math.min(1.3,(a.target||1500)/baseDaily));
+  window._kcalFactor=Math.max(0.8,Math.min(1.3,dailyTarget/baseDaily));
+  // coordinated: প্রতি meal-এর target = dailyTarget × split (যোগফল = dailyTarget ✓)
+  window._mealTargets={
+    breakfast:Math.round(dailyTarget*(split.breakfast||.3)),
+    lunch:    Math.round(dailyTarget*(split.lunch||.4)),
+    dinner:   Math.round(dailyTarget*(split.dinner||.3)),
+  };
+  window._courseCount=courseCount;
   Object.values(myWeek).forEach(day=>{
     MEALS.forEach(meal=>{
       const item=day[meal.key];
       item._share=split[meal.key]||.33;
+      item._mealKcal=window._mealTargets[meal.key]||Math.round(dailyTarget*0.33);
+      item._courseN=courseCount[meal.key]||4;
       item._tweak=window._kcalFactor>1.02?'আপনার জন্য পরিমাণ বাড়ানো':(window._kcalFactor<0.98?'আপনার জন্য পরিমাণ কমানো':'আপনার জন্য মানানসই পরিমাণ');
     });
   });
@@ -1060,10 +1096,17 @@ function card(item,meal){
   const mixExtra=mixOn?Math.round(base*MIX_RATE):0;
   const withVat=Math.round((base+mixExtra)*(1+VAT_RATE));
   const f=window._kcalFactor||1;
-  // kcal/protein = SUM of selected courses' fixed values × personal factor
+  // ── COORDINATED kcal: প্রতি meal-এর target (daily × split) থেকে
+  //    প্রতি course-এর kcal বের করি। মূল ৩ course (আবশ্যক) target ভাগ করে,
+  //    course ৪/৫ (চাটনি/ফল) অল্প fixed। নির্বাচিত course-এর যোগফল দেখাই। ──
+  const mealKcalTarget=item._mealKcal||Math.round((window._mealTargets&&window._mealTargets[meal.key])||450);
+  const mainCount=Math.max(1,Math.min(3,(item._courseN||3)));   // মূল course (১-৩)
+  const perMainKcal=Math.round(mealKcalTarget/mainCount);
+  const COURSE_KCAL_C=[perMainKcal,perMainKcal,perMainKcal,45,65];  // ৪=চাটনি,৫=ফল
+  const COURSE_PROT_C=[Math.round(mealKcalTarget*0.25/4/mainCount),Math.round(mealKcalTarget*0.25/4/mainCount),Math.round(mealKcalTarget*0.25/4/mainCount),1,2];
   let kcal=0,prot=0;
-  sel.forEach(ci=>{kcal+=COURSE_KCAL[ci]||120;prot+=COURSE_PROT[ci]||5;});
-  kcal=Math.round(kcal*f/5)*5; prot=Math.round(prot*f);
+  sel.forEach(ci=>{kcal+=COURSE_KCAL_C[ci]||100;prot+=COURSE_PROT_C[ci]||4;});
+  kcal=Math.round(kcal/5)*5; prot=Math.round(prot);
   const fat=Math.round(kcal*0.25/9), carb=Math.round(kcal*0.4/4), fib=Math.max(6,Math.round(cnt*3.2));
   const dr=[['প্রোটিন',Math.min(99,Math.round(prot/0.6))],['আয়রন',Math.min(99,22+cnt*4)],['ফাইবার',Math.min(99,Math.round(fib/0.25))],['ভিটামিন C',Math.min(99,30+cnt*5)]];
   const db=MEAL_DB[item.cat]||MEAL_DB.DM;
@@ -1159,9 +1202,14 @@ function buildCartItem(uid){
   const courses=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>c.n);
   // store the actual day ingredients so kitchen.html receives THIS day's recipe
   const courseDetail=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>({name:c.n,items:c.items||[]}));
-  const f=window._kcalFactor||1;
-  let kc=0,pr=0; sel.forEach(ci=>{kc+=COURSE_KCAL[ci]||120;pr+=COURSE_PROT[ci]||5;});
-  kc=Math.round(kc*f/5)*5; pr=Math.round(pr*f);
+  // COORDINATED kcal (card-এর মতো একই হিসাব) — meal target থেকে
+  const _mt=(window._mealTargets&&window._mealTargets[mealKey])||Math.round(((window._mealTargets&&Object.values(window._mealTargets).reduce((a,b)=>a+b,0))||1500)*0.33);
+  const _mainN=Math.max(1,Math.min(3,(window._courseCount&&window._courseCount[mealKey])||3));
+  const _perMain=Math.round(_mt/_mainN);
+  const _CK=[_perMain,_perMain,_perMain,45,65];
+  const _CP=[Math.round(_mt*0.25/4/_mainN),Math.round(_mt*0.25/4/_mainN),Math.round(_mt*0.25/4/_mainN),1,2];
+  let kc=0,pr=0; sel.forEach(ci=>{kc+=_CK[ci]||100;pr+=_CP[ci]||4;});
+  kc=Math.round(kc/5)*5; pr=Math.round(pr);
   const medic=medicinalFor(item.cat,di,mealKey);  // day/condition/AI medicinal layer
   return {uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,day_index:di,courseDetail,kcalFactor:f,
     name:item.ename||item.name,name_bn:item.name,meal:mealKey,mealBn:MEALS.find(m=>m.key===mealKey).bn,
