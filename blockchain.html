@@ -215,6 +215,7 @@
           throw new Error(JSON.stringify(allIngredients));
         }
         renderIngredients(allIngredients);
+        openFromURL();   // meal-score থেকে ?ing= এলে সরাসরি ঐ উপাদান খুলি
       } catch (e) {
         console.error('Blockchain load error:', e);
         grid.innerHTML = `
@@ -259,6 +260,28 @@
         (i.name_en || '').toLowerCase().includes(query.toLowerCase())
       );
       renderIngredients(filtered);
+    }
+
+    // meal-score থেকে আসা ?ing=<নাম> থাকলে মিলিয়ে detail খুলি
+    function openFromURL() {
+      try {
+        const q = new URLSearchParams(location.search).get('ing');
+        if (!q || !Array.isArray(allIngredients) || !allIngredients.length) return;
+        const needle = q.trim().toLowerCase();
+        const hit = allIngredients.find(i =>
+          (i.name_bn || '').trim().toLowerCase() === needle ||
+          (i.name_en || '').trim().toLowerCase() === needle ||
+          (i.name_bn || '').toLowerCase().includes(needle) ||
+          (i.name_en || '').toLowerCase().includes(needle)
+        );
+        if (hit) {
+          showDetail(hit.id);
+        } else {
+          // মিল না পেলে search box-এ বসিয়ে filter করি
+          const sb = document.querySelector('.search-bar');
+          if (sb) { sb.value = q; filterIngredients(q); }
+        }
+      } catch (e) { /* ignore */ }
     }
 
     function showDetail(id) {
