@@ -194,7 +194,7 @@ ${coffeeFlag  ? '\n⚠️ অতিরিক্ত কফি ('+log.coffee_cups+
       },
       body: JSON.stringify({
         model:      'claude-haiku-4-5-20251001',
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages:   [{ role: 'user', content: finalPrompt }]
       })
     });
@@ -215,29 +215,41 @@ ${coffeeFlag  ? '\n⚠️ অতিরিক্ত কফি ('+log.coffee_cups+
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     let parsed = null;
     try {
-      const clean = text.replace(/```json|```/g, '').trim();
-      // Handle case where Claude adds text before/after JSON
+      let clean = text.replace(/```json|```/g, '').trim();
       const jsonStart = clean.indexOf('{');
       const jsonEnd   = clean.lastIndexOf('}');
       if (jsonStart >= 0 && jsonEnd > jsonStart) {
-        parsed = JSON.parse(clean.substring(jsonStart, jsonEnd + 1));
-      } else {
-        parsed = JSON.parse(clean);
+        clean = clean.substring(jsonStart, jsonEnd + 1);
       }
+      parsed = JSON.parse(clean);
     } catch(pe) {
-      // Fallback: return raw text in analysis_bn
+      // ── অসম্পূর্ণ/truncated JSON — field গুলো আলাদা করে উদ্ধার করি ──
+      const grabStr = (key) => {
+        const m = text.match(new RegExp('"' + key + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+        return m ? m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ') : null;
+      };
+      const grabNum = (key) => {
+        const m = text.match(new RegExp('"' + key + '"\\s*:\\s*(\\d+)'));
+        return m ? parseInt(m[1]) : null;
+      };
+      const grabArr = (key) => {
+        const m = text.match(new RegExp('"' + key + '"\\s*:\\s*\\[([^\\]]*)\\]'));
+        if (!m) return [];
+        return (m[1].match(/"((?:[^"\\]|\\.)*)"/g) || []).map(s => s.slice(1,-1));
+      };
+
       parsed = {
-        health_score:     65,
-        analysis_bn:      text.substring(0, 300),
-        morning_greeting: 'শুভ সকাল!',
-        recommendations:  text.substring(0, 150),
-        problems:         [],
-        solutions:        [],
-        daily_menu: {
-          breakfast: { name:'মেথি কুইনোয়া পরিজ',  calories:280, benefits:'রক্তে শর্করা নিয়ন্ত্রণ', herbs:'মেথি' },
-          lunch:     { name:'করলা মুগ ডাল স্যুপ',  calories:380, benefits:'গ্লুকোজ নিয়ন্ত্রণ',     herbs:'করলা' },
-          dinner:    { name:'হলুদ ব্রোকলি স্যুপ',  calories:300, benefits:'অ্যান্টিঅক্সিডেন্ট',    herbs:'হলুদ' }
-        }
+        health_score:           grabNum('health_score') ?? null,
+        analysis_bn:            grabStr('analysis_bn') || 'বিশ্লেষণ অসম্পূর্ণ — আবার চেষ্টা করুন।',
+        morning_greeting:       grabStr('morning_greeting') || '',
+        recommendations:        grabStr('recommendations') || '',
+        problems:               grabArr('problems'),
+        solutions:              grabArr('solutions'),
+        conventional_medicine:  grabArr('conventional_medicine'),
+        homeopathic:            grabArr('homeopathic'),
+        ayurvedic:              grabArr('ayurvedic'),
+        food_remedies:          grabArr('food_remedies'),
+        _truncated:             true   // debug: parse fail হয়েছিল বোঝাতে
       };
     }
 
