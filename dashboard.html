@@ -2195,8 +2195,9 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
       daily_menu_recommendation_json: toJson(demo.daily_menu_recommendation_json || null),
       disclaimer_shown:               true
     };
-    const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
-      method:'POST', headers:{...H,'Prefer':'return=representation'},
+    const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis?on_conflict=customer_id,analysis_date`,{
+      method:'POST',
+      headers:{...H,'Prefer':'resolution=merge-duplicates,return=representation'},
       body: JSON.stringify(rowToSave)
     });
     if(!r2.ok){
