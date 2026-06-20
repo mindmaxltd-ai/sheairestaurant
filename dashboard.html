@@ -2160,15 +2160,43 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
     toast('⚠️ ' + e.message + ' — Demo দেখাচ্ছে', false);
   }
 
-  // Save to Supabase
+  // Save to Supabase — টেবিলের আসল column নামে map করো
   try {
+    const toJson = (v) => (v == null ? null : (typeof v === 'string' ? v : JSON.stringify(v)));
+    const rowToSave = {
+      customer_id:                    CID,
+      analysis_date:                  today,
+      health_score:                   demo.health_score ?? null,
+      health_summary_bn:              demo.analysis_bn || demo.health_summary_bn || null,
+      general_suggestions_bn:         demo.recommendations || demo.general_suggestions_bn || null,
+      problems_json:                  toJson(demo.problems || demo.problems_json || null),
+      nutrition_advice_bn:            demo.nutrition_advice_bn || null,
+      conventional_medicines_json:    toJson(demo.conventional_medicine || demo.conventional_medicines_json || null),
+      ayurvedic_bn:                   Array.isArray(demo.ayurvedic) ? demo.ayurvedic.join('\n') : (demo.ayurvedic_bn || null),
+      homeopathic_bn:                 Array.isArray(demo.homeopathic) ? demo.homeopathic.join('\n') : (demo.homeopathic_bn || null),
+      home_remedies_bn:               Array.isArray(demo.food_remedies) ? demo.food_remedies.join('\n') : (demo.home_remedies_bn || null),
+      medicinal_plants_json:          toJson(demo.medicinal_plants_json || null),
+      motivational_message_bn:        demo.islamic_remedy ? (Array.isArray(demo.islamic_remedy) ? demo.islamic_remedy.join('\n') : demo.islamic_remedy) : (demo.motivational_message_bn || null),
+      daily_menu_recommendation_json: toJson(demo.daily_menu_recommendation_json || null),
+      disclaimer_shown:               true
+    };
     const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
       method:'POST', headers:{...H,'Prefer':'return=representation'},
-      body: JSON.stringify(demo)
+      body: JSON.stringify(rowToSave)
     });
+    if(!r2.ok){
+      const errTxt = await r2.text();
+      console.error('ai_analysis save failed:', r2.status, errTxt);
+      toast('⚠️ সেভ ব্যর্থ ('+r2.status+') — Console দেখুন', false);
+      renderAnalysis({...rowToSave, id:'temp', analysis_bn:rowToSave.health_summary_bn, recommendations:rowToSave.general_suggestions_bn}, null);
+      return;
+    }
     const d2 = await r2.json();
-    renderAnalysis(d2[0]||demo, null);
-  } catch(e) { renderAnalysis(demo, null); }
+    renderAnalysis(d2[0]||rowToSave, null);
+  } catch(e) {
+    console.error('ai_analysis save error:', e);
+    renderAnalysis({...demo, id:'temp'}, null);
+  }
 }
 // ═══════════════════════════════════════
 // RENDER DAILY MENU
