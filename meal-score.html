@@ -885,20 +885,26 @@ async function runAnalysis(silent){
       const saved=t.analysis;
       const rj=saved.result_json||{};
       const savedCat=normalizeCat(saved.category)||activeCat;
+      if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
       // আজকের কিনা যাচাই — তারিখ অনুযায়ী source লেখা
       const created=(saved.created_at||'').slice(0,10);
       const today=new Date().toISOString().slice(0,10);
       const isToday=created===today;
-      result=Object.assign({
-        cat:savedCat,
-        score:saved.meal_score,
-        target:saved.daily_kcal,
-        protein:saved.daily_protein,
-        focus:saved.focus,
+      // local হিসাব দিয়ে base বানাই, তারপর Supabase-এর যা আছে তা দিয়ে override করি।
+      // score: meal_score না থাকলে health_score; kcal/protein না থাকলে local হিসাব।
+      const base=localEngine(activeCat);
+      const score   = (saved.meal_score!=null)    ? saved.meal_score    : (saved.health_score!=null ? saved.health_score : base.score);
+      const target  = (saved.daily_kcal!=null)    ? saved.daily_kcal    : base.target;
+      const protein = (saved.daily_protein!=null) ? saved.daily_protein : base.protein;
+      result=Object.assign({}, base, rj, {
+        cat:activeCat,
+        score:score,
+        target:target,
+        protein:protein,
+        focus:saved.focus||base.focus,
         bmi:(metrics.bmi||'—'),
         source:isToday?'আজকের AI বিশ্লেষণ':('সর্বশেষ AI বিশ্লেষণ ('+(created||'পূর্ববর্তী')+')'),
-      },rj);
-      if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
+      });
     }
   }catch(e){/* Supabase না পেলে নিচে local হিসাব */}
 
