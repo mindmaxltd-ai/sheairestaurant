@@ -11,7 +11,10 @@
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://xlkrggspepnysbouatec.supabase.co';
 const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
-const CLAUDE_KEY   = process.env.CLAUDE_API_KEY || '';
+const CLAUDE_KEY   = process.env.CLAUDE_API_KEY ||
+                     process.env.CLAUDE_KEY ||
+                     process.env.ANTHROPIC_API_KEY ||
+                     '';
 
 const SB = {
   apikey: SERVICE_KEY,
