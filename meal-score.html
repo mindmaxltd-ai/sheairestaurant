@@ -614,7 +614,7 @@ const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
 
 const PRICE_PER_COURSE=90, VAT_RATE=0.05, MIX_RATE=0.25, MAX_COURSES=5;
-const MIN_BY_MEAL={breakfast:2,lunch:3,dinner:3};   // breakfast min 2, lunch/dinner min 3
+const MIN_BY_MEAL={breakfast:4,lunch:4,dinner:4};   // সব meal-এ ন্যূনতম ৪ course (সর্বোচ্চ ৫)
 // fixed kcal per course slot (main courses high, fruit/chutney low)
 const COURSE_KCAL=[150,170,130,40,60];   // course 1..5
 const COURSE_PROT=[7,9,6,1,2];           // protein g per course
@@ -1096,17 +1096,15 @@ function card(item,meal){
   const mixExtra=mixOn?Math.round(base*MIX_RATE):0;
   const withVat=Math.round((base+mixExtra)*(1+VAT_RATE));
   const f=window._kcalFactor||1;
-  // ── COORDINATED kcal: প্রতি meal-এর target (daily × split) থেকে
-  //    প্রতি course-এর kcal বের করি। মূল ৩ course (আবশ্যক) target ভাগ করে,
-  //    course ৪/৫ (চাটনি/ফল) অল্প fixed। নির্বাচিত course-এর যোগফল দেখাই। ──
-  const mealKcalTarget=item._mealKcal||Math.round((window._mealTargets&&window._mealTargets[meal.key])||450);
-  const mainCount=Math.max(1,Math.min(3,(item._courseN||3)));   // মূল course (১-৩)
-  const perMainKcal=Math.round(mealKcalTarget/mainCount);
-  const COURSE_KCAL_C=[perMainKcal,perMainKcal,perMainKcal,45,65];  // ৪=চাটনি,৫=ফল
-  const COURSE_PROT_C=[Math.round(mealKcalTarget*0.25/4/mainCount),Math.round(mealKcalTarget*0.25/4/mainCount),Math.round(mealKcalTarget*0.25/4/mainCount),1,2];
+  // ── EXACT COORDINATED kcal ──
+  // নিয়ম: ৫ course = পূর্ণ meal target। প্রতি course = meal target ÷ ৫ (সমান)।
+  // customer ৪ বা ৫ course নেয় → যোগফল = (target/৫) × নির্বাচিত সংখ্যা (exact)।
+  const mealKcalTarget=Math.round(item._mealKcal||((window._mealTargets&&window._mealTargets[meal.key])||450));
+  const perCourseKcal=mealKcalTarget/5;                       // সমান ৫ ভাগ (round করি না — exactness রাখি)
+  const perCourseProt=(mealKcalTarget*0.25/4)/5;              // প্রোটিন ২৫% ক্যালরি থেকে
   let kcal=0,prot=0;
-  sel.forEach(ci=>{kcal+=COURSE_KCAL_C[ci]||100;prot+=COURSE_PROT_C[ci]||4;});
-  kcal=Math.round(kcal/5)*5; prot=Math.round(prot);
+  sel.forEach(()=>{kcal+=perCourseKcal;prot+=perCourseProt;});  // নির্বাচিত course সংখ্যা × per-course
+  kcal=Math.round(kcal); prot=Math.round(prot);
   const fat=Math.round(kcal*0.25/9), carb=Math.round(kcal*0.4/4), fib=Math.max(6,Math.round(cnt*3.2));
   const dr=[['প্রোটিন',Math.min(99,Math.round(prot/0.6))],['আয়রন',Math.min(99,22+cnt*4)],['ফাইবার',Math.min(99,Math.round(fib/0.25))],['ভিটামিন C',Math.min(99,30+cnt*5)]];
   const db=MEAL_DB[item.cat]||MEAL_DB.DM;
@@ -1162,7 +1160,7 @@ function card(item,meal){
         '<div class="med-row"><span class="ml">Topping</span><span class="pw top">Roasted Pumpkin Seed</span></div>'+
         '<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+medic.chutney+'</span></div>'+
       '</div></div>'+
-      '<div class="info-box"><b>Ingredients</b><br>'+(item.ename||item.name)+' (৩২০g): '+allIngs.join(', ')+', পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা। সব উপাদান বাংলাদেশে পাওয়া যায়।</div>'+
+      '<div class="info-box"><b>Ingredients</b><br>'+(item.ename||item.name)+': '+allIngs.join(', ')+', পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা। সব উপাদান বাংলাদেশে পাওয়া যায়। <span style="color:var(--ink-2);font-size:.72rem">(সঠিক পরিমাণ রান্নাঘরের রেসিপিতে — আপনার ব্যক্তিগত ক্যালরি অনুযায়ী)</span></div>'+
       '<div class="info-box"><b>Allergen</b><br>'+allergenInfoHTML(allIngs.concat(medic.disease,medic.condition))+'</div>'+
       '<div><div class="panel-h">Product Claims</div><div class="claim-list">'+claimsHTML()+'</div></div>'+
       '<div class="bchain"><span class="bl">⛓ Blockchain Verified Ingredients</span>'+
@@ -1202,14 +1200,11 @@ function buildCartItem(uid){
   const courses=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>c.n);
   // store the actual day ingredients so kitchen.html receives THIS day's recipe
   const courseDetail=fullCourses.filter((c,i)=>sel.indexOf(i)>-1).map(c=>({name:c.n,items:c.items||[]}));
-  // COORDINATED kcal (card-এর মতো একই হিসাব) — meal target থেকে
-  const _mt=(window._mealTargets&&window._mealTargets[mealKey])||Math.round(((window._mealTargets&&Object.values(window._mealTargets).reduce((a,b)=>a+b,0))||1500)*0.33);
-  const _mainN=Math.max(1,Math.min(3,(window._courseCount&&window._courseCount[mealKey])||3));
-  const _perMain=Math.round(_mt/_mainN);
-  const _CK=[_perMain,_perMain,_perMain,45,65];
-  const _CP=[Math.round(_mt*0.25/4/_mainN),Math.round(_mt*0.25/4/_mainN),Math.round(_mt*0.25/4/_mainN),1,2];
-  let kc=0,pr=0; sel.forEach(ci=>{kc+=_CK[ci]||100;pr+=_CP[ci]||4;});
-  kc=Math.round(kc/5)*5; pr=Math.round(pr);
+  // EXACT COORDINATED kcal (card-এর মতো) — ৫ course = meal target, সমান ভাগ
+  const _mt=Math.round((window._mealTargets&&window._mealTargets[mealKey])||450);
+  const _perC=_mt/5, _perP=(_mt*0.25/4)/5;
+  let kc=0,pr=0; sel.forEach(()=>{kc+=_perC;pr+=_perP;});
+  kc=Math.round(kc); pr=Math.round(pr);
   const medic=medicinalFor(item.cat,di,mealKey);  // day/condition/AI medicinal layer
   return {uid,menu_item_id:(item.id&&String(item.id).length>20)?item.id:null,code:item.code,day_index:di,courseDetail,kcalFactor:f,
     name:item.ename||item.name,name_bn:item.name,meal:mealKey,mealBn:MEALS.find(m=>m.key===mealKey).bn,
