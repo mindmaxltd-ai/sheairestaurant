@@ -37,6 +37,17 @@ const reply = (status, body) => ({
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return reply(200, {});
+  // GET — দ্রুত status check (key পৌঁছেছে কিনা; value দেখায় না)
+  if (event.httpMethod === 'GET') {
+    return reply(200, {
+      ok: true,
+      function: 'sar',
+      supabase_url:   SUPABASE_URL ? 'set' : 'MISSING',
+      service_key:    SERVICE_KEY ? 'set' : 'MISSING',
+      claude_key:     CLAUDE_KEY ? 'set' : 'MISSING',
+      note: 'POST { action, ... } দিয়ে ব্যবহার করুন।',
+    });
+  }
   if (event.httpMethod !== 'POST')    return reply(405, { error: 'POST only' });
   if (!SERVICE_KEY) return reply(500, { error: 'Missing SUPABASE_SERVICE_KEY env var' });
 
@@ -161,6 +172,31 @@ exports.handler = async (event) => {
         const r = await fetch(url, { headers: SB });
         const d = await r.json();
         const row = (Array.isArray(d) && d[0]) || null;
+        return reply(200, { found: !!row, analysis: row });
+      }
+
+      // ── সর্বশেষ AI বিশ্লেষণ (আজ না থাকলে আগের যেকোনোটা) ──
+      // meal-score/receipt শুধু Supabase থেকে পড়ে — কখনো live AI ডাকে না।
+      // কোনোদিন update না হলে আগের সর্বশেষ রিপোর্ট দেখায়।
+      case 'latestScore': {
+        const cid = encodeURIComponent(p.customer_id || '');
+        // analysis_type=meal_score আগে খুঁজি; না পেলে যেকোনো type
+        let url = `${SUPABASE_URL}/rest/v1/ai_analysis`
+          + `?customer_id=eq.${cid}`
+          + `&analysis_type=eq.meal_score`
+          + `&select=*&order=created_at.desc&limit=1`;
+        let r = await fetch(url, { headers: SB });
+        let d = await r.json();
+        let row = (Array.isArray(d) && d[0]) || null;
+        if (!row) {
+          // meal_score type না থাকলে — সর্বশেষ যেকোনো analysis
+          url = `${SUPABASE_URL}/rest/v1/ai_analysis`
+            + `?customer_id=eq.${cid}`
+            + `&select=*&order=created_at.desc&limit=1`;
+          r = await fetch(url, { headers: SB });
+          d = await r.json();
+          row = (Array.isArray(d) && d[0]) || null;
+        }
         return reply(200, { found: !!row, analysis: row });
       }
 
