@@ -2579,8 +2579,8 @@ async function loadAnalysisReports() {
       const score = rpt.health_score || rpt.report_json?.health_score || '—';
       const scoreNum = parseInt(score);
       const scoreColor = scoreNum >= 70 ? '#34D399' : scoreNum >= 40 ? '#FCD34D' : '#F87171';
-      const analysis = rpt.analysis_bn || rpt.report_json?.analysis_bn || 'বিশ্লেষণ পাওয়া যায়নি';
-      const recs = rpt.recommendations || rpt.report_json?.recommendations || '';
+      const analysis = rpt.health_summary_bn || rpt.analysis_bn || rpt.report_json?.analysis_bn || 'বিশ্লেষণ পাওয়া যায়নি';
+      const recs = rpt.general_suggestions_bn || rpt.recommendations || rpt.report_json?.recommendations || '';
       const date = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
       const pdfUrl = rpt.pdf_url || '';
 
@@ -3616,11 +3616,14 @@ async function mLoadReports() {
       const scoreN    = parseInt(score) || 0;
       const scoreClr  = scoreN >= 70 ? '#34D399' : scoreN >= 40 ? '#FCD34D' : '#F87171';
       const date      = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
-      const analysis  = rpt.analysis_bn || '—';
-      const recs      = rpt.recommendations || '';
-      const problems  = Array.isArray(rpt.problems) ? rpt.problems : [];
-      const solutions = Array.isArray(rpt.solutions) ? rpt.solutions : [];
-      const menu      = rpt.daily_menu_recommendation_json || rpt.daily_menu || null;
+      const analysis  = rpt.health_summary_bn || rpt.analysis_bn || rpt.report_json?.analysis_bn || '—';
+      const recs      = rpt.general_suggestions_bn || rpt.recommendations || rpt.nutrition_advice_bn || '';
+      // problems/solutions — JSON column অথবা array, যেটাই থাকুক
+      const parseArr  = (v) => { if(!v) return []; if(Array.isArray(v)) return v; try{ const x=JSON.parse(v); return Array.isArray(x)?x:[]; }catch(e){ return []; } };
+      const problems  = parseArr(rpt.problems_json || rpt.problems);
+      const solutions = parseArr(rpt.solutions_json || rpt.solutions);
+      let menu        = rpt.daily_menu_recommendation_json || rpt.daily_menu || null;
+      if (typeof menu === 'string') { try { menu = JSON.parse(menu); } catch(e){ menu = null; } }
       const pdfUrl    = rpt.pdf_url || '';
       const morning   = rpt.morning_greeting || '';
       const bday      = rpt.birthday_message || '';
