@@ -2107,16 +2107,25 @@ async function triggerAnalysis() {
     .filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k))
     .map(([k,v])=>`${k}: ${v}`).join(', ') || 'মেট্রিক্স পাওয়া যায়নি';
 
-  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI স্বাস্থ্য বিশ্লেষক।
+  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI পুষ্টি ও স্বাস্থ্য বিশ্লেষক।
 
 গ্রাহক: ${cust?.full_name||'SAR গ্রাহক'}, বয়স: ${age||'অজানা'}, রোগ: ${catMap[cat]||cat}
+উচ্চতা: ${cust?.height_cm||'?'} সেমি, ওজন: ${cust?.weight_kg||'?'} কেজি, BMI: ${cust?.bmi||'?'}
 ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
 মেট্রিক্স: ${mStr}
+
+তুমি উচ্চতা, ওজন, BMI, বয়স, রোগ ও কার্যকলাপ বিবেচনা করে ব্যক্তিগত দৈনিক ক্যালরি লক্ষ্য (Mifflin-St Jeor ভিত্তিক) ও প্রোটিন হিসাব করবে। রোগ অনুযায়ী সমন্বয়: স্থূলতা→ঘাটতি, গর্ভাবস্থা→বেশি, ডায়াবেটিস→স্থিতিশীল। meal split ও course সংখ্যা target অনুযায়ী দাও (কম target→কম course; সকাল ২-৩, দুপুর/রাত ৩-৫)।
 
 নিচের JSON-এ বাংলায় উত্তর দাও (শুধু JSON):
 {
   "health_score": 0থেকে100,
   "analysis_bn": "৩-৪ বাক্যে স্বাস্থ্য মূল্যায়ন",
+  "daily_kcal_target": <ব্যক্তিগত সংখ্যা, যেমন 1450>,
+  "daily_protein": <গ্রাম, যেমন 65>,
+  "meal_split": {"breakfast":0.3,"lunch":0.4,"dinner":0.3},
+  "course_count": {"breakfast":3,"lunch":4,"dinner":4},
+  "condition_powders": ["আজকের কন্ডিশন (জ্বর/মাসিক/স্ট্রেস) অনুযায়ী ৩টি"],
+  "chutney": "আজকের জন্য একটি থেরাপিউটিক চাটনি",
   "problems": ["সমস্যা ১","সমস্যা ২"],
   "solutions": ["সমাধান ১","সমাধান ২"],
   "conventional_medicine": ["প্রচলিত ওষুধ Generic নাম ও ডোজ"],
@@ -2193,6 +2202,23 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
       medicinal_plants_json:          toJson(demo.medicinal_plants_json || null),
       motivational_message_bn:        demo.islamic_remedy ? (Array.isArray(demo.islamic_remedy) ? demo.islamic_remedy.join('\n') : demo.islamic_remedy) : (demo.motivational_message_bn || null),
       daily_menu_recommendation_json: toJson(demo.daily_menu_recommendation_json || null),
+      // ── meal-score/receipt-এর জন্য coordinated nutrition (hybrid) ──
+      analysis_type:                  'meal_score',
+      category:                       (typeof cat!=='undefined' ? cat : null),
+      meal_score:                     demo.health_score ?? null,
+      daily_kcal:                     demo.daily_kcal_target ?? null,
+      daily_protein:                  demo.daily_protein ?? null,
+      focus:                          demo.recommendations || demo.analysis_bn || null,
+      // result_json — meal-score এখান থেকে split/course/powder/chutney পড়বে
+      result_json:                    toJson({
+                                        target:           demo.daily_kcal_target ?? null,
+                                        protein:          demo.daily_protein ?? null,
+                                        split:            demo.meal_split || null,
+                                        course_count:     demo.course_count || null,
+                                        condition_powders: demo.condition_powders || null,
+                                        chutney:          demo.chutney || null,
+                                        score:            demo.health_score ?? null,
+                                      }),
       disclaimer_shown:               true
     };
     const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis?on_conflict=customer_id,analysis_date`,{
