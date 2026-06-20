@@ -869,58 +869,50 @@ function FALLBACK(cat,meal,di){
     kcal:0,protein:0,fiber:11,benefits:db.benefits.join(' · ')};
 }
 
-// ── AI analysis (6AM personalization) ──
+// ── নতুন নিয়ম: meal-score কখনো live AI ডাকে না (খরচ বাঁচাতে)।
+//    AI শুধু admin/cron চালায় ও Supabase ai_analysis-এ store করে।
+//    এখানে আমরা শুধু সর্বশেষ সংরক্ষিত বিশ্লেষণ পড়ি (আজ না থাকলে আগেরটা)।
+//    কোনো সংরক্ষিত data না থাকলে — local deterministic হিসাব।
 async function runAnalysis(silent){
   const btn=document.getElementById('recomputeBtn');
-  if(!silent){btn.disabled=true;btn.textContent='↻ বিশ্লেষণ চলছে…';}
+  if(!silent){btn.disabled=true;btn.textContent='↻ লোড হচ্ছে…';}
   let result=null;
 
-  // ── SAVED-FIRST: on page load, try today's stored 6 AM analysis first.
-  //    Only when the user taps "recompute" (silent=false) do we skip this
-  //    and force a fresh analysis. ──
-  if(silent){
-    try{
-      const t=await api('todayScore',{customer_id:CID});
-      if(t&&t.found&&t.analysis){
-        const saved=t.analysis;
-        const rj=saved.result_json||{};
-        // adopt the saved category if it matches a real one
-        const savedCat=normalizeCat(saved.category)||activeCat;
-        result=Object.assign({
-          cat:savedCat,
-          score:saved.meal_score,
-          target:saved.daily_kcal,
-          protein:saved.daily_protein,
-          focus:saved.focus,
-          bmi:(metrics.bmi||'—'),
-          source:'আজকের সংরক্ষিত বিশ্লেষণ (৬টা)',
-        },rj);
-        // keep activeCat aligned with the saved analysis
-        if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
-      }
-    }catch(e){/* fall through to live analysis */}
-  }
+  // ── Supabase থেকে সর্বশেষ AI বিশ্লেষণ পড়ি (আজ → না হলে আগের যেকোনোটা) ──
+  try{
+    const t=await api('latestScore',{customer_id:CID});
+    if(t&&t.found&&t.analysis){
+      const saved=t.analysis;
+      const rj=saved.result_json||{};
+      const savedCat=normalizeCat(saved.category)||activeCat;
+      // আজকের কিনা যাচাই — তারিখ অনুযায়ী source লেখা
+      const created=(saved.created_at||'').slice(0,10);
+      const today=new Date().toISOString().slice(0,10);
+      const isToday=created===today;
+      result=Object.assign({
+        cat:savedCat,
+        score:saved.meal_score,
+        target:saved.daily_kcal,
+        protein:saved.daily_protein,
+        focus:saved.focus,
+        bmi:(metrics.bmi||'—'),
+        source:isToday?'আজকের AI বিশ্লেষণ':('সর্বশেষ AI বিশ্লেষণ ('+(created||'পূর্ববর্তী')+')'),
+      },rj);
+      if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
+    }
+  }catch(e){/* Supabase না পেলে নিচে local হিসাব */}
 
-  // ── if no saved row (or recompute), run live AI then local fallback ──
-  if(!result){
-    try{
-      const r=await api('analyze',{prompt:buildPrompt(activeCat)});
-      if(r.ai) result=Object.assign({cat:activeCat,bmi:(metrics.bmi||'—'),source:'Claude AI'},JSON.parse(r.ai));
-    }catch(e){}
-    if(!result) result=localEngine(activeCat);
-  }
-  // adopt fresh weekly titles from Claude if provided, then rebuild the week
+  // ── সংরক্ষিত কিছু না পেলে — local deterministic হিসাব (AI ছাড়া) ──
+  if(!result) result=localEngine(activeCat);
+
+  // AI যদি সংরক্ষিত titles/daily দিয়ে থাকে, সেগুলো ব্যবহার করি
   if(result.titles&&result.titles.breakfast){aiTitles=result.titles;buildWeek(activeCat);}
-  if(result.daily){aiDaily=result.daily;}   // AI per-day ingredient picks (optional)
+  if(result.daily){aiDaily=result.daily;}
   analysis=result;
   applyPersonalization(result);
   paintScore(result);
-  // only SAVE a new row when this was a fresh recompute (avoid duplicate
-  // rows every time the page loads from an already-saved analysis)
-  if(!silent || (result.source!=='আজকের সংরক্ষিত বিশ্লেষণ (৬টা)')){
-    try{await api('saveScore',{customer_id:CID,category:activeCat,meal_score:result.score,daily_kcal:result.target,daily_protein:result.protein,focus:result.focus,analysis:result});}catch(e){}
-  }
-  if(!silent){btn.disabled=false;btn.textContent='↻ এখনই পুনঃবিশ্লেষণ করুন';toast('✓ মেনু আপডেট হয়েছে');}
+  // meal-score আর নতুন row save করে না — AI/cron-ই একমাত্র লেখে।
+  if(!silent){btn.disabled=false;btn.textContent='↻ রিফ্রেশ করুন';toast('✓ মেনু আপডেট হয়েছে');}
 }
 function buildPrompt(cat){
   const m=metrics;
