@@ -295,17 +295,18 @@ textarea{resize:vertical;min-height:76px}
       <p class="card-sub">আপনার মৌলিক তথ্য দিন — তারপর স্বাস্থ্য মেট্রিক্স পূরণ করুন</p>
     </div>
 
-    <!-- PROGRESS: 3 steps -->
+    <!-- PROGRESS: 4 steps -->
     <div class="prog-wrap">
       <div class="step-dots" id="stepDots">
         <div class="sdot active" data-s="1"><div class="sdot-circle">১</div><span>পরিচয়</span></div>
-        <div class="sdot" data-s="2"><div class="sdot-circle">২</div><span>নিশ্চিত</span></div>
-        <div class="sdot" data-s="3"><div class="sdot-circle">৩</div><span>পেমেন্ট</span></div>
+        <div class="sdot" data-s="2"><div class="sdot-circle">২</div><span>OTP যাচাই</span></div>
+        <div class="sdot" data-s="3"><div class="sdot-circle">৩</div><span>নিশ্চিত</span></div>
+        <div class="sdot" data-s="4"><div class="sdot-circle">৪</div><span>পেমেন্ট</span></div>
       </div>
-      <div class="pbar-bg"><div class="pbar" id="pbar" style="width:33.33%"></div></div>
+      <div class="pbar-bg"><div class="pbar" id="pbar" style="width:25%"></div></div>
       <div class="step-info-row">
         <span class="step-nm" id="stepNm">ধাপ ১: মৌলিক পরিচয়</span>
-        <span class="step-ct" id="stepCt">১ / ৩</span>
+        <span class="step-ct" id="stepCt">১ / ৪</span>
       </div>
     </div>
 
@@ -331,23 +332,6 @@ textarea{resize:vertical;min-height:76px}
           <div class="fld">
             <label>মোবাইল নম্বর <span class="req">⭐</span></label>
             <input type="tel" id="phone" placeholder="01XXXXXXXXX" maxlength="11" required oninput="resetOtp()">
-          </div>
-          <div class="fld" id="otpBox" style="background:rgba(233,30,140,.05);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:.85rem;margin-bottom:1rem">
-            <div style="display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap">
-              <button type="button" id="otpSendBtn" onclick="sendOtp()"
-                style="background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;border:none;border-radius:9px;padding:.55rem 1rem;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
-                📱 যাচাই কোড পাঠান
-              </button>
-              <div style="flex:1;min-width:120px">
-                <input type="tel" id="otpCode" placeholder="৬-সংখ্যার কোড" maxlength="6" disabled
-                  style="width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border,rgba(255,255,255,.15));border-radius:9px;padding:.55rem .8rem;color:#fff;font-family:'Space Mono',monospace;font-size:.95rem;letter-spacing:.15em;text-align:center;outline:none">
-              </div>
-              <button type="button" id="otpVerifyBtn" onclick="verifyOtp()" disabled
-                style="background:rgba(5,150,105,.2);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:9px;padding:.55rem 1rem;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap">
-                ✓ যাচাই
-              </button>
-            </div>
-            <div id="otpMsg" style="font-size:.76rem;margin-top:.5rem;display:none"></div>
           </div>
           <div class="fld">
             <label>ইমেইল <span class="opt">(ঐচ্ছিক)</span></label>
@@ -499,12 +483,47 @@ textarea{resize:vertical;min-height:76px}
 
         <div class="msg" id="m1"></div>
         <div class="btn-row">
-          <button class="btn-next" onclick="go(1)">পরবর্তী → পর্যালোচনা</button>
+          <button class="btn-next" onclick="go(1)">পরবর্তী → OTP যাচাই</button>
         </div>
       </div><!-- /p1 -->
 
-      <!-- ═══ STEP 2: REVIEW ═══ -->
+      <!-- ═══ STEP 2: OTP VERIFICATION ═══ -->
       <div class="panel" id="p2">
+        <div class="step-hd">
+          <span class="step-icon">📱</span>
+          <div class="step-title">মোবাইল নম্বর যাচাই</div>
+          <div class="step-desc">আপনার নম্বরে একটি ৬-সংখ্যার কোড পাঠানো হবে। কোডটি লিখে যাচাই করুন।</div>
+        </div>
+
+        <div class="sum-box" style="margin-bottom:1.25rem">
+          <div class="sum-row"><span class="sum-k">যাচাই করা হবে</span><span class="sum-v" id="otpPhoneShow">—</span></div>
+        </div>
+
+        <div class="fld" style="background:rgba(233,30,140,.05);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <button type="button" id="otpSendBtn" onclick="sendOtp()"
+            style="width:100%;background:linear-gradient(135deg,#E91E8C,#6B21A8);color:#fff;border:none;border-radius:10px;padding:.8rem 1rem;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:.85rem">
+            📱 যাচাই কোড পাঠান
+          </button>
+          <div style="display:flex;gap:.5rem;align-items:stretch">
+            <input type="tel" id="otpCode" placeholder="৬-সংখ্যার কোড" maxlength="6" disabled
+              style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:.7rem .8rem;color:#fff;font-family:'Space Mono',monospace;font-size:1.1rem;letter-spacing:.25em;text-align:center;outline:none">
+            <button type="button" id="otpVerifyBtn" onclick="verifyOtp()" disabled
+              style="background:rgba(5,150,105,.2);color:#34D399;border:1px solid rgba(52,211,153,.3);border-radius:10px;padding:.7rem 1.3rem;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;white-space:nowrap">
+              ✓ যাচাই
+            </button>
+          </div>
+          <div id="otpMsg" style="font-size:.8rem;margin-top:.7rem;display:none"></div>
+        </div>
+
+        <div class="msg" id="m_otp"></div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="back(2)">← পিছনে</button>
+          <button class="btn-next" onclick="go(2)">পরবর্তী → পর্যালোচনা</button>
+        </div>
+      </div><!-- /p2 -->
+
+      <!-- ═══ STEP 3: REVIEW ═══ -->
+      <div class="panel" id="p3">
         <div class="step-hd">
           <span class="step-icon">📋</span>
           <div class="step-title">তথ্য পর্যালোচনা করুন</div>
@@ -535,13 +554,13 @@ textarea{resize:vertical;min-height:76px}
 
         <div class="msg" id="m2"></div>
         <div class="btn-row">
-          <button class="btn-back" onclick="back(2)">← পিছনে</button>
-          <button class="btn-next" onclick="go(2)">পেমেন্টে যান →</button>
+          <button class="btn-back" onclick="back(3)">← পিছনে</button>
+          <button class="btn-next" onclick="go(3)">পেমেন্টে যান →</button>
         </div>
-      </div><!-- /p2 -->
+      </div><!-- /p3 review -->
 
-      <!-- ═══ STEP 3: PAYMENT ═══ -->
-      <div class="panel" id="p3">
+      <!-- ═══ STEP 4: PAYMENT ═══ -->
+      <div class="panel" id="p4">
         <div class="step-hd">
           <span class="step-icon">💳</span>
           <div class="step-title">নিবন্ধন ফি পরিশোধ</div>
@@ -574,9 +593,9 @@ textarea{resize:vertical;min-height:76px}
 
         <div class="msg" id="m3"></div>
         <div class="btn-row" style="margin-top:1rem">
-          <button class="btn-back" onclick="back(3)">← পিছনে</button>
+          <button class="btn-back" onclick="back(4)">← পিছনে</button>
         </div>
-      </div><!-- /p3 -->
+      </div><!-- /p4 payment -->
 
       <!-- SUCCESS -->
       <div class="success-panel" id="sucPanel">
@@ -613,17 +632,17 @@ const H = {
 let step = 1;
 let selPayMethod = 'bkash';
 
-const stepNames = ['','ধাপ ১: মৌলিক পরিচয়','ধাপ ২: পর্যালোচনা','ধাপ ৩: পেমেন্ট'];
+const stepNames = ['','ধাপ ১: মৌলিক পরিচয়','ধাপ ২: OTP যাচাই','ধাপ ৩: পর্যালোচনা','ধাপ ৪: পেমেন্ট'];
 
 function updateProg(s) {
-  document.getElementById('pbar').style.width = (s/3*100)+'%';
+  document.getElementById('pbar').style.width = (s/4*100)+'%';
   document.getElementById('stepNm').textContent = stepNames[s];
-  document.getElementById('stepCt').textContent = s+' / ৩';
+  document.getElementById('stepCt').textContent = s+' / ৪';
   document.querySelectorAll('.sdot').forEach((d,i)=>{
     const n=i+1;d.classList.remove('active','done');
     if(n<s){d.classList.add('done');d.querySelector('.sdot-circle').textContent='✓'}
     else if(n===s){d.classList.add('active')}
-    else{d.querySelector('.sdot-circle').textContent=n}
+    else{d.querySelector('.sdot-circle').textContent=['','১','২','৩','৪'][n]}
   });
 }
 
@@ -750,14 +769,31 @@ function validateStep1(){
   return true;
 }
 
-/* ── NAVIGATION ── */
+/* ── NAVIGATION (4 ধাপ) ── */
 function go(s){
   if(s===1){
+    // ধাপ ১ → ধাপ ২ (OTP): শুধু তথ্য যাচাই করো, তারপর OTP ধাপে নাও
     if(!validateStep1())return;
-    if(!phoneVerified){ showMsg('m1','⚠️ এগোনোর আগে মোবাইল নম্বর OTP দিয়ে যাচাই করুন','error'); return; }
-    fillSummary()
+    // OTP ধাপে ফোন নম্বর দেখাও
+    const ph = g('phone');
+    const show = document.getElementById('otpPhoneShow');
+    if(show) show.textContent = ph || '—';
+    resetOtp();
   }
-  if(s===2){if(!document.getElementById('consent').checked){showMsg('m2','⚠️ শর্তাবলীতে সম্মতি দিন','error');return}}
+  if(s===2){
+    // ধাপ ২ → ধাপ ৩ (পর্যালোচনা): OTP যাচাই বাধ্যতামূলক
+    if(!phoneVerified){
+      showMsg('m_otp','⚠️ এগোনোর আগে মোবাইল নম্বর OTP দিয়ে যাচাই করুন','error');
+      return;
+    }
+    fillSummary();
+  }
+  if(s===3){
+    // ধাপ ৩ → ধাপ ৪ (পেমেন্ট): সম্মতি বাধ্যতামূলক
+    if(!document.getElementById('consent').checked){
+      showMsg('m2','⚠️ শর্তাবলীতে সম্মতি দিন','error');return;
+    }
+  }
   document.getElementById('p'+s).classList.remove('active');
   step=s+1;
   document.getElementById('p'+step).classList.add('active');
@@ -975,7 +1011,7 @@ async function submitReg(){
     loader.classList.remove('show');
 
     // Show success with pending message
-    document.getElementById('p3').classList.remove('active');
+    document.getElementById('p4').classList.remove('active');
     const sp = document.getElementById('sucPanel');
     sp.style.display = 'block';
     document.getElementById('midBox').textContent = cust?.member_id || 'SAR-2026-XXXXXX';
