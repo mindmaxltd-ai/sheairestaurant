@@ -1,4 +1,16 @@
 [functions]
   directory = "netlify/functions"
+
+# AI analysis (Claude API) ১০ সেকেন্ডের বেশি নিলেও যেন 504 না হয় —
+# timeout বাড়ানো হলো (Netlify সর্বোচ্চ ২৬ সেকেন্ড)।
+[functions."analyze"]
+  timeout = 26
+
+[functions."daily-report"]
+  timeout = 26
+
+[functions."send-otp"]
+  timeout = 26
+
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL"
