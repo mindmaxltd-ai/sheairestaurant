@@ -157,9 +157,48 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
 
 @media(max-width:768px){.two-col{grid-template-columns:1fr}.sign-grid{grid-template-columns:1fr}}
 </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
+<!-- ═══ DOCTOR PAYMENT GATE (ধাপ ১: super admin bypass + ৭৫০৳ screen) ═══ -->
+<div id="payGate" style="display:none;position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,#2A0E14,#1a0f1c);overflow:auto;
+  font-family:'Segoe UI',system-ui,sans-serif">
+  <div style="max-width:480px;margin:6vh auto;padding:2rem 1.5rem">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:2.4rem">🩺</div>
+      <h1 style="color:#FFD43B;font-size:1.4rem;margin:.5rem 0">ডাক্তার পরামর্শ</h1>
+      <p style="color:rgba(255,255,255,.6);font-size:.9rem">SAR — She AI Revolution</p>
+    </div>
+
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(233,30,140,.3);
+      border-radius:16px;padding:1.5rem;margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;
+        padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1)">
+        <span style="color:#fff;font-weight:600">পরামর্শ ফি</span>
+        <span style="color:#FFD43B;font-size:1.6rem;font-weight:800">৳৭৫০</span>
+      </div>
+      <ul style="list-style:none;padding:1rem 0 0;margin:0;color:rgba(255,255,255,.75);font-size:.86rem;line-height:2">
+        <li>✓ AI-সহায়ক ডাক্তার মূল্যায়ন</li>
+        <li>✓ দিনে সর্বোচ্চ ৩টি প্রেসক্রিপশন</li>
+        <li>✓ প্রেসক্রিপশন PDF — ড্যাশবোর্ডে সংরক্ষিত</li>
+        <li>✓ BMDC নিবন্ধিত ডাক্তার দ্বারা যাচাইকৃত</li>
+      </ul>
+    </div>
+
+    <button id="payGateBtn" onclick="startDoctorPayment()" style="width:100%;
+      background:linear-gradient(135deg,#E91E8C,#C2185B);color:#fff;border:none;
+      border-radius:12px;padding:1rem;font-size:1rem;font-weight:700;cursor:pointer;
+      font-family:inherit">
+      ৳৭৫০ দিয়ে পরামর্শ শুরু করুন →
+    </button>
+    <div id="payGateMsg" style="text-align:center;margin-top:1rem;font-size:.85rem;color:#FF6BB5"></div>
+
+    <p style="text-align:center;margin-top:1.5rem">
+      <a href="dashboard.html" style="color:rgba(255,255,255,.45);font-size:.85rem;text-decoration:none">← ড্যাশবোর্ডে ফিরে যান</a>
+    </p>
+  </div>
+</div>
 <div class="bg"></div>
 <div class="rainbow"></div>
 
@@ -303,7 +342,46 @@ const H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'
 let patient = {};
 let currentRxData = null;
 
+// ═══ DOCTOR PAYMENT GATE (ধাপ ১) ═══
+const SUPER_ADMIN_PHONE = '01767626653';   // super admin — payment ছাড়াই ঢোকে
+
+// gate পাস করেছে কিনা — super admin, বা আজকের paid session
+function doctorAccessAllowed(){
+  const sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  // 1) super admin bypass
+  if(sc.phone === SUPER_ADMIN_PHONE) return true;
+  // 2) আজকের জন্য paid session (localStorage — ধাপ ৩-এ Supabase verify যোগ হবে)
+  try{
+    const ds = JSON.parse(localStorage.getItem('sar_doctor_session')||'{}');
+    const today = new Date().toISOString().slice(0,10);
+    if(ds.paid && ds.date === today) return true;
+  }catch(e){}
+  // 3) SSLCommerz থেকে ?paid=ok নিয়ে ফিরলে (ধাপ ৩-এ verify হবে)
+  const q = new URLSearchParams(location.search);
+  if(q.get('paid') === 'ok'){
+    const today = new Date().toISOString().slice(0,10);
+    localStorage.setItem('sar_doctor_session', JSON.stringify({paid:true, date:today, tran:q.get('tran')||''}));
+    return true;
+  }
+  return false;
+}
+
+function showPayGate(){
+  document.getElementById('payGate').style.display = 'block';
+}
+
+// ধাপ ১-এ শুধু gate দেখায়; আসল payment call ধাপ ২-এ যুক্ত হবে
+function startDoctorPayment(){
+  document.getElementById('payGateMsg').textContent = 'পেমেন্ট সংযোগ শীঘ্রই যুক্ত হচ্ছে... (ধাপ ২)';
+}
+
 async function init(){
+  // ── PAYMENT GATE: অনুমতি না থাকলে gate দেখিয়ে থামি ──
+  if(!doctorAccessAllowed()){
+    showPayGate();
+    return;
+  }
+
   // Try sessionStorage first (from dashboard)
   const stored = sessionStorage.getItem('doctor_patient');
   if(stored){
@@ -445,39 +523,15 @@ ${metricsStr}
     // Try Claude API via Edge Function first
     let aiData = null;
 
-    // ── PRIMARY: Netlify analyze function (dashboard যেটা ব্যবহার করে — কাজ করছে) ──
     try {
-      const r = await fetch('/.netlify/functions/analyze', {
+      const r = await fetch(`${SUPA_URL}/functions/v1/analyze-customer`, {
         method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ prompt })
+        headers:H,
+        body:JSON.stringify({ customer_id:patient.id, complaint, force:true })
       });
-      if(r.ok){
-        const d = await r.json();
-        // function parsed object বা raw text — দুটোই হ্যান্ডেল করি
-        if(d.parsed && (d.parsed.assessment || d.parsed.rx)) aiData = d.parsed;
-        else if(d.assessment || d.rx) aiData = d;
-        else if(d.text){
-          let clean=d.text.replace(/```json|```/g,'').trim();
-          const a=clean.indexOf('{'), b=clean.lastIndexOf('}');
-          if(a>-1&&b>a) clean=clean.slice(a,b+1);
-          try{ aiData = JSON.parse(clean); }catch(e){ aiData = { assessment: d.text.slice(0,400) }; }
-        }
-      }
+      const d = await r.json();
+      if(d?.analysis_bn){ aiData = { assessment:d.analysis_bn }; }
     } catch(e){}
-
-    // Fallback: Supabase Edge Function (পুরোনো — অক্ষত)
-    if(!aiData){
-      try {
-        const r = await fetch(`${SUPA_URL}/functions/v1/analyze-customer`, {
-          method:'POST',
-          headers:H,
-          body:JSON.stringify({ customer_id:patient.id, complaint, force:true })
-        });
-        const d = await r.json();
-        if(d?.analysis_bn){ aiData = { assessment:d.analysis_bn }; }
-      } catch(e){}
-    }
 
     // Fallback: direct Claude API (if key in localStorage)
     if(!aiData){
@@ -605,105 +659,18 @@ async function signPrescription(){
     });
   } catch(e){ console.warn('Supabase note save:', e); }
 
-  showSignMsg(`✅ প্রেসক্রিপশন সাইন করা হয়েছে — Dr. ${name} (BMDC: ${reg})। PDF তৈরি ও গ্রাহকের মোবাইলে পাঠানো হচ্ছে...`, true);
-  showToast('✅ প্রেসক্রিপশন সাইন সম্পন্ন — PDF পাঠানো হচ্ছে');
+  showSignMsg(`✅ প্রেসক্রিপশন সাইন করা হয়েছে — Dr. ${name} (BMDC: ${reg})। গ্রাহককে WhatsApp ও Email-এ পাঠানো হচ্ছে...`, true);
+  showToast('✅ প্রেসক্রিপশন সাইন ও রিলিজ সম্পন্ন');
 
-  // ── PDF বানাও → Supabase storage-এ রাখো → link SMS-এ পাঠাও ──
-  const custPhone = patient.phone || JSON.parse(localStorage.getItem('sar_customer')||'{}').phone;
-  sendRxPdf({ name, reg, editedRx, prescription, custPhone });
-}
-
-// PDF তৈরি, Supabase storage-এ upload, এবং SMS-এ link পাঠানো
-async function sendRxPdf({ name, reg, editedRx, prescription, custPhone }){
-  let pdfUrl = '';
-  try {
-    // 1. jsPDF দিয়ে prescription PDF বানাই
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit:'pt', format:'a4' });
-    const W = doc.internal.pageSize.getWidth();
-    let y = 50;
-    doc.setFontSize(18); doc.setTextColor(233,30,140);
-    doc.text('SAR — She AI Restaurant', W/2, y, {align:'center'}); y+=22;
-    doc.setFontSize(11); doc.setTextColor(90,90,90);
-    doc.text('Doctor Prescription', W/2, y, {align:'center'}); y+=30;
-    doc.setDrawColor(233,30,140); doc.line(40,y,W-40,y); y+=24;
-    doc.setFontSize(11); doc.setTextColor(20,20,20);
-    const line=(label,val)=>{ doc.setFont(undefined,'bold'); doc.text(label,40,y);
-      doc.setFont(undefined,'normal'); const sp=doc.splitTextToSize(String(val||'—'),W-160);
-      doc.text(sp,160,y); y+=Math.max(18,sp.length*15)+4; };
-    line('রোগী:', patient.name||'আপা');
-    line('তারিখ:', new Date().toLocaleDateString('bn-BD'));
-    line('ডাক্তার:', `Dr. ${name} (BMDC: ${reg})`);
-    line('অভিযোগ:', prescription.complaint);
-    line('মূল্যায়ন:', prescription.ai_assessment);
-    y+=6; doc.setFont(undefined,'bold'); doc.setTextColor(233,30,140);
-    doc.text('ঔষধ (Rx):',40,y); y+=20; doc.setTextColor(20,20,20);
-    (editedRx||[]).forEach((r,i)=>{ const t=`${i+1}. ${r.generic||''} — ${r.note||''}`;
-      const sp=doc.splitTextToSize(t,W-80); doc.setFont(undefined,'normal');
-      doc.text(sp,50,y); y+=sp.length*15+4; });
-    y+=6; line('সাধারণ পরামর্শ:', prescription.general);
-    line('ঘরোয়া প্রতিকার:', prescription.home);
-    line('বিপদ সংকেত:', prescription.dangers);
-    y+=10; doc.setFontSize(8); doc.setTextColor(140,140,140);
-    doc.text('SAR — women-led · women-run · women-only · 📞 01346098892', W/2, y, {align:'center'});
-
-    // 2. PDF কে blob বানাই
-    const pdfBlob = doc.output('blob');
-    const fileName = `rx_${patient.id||'cust'}_${Date.now()}.pdf`;
-
-    // 3. Supabase storage 'prescriptions' bucket-এ upload
-    const up = await fetch(`${SUPA_URL}/storage/v1/object/prescriptions/${fileName}`,{
-      method:'POST',
-      headers:{ apikey:SUPA_KEY, Authorization:'Bearer '+SUPA_KEY, 'Content-Type':'application/pdf' },
-      body: pdfBlob
-    });
-    if(up.ok){
-      pdfUrl = `${SUPA_URL}/storage/v1/object/public/prescriptions/${fileName}`;
-    } else {
-      console.warn('PDF upload failed:', up.status, await up.text().catch(()=>''));
+  // Notify via Edge Function
+  if(patient.id){
+    const custPhone = patient.phone || JSON.parse(localStorage.getItem('sar_customer')||'{}').phone;
+    if(custPhone){
+      const waMsg = `🩺 *SAR ডাক্তার প্রেসক্রিপশন*\n\nপ্রিয় ${patient.name||'আপা'},\n\nআপনার প্রেসক্রিপশন প্রস্তুত!\n\n👨‍⚕️ Dr. ${name}\nBMDC: ${reg}\n\n💊 ওষুধ:\n${editedRx.map(r=>`• ${r.generic}: ${r.note}`).join('\n')}\n\n📋 পরামর্শ: ${prescription.general}\n\n⚠️ বিপদ লক্ষণ: ${prescription.dangers}\n\nSAR — She AI Restaurant\n📞 01346098892`;
+      fetch(`${SUPA_URL}/functions/v1/send-whatsapp`,{method:'POST',headers:H,
+        body:JSON.stringify({to_phone:custPhone, custom_message:waMsg, customer_id:patient.id})
+      }).catch(()=>{});
     }
-  } catch(e){ console.warn('PDF build/upload error:', e); }
-
-  // 4. sar_notes-এ link সহ সেভ (PDF থাকলে link, নাহলে text)
-  try {
-    await fetch(`${SUPA_URL}/rest/v1/sar_notes`,{
-      method:'POST', headers:{...H,'Prefer':'return=minimal'},
-      body:JSON.stringify({
-        customer_id: patient.id,
-        note_type: 'prescription',
-        urgency_level: 'medium',
-        note_text_bn: `[Dr. ${name} / BMDC: ${reg}] প্রেসক্রিপশন${pdfUrl?' — PDF: '+pdfUrl:''}`,
-        is_resolved: false,
-      })
-    });
-  } catch(e){ console.warn('note save:', e); }
-
-  // 5. SMS-এ link পাঠাও (send-sms function — কাজ করছে)
-  if(custPhone){
-    const smsMsg = pdfUrl
-      ? `SAR: প্রিয় ${patient.name||'আপা'}, আপনার ডাক্তার প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। ডাউনলোড করুন: ${pdfUrl}`
-      : `SAR: প্রিয় ${patient.name||'আপা'}, আপনার প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। বিস্তারিত ড্যাশবোর্ডে দেখুন।`;
-    try {
-      const r = await fetch('/.netlify/functions/send-sms',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ to: custPhone, msg: smsMsg })
-      });
-      const d = await r.json().catch(()=>({}));
-      if(d && d.sent) showSignMsg(`✅ প্রেসক্রিপশন PDF গ্রাহকের মোবাইলে পাঠানো হয়েছে (${custPhone})।`, true);
-      else showSignMsg(`⚠️ PDF তৈরি হয়েছে${pdfUrl?' ('+pdfUrl+')':''} কিন্তু SMS পাঠানো যায়নি: ${(d&&d.error)||'?'}`, false);
-    } catch(e){
-      showSignMsg(`⚠️ PDF তৈরি হয়েছে কিন্তু SMS ব্যর্থ — আবার চেষ্টা করুন।`, false);
-    }
-  } else {
-    showSignMsg(`⚠️ গ্রাহকের মোবাইল নম্বর পাওয়া যায়নি — SMS পাঠানো যায়নি।`, false);
-  }
-
-  // পুরোনো WhatsApp Edge Function fallback (অক্ষত)
-  if(patient.id && custPhone){
-    const waMsg = `🩺 SAR ডাক্তার প্রেসক্রিপশন\n\nপ্রিয় ${patient.name||'আপা'},\nDr. ${name} (BMDC: ${reg})\n${pdfUrl?'PDF: '+pdfUrl:''}`;
-    fetch(`${SUPA_URL}/functions/v1/send-whatsapp`,{method:'POST',headers:H,
-      body:JSON.stringify({to_phone:custPhone, custom_message:waMsg, customer_id:patient.id})
-    }).catch(()=>{});
   }
 }
 
