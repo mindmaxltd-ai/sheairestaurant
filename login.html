@@ -296,7 +296,7 @@ body{
         </div>
       </div>
       <div class="forgot-row">
-        <a href="#" class="forgot-link" onclick="switchTab('otp',document.querySelectorAll('.auth-tab')[1]);return false">পাসওয়ার্ড ভুলে গেছেন?</a>
+        <a href="#" class="forgot-link" onclick="openReset();return false">পাসওয়ার্ড ভুলে গেছেন?</a>
       </div>
       <button class="btn-login" onclick="loginWithPassword()" id="btnPassLogin">
         <span>লগইন করুন</span> <span>→</span>
@@ -344,6 +344,69 @@ body{
         <div class="msg" id="msgOtpCode"></div>
         <p style="text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.35);cursor:pointer" onclick="resetOTP()">← অন্য নম্বর ব্যবহার করুন</p>
       </div>
+    </div>
+
+    <!-- ═══ RESET PASSWORD PANEL (OTP দিয়ে) ═══ -->
+    <div class="auth-panel" id="panel-reset" style="display:none">
+      <div class="login-sub" style="margin-bottom:1.25rem">🔑 পাসওয়ার্ড রিসেট — আপনার নম্বরে OTP পাঠানো হবে</div>
+
+      <!-- ধাপ ১: ফোন নম্বর -->
+      <div id="rsPhase1">
+        <div class="field">
+          <label>মোবাইল নম্বর</label>
+          <div class="input-wrap">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="rs_phone" placeholder="01XXXXXXXXX" maxlength="11">
+          </div>
+        </div>
+        <button class="btn-login" onclick="rsSendOtp()" id="rsSendBtn">
+          <span>OTP পাঠান</span> <span>→</span>
+        </button>
+        <div class="msg" id="msgRs1"></div>
+      </div>
+
+      <!-- ধাপ ২: OTP যাচাই -->
+      <div id="rsPhase2" style="display:none">
+        <div class="otp-info"><strong id="rsSentTo">01XXXXXXXXX</strong> নম্বরে OTP পাঠানো হয়েছে।</div>
+        <div class="field">
+          <label>৬-সংখ্যার OTP</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔢</span>
+            <input type="tel" id="rs_code" placeholder="৬ সংখ্যার কোড" maxlength="6" style="letter-spacing:.3em">
+          </div>
+        </div>
+        <button class="btn-login" onclick="rsVerifyOtp()" id="rsVerifyBtn">
+          <span>OTP যাচাই করুন</span> <span>✓</span>
+        </button>
+        <div class="msg" id="msgRs2"></div>
+        <p style="text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.35);cursor:pointer" onclick="rsRestart()">← অন্য নম্বর ব্যবহার করুন</p>
+      </div>
+
+      <!-- ধাপ ৩: নতুন পাসওয়ার্ড -->
+      <div id="rsPhase3" style="display:none">
+        <div class="otp-info" style="background:rgba(5,150,105,.12);border-color:rgba(52,211,153,.3)">✓ যাচাই সম্পন্ন — এবার নতুন পাসওয়ার্ড দিন</div>
+        <div class="field">
+          <label>নতুন পাসওয়ার্ড</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="rs_new1" placeholder="নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)">
+            <button class="eye-btn" onclick="toggleEye('rs_new1',this)" type="button">👁️</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>পাসওয়ার্ড নিশ্চিত করুন</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="rs_new2" placeholder="আবার লিখুন">
+          </div>
+        </div>
+        <button class="btn-login" onclick="rsSavePassword()" id="rsSaveBtn">
+          <span>পাসওয়ার্ড সংরক্ষণ করুন</span> <span>✓</span>
+        </button>
+        <div class="msg" id="msgRs3"></div>
+      </div>
+
+      <p style="text-align:center;margin-top:1rem;font-size:.82rem;color:rgba(255,255,255,.4);cursor:pointer" onclick="closeReset()">← লগইনে ফিরে যান</p>
     </div>
 
     <!-- REGISTER LINK -->
@@ -596,6 +659,154 @@ document.addEventListener('keydown', e => {
     if (document.getElementById('panel-password').classList.contains('active')) loginWithPassword();
   }
 });
+// ═══════════════════════════════
+// RESET PASSWORD FLOW (আসল OTP — send-otp.js function)
+// register.html-এর মতোই strategy
+// ═══════════════════════════════
+let rsPhone = '';
+
+function openReset() {
+  // password ও otp panel লুকাই, reset panel দেখাই
+  document.getElementById('panel-password').classList.remove('active');
+  document.getElementById('panel-password').style.display = 'none';
+  const otpP = document.getElementById('panel-otp');
+  if (otpP) { otpP.classList.remove('active'); otpP.style.display = 'none'; }
+  document.getElementById('panel-reset').style.display = 'block';
+  // tab গুলো লুকাই (reset আলাদা flow)
+  const tabs = document.querySelector('.auth-tabs');
+  if (tabs) tabs.style.display = 'none';
+  // ধাপ ১ দেখাও
+  rsRestart();
+}
+
+function closeReset() {
+  document.getElementById('panel-reset').style.display = 'none';
+  const tabs = document.querySelector('.auth-tabs');
+  if (tabs) tabs.style.display = '';
+  document.getElementById('panel-password').style.display = 'block';
+  document.getElementById('panel-password').classList.add('active');
+}
+
+function rsRestart() {
+  rsPhone = '';
+  document.getElementById('rsPhase1').style.display = 'block';
+  document.getElementById('rsPhase2').style.display = 'none';
+  document.getElementById('rsPhase3').style.display = 'none';
+  document.getElementById('rs_phone').value = '';
+  document.getElementById('rs_code').value = '';
+}
+
+// ধাপ ১ — আসল OTP পাঠাও (send-otp function)
+async function rsSendOtp() {
+  const phone = document.getElementById('rs_phone').value.trim();
+  if (!phone || !/^01[3-9]\d{8}$/.test(phone)) {
+    showMsg('msgRs1', '⚠️ সঠিক মোবাইল নম্বর দিন', 'error'); return;
+  }
+  const btn = document.getElementById('rsSendBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = 'পাঠানো হচ্ছে…';
+
+  // আগে যাচাই — এই নম্বরে অ্যাকাউন্ট আছে কিনা
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/customers?phone=eq.${phone}&select=id,full_name`, { headers });
+    const list = await res.json();
+    if (!list || list.length === 0) {
+      btn.disabled = false; btn.querySelector('span').textContent = 'OTP পাঠান';
+      showMsg('msgRs1', '❌ এই নম্বরে কোনো অ্যাকাউন্ট নেই। নিবন্ধন করুন।', 'error'); return;
+    }
+  } catch (e) {
+    btn.disabled = false; btn.querySelector('span').textContent = 'OTP পাঠান';
+    showMsg('msgRs1', '❌ যাচাই ব্যর্থ — আবার চেষ্টা করুন', 'error'); return;
+  }
+
+  // আসল OTP পাঠাও — register.html-এর মতো send-otp function
+  try {
+    const r = await fetch('/.netlify/functions/send-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'send', phone })
+    });
+    const d = await r.json().catch(() => ({}));
+    btn.disabled = false; btn.querySelector('span').textContent = 'OTP পাঠান';
+    if (d && d.sent) {
+      rsPhone = phone;
+      document.getElementById('rsSentTo').textContent = phone;
+      document.getElementById('rsPhase1').style.display = 'none';
+      document.getElementById('rsPhase2').style.display = 'block';
+      document.getElementById('rs_code').focus();
+      showMsg('msgRs2', '✓ আপনার নম্বরে OTP পাঠানো হয়েছে', 'success');
+    } else {
+      showMsg('msgRs1', '❌ OTP পাঠানো যায়নি: ' + ((d && d.error) || 'আবার চেষ্টা করুন'), 'error');
+    }
+  } catch (e) {
+    btn.disabled = false; btn.querySelector('span').textContent = 'OTP পাঠান';
+    showMsg('msgRs1', '❌ OTP পাঠানো ব্যর্থ — আবার চেষ্টা করুন', 'error');
+  }
+}
+
+// ধাপ ২ — OTP যাচাই (send-otp function)
+async function rsVerifyOtp() {
+  const code = document.getElementById('rs_code').value.trim();
+  if (code.length !== 6) {
+    showMsg('msgRs2', '⚠️ ৬ সংখ্যার OTP দিন', 'error'); return;
+  }
+  const btn = document.getElementById('rsVerifyBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = 'যাচাই হচ্ছে…';
+  try {
+    const r = await fetch('/.netlify/functions/send-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify', phone: rsPhone, code })
+    });
+    const d = await r.json().catch(() => ({}));
+    btn.disabled = false; btn.querySelector('span').textContent = 'OTP যাচাই করুন';
+    if (d && d.verified) {
+      document.getElementById('rsPhase2').style.display = 'none';
+      document.getElementById('rsPhase3').style.display = 'block';
+      document.getElementById('rs_new1').focus();
+      showMsg('msgRs3', '', 'info');
+    } else {
+      showMsg('msgRs2', '❌ ' + ((d && d.error) || 'OTP ভুল — আবার চেষ্টা করুন'), 'error');
+    }
+  } catch (e) {
+    btn.disabled = false; btn.querySelector('span').textContent = 'OTP যাচাই করুন';
+    showMsg('msgRs2', '❌ যাচাই ব্যর্থ — আবার চেষ্টা করুন', 'error');
+  }
+}
+
+// ধাপ ৩ — নতুন পাসওয়ার্ড সংরক্ষণ (customers.password_hash update)
+async function rsSavePassword() {
+  const p1 = document.getElementById('rs_new1').value;
+  const p2 = document.getElementById('rs_new2').value;
+  if (!p1 || p1.length < 6) {
+    showMsg('msgRs3', '⚠️ পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে', 'error'); return;
+  }
+  if (p1 !== p2) {
+    showMsg('msgRs3', '⚠️ দুটি পাসওয়ার্ড মেলেনি', 'error'); return;
+  }
+  const btn = document.getElementById('rsSaveBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = 'সংরক্ষণ হচ্ছে…';
+  // register.html-এর মতোই encoding (btoa base64) — যাতে লগইন মিলবে
+  const hash = btoa(unescape(encodeURIComponent(p1)));
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/customers?phone=eq.${rsPhone}`, {
+      method: 'PATCH',
+      headers: { ...headers, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ password_hash: hash, updated_at: new Date().toISOString() })
+    });
+    btn.disabled = false; btn.querySelector('span').textContent = 'পাসওয়ার্ড সংরক্ষণ করুন';
+    if (r.ok) {
+      showMsg('msgRs3', '✓ পাসওয়ার্ড পরিবর্তন হয়েছে! লগইনে ফিরে যাচ্ছে…', 'success');
+      setTimeout(() => {
+        closeReset();
+        document.getElementById('login_phone').value = rsPhone;
+        showMsg('msgPass', '✓ নতুন পাসওয়ার্ড দিয়ে লগইন করুন', 'success');
+      }, 1500);
+    } else {
+      showMsg('msgRs3', '❌ সংরক্ষণ ব্যর্থ — আবার চেষ্টা করুন', 'error');
+    }
+  } catch (e) {
+    btn.disabled = false; btn.querySelector('span').textContent = 'পাসওয়ার্ড সংরক্ষণ করুন';
+    showMsg('msgRs3', '❌ সংরক্ষণ ব্যর্থ: ' + e.message, 'error');
+  }
+}
 </script>
 </body>
 </html>
