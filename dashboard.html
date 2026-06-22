@@ -2107,14 +2107,31 @@ async function triggerAnalysis() {
     .filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k))
     .map(([k,v])=>`${k}: ${v}`).join(', ') || 'মেট্রিক্স পাওয়া যায়নি';
 
-  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI পুষ্টি ও স্বাস্থ্য বিশ্লেষক।
+  // ── মাসিক চক্রের ফেজ হিসাব করে AI-কে স্পষ্ট জানাই ──
+  let cycleStr = 'মাসিক চক্রের তথ্য নেই';
+  if (m && m.last_period_date && m.cycle_length_days) {
+    const _last = new Date(m.last_period_date);
+    const _len = parseInt(m.cycle_length_days) || 28;
+    const _day = Math.floor((new Date() - _last) / 86400000) % _len + 1;
+    let _ph, _adv;
+    if (_day <= 5)      { _ph='মাসিক ফেজ';     _adv='আয়রন ও ফোলেট সমৃদ্ধ খাবার, উষ্ণ পানীয়, বিশ্রাম'; }
+    else if (_day <= 13){ _ph='ফলিকুলার ফেজ'; _adv='হালকা প্রোটিন ও সবজি, শক্তি বেশি'; }
+    else if (_day <= 16){ _ph='ওভুলেশন ফেজ';  _adv='অ্যান্টিঅক্সিডেন্ট ও জিংক সমৃদ্ধ খাবার'; }
+    else                { _ph='লুটিয়াল ফেজ';  _adv='ম্যাগনেসিয়াম ও বি৬, চিনি-ক্যাফেইন কমানো'; }
+    cycleStr = `${_ph} (চক্রের দিন ${_day}/${_len}) — পুষ্টি ফোকাস: ${_adv}`;
+  }
+
+  const prompt = `তুমি SAR (She AI Revolution) — women-led, women-run, women-only AI+EI+blockchain ভিত্তিক খাদ্য ও পুষ্টি আন্দোলনের বিশেষজ্ঞ AI পুষ্টি ও স্বাস্থ্য বিশ্লেষক।
+
+SAR-এর সব খাবার অবশ্যই: তেল-মুক্ত, চিনি-মুক্ত, লবণ-মুক্ত (pink salt ব্যবহার), কৃত্রিম রং-মুক্ত, দুধ-মুক্ত, আয়ুর্বেদিক ও অর্গানিক। রান্না steam/bake/air-fry (আগুন-মুক্ত)। অনুমোদিত: মাখন, টক দই, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম, মৌসুমি ফল।
 
 গ্রাহক: ${cust?.full_name||'SAR গ্রাহক'}, বয়স: ${age||'অজানা'}, রোগ: ${catMap[cat]||cat}
 উচ্চতা: ${cust?.height_cm||'?'} সেমি, ওজন: ${cust?.weight_kg||'?'} কেজি, BMI: ${cust?.bmi||'?'}
+মাসিক চক্র: ${cycleStr}
 ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
 মেট্রিক্স: ${mStr}
 
-তুমি উচ্চতা, ওজন, BMI, বয়স, রোগ ও কার্যকলাপ বিবেচনা করে ব্যক্তিগত দৈনিক ক্যালরি লক্ষ্য (Mifflin-St Jeor ভিত্তিক) ও প্রোটিন হিসাব করবে। রোগ অনুযায়ী সমন্বয়: স্থূলতা→ঘাটতি, গর্ভাবস্থা→বেশি, ডায়াবেটিস→স্থিতিশীল। meal split ও course সংখ্যা target অনুযায়ী দাও (কম target→কম course; সকাল ২-৩, দুপুর/রাত ৩-৫)।
+তুমি উচ্চতা, ওজন, BMI, বয়স, রোগ, কার্যকলাপ ও মাসিক চক্রের ফেজ বিবেচনা করে ব্যক্তিগত দৈনিক ক্যালরি লক্ষ্য (Mifflin-St Jeor ভিত্তিক) ও প্রোটিন হিসাব করবে। মাসিক ফেজ অনুযায়ী পুষ্টি সমন্বয় করো (মাসিক→আয়রন, লুটিয়াল→ম্যাগনেসিয়াম ও কম চিনি, ইত্যাদি)। রোগ অনুযায়ী সমন্বয়: স্থূলতা→ঘাটতি, গর্ভাবস্থা→বেশি, ডায়াবেটিস→স্থিতিশীল। meal split ও course সংখ্যা target অনুযায়ী দাও (কম target→কম course; সকাল ২-৩, দুপুর/রাত ৩-৫)।
 
 নিচের JSON-এ বাংলায় উত্তর দাও (শুধু JSON):
 {
@@ -3899,6 +3916,25 @@ function mVoice(targetId) {
       <p style="font-size:11px;color:var(--ink-soft);text-align:center;margin:10px 0 0">
         💡 ছবি শুধু আপনার এই ডিভাইসে থাকে, নিরাপদ।</p>
     </div>
+  </div>
+</div>
+
+<!-- ═══ SAR DISCLAIMER (সব পেজে) ═══ -->
+<div style="max-width:920px;margin:2rem auto 1rem;padding:1.1rem 1.3rem;
+  background:rgba(233,30,140,.06);border:1px solid rgba(233,30,140,.2);
+  border-radius:14px;text-align:center;line-height:1.65">
+  <div style="font-size:.82rem;color:rgba(255,255,255,.7)">
+    <strong style="color:#FF6BB5">⚕️ গুরুত্বপূর্ণ:</strong>
+    SAR কোনো চিকিৎসা বা রোগ নিরাময় নয়। এটি একটি স্বাস্থ্য, সুস্থতা ও নারী-ক্ষমতায়ন প্ল্যাটফর্ম।
+    সঠিক রোগনির্ণয় ও চিকিৎসার জন্য অনুগ্রহ করে আপনার ডাক্তারের পরামর্শ নিন।
+  </div>
+  <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.55rem;font-style:italic">
+    <strong style="color:#FF6BB5">⚕️ Important:</strong>
+    SAR is not a treatment or cure for any disease. It is a health, wellness and women-empowerment platform.
+    Please consult your doctor for proper diagnosis and treatment.
+  </div>
+  <div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.5rem">
+    SAR — She AI Revolution · women-led · women-run · women-only
   </div>
 </div>
 
