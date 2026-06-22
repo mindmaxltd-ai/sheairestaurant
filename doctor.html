@@ -157,6 +157,7 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
 
 @media(max-width:768px){.two-col{grid-template-columns:1fr}.sign-grid{grid-template-columns:1fr}}
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div class="bg"></div>
@@ -604,18 +605,105 @@ async function signPrescription(){
     });
   } catch(e){ console.warn('Supabase note save:', e); }
 
-  showSignMsg(`✅ প্রেসক্রিপশন সাইন করা হয়েছে — Dr. ${name} (BMDC: ${reg})। গ্রাহককে WhatsApp ও Email-এ পাঠানো হচ্ছে...`, true);
-  showToast('✅ প্রেসক্রিপশন সাইন ও রিলিজ সম্পন্ন');
+  showSignMsg(`✅ প্রেসক্রিপশন সাইন করা হয়েছে — Dr. ${name} (BMDC: ${reg})। PDF তৈরি ও গ্রাহকের মোবাইলে পাঠানো হচ্ছে...`, true);
+  showToast('✅ প্রেসক্রিপশন সাইন সম্পন্ন — PDF পাঠানো হচ্ছে');
 
-  // Notify via Edge Function
-  if(patient.id){
-    const custPhone = patient.phone || JSON.parse(localStorage.getItem('sar_customer')||'{}').phone;
-    if(custPhone){
-      const waMsg = `🩺 *SAR ডাক্তার প্রেসক্রিপশন*\n\nপ্রিয় ${patient.name||'আপা'},\n\nআপনার প্রেসক্রিপশন প্রস্তুত!\n\n👨‍⚕️ Dr. ${name}\nBMDC: ${reg}\n\n💊 ওষুধ:\n${editedRx.map(r=>`• ${r.generic}: ${r.note}`).join('\n')}\n\n📋 পরামর্শ: ${prescription.general}\n\n⚠️ বিপদ লক্ষণ: ${prescription.dangers}\n\nSAR — She AI Restaurant\n📞 01346098892`;
-      fetch(`${SUPA_URL}/functions/v1/send-whatsapp`,{method:'POST',headers:H,
-        body:JSON.stringify({to_phone:custPhone, custom_message:waMsg, customer_id:patient.id})
-      }).catch(()=>{});
+  // ── PDF বানাও → Supabase storage-এ রাখো → link SMS-এ পাঠাও ──
+  const custPhone = patient.phone || JSON.parse(localStorage.getItem('sar_customer')||'{}').phone;
+  sendRxPdf({ name, reg, editedRx, prescription, custPhone });
+}
+
+// PDF তৈরি, Supabase storage-এ upload, এবং SMS-এ link পাঠানো
+async function sendRxPdf({ name, reg, editedRx, prescription, custPhone }){
+  let pdfUrl = '';
+  try {
+    // 1. jsPDF দিয়ে prescription PDF বানাই
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'pt', format:'a4' });
+    const W = doc.internal.pageSize.getWidth();
+    let y = 50;
+    doc.setFontSize(18); doc.setTextColor(233,30,140);
+    doc.text('SAR — She AI Restaurant', W/2, y, {align:'center'}); y+=22;
+    doc.setFontSize(11); doc.setTextColor(90,90,90);
+    doc.text('Doctor Prescription', W/2, y, {align:'center'}); y+=30;
+    doc.setDrawColor(233,30,140); doc.line(40,y,W-40,y); y+=24;
+    doc.setFontSize(11); doc.setTextColor(20,20,20);
+    const line=(label,val)=>{ doc.setFont(undefined,'bold'); doc.text(label,40,y);
+      doc.setFont(undefined,'normal'); const sp=doc.splitTextToSize(String(val||'—'),W-160);
+      doc.text(sp,160,y); y+=Math.max(18,sp.length*15)+4; };
+    line('রোগী:', patient.name||'আপা');
+    line('তারিখ:', new Date().toLocaleDateString('bn-BD'));
+    line('ডাক্তার:', `Dr. ${name} (BMDC: ${reg})`);
+    line('অভিযোগ:', prescription.complaint);
+    line('মূল্যায়ন:', prescription.ai_assessment);
+    y+=6; doc.setFont(undefined,'bold'); doc.setTextColor(233,30,140);
+    doc.text('ঔষধ (Rx):',40,y); y+=20; doc.setTextColor(20,20,20);
+    (editedRx||[]).forEach((r,i)=>{ const t=`${i+1}. ${r.generic||''} — ${r.note||''}`;
+      const sp=doc.splitTextToSize(t,W-80); doc.setFont(undefined,'normal');
+      doc.text(sp,50,y); y+=sp.length*15+4; });
+    y+=6; line('সাধারণ পরামর্শ:', prescription.general);
+    line('ঘরোয়া প্রতিকার:', prescription.home);
+    line('বিপদ সংকেত:', prescription.dangers);
+    y+=10; doc.setFontSize(8); doc.setTextColor(140,140,140);
+    doc.text('SAR — women-led · women-run · women-only · 📞 01346098892', W/2, y, {align:'center'});
+
+    // 2. PDF কে blob বানাই
+    const pdfBlob = doc.output('blob');
+    const fileName = `rx_${patient.id||'cust'}_${Date.now()}.pdf`;
+
+    // 3. Supabase storage 'prescriptions' bucket-এ upload
+    const up = await fetch(`${SUPA_URL}/storage/v1/object/prescriptions/${fileName}`,{
+      method:'POST',
+      headers:{ apikey:SUPA_KEY, Authorization:'Bearer '+SUPA_KEY, 'Content-Type':'application/pdf' },
+      body: pdfBlob
+    });
+    if(up.ok){
+      pdfUrl = `${SUPA_URL}/storage/v1/object/public/prescriptions/${fileName}`;
+    } else {
+      console.warn('PDF upload failed:', up.status, await up.text().catch(()=>''));
     }
+  } catch(e){ console.warn('PDF build/upload error:', e); }
+
+  // 4. sar_notes-এ link সহ সেভ (PDF থাকলে link, নাহলে text)
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/sar_notes`,{
+      method:'POST', headers:{...H,'Prefer':'return=minimal'},
+      body:JSON.stringify({
+        customer_id: patient.id,
+        note_type: 'prescription',
+        urgency_level: 'medium',
+        note_text_bn: `[Dr. ${name} / BMDC: ${reg}] প্রেসক্রিপশন${pdfUrl?' — PDF: '+pdfUrl:''}`,
+        is_resolved: false,
+      })
+    });
+  } catch(e){ console.warn('note save:', e); }
+
+  // 5. SMS-এ link পাঠাও (send-sms function — কাজ করছে)
+  if(custPhone){
+    const smsMsg = pdfUrl
+      ? `SAR: প্রিয় ${patient.name||'আপা'}, আপনার ডাক্তার প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। ডাউনলোড করুন: ${pdfUrl}`
+      : `SAR: প্রিয় ${patient.name||'আপা'}, আপনার প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। বিস্তারিত ড্যাশবোর্ডে দেখুন।`;
+    try {
+      const r = await fetch('/.netlify/functions/send-sms',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ to: custPhone, msg: smsMsg })
+      });
+      const d = await r.json().catch(()=>({}));
+      if(d && d.sent) showSignMsg(`✅ প্রেসক্রিপশন PDF গ্রাহকের মোবাইলে পাঠানো হয়েছে (${custPhone})।`, true);
+      else showSignMsg(`⚠️ PDF তৈরি হয়েছে${pdfUrl?' ('+pdfUrl+')':''} কিন্তু SMS পাঠানো যায়নি: ${(d&&d.error)||'?'}`, false);
+    } catch(e){
+      showSignMsg(`⚠️ PDF তৈরি হয়েছে কিন্তু SMS ব্যর্থ — আবার চেষ্টা করুন।`, false);
+    }
+  } else {
+    showSignMsg(`⚠️ গ্রাহকের মোবাইল নম্বর পাওয়া যায়নি — SMS পাঠানো যায়নি।`, false);
+  }
+
+  // পুরোনো WhatsApp Edge Function fallback (অক্ষত)
+  if(patient.id && custPhone){
+    const waMsg = `🩺 SAR ডাক্তার প্রেসক্রিপশন\n\nপ্রিয় ${patient.name||'আপা'},\nDr. ${name} (BMDC: ${reg})\n${pdfUrl?'PDF: '+pdfUrl:''}`;
+    fetch(`${SUPA_URL}/functions/v1/send-whatsapp`,{method:'POST',headers:H,
+      body:JSON.stringify({to_phone:custPhone, custom_message:waMsg, customer_id:patient.id})
+    }).catch(()=>{});
   }
 }
 
