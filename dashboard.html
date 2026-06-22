@@ -457,8 +457,11 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
   .dash-col-right{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
 }
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%)}
+  .sidebar{transform:translateX(-100%);
+    background:#120a16;backdrop-filter:none;   /* mobile-এ সম্পূর্ণ অস্বচ্ছ — blur সমস্যা দূর */
+    box-shadow:4px 0 30px rgba(0,0,0,.6)}
   .sidebar.open{transform:translateX(0)}
+  .sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99;display:none}
   .sb-overlay.show{display:block}
   .topbar{display:flex}
   .main{margin-left:0;padding:4.5rem 1rem 4rem}
@@ -2648,6 +2651,40 @@ async function loadAnalysisReports() {
         </div>
       </div>`;
     }).join('');
+
+    // ── doctor prescription গুলোও দেখাই (sar_notes থেকে, PDF link সহ) ──
+    try{
+      const pr = await fetch(`${SUPA}/rest/v1/sar_notes?customer_id=eq.${CID}&note_type=eq.prescription&order=created_at.desc&limit=5&select=*`, {headers:H});
+      const pres = pr.ok ? await pr.json() : [];
+      if(Array.isArray(pres) && pres.length){
+        const presHtml = pres.map((n,j)=>{
+          const txt = n.note_text_bn || n.note_text || '';
+          // note_text-এ "PDF: <url>" থাকলে link বের করি
+          const m = txt.match(/PDF:\s*(https?:\/\/[^\s]+)/);
+          const pdf = n.pdf_url || (m ? m[1] : '');
+          const date = (n.created_at||'').split('T')[0] || '—';
+          const clean = txt.replace(/—?\s*PDF:\s*https?:\/\/[^\s]+/,'').trim();
+          return `<div class="report-item" id="pres-${j}">
+            <div class="report-toggle" onclick="document.getElementById('pres-${j}').classList.toggle('open')">
+              <div style="display:flex;align-items:center;gap:.75rem">
+                <span style="font-size:.85rem;color:rgba(255,255,255,.55)">${date}</span>
+                <span class="report-score-badge" style="background:rgba(233,30,140,.15);color:#FF6BB5;border:1px solid rgba(233,30,140,.4)">
+                  💊 প্রেসক্রিপশন
+                </span>
+              </div>
+              <span class="report-arrow">▼</span>
+            </div>
+            <div class="report-body">
+              <p>${clean||'ডাক্তার প্রেসক্রিপশন'}</p>
+              ${pdf ? `<a href="${pdf}" target="_blank" class="report-pdf-link">📄 প্রেসক্রিপশন PDF</a>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+        el.innerHTML += `<div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(255,255,255,.08);
+          font-size:.72rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em">
+          💊 ডাক্তার প্রেসক্রিপশন</div>` + presHtml;
+      }
+    }catch(e){ /* prescription optional */ }
 
   } catch(e) {
     console.error('loadAnalysisReports error:', e);
