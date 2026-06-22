@@ -370,9 +370,66 @@ function showPayGate(){
   document.getElementById('payGate').style.display = 'block';
 }
 
-// ধাপ ১-এ শুধু gate দেখায়; আসল payment call ধাপ ২-এ যুক্ত হবে
-function startDoctorPayment(){
-  document.getElementById('payGateMsg').textContent = 'পেমেন্ট সংযোগ শীঘ্রই যুক্ত হচ্ছে... (ধাপ ২)';
+// ধাপ ২: আসল SSLCommerz payment — createInvoice → createSession → gateway
+async function startDoctorPayment(){
+  const btn = document.getElementById('payGateBtn');
+  const msg = document.getElementById('payGateMsg');
+  const sc = JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  if(!sc.id){
+    msg.textContent = '⚠️ আগে লগইন করুন (গ্রাহক তথ্য পাওয়া যায়নি)।';
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'পেমেন্ট পেজ তৈরি হচ্ছে...';
+  msg.textContent = '';
+  const PAY = '/.netlify/functions/payment';
+  try{
+    // 1) invoice তৈরি (৭৫০৳ consultation)
+    const invRes = await fetch(PAY, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'createInvoice',
+        customer_id: sc.id,
+        type:'CONSULTATION',
+        package_name:'Doctor Consultation',
+        amount:750, total_amount:750,
+        meta:{ purpose:'doctor', customer_id:sc.id }
+      })
+    });
+    const invD = await invRes.json();
+    if(!invD.ok || !invD.invoice){ throw new Error(invD.error||'invoice তৈরি ব্যর্থ'); }
+
+    // 2) transaction id + payment session
+    const txnId = 'DOC-'+Date.now()+'-'+Math.random().toString(36).slice(2,8);
+    // createPayment (PROCESSING রেকর্ড) — payment.js এই ধাপ চায়
+    await fetch(PAY, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'createPayment',
+        invoice_id: invD.invoice.id, customer_id: sc.id,
+        gateway:'sslcommerz', transaction_id: txnId
+      })
+    }).catch(()=>{});
+
+    // 3) SSLCommerz session → GatewayPageURL
+    const sesRes = await fetch(PAY, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'createSession',
+        invoice_id: invD.invoice.id, transaction_id: txnId,
+        customer:{ id:sc.id, full_name:sc.full_name, email:sc.email, phone:sc.phone }
+      })
+    });
+    const sesD = await sesRes.json();
+    if(sesD.ok && sesD.GatewayPageURL){
+      msg.textContent = '✓ নিরাপদ পেমেন্ট পেজে নিয়ে যাওয়া হচ্ছে...';
+      window.location.href = sesD.GatewayPageURL;   // SSLCommerz hosted page
+    } else {
+      throw new Error(sesD.error||'পেমেন্ট সেশন তৈরি হয়নি');
+    }
+  }catch(e){
+    btn.disabled = false; btn.textContent = '৳৭৫০ দিয়ে পরামর্শ শুরু করুন →';
+    msg.textContent = '❌ '+e.message;
+  }
 }
 
 async function init(){
