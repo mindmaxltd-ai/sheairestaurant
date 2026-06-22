@@ -580,15 +580,38 @@ ${metricsStr}
     // Try Claude API via Edge Function first
     let aiData = null;
 
+    // ── PRIMARY: Netlify analyze function (dashboard যেটা ব্যবহার করে — কাজ করছে) ──
     try {
-      const r = await fetch(`${SUPA_URL}/functions/v1/analyze-customer`, {
+      const r = await fetch('/.netlify/functions/analyze', {
         method:'POST',
-        headers:H,
-        body:JSON.stringify({ customer_id:patient.id, complaint, force:true })
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ prompt })
       });
-      const d = await r.json();
-      if(d?.analysis_bn){ aiData = { assessment:d.analysis_bn }; }
+      if(r.ok){
+        const d = await r.json();
+        if(d.parsed && (d.parsed.assessment || d.parsed.rx)) aiData = d.parsed;
+        else if(d.assessment || d.rx) aiData = d;
+        else if(d.text){
+          let clean=d.text.replace(/```json|```/g,'').trim();
+          const a=clean.indexOf('{'), b=clean.lastIndexOf('}');
+          if(a>-1&&b>a) clean=clean.slice(a,b+1);
+          try{ aiData = JSON.parse(clean); }catch(e){ aiData = { assessment: d.text.slice(0,400) }; }
+        }
+      }
     } catch(e){}
+
+    // Fallback: Supabase Edge Function (পুরোনো — অক্ষত)
+    if(!aiData){
+      try {
+        const r = await fetch(`${SUPA_URL}/functions/v1/analyze-customer`, {
+          method:'POST',
+          headers:H,
+          body:JSON.stringify({ customer_id:patient.id, complaint, force:true })
+        });
+        const d = await r.json();
+        if(d?.analysis_bn){ aiData = { assessment:d.analysis_bn }; }
+      } catch(e){}
+    }
 
     // Fallback: direct Claude API (if key in localStorage)
     if(!aiData){
