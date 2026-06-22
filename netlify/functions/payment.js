@@ -174,6 +174,15 @@ exports.handler = async (event) => {
         const cust = p.customer || {};
         const meta = inv.meta_json || {};
 
+        // ── doctor consultation হলে আলাদা success/fail URL (doctor.html-এ ফেরত) ──
+        const isDoctor = (meta.purpose === 'doctor') || (inv.type === 'CONSULTATION');
+        const successUrl = isDoctor
+          ? `${SITE_URL}/.netlify/functions/payment-webhook?redirect=doctor_success`
+          : `${SITE_URL}/.netlify/functions/payment-webhook?redirect=success`;
+        const failUrl = isDoctor
+          ? `${SITE_URL}/.netlify/functions/payment-webhook?redirect=doctor_fail`
+          : `${SITE_URL}/.netlify/functions/payment-webhook?redirect=fail`;
+
         // SSLCommerz form-encoded payload
         const form = {
           store_id:     SSLC_STORE_ID,
@@ -182,9 +191,9 @@ exports.handler = async (event) => {
           currency:     'BDT',
           tran_id:      p.transaction_id,
           // gateway → এই URL-গুলোতে গ্রাহককে ফেরত পাঠাবে
-          success_url:  `${SITE_URL}/.netlify/functions/payment-webhook?redirect=success`,
-          fail_url:     `${SITE_URL}/.netlify/functions/payment-webhook?redirect=fail`,
-          cancel_url:   `${SITE_URL}/invoice.html?inv=${enc(inv.invoice_number)}`,
+          success_url:  successUrl,
+          fail_url:     failUrl,
+          cancel_url:   isDoctor ? `${SITE_URL}/dashboard.html?paid=cancel` : `${SITE_URL}/invoice.html?inv=${enc(inv.invoice_number)}`,
           ipn_url:      `${SITE_URL}/.netlify/functions/payment-webhook`,
           // গ্রাহক তথ্য
           cus_name:  cust.full_name || 'SAR গ্রাহক',
@@ -202,12 +211,14 @@ exports.handler = async (event) => {
           ship_state:    'Dhaka',
           ship_postcode: '1200',
           ship_country:  'Bangladesh',
-          product_name:    'SAR Meal Order',
-          product_category: 'Food',
+          product_name:    isDoctor ? 'Doctor Consultation' : 'SAR Meal Order',
+          product_category: isDoctor ? 'Health' : 'Food',
           product_profile: 'general',
           num_of_item: (meta.items || []).length || 1,
           value_a: inv.invoice_number,   // আমাদের রেফারেন্স (webhook-এ ফেরত আসবে)
           value_b: inv.id,
+          value_c: isDoctor ? 'doctor' : 'meal',
+          value_d: meta.customer_id || cust.id || '',
         };
 
         // গ্রাহকের বাছাই করা মাধ্যম সরাসরি খোলে (multi_card_name)
