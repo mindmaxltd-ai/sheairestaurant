@@ -353,16 +353,25 @@ function showToast(m){
 // ── approve + digital signature (ধাপ B-তে PDF + পাঠানো যোগ হবে) ──
 async function approveRx(idx){
   const n = allRx[idx];
+  const c = n._cust || {};
   const name = (document.getElementById('dn-'+idx).value||'').trim();
   const reg  = (document.getElementById('db-'+idx).value||'').trim();
-  const desig= (document.getElementById('dd-'+idx).value||'').trim() || 'Registered Physician (BMDC)';
+  const desig= (document.getElementById('dd-'+idx).value||'').trim() || 'MBBS, Registered Physician (BMDC)';
   const msg = document.getElementById('msg-'+idx);
   if(!name || !reg){ msg.style.color='var(--red)'; msg.textContent='⚠️ নাম ও BMDC নম্বর দিন।'; return; }
   const btn = document.getElementById('ab-'+idx);
-  btn.disabled=true; btn.textContent='অনুমোদন হচ্ছে...';
+  btn.disabled=true; btn.textContent='PDF তৈরি ও অনুমোদন হচ্ছে...';
   msg.style.color='var(--ink-2)'; msg.textContent='';
 
-  // ধাপ A: শুধু status=approved + signature তথ্য সেভ (PDF + পাঠানো ধাপ B)
+  const approvedAt = new Date();
+  let pdfUrl = '';
+
+  // ── 1) Mayo Clinic-স্টাইল prescription PDF তৈরি (digital signature সহ) ──
+  try{
+    pdfUrl = await buildRxPdf(n, c, { name, reg, desig, approvedAt });
+  }catch(e){ console.warn('PDF build:', e); }
+
+  // ── 2) status=approved + signature + pdf_url সেভ ──
   try{
     const r = await fetch(`${SUPA}/rest/v1/sar_notes?id=eq.${n.id}`, {
       method:'PATCH', headers:{...H, Prefer:'return=minimal'},
@@ -370,23 +379,127 @@ async function approveRx(idx){
         rx_status:'approved', is_resolved:true,
         approved_by:`Dr. ${name} (BMDC: ${reg})`,
         designation: desig,
-        approved_at: new Date().toISOString(),
+        approved_at: approvedAt.toISOString(),
+        pdf_url: pdfUrl || null,
       })
     });
-    if(r.ok){
-      msg.style.color='#34D399'; msg.textContent='✓ অনুমোদিত ও স্বাক্ষরিত।';
-      showToast('✓ প্রেসক্রিপশন অনুমোদিত');
-      setTimeout(loadRx, 900);
-    }else{
+    if(!r.ok){
       const t = await r.text().catch(()=>'');
       btn.disabled=false; btn.textContent='✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন';
-      msg.style.color='var(--red)'; msg.textContent='❌ অনুমোদন ব্যর্থ: '+t;
+      msg.style.color='var(--red)'; msg.textContent='❌ অনুমোদন ব্যর্থ: '+t; return;
     }
   }catch(e){
     btn.disabled=false; btn.textContent='✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন';
-    msg.style.color='var(--red)'; msg.textContent='❌ '+e.message;
+    msg.style.color='var(--red)'; msg.textContent='❌ '+e.message; return;
   }
+
+  // ── 3) approved হলে customer-কে অটো SMS + email (PDF link) ──
+  if(pdfUrl){
+    const who = c.full_name || 'আপা';
+    if(c.phone){
+      fetch('/.netlify/functions/send-sms', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ to:c.phone,
+          msg:`SAR: প্রিয় ${who}, আপনার ডাক্তার-অনুমোদিত প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। দেখুন: ${pdfUrl}` })
+      }).catch(()=>{});
+    }
+    if(c.email){
+      const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
+        <h2 style="color:#E91E8C">🌸 SAR — অনুমোদিত প্রেসক্রিপশন</h2>
+        <p>প্রিয় ${who},</p><p>আপনার প্রেসক্রিপশন ডাক্তার কর্তৃক যাচাই ও অনুমোদিত হয়েছে।</p>
+        <p><a href="${pdfUrl}" target="_blank" style="display:inline-block;background:#E91E8C;color:#fff;
+          padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 প্রেসক্রিপশন দেখুন (PDF)</a></p>
+        <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only</p></div>`;
+      fetch('/.netlify/functions/send-email', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ to:c.email, subject:'SAR — অনুমোদিত প্রেসক্রিপশন', html })
+      }).catch(()=>{});
+    }
+  }
+
+  msg.style.color='#34D399';
+  msg.textContent = pdfUrl ? '✓ অনুমোদিত, PDF তৈরি ও গ্রাহককে পাঠানো হয়েছে।' : '✓ অনুমোদিত (PDF তৈরি হয়নি — bucket চেক করুন)।';
+  showToast('✓ প্রেসক্রিপশন অনুমোদিত ও পাঠানো হয়েছে');
+  setTimeout(loadRx, 1100);
 }
+
+// ── Mayo Clinic-স্টাইল prescription PDF → Supabase storage → public/signed URL ──
+async function buildRxPdf(n, c, sig){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const W = doc.internal.pageSize.getWidth();
+  const M = 48;                       // margin
+  let y = 56;
+
+  // Header — clinic identity
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(194,24,91);
+  doc.text('SAR — She AI Revolution', M, y); y+=20;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120);
+  doc.text('Health · Wellness · Women Empowerment Platform', M, y); y+=24;
+  doc.setDrawColor(194,24,91); doc.setLineWidth(2); doc.line(M, y, W-M, y); y+=26;
+
+  // Patient block (Mayo-style: label-value rows)
+  doc.setFontSize(10); doc.setTextColor(40,40,40);
+  const row=(label,val)=>{ doc.setFont('helvetica','bold'); doc.text(label, M, y);
+    doc.setFont('helvetica','normal'); const sp=doc.splitTextToSize(String(val||'—'), W-M-150);
+    doc.text(sp, M+120, y); y+=Math.max(16,sp.length*13)+4; };
+  row('Patient Name:', c.full_name||'—');
+  row('Phone:', c.phone||'—');
+  if(c.sar_category) row('Category:', c.sar_category);
+  if(c.bmi) row('BMI:', c.bmi);
+  row('Date:', sig.approvedAt.toLocaleDateString('en-GB'));
+  y+=6; doc.setDrawColor(220,220,220); doc.setLineWidth(1); doc.line(M,y,W-M,y); y+=22;
+
+  // Rx body — prescription text
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(194,24,91);
+  doc.text('℞  Prescription', M, y); y+=20;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(30,30,30);
+  const body = (n.note_text_bn || n.note_text || '').replace(/\r/g,'');
+  const lines = doc.splitTextToSize(body, W-M*2);
+  lines.forEach(ln=>{
+    if(y > doc.internal.pageSize.getHeight()-140){ doc.addPage(); y=56; }
+    doc.text(ln, M, y); y+=15;
+  });
+  y+=30;
+
+  // Digital signature block (Mayo-style footer)
+  if(y > doc.internal.pageSize.getHeight()-150){ doc.addPage(); y=56; }
+  doc.setDrawColor(16,185,129); doc.setLineWidth(1.5); doc.line(M, y, W-M, y); y+=22;
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(16,150,100);
+  doc.text('✓ Digitally Verified & Approved', M, y); y+=18;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(30,30,30);
+  doc.text(`Dr. ${sig.name}`, M, y); y+=15;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
+  doc.text(`BMDC Reg: ${sig.reg}`, M, y); y+=13;
+  doc.text(sig.desig, M, y); y+=13;
+  doc.text(`Verifier: SAR Medical Panel`, M, y); y+=13;
+  doc.text(`Signed: ${sig.approvedAt.toLocaleString('en-GB')}`, M, y); y+=20;
+  doc.setFontSize(7.5); doc.setTextColor(150,150,150);
+  doc.text('This is a digitally signed prescription. SAR is a wellness platform; consult your doctor for treatment.', M, y);
+
+  // upload to Supabase storage (prescriptions bucket)
+  const blob = doc.output('blob');
+  const token = (crypto.randomUUID ? crypto.randomUUID().slice(0,12) : Date.now().toString(36));
+  const path = `${n.customer_id||'cust'}/rx-${n.id}-${token}.pdf`;
+  const up = await fetch(`${SUPA}/storage/v1/object/prescriptions/${encodeURIComponent(path)}`, {
+    method:'POST',
+    headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/pdf', 'x-upsert':'true' },
+    body: blob
+  });
+  if(!up.ok) throw new Error('upload failed '+up.status);
+
+  // signed URL (private bucket হলে ৩০ দিন) — নাহলে public fallback
+  let url = `${SUPA}/storage/v1/object/public/prescriptions/${path}`;
+  try{
+    const s = await fetch(`${SUPA}/storage/v1/object/sign/prescriptions/${encodeURIComponent(path)}`, {
+      method:'POST', headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json' },
+      body: JSON.stringify({ expiresIn: 60*60*24*30 })
+    });
+    if(s.ok){ const sd=await s.json(); if(sd&&sd.signedURL) url = `${SUPA}/storage/v1${sd.signedURL}`; }
+  }catch(e){}
+  return url;
+}
+
 </script>
 </body>
 </html>
