@@ -110,35 +110,59 @@ exports.handler = async (event) => {
         });
         summary.analyzed++;
 
-        // ── 3. reports টেবিলে সেভ (dashboard এ দেখানোর জন্য, PDF ছাড়া) ──
-        await fetch(`${SUPABASE_URL}/rest/v1/reports`, {
-          method: 'POST',
-          headers: { ...SB, Prefer: 'resolution=merge-duplicates,return=minimal' },
-          body: JSON.stringify({
-            customer_id: cid,
-            report_date: today,
-            pdf_url:     null,            // PDF পরে যোগ হবে
-            meal_score:  a.score,
-            category:    cat,
-          }),
-        });
+        // ── 3. reports টেবিলে সেভ (dashboard এ দেখানোর জন্য) ──
+        try {
+          const rRes = await fetch(`${SUPABASE_URL}/rest/v1/reports`, {
+            method: 'POST',
+            headers: { ...SB, Prefer: 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify({
+              customer_id: cid, report_date: today, pdf_url: null,
+              meal_score: a.score, category: cat,
+            }),
+          });
+          if (rRes.ok) summary.reports++;
+          else summary.errors.push(`report save (${name}): ${rRes.status} ${await rRes.text().catch(()=>'')}`);
+        } catch (e) { summary.errors.push(`report save (${name}): ${e.message}`); }
 
-        // ── 4. SMS/WhatsApp + ইমেইল পাঠানো (menu link সহ, PDF link ছাড়া) ──
+        // ── 4. SMS + ইমেইল — SAR-এর নিজের কাজ-করা function দিয়ে ──
         const mealUrl = `${PUBLIC_SITE}/meal-score.html?customer_id=${cid}`;
         const shortMsg =
           `প্রিয় ${name}, আজকের আপনার SAR স্বাস্থ্য রিপোর্ট তৈরি!\n`
           + `খাবার স্কোর: ${a.score}/100\n`
           + `মেনু দেখুন: ${mealUrl}`;
 
-        if (cust.phone && TWILIO_SID) {
-          const ok = await sendSMS(cust.phone, shortMsg);
-          if (ok) summary.sms++;
-          else summary.errors.push(`SMS fail: ${name}`);
+        // SMS — send-sms function (OTP-তে কাজ করছে; param: to, msg)
+        if (cust.phone) {
+          try {
+            const sr = await fetch(`${PUBLIC_SITE}/.netlify/functions/send-sms`, {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ to: cust.phone, msg: shortMsg }),
+            });
+            const sd = await sr.json().catch(()=>({}));
+            if (sd && sd.sent) summary.sms++;
+            else summary.errors.push(`SMS (${name}): ${(sd&&sd.error)||sr.status}`);
+          } catch (e) { summary.errors.push(`SMS (${name}): ${e.message}`); }
         }
-        if (cust.email && RESEND_KEY) {
-          const ok = await sendEmail(cust.email, name, a.score, mealUrl, cid);
-          if (ok) summary.email++;
-          else summary.errors.push(`Email fail: ${name}`);
+
+        // Email — send-email function (param: to, subject, html)
+        if (cust.email) {
+          try {
+            const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
+              <h2 style="color:#E91E8C">🌸 SAR — আজকের স্বাস্থ্য রিপোর্ট</h2>
+              <p>প্রিয় ${name},</p>
+              <p>আপনার আজকের খাবার স্কোর: <strong>${a.score}/100</strong></p>
+              <p><a href="${mealUrl}" style="display:inline-block;background:#E91E8C;color:#fff;
+                padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">আজকের মেনু দেখুন</a></p>
+              <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only<br>
+              এটি চিকিৎসা নয়; ডাক্তারের পরামর্শ নিন।</p></div>`;
+            const er = await fetch(`${PUBLIC_SITE}/.netlify/functions/send-email`, {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ to: cust.email, subject:'SAR — আজকের স্বাস্থ্য রিপোর্ট', html }),
+            });
+            const ed = await er.json().catch(()=>({}));
+            if (ed && (ed.sent || ed.id)) summary.email++;
+            else summary.errors.push(`Email (${name}): ${(ed&&ed.error)||er.status}`);
+          } catch (e) { summary.errors.push(`Email (${name}): ${e.message}`); }
         }
 
       } catch (perErr) {
