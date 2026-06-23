@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAR — ডাক্তার পরামর্শ ও অনুমোদন কেন্দ্র</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f0a14; --card:#1a0f1c; --ink:#fff; --ink-2:rgba(255,255,255,.6);
+    --pink:#E91E8C; --pink-deep:#C2185B; --pink-soft:#FF6BB5;
+    --gold:#FFD43B; --green:#10B981; --red:#EF4444;
+    --line:rgba(255,255,255,.1);
+  }
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(165deg,#1a0f1c,#0f0a14);
+    color:var(--ink);min-height:100vh;line-height:1.6}
+  .wrap{max-width:1000px;margin:0 auto;padding:1.5rem}
+
+  /* ── login gate ── */
+  .gate{position:fixed;inset:0;z-index:999;background:linear-gradient(165deg,#1a0f1c,#0f0a14);
+    display:flex;align-items:center;justify-content:center;padding:1.5rem}
+  .gate-card{max-width:380px;width:100%;background:var(--card);border:1px solid rgba(233,30,140,.3);
+    border-radius:18px;padding:2rem 1.5rem;text-align:center}
+  .gate-card h1{color:var(--gold);font-size:1.3rem;margin-bottom:.4rem}
+  .gate-card p{color:var(--ink-2);font-size:.88rem;margin-bottom:1.3rem}
+  .gate input{width:100%;background:rgba(255,255,255,.06);border:1.5px solid var(--line);
+    border-radius:10px;padding:.85rem 1rem;color:#fff;font-size:1rem;font-family:inherit;margin-bottom:1rem}
+  .gate input:focus{outline:none;border-color:var(--pink)}
+  .gate button{width:100%;background:linear-gradient(135deg,var(--pink),var(--pink-deep));
+    color:#fff;border:none;border-radius:10px;padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .gate-msg{margin-top:.9rem;font-size:.85rem;color:var(--red);min-height:1.2em}
+
+  /* ── header ── */
+  .top{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+  .top h1{font-size:1.4rem;color:var(--gold)}
+  .top .who{margin-left:auto;font-size:.82rem;color:var(--ink-2)}
+  .top .logout{color:var(--pink-soft);text-decoration:none;font-size:.82rem;cursor:pointer}
+
+  .tabs{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+  .tab{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;
+    padding:.5rem 1rem;color:var(--ink-2);cursor:pointer;font-size:.86rem;font-family:inherit}
+  .tab.active{background:linear-gradient(135deg,var(--pink),var(--pink-deep));color:#fff;border-color:transparent}
+
+  .rx{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:1.25rem;margin-bottom:1rem}
+  .rx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+  .rx-name{font-weight:700;font-size:1.05rem}
+  .rx-meta{font-size:.78rem;color:var(--ink-2)}
+  .badge{font-size:.72rem;padding:.25rem .7rem;border-radius:20px;font-weight:600}
+  .badge.pending{background:rgba(245,166,35,.15);color:var(--gold);border:1px solid rgba(245,166,35,.4)}
+  .badge.approved{background:rgba(16,185,129,.15);color:#34D399;border:1px solid rgba(16,185,129,.4)}
+  .rx-body{margin-top:.9rem;padding:.9rem;background:rgba(255,255,255,.03);border-radius:10px;
+    font-size:.88rem;white-space:pre-wrap;color:rgba(255,255,255,.85)}
+  .rx-links{margin-top:.8rem;display:flex;gap:.6rem;flex-wrap:wrap}
+  .link-btn{display:inline-flex;align-items:center;gap:.4rem;background:rgba(233,30,140,.1);
+    border:1px solid rgba(233,30,140,.3);border-radius:8px;padding:.4rem .85rem;
+    color:var(--pink-soft);text-decoration:none;font-size:.8rem;cursor:pointer;font-family:inherit}
+  .sign-box{margin-top:1rem;padding:1rem;background:rgba(16,185,129,.06);
+    border:1px solid rgba(16,185,129,.25);border-radius:10px;display:none}
+  .sign-box.show{display:block}
+  .sign-box label{display:block;font-size:.78rem;color:var(--ink-2);margin:.5rem 0 .25rem}
+  .sign-box input{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);
+    border-radius:8px;padding:.6rem .8rem;color:#fff;font-size:.9rem;font-family:inherit}
+  .sign-box input:focus{outline:none;border-color:var(--green)}
+  .approve-btn{width:100%;margin-top:.9rem;background:linear-gradient(135deg,var(--green),#059669);
+    color:#fff;border:none;border-radius:9px;padding:.8rem;font-weight:700;cursor:pointer;font-family:inherit}
+  .approve-btn:disabled{opacity:.6;cursor:not-allowed}
+  .empty{text-align:center;padding:3rem 1rem;color:var(--ink-2)}
+  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--green);
+    color:#fff;padding:.8rem 1.5rem;border-radius:10px;font-size:.9rem;opacity:0;
+    transition:opacity .3s;z-index:500;pointer-events:none}
+  .toast.show{opacity:1}
+  .rx-msg{font-size:.82rem;margin-top:.6rem;min-height:1.2em}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN GATE — শুধু অনুমোদিত নম্বর ═══ -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div style="font-size:2.2rem">🩺</div>
+    <h1>পরামর্শ ও অনুমোদন কেন্দ্র</h1>
+    <p>SAR — শুধুমাত্র অনুমোদিত ডাক্তারের জন্য</p>
+    <input type="tel" id="gatePhone" placeholder="আপনার অনুমোদিত মোবাইল নম্বর" maxlength="11">
+    <button onclick="checkGate()">প্রবেশ করুন →</button>
+    <div class="gate-msg" id="gateMsg"></div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="wrap" id="main" style="display:none">
+  <div class="top">
+    <div style="font-size:1.8rem">🩺</div>
+    <div>
+      <h1>পরামর্শ ও অনুমোদন কেন্দ্র</h1>
+      <div style="font-size:.8rem;color:var(--ink-2)">SAR — She AI Revolution</div>
+    </div>
+    <div class="who" id="whoBox"></div>
+    <a class="logout" onclick="doLogout()">লগআউট</a>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-pending" onclick="switchTab('pending')">⏳ অনুমোদনের অপেক্ষায়</button>
+    <button class="tab" id="tab-approved" onclick="switchTab('approved')">✓ অনুমোদিত</button>
+  </div>
+
+  <div id="rxList">
+    <div class="empty"><div style="font-size:1.5rem">⏳</div>লোড হচ্ছে...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H = {apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json'};
+
+// ═══ অনুমোদিত নম্বর — ভবিষ্যতে এখানে যোগ/বদল করুন ═══
+const ALLOWED_PHONES = ['01745069310', '01767626653'];
+
+let currentTab = 'pending';
+let allRx = [];
+
+// ── login gate ──
+function checkGate(){
+  const phone = (document.getElementById('gatePhone').value||'').trim();
+  if(ALLOWED_PHONES.includes(phone)){
+    sessionStorage.setItem('sar_consult_phone', phone);
+    document.getElementById('gate').style.display='none';
+    document.getElementById('main').style.display='block';
+    document.getElementById('whoBox').textContent = '📱 '+phone;
+    loadRx();
+  } else {
+    document.getElementById('gateMsg').textContent = '❌ এই নম্বর অনুমোদিত নয়। শুধুমাত্র নিবন্ধিত ডাক্তার প্রবেশ করতে পারবেন।';
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem('sar_consult_phone');
+  location.reload();
+}
+// আগে থেকে logged-in?
+(function(){
+  const saved = sessionStorage.getItem('sar_consult_phone');
+  if(saved && ALLOWED_PHONES.includes(saved)){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('main').style.display='block';
+    document.getElementById('whoBox').textContent = '📱 '+saved;
+    loadRx();
+  }
+})();
+
+function switchTab(t){
+  currentTab = t;
+  document.getElementById('tab-pending').classList.toggle('active', t==='pending');
+  document.getElementById('tab-approved').classList.toggle('active', t==='approved');
+  render();
+}
+
+// ── prescription গুলো লোড (sar_notes, note_type=prescription) ──
+async function loadRx(){
+  const el = document.getElementById('rxList');
+  el.innerHTML = '<div class="empty"><div style="font-size:1.5rem">⏳</div>লোড হচ্ছে...</div>';
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/sar_notes?note_type=eq.prescription&order=created_at.desc&limit=50&select=*`, {headers:H});
+    allRx = r.ok ? await r.json() : [];
+    if(!Array.isArray(allRx)) allRx = [];
+    // প্রতিটার customer নাম আনি
+    await enrichNames();
+    render();
+  }catch(e){
+    el.innerHTML = '<div class="empty" style="color:var(--red)">লোড করা যায়নি — আবার চেষ্টা করুন।</div>';
+  }
+}
+
+// customer নাম যোগ
+async function enrichNames(){
+  const ids = [...new Set(allRx.map(n=>n.customer_id).filter(Boolean))];
+  if(!ids.length) return;
+  try{
+    const inList = ids.map(encodeURIComponent).join(',');
+    const r = await fetch(`${SUPA}/rest/v1/customers?id=in.(${inList})&select=id,full_name,phone,email,bmi,sar_category`, {headers:H});
+    const custs = r.ok ? await r.json() : [];
+    const map = {}; custs.forEach(c=>map[c.id]=c);
+    allRx.forEach(n=> n._cust = map[n.customer_id] || {});
+  }catch(e){}
+}
+
+function render(){
+  const el = document.getElementById('rxList');
+  const isPending = currentTab==='pending';
+  const list = allRx.filter(n=>{
+    const status = n.rx_status || (n.is_resolved ? 'approved' : 'pending');
+    return isPending ? status==='pending' : status==='approved';
+  });
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><div style="font-size:1.5rem">${isPending?'✓':'📋'}</div>${isPending?'অনুমোদনের অপেক্ষায় কোনো প্রেসক্রিপশন নেই।':'এখনো কোনো অনুমোদিত প্রেসক্রিপশন নেই।'}</div>`;
+    return;
+  }
+  el.innerHTML = list.map((n,i)=>{
+    const c = n._cust || {};
+    const status = n.rx_status || (n.is_resolved ? 'approved' : 'pending');
+    const date = (n.created_at||'').split('T')[0] || '—';
+    const idx = allRx.indexOf(n);
+    return `<div class="rx">
+      <div class="rx-head">
+        <div>
+          <div class="rx-name">${c.full_name||'গ্রাহক'}</div>
+          <div class="rx-meta">${c.phone||''} ${c.sar_category?'· '+c.sar_category:''} · ${date}</div>
+        </div>
+        <span class="badge ${status}">${status==='approved'?'✓ অনুমোদিত':'⏳ অপেক্ষমাণ'}</span>
+      </div>
+      <div class="rx-body">${(n.note_text_bn||n.note_text||'').replace(/</g,'&lt;')}</div>
+      <div class="rx-links">
+        <button class="link-btn" onclick="viewAIReport('${n.customer_id}')">📊 AI রিপোর্ট দেখুন</button>
+        ${status==='approved' && n.pdf_url ? `<a class="link-btn" href="${n.pdf_url}" target="_blank">📄 অনুমোদিত PDF</a>` : ''}
+        ${status==='pending' ? `<button class="link-btn" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:#34D399" onclick="toggleSign(${idx})">✓ যাচাই ও অনুমোদন</button>` : ''}
+      </div>
+      ${status==='pending' ? `
+      <div class="sign-box" id="sign-${idx}">
+        <div style="font-size:.85rem;color:var(--gold);font-weight:600">🔏 ডিজিটাল স্বাক্ষর ও অনুমোদন</div>
+        <label>ডাক্তারের নাম</label>
+        <input id="dn-${idx}" placeholder="Dr. ...">
+        <label>BMDC রেজিস্ট্রেশন নম্বর</label>
+        <input id="db-${idx}" placeholder="যেমন A-12345">
+        <label>পদবি / Designation</label>
+        <input id="dd-${idx}" value="MBBS, Registered Physician (BMDC)">
+        <div class="rx-msg" id="msg-${idx}"></div>
+        <button class="approve-btn" id="ab-${idx}" onclick="approveRx(${idx})">✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleSign(idx){
+  const b = document.getElementById('sign-'+idx);
+  if(b) b.classList.toggle('show');
+}
+
+// ── AI report দেখা (printable HTML) ──
+async function viewAIReport(cid){
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=created_at.desc&limit=1&select=*`, {headers:H});
+    const a = r.ok ? await r.json() : [];
+    if(!a.length){ showToast('এই গ্রাহকের AI রিপোর্ট পাওয়া যায়নি'); return; }
+    const x = a[0];
+    let rj = x.result_json || {}; if(typeof rj==='string'){try{rj=JSON.parse(rj);}catch(e){rj={};}}
+    const body =
+      `<div class="sec"><b>স্বাস্থ্য স্কোর</b>${x.health_score ?? x.meal_score ?? '—'}/100</div>`+
+      `<div class="sec"><b>বিশ্লেষণ</b>${(x.health_summary_bn||x.analysis_bn||x.general_suggestions_bn||rj.note||'—')}</div>`+
+      (x.daily_kcal?`<div class="sec"><b>দৈনিক ক্যালরি</b>${x.daily_kcal} kcal · প্রোটিন ${x.daily_protein||'—'}g</div>`:'')+
+      (x.focus?`<div class="sec"><b>ফোকাস</b>${x.focus}</div>`:'');
+    openHTML('AI স্বাস্থ্য রিপোর্ট', body);
+  }catch(e){ showToast('রিপোর্ট লোড করা যায়নি'); }
+}
+
+function openHTML(title, bodyHtml){
+  const w = window.open('','_blank');
+  if(!w){ showToast('পপ-আপ ব্লক — অনুমতি দিন'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} — SAR</title>
+    <style>body{font-family:'Segoe UI',sans-serif;max-width:760px;margin:0 auto;padding:2rem 1.5rem;color:#1a1a1a;line-height:1.7}
+    .rh{text-align:center;border-bottom:3px solid #E91E8C;padding-bottom:1rem;margin-bottom:1.5rem}
+    .rh h1{color:#E91E8C;font-size:1.5rem;margin:0}.sec{margin:1rem 0;padding:1rem;background:#FFF4FA;border-radius:10px;border-left:4px solid #E91E8C}
+    .sec b{color:#C2185B;display:block;margin-bottom:.4rem}.pbtn{display:block;width:100%;background:#E91E8C;color:#fff;border:none;border-radius:10px;padding:.9rem;font-weight:700;cursor:pointer;margin:1.5rem 0}
+    @media print{.pbtn{display:none}}</style></head><body>
+    <div class="rh"><h1>🌸 SAR — She AI Revolution</h1><p>${title}</p></div>
+    <button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট / PDF</button>${bodyHtml}
+    <div style="text-align:center;margin-top:2rem;color:#aaa;font-size:.75rem">SAR · এটি চিকিৎসা নয়; ডাক্তারের পরামর্শ নিন।</div>
+    </body></html>`);
+  w.document.close();
+}
+
+function showToast(m){
+  const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── approve + digital signature (ধাপ B-তে PDF + পাঠানো যোগ হবে) ──
+async function approveRx(idx){
+  const n = allRx[idx];
+  const name = (document.getElementById('dn-'+idx).value||'').trim();
+  const reg  = (document.getElementById('db-'+idx).value||'').trim();
+  const desig= (document.getElementById('dd-'+idx).value||'').trim() || 'Registered Physician (BMDC)';
+  const msg = document.getElementById('msg-'+idx);
+  if(!name || !reg){ msg.style.color='var(--red)'; msg.textContent='⚠️ নাম ও BMDC নম্বর দিন।'; return; }
+  const btn = document.getElementById('ab-'+idx);
+  btn.disabled=true; btn.textContent='অনুমোদন হচ্ছে...';
+  msg.style.color='var(--ink-2)'; msg.textContent='';
+
+  // ধাপ A: শুধু status=approved + signature তথ্য সেভ (PDF + পাঠানো ধাপ B)
+  try{
+    const r = await fetch(`${SUPA}/rest/v1/sar_notes?id=eq.${n.id}`, {
+      method:'PATCH', headers:{...H, Prefer:'return=minimal'},
+      body: JSON.stringify({
+        rx_status:'approved', is_resolved:true,
+        approved_by:`Dr. ${name} (BMDC: ${reg})`,
+        designation: desig,
+        approved_at: new Date().toISOString(),
+      })
+    });
+    if(r.ok){
+      msg.style.color='#34D399'; msg.textContent='✓ অনুমোদিত ও স্বাক্ষরিত।';
+      showToast('✓ প্রেসক্রিপশন অনুমোদিত');
+      setTimeout(loadRx, 900);
+    }else{
+      const t = await r.text().catch(()=>'');
+      btn.disabled=false; btn.textContent='✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন';
+      msg.style.color='var(--red)'; msg.textContent='❌ অনুমোদন ব্যর্থ: '+t;
+    }
+  }catch(e){
+    btn.disabled=false; btn.textContent='✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন';
+    msg.style.color='var(--red)'; msg.textContent='❌ '+e.message;
+  }
+}
+</script>
+</body>
+</html>
