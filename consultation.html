@@ -76,14 +76,28 @@
 </head>
 <body>
 
-<!-- ═══ LOGIN GATE — শুধু অনুমোদিত নম্বর ═══ -->
+<!-- ═══ LOGIN GATE — অনুমোদিত নম্বর + OTP যাচাই ═══ -->
 <div class="gate" id="gate">
   <div class="gate-card">
     <div style="font-size:2.2rem">🩺</div>
     <h1>পরামর্শ ও অনুমোদন কেন্দ্র</h1>
     <p>SAR — শুধুমাত্র অনুমোদিত ডাক্তারের জন্য</p>
-    <input type="tel" id="gatePhone" placeholder="আপনার অনুমোদিত মোবাইল নম্বর" maxlength="11">
-    <button onclick="checkGate()">প্রবেশ করুন →</button>
+
+    <!-- ধাপ ১: নম্বর -->
+    <div id="gPhase1">
+      <input type="tel" id="gatePhone" placeholder="আপনার অনুমোদিত মোবাইল নম্বর" maxlength="11">
+      <button onclick="gateSendOtp()" id="gateSendBtn">OTP পাঠান →</button>
+    </div>
+
+    <!-- ধাপ ২: OTP -->
+    <div id="gPhase2" style="display:none">
+      <p style="font-size:.82rem;color:var(--ink-2);margin-bottom:.8rem">
+        <span id="gateSentTo"></span> নম্বরে পাঠানো ৬-সংখ্যার OTP দিন</p>
+      <input type="tel" id="gateOtp" placeholder="৬ সংখ্যার OTP" maxlength="6" style="letter-spacing:.3em;text-align:center">
+      <button onclick="gateVerifyOtp()" id="gateVerifyBtn">যাচাই করে প্রবেশ করুন ✓</button>
+      <p style="font-size:.78rem;color:var(--ink-2);margin-top:.8rem;cursor:pointer" onclick="gateRestart()">← নম্বর পরিবর্তন করুন</p>
+    </div>
+
     <div class="gate-msg" id="gateMsg"></div>
   </div>
 </div>
@@ -118,29 +132,88 @@ const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const H = {apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json'};
 
 // ═══ অনুমোদিত নম্বর — ভবিষ্যতে এখানে যোগ/বদল করুন ═══
-const ALLOWED_PHONES = ['01745069310', '01767626653'];
+const ALLOWED_PHONES = ['01745069310', '01346098892', '01346098893'];
 
 let currentTab = 'pending';
 let allRx = [];
+let gatePhoneVal = '';
 
-// ── login gate ──
-function checkGate(){
+// ── ধাপ ১: নম্বর যাচাই → OTP পাঠাও ──
+async function gateSendOtp(){
   const phone = (document.getElementById('gatePhone').value||'').trim();
-  if(ALLOWED_PHONES.includes(phone)){
-    sessionStorage.setItem('sar_consult_phone', phone);
-    document.getElementById('gate').style.display='none';
-    document.getElementById('main').style.display='block';
-    document.getElementById('whoBox').textContent = '📱 '+phone;
-    loadRx();
-  } else {
-    document.getElementById('gateMsg').textContent = '❌ এই নম্বর অনুমোদিত নয়। শুধুমাত্র নিবন্ধিত ডাক্তার প্রবেশ করতে পারবেন।';
+  const msg = document.getElementById('gateMsg');
+  if(!ALLOWED_PHONES.includes(phone)){
+    msg.style.color='var(--red)';
+    msg.textContent = '❌ এই নম্বর অনুমোদিত নয়। শুধুমাত্র নিবন্ধিত ডাক্তার প্রবেশ করতে পারবেন।';
+    return;
+  }
+  const btn = document.getElementById('gateSendBtn');
+  btn.disabled=true; btn.textContent='OTP পাঠানো হচ্ছে...';
+  msg.textContent='';
+  try{
+    const r = await fetch('/.netlify/functions/send-otp', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'send', phone })
+    });
+    const d = await r.json().catch(()=>({}));
+    btn.disabled=false; btn.textContent='OTP পাঠান →';
+    if(d && d.sent){
+      gatePhoneVal = phone;
+      document.getElementById('gateSentTo').textContent = phone;
+      document.getElementById('gPhase1').style.display='none';
+      document.getElementById('gPhase2').style.display='block';
+      document.getElementById('gateOtp').focus();
+      msg.style.color='#34D399'; msg.textContent='✓ OTP পাঠানো হয়েছে';
+    }else{
+      msg.style.color='var(--red)'; msg.textContent='❌ OTP পাঠানো যায়নি: '+((d&&d.error)||'আবার চেষ্টা করুন');
+    }
+  }catch(e){
+    btn.disabled=false; btn.textContent='OTP পাঠান →';
+    msg.style.color='var(--red)'; msg.textContent='❌ OTP পাঠানো ব্যর্থ — আবার চেষ্টা করুন';
   }
 }
+
+// ── ধাপ ২: OTP যাচাই → প্রবেশ ──
+async function gateVerifyOtp(){
+  const code = (document.getElementById('gateOtp').value||'').trim();
+  const msg = document.getElementById('gateMsg');
+  if(code.length!==6){ msg.style.color='var(--red)'; msg.textContent='⚠️ ৬ সংখ্যার OTP দিন'; return; }
+  const btn = document.getElementById('gateVerifyBtn');
+  btn.disabled=true; btn.textContent='যাচাই হচ্ছে...';
+  try{
+    const r = await fetch('/.netlify/functions/send-otp', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'verify', phone:gatePhoneVal, code })
+    });
+    const d = await r.json().catch(()=>({}));
+    btn.disabled=false; btn.textContent='যাচাই করে প্রবেশ করুন ✓';
+    if(d && d.verified){
+      sessionStorage.setItem('sar_consult_phone', gatePhoneVal);
+      document.getElementById('gate').style.display='none';
+      document.getElementById('main').style.display='block';
+      document.getElementById('whoBox').textContent = '📱 '+gatePhoneVal;
+      loadRx();
+    }else{
+      msg.style.color='var(--red)'; msg.textContent='❌ '+((d&&d.error)||'OTP ভুল — আবার চেষ্টা করুন');
+    }
+  }catch(e){
+    btn.disabled=false; btn.textContent='যাচাই করে প্রবেশ করুন ✓';
+    msg.style.color='var(--red)'; msg.textContent='❌ যাচাই ব্যর্থ — আবার চেষ্টা করুন';
+  }
+}
+
+function gateRestart(){
+  document.getElementById('gPhase1').style.display='block';
+  document.getElementById('gPhase2').style.display='none';
+  document.getElementById('gateOtp').value='';
+  document.getElementById('gateMsg').textContent='';
+}
+
 function doLogout(){
   sessionStorage.removeItem('sar_consult_phone');
   location.reload();
 }
-// আগে থেকে logged-in?
+// আগে থেকে যাচাইকৃত? (OTP সেশন)
 (function(){
   const saved = sessionStorage.getItem('sar_consult_phone');
   if(saved && ALLOWED_PHONES.includes(saved)){
