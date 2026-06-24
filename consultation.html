@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SAR — ডাক্তার পরামর্শ ও অনুমোদন কেন্দ্র</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
@@ -131,8 +132,17 @@ const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
 const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
 const H = {apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json'};
 
-// ═══ অনুমোদিত নম্বর — ভবিষ্যতে এখানে যোগ/বদল করুন ═══
+// ═══ অনুমোদিত নম্বর + ডাক্তার তথ্য (নাম/BMDC/পদবি fixed) ═══
 const ALLOWED_PHONES = ['01745069310', '01346098892', '01346098893'];
+const DOCTOR_INFO = {
+  '01745069310': { name:'Dr. Rowshonara',     bmdc:'12456', desig:'MBBS, Registered Physician (BMDC)' },
+  '01346098892': { name:'Dr. Manha',          bmdc:'1234',  desig:'MBBS, Registered Physician (BMDC)' },
+  '01346098893': { name:'Dr. SAR Consultant', bmdc:'00000', desig:'MBBS, Registered Physician (BMDC)' },
+};
+function currentDoctor(){
+  const ph = sessionStorage.getItem('sar_consult_phone') || '';
+  return DOCTOR_INFO[ph] || { name:'', bmdc:'', desig:'MBBS, Registered Physician (BMDC)' };
+}
 
 let currentTab = 'pending';
 let allRx = [];
@@ -292,15 +302,15 @@ function render(){
       </div>
       ${status==='pending' ? `
       <div class="sign-box" id="sign-${idx}">
-        <div style="font-size:.85rem;color:var(--gold);font-weight:600">🔏 ডিজিটাল স্বাক্ষর ও অনুমোদন</div>
-        <label>ডাক্তারের নাম</label>
-        <input id="dn-${idx}" placeholder="Dr. ...">
-        <label>BMDC রেজিস্ট্রেশন নম্বর</label>
-        <input id="db-${idx}" placeholder="যেমন A-12345">
-        <label>পদবি / Designation</label>
-        <input id="dd-${idx}" value="MBBS, Registered Physician (BMDC)">
+        <div style="font-size:.85rem;color:var(--gold);font-weight:600;margin-bottom:.5rem">✏️ প্রেসক্রিপশন সম্পাদনা ও অনুমোদন</div>
+        <label>প্রেসক্রিপশন (প্রয়োজনে সম্পাদনা করুন)</label>
+        <textarea id="rxedit-${idx}" style="width:100%;min-height:160px;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:.7rem;color:#fff;font-size:.85rem;font-family:inherit;line-height:1.6">${(n.note_text_bn||n.note_text||'').replace(/</g,'&lt;')}</textarea>
+        <div style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:.8rem;color:rgba(255,255,255,.75)">
+          🔏 অনুমোদনকারী ডাক্তার: <b style="color:#34D399">${currentDoctor().name}</b> · BMDC: ${currentDoctor().bmdc}<br>
+          <span style="font-size:.72rem;color:rgba(255,255,255,.5)">${currentDoctor().desig}</span>
+        </div>
         <div class="rx-msg" id="msg-${idx}"></div>
-        <button class="approve-btn" id="ab-${idx}" onclick="approveRx(${idx})">✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন</button>
+        <button class="approve-btn" id="ab-${idx}" onclick="approveRx(${idx})">✓ অনুমোদন ও স্বাক্ষর দিন</button>
       </div>` : ''}
     </div>`;
   }).join('');
@@ -350,15 +360,15 @@ function showToast(m){
   setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-// ── approve + digital signature (ধাপ B-তে PDF + পাঠানো যোগ হবে) ──
+// ── approve + digital signature (নাম/BMDC fixed login থেকে; prescription editable) ──
 async function approveRx(idx){
   const n = allRx[idx];
   const c = n._cust || {};
-  const name = (document.getElementById('dn-'+idx).value||'').trim();
-  const reg  = (document.getElementById('db-'+idx).value||'').trim();
-  const desig= (document.getElementById('dd-'+idx).value||'').trim() || 'MBBS, Registered Physician (BMDC)';
+  const doc = currentDoctor();
+  const name = doc.name, reg = doc.bmdc, desig = doc.desig;
+  const editedText = (document.getElementById('rxedit-'+idx)||{}).value || n.note_text_bn || '';
   const msg = document.getElementById('msg-'+idx);
-  if(!name || !reg){ msg.style.color='var(--red)'; msg.textContent='⚠️ নাম ও BMDC নম্বর দিন।'; return; }
+  if(!name || !reg){ msg.style.color='var(--red)'; msg.textContent='⚠️ ডাক্তার তথ্য পাওয়া যায়নি — আবার লগইন করুন।'; return; }
   const btn = document.getElementById('ab-'+idx);
   btn.disabled=true; btn.textContent='PDF তৈরি ও অনুমোদন হচ্ছে...';
   msg.style.color='var(--ink-2)'; msg.textContent='';
@@ -366,18 +376,22 @@ async function approveRx(idx){
   const approvedAt = new Date();
   let pdfUrl = '';
 
+  // edited text PDF-এ ব্যবহারের জন্য n-এ সেট করি
+  n.note_text_bn = editedText;
+
   // ── 1) Mayo Clinic-স্টাইল prescription PDF তৈরি (digital signature সহ) ──
   let pdfErr = '';
   try{
     pdfUrl = await buildRxPdf(n, c, { name, reg, desig, approvedAt });
   }catch(e){ pdfErr = String(e.message||e); console.warn('PDF build:', e); }
 
-  // ── 2) status=approved + signature + pdf_url সেভ ──
+  // ── 2) status=approved + edited text + signature + pdf_url সেভ ──
   try{
     const r = await fetch(`${SUPA}/rest/v1/sar_notes?id=eq.${n.id}`, {
       method:'PATCH', headers:{...H, Prefer:'return=minimal'},
       body: JSON.stringify({
         rx_status:'approved', is_resolved:true,
+        note_text_bn: editedText,
         approved_by:`Dr. ${name} (BMDC: ${reg})`,
         designation: desig,
         approved_at: approvedAt.toISOString(),
@@ -386,7 +400,7 @@ async function approveRx(idx){
     });
     if(!r.ok){
       const t = await r.text().catch(()=>'');
-      btn.disabled=false; btn.textContent='✓ যাচাই করে অনুমোদন ও স্বাক্ষর দিন';
+      btn.disabled=false; btn.textContent='✓ অনুমোদন ও স্বাক্ষর দিন';
       msg.style.color='var(--red)'; msg.textContent='❌ অনুমোদন ব্যর্থ: '+t; return;
     }
   }catch(e){
@@ -437,62 +451,109 @@ async function approveRx(idx){
   setTimeout(loadRx, 1300);
 }
 
-// ── Mayo Clinic-স্টাইল prescription PDF → Supabase storage → public/signed URL ──
+// ── Light Mayo+receipt-style prescription PDF (html2pdf — বাংলা readable) ──
 async function buildRxPdf(n, c, sig){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'pt', format:'a4' });
-  const W = doc.internal.pageSize.getWidth();
-  const M = 48;                       // margin
-  let y = 56;
+  // customer-এর সর্বশেষ AI analysis আনি (২০টা তথ্যের জন্য)
+  let ai = {};
+  try{
+    const ar = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${n.customer_id}&order=analysis_date.desc&limit=1&select=*`, {headers:H});
+    const a = ar.ok ? await ar.json() : [];
+    if(a.length) ai = a[0];
+  }catch(e){}
 
-  // Header — clinic identity
-  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(194,24,91);
-  doc.text('SAR — She AI Revolution', M, y); y+=20;
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120,120,120);
-  doc.text('Health · Wellness · Women Empowerment Platform', M, y); y+=24;
-  doc.setDrawColor(194,24,91); doc.setLineWidth(2); doc.line(M, y, W-M, y); y+=26;
+  // jsonb → পড়ার মতো string
+  const jstr = (v)=>{
+    if(!v) return '';
+    if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return v; } }
+    if(Array.isArray(v)) return v.map(x=> typeof x==='object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
+    if(typeof v === 'object') return Object.values(v).map(x=> typeof x==='object'?JSON.stringify(x):x).join(', ');
+    return String(v);
+  };
+  const esc = (s)=> String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  // Patient block (Mayo-style: label-value rows)
-  doc.setFontSize(10); doc.setTextColor(40,40,40);
-  const row=(label,val)=>{ doc.setFont('helvetica','bold'); doc.text(label, M, y);
-    doc.setFont('helvetica','normal'); const sp=doc.splitTextToSize(String(val||'—'), W-M-150);
-    doc.text(sp, M+120, y); y+=Math.max(16,sp.length*13)+4; };
-  row('Patient Name:', c.full_name||'—');
-  row('Phone:', c.phone||'—');
-  if(c.sar_category) row('Category:', c.sar_category);
-  if(c.bmi) row('BMI:', c.bmi);
-  row('Date:', sig.approvedAt.toLocaleDateString('en-GB'));
-  y+=6; doc.setDrawColor(220,220,220); doc.setLineWidth(1); doc.line(M,y,W-M,y); y+=22;
+  // ২০টা তথ্য (যেগুলো আছে কেবল সেগুলো দেখাই)
+  const rows = [
+    ['Health Score', ai.health_score!=null ? ai.health_score+' / 100' : ''],
+    ['Disease Category', ai.category || c.sar_category || ''],
+    ['BMI', c.bmi || ''],
+    ['Daily Calorie', ai.daily_kcal ? ai.daily_kcal+' kcal' : ''],
+    ['Daily Protein', ai.daily_protein ? ai.daily_protein+' g' : ''],
+    ['Meal Score', ai.meal_score!=null ? ai.meal_score : ''],
+    ['Focus', ai.focus || ''],
+    ['Health Summary', ai.health_summary_bn || ''],
+    ['Problems', jstr(ai.problems_json)],
+    ['Complication Risk', jstr(ai.complications_risk_json)],
+    ['Nutrition Advice', ai.nutrition_advice_bn || ''],
+    ['Conventional Medicine', jstr(ai.conventional_medicines_json)],
+    ['Ayurvedic', ai.ayurvedic_bn || ''],
+    ['Homeopathic', ai.homeopathic_bn || ''],
+    ['Home Remedies', ai.home_remedies_bn || ''],
+    ['Medicinal Plants', jstr(ai.medicinal_plants_json)],
+    ['Daily Menu', jstr(ai.daily_menu_recommendation_json)],
+    ['General Suggestions', ai.general_suggestions_bn || ''],
+    ['Motivation', ai.motivational_message_bn || ''],
+    ['Analysis Date', ai.analysis_date || ''],
+  ].filter(r=> r[1]!=='' && r[1]!=null);
 
-  // Rx body — prescription text
-  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(194,24,91);
-  doc.text('℞  Prescription', M, y); y+=20;
-  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(30,30,30);
-  const body = (n.note_text_bn || n.note_text || '').replace(/\r/g,'');
-  const lines = doc.splitTextToSize(body, W-M*2);
-  lines.forEach(ln=>{
-    if(y > doc.internal.pageSize.getHeight()-140){ doc.addPage(); y=56; }
-    doc.text(ln, M, y); y+=15;
-  });
-  y+=30;
+  const infoRows = rows.map(r=>
+    `<tr><td style="padding:4px 8px;font-weight:600;color:#444;width:34%;vertical-align:top;border-bottom:1px solid #f0f0f0">${r[0]}</td>
+     <td style="padding:4px 8px;color:#222;border-bottom:1px solid #f0f0f0">${esc(r[1])}</td></tr>`
+  ).join('');
 
-  // Digital signature block (Mayo-style footer)
-  if(y > doc.internal.pageSize.getHeight()-150){ doc.addPage(); y=56; }
-  doc.setDrawColor(16,185,129); doc.setLineWidth(1.5); doc.line(M, y, W-M, y); y+=22;
-  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(16,150,100);
-  doc.text('✓ Digitally Verified & Approved', M, y); y+=18;
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(30,30,30);
-  doc.text(`Dr. ${sig.name}`, M, y); y+=15;
-  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(80,80,80);
-  doc.text(`BMDC Reg: ${sig.reg}`, M, y); y+=13;
-  doc.text(sig.desig, M, y); y+=13;
-  doc.text(`Verifier: SAR Medical Panel`, M, y); y+=13;
-  doc.text(`Signed: ${sig.approvedAt.toLocaleString('en-GB')}`, M, y); y+=20;
-  doc.setFontSize(7.5); doc.setTextColor(150,150,150);
-  doc.text('This is a digitally signed prescription. SAR is a wellness platform; consult your doctor for treatment.', M, y);
+  const rxBody = esc(n.note_text_bn || n.note_text || '').replace(/\n/g,'<br>');
+  const dt = sig.approvedAt;
 
-  // upload to Supabase storage — বিদ্যমান public "reports" bucket, rx/ prefix-এ আলাদা
-  const blob = doc.output('blob');
+  // light, white, minimal — receipt + Mayo
+  const html = `
+  <div style="width:190mm;padding:10mm;font-family:'Hind Siliguri',Arial,sans-serif;color:#222;font-size:11px;line-height:1.55;background:#fff">
+    <div style="text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:12px">
+      <div style="font-size:18px;font-weight:700;color:#C2185B">SAR — She AI Revolution</div>
+      <div style="font-size:9px;color:#888">Health · Wellness · Women Empowerment Platform</div>
+      <div style="font-size:13px;font-weight:600;margin-top:6px;color:#333">Prescription / প্রেসক্রিপশন</div>
+    </div>
+
+    <table style="width:100%;font-size:10.5px;margin-bottom:10px">
+      <tr><td style="padding:2px 0"><b>Patient:</b> ${esc(c.full_name||'—')}</td>
+          <td style="padding:2px 0;text-align:right"><b>Date:</b> ${dt.toLocaleDateString('en-GB')}</td></tr>
+      <tr><td style="padding:2px 0"><b>Phone:</b> ${esc(c.phone||'—')}</td>
+          <td style="padding:2px 0;text-align:right"><b>Rx ID:</b> ${String(n.id).slice(0,8)}</td></tr>
+    </table>
+
+    <div style="background:#FFF4FA;border-left:3px solid #E91E8C;padding:8px 10px;border-radius:4px;margin-bottom:12px">
+      <div style="font-weight:700;color:#C2185B;margin-bottom:4px">℞ Prescription</div>
+      <div>${rxBody}</div>
+    </div>
+
+    <div style="font-weight:700;color:#C2185B;margin:10px 0 4px;font-size:11px">Daily AI Health Report — Key Information</div>
+    <table style="width:100%;border-collapse:collapse;font-size:10px">${infoRows}</table>
+
+    <div style="border-top:2px solid #10B981;margin-top:16px;padding-top:8px">
+      <div style="color:#0a9d6b;font-weight:700;font-size:10px">✓ Digitally Verified &amp; Approved</div>
+      <div style="font-weight:700;margin-top:3px">Dr. ${esc(sig.name)}</div>
+      <div style="color:#666;font-size:9.5px">BMDC Reg: ${esc(sig.reg)} · ${esc(sig.desig)}</div>
+      <div style="color:#666;font-size:9.5px">Verifier: SAR Medical Panel · Signed: ${dt.toLocaleString('en-GB')}</div>
+      <div style="color:#aaa;font-size:8px;margin-top:6px">This is a digitally signed prescription. SAR is a wellness platform; consult your registered doctor for treatment.</div>
+    </div>
+  </div>`;
+
+  // html2pdf দিয়ে blob — light (image quality কম রেখে file ছোট)
+  const holder = document.createElement('div');
+  holder.style.position='fixed'; holder.style.left='-9999px'; holder.innerHTML = html;
+  document.body.appendChild(holder);
+  const opt = {
+    margin: 0,
+    image: { type:'jpeg', quality:0.85 },
+    html2canvas: { scale:1.6, useCORS:true, backgroundColor:'#ffffff' },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
+  };
+  let blob;
+  try{
+    blob = await html2pdf().set(opt).from(holder.firstElementChild).outputPdf('blob');
+  } finally {
+    document.body.removeChild(holder);
+  }
+
+  // upload to Supabase storage — public "reports" bucket, rx/ prefix
   const token = (crypto.randomUUID ? crypto.randomUUID().slice(0,12) : Date.now().toString(36));
   const path = `rx/${n.customer_id||'cust'}/rx-${n.id}-${token}.pdf`;
   const up = await fetch(`${SUPA}/storage/v1/object/reports/${encodeURIComponent(path)}`, {
@@ -501,10 +562,7 @@ async function buildRxPdf(n, c, sig){
     body: blob
   });
   if(!up.ok) throw new Error('upload failed '+up.status);
-
-  // reports bucket public — সরাসরি public URL (token-এর কারণে অনুমান-অযোগ্য, নিরাপদ)
-  const url = `${SUPA}/storage/v1/object/public/reports/${path}`;
-  return url;
+  return `${SUPA}/storage/v1/object/public/reports/${path}`;
 }
 
 </script>
