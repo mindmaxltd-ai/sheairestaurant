@@ -633,6 +633,48 @@ async function loadApprovedRx(){
   }
 }
 
+// ── AI উত্তর robust parse: সম্পূর্ণ বা অসম্পূর্ণ/কাটা JSON দুটোই সামলায় ──
+function robustParseAI(text){
+  if(!text) return { assessment:'—' };
+  let clean = text.replace(/```json|```/g,'').trim();
+  const a = clean.indexOf('{');
+  if(a > -1) clean = clean.slice(a);
+  // ১) সম্পূর্ণ JSON চেষ্টা
+  try{
+    const b = clean.lastIndexOf('}');
+    if(b > 0) return JSON.parse(clean.slice(0, b+1));
+  }catch(e){}
+  // ২) কাটা JSON — field গুলো regex দিয়ে উদ্ধার
+  const grab = (key)=>{
+    const m = clean.match(new RegExp('"'+key+'"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
+    return m ? m[1].replace(/\\"/g,'"').replace(/\\n/g,'\n') : '';
+  };
+  // rx array আলাদা করে
+  let rx = [];
+  const rxBlock = clean.match(/"rx"\s*:\s*\[([\s\S]*?)(\]|$)/);
+  if(rxBlock){
+    const items = rxBlock[1].match(/\{[^{}]*\}/g) || [];
+    items.forEach(it=>{
+      try{ const o = JSON.parse(it); if(o.generic) rx.push(o); }
+      catch(e){
+        const g = it.match(/"generic"\s*:\s*"([^"]*)"/);
+        const nt = it.match(/"note"\s*:\s*"([^"]*)"/);
+        const ct = it.match(/"cat"\s*:\s*"([^"]*)"/);
+        if(g) rx.push({ cat:ct?ct[1]:'', generic:g[1], note:nt?nt[1]:'' });
+      }
+    });
+  }
+  return {
+    assessment: grab('assessment') || text.slice(0,300),
+    rx,
+    general: grab('general'),
+    home: grab('home'),
+    islamic: grab('islamic'),
+    dangers: grab('dangers'),
+    alerts: grab('alerts'),
+  };
+}
+
 async function runAIAnalysis(){
   const complaint = document.getElementById('complaint').value.trim();
   if(!complaint){ showToast('⚠️ আজকের অভিযোগ লিখুন'); return; }
@@ -693,7 +735,7 @@ ${prevRxStr}
 
 আজকের অভিযোগ: ${complaint}
 
-অনুরোধ: উপরের সব মেট্রিক্স, আগের প্রেসক্রিপশন ও আজকের অভিযোগ বিবেচনা করে নিচের JSON structure-এ ক্লিনিক্যাল বিশ্লেষণ দাও। শুধু JSON, কোনো markdown নয়:
+অনুরোধ: উপরের সব মেট্রিক্স, আগের প্রেসক্রিপশন ও আজকের অভিযোগ বিবেচনা করে নিচের JSON structure-এ ক্লিনিক্যাল বিশ্লেষণ দাও। প্রতিটি অংশ সংক্ষিপ্ত রাখো (assessment সর্বোচ্চ ৩ বাক্য, প্রতিটি field সংক্ষিপ্ত)। সম্পূর্ণ valid JSON দাও, কাটা যাবে না। শুধু JSON object দাও, কোনো markdown code block বা অতিরিক্ত লেখা নয়:
 {
   "assessment": "ক্লিনিক্যাল মূল্যায়ন (বাংলায়, ২-৩ বাক্য)",
   "rx": [
@@ -722,10 +764,7 @@ ${prevRxStr}
         if(d.parsed && (d.parsed.assessment || d.parsed.rx)) aiData = d.parsed;
         else if(d.assessment || d.rx) aiData = d;
         else if(d.text){
-          let clean=d.text.replace(/```json|```/g,'').trim();
-          const a=clean.indexOf('{'), b=clean.lastIndexOf('}');
-          if(a>-1&&b>a) clean=clean.slice(a,b+1);
-          try{ aiData = JSON.parse(clean); }catch(e){ aiData = { assessment: d.text.slice(0,400) }; }
+          aiData = robustParseAI(d.text);
         }
       }
     } catch(e){}
@@ -754,7 +793,7 @@ ${prevRxStr}
         });
         const cd = await cr.json();
         const raw = cd.content?.[0]?.text||'';
-        try{ aiData = JSON.parse(raw.replace(/```json|```/g,'').trim()); } catch(e){ aiData = {assessment:raw}; }
+        aiData = robustParseAI(raw);
       }
     }
 
