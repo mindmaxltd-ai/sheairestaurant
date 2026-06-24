@@ -507,7 +507,7 @@ async function buildRxPdf(n, c, sig){
 
   // receipt.html ECR-style — compact, top-aligned, light
   const html = `
-  <div style="width:720px;margin:0 auto;padding:24px 30px;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:12px;line-height:1.55;background:#fff;box-sizing:border-box">
+  <div style="width:740px;margin:0 auto;padding:30px 48px;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:12px;line-height:1.55;background:#fff;box-sizing:border-box">
 
     <!-- header (receipt style) -->
     <div style="text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:10px">
@@ -550,12 +550,12 @@ async function buildRxPdf(n, c, sig){
   // html2pdf দিয়ে blob
   const holder = document.createElement('div');
   holder.style.position='fixed'; holder.style.left='-9999px'; holder.style.top='0';
-  holder.style.width='760px'; holder.innerHTML = html;
+  holder.style.width='740px'; holder.innerHTML = html;
   document.body.appendChild(holder);
   const opt = {
-    margin: [6, 6, 6, 6],
+    margin: 0,
     image: { type:'jpeg', quality:0.92 },
-    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff', scrollY:0, windowWidth:760 },
+    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff', scrollY:0, scrollX:0, windowWidth:740 },
     jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
   };
   let blob;
