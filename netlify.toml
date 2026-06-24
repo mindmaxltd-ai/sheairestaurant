@@ -8,6 +8,9 @@
 
 [functions."daily-report"]
   timeout = 26
+  # ── Scheduled: প্রতিদিন সকাল ৬টা বাংলাদেশ (00:00 UTC) ──
+  # AI analysis চালায় + reports সেভ + SMS/email পাঠায়
+  schedule = "0 0 * * *"
 
 [functions."send-otp"]
   timeout = 26
