@@ -521,7 +521,7 @@ async function buildRxPdf(n, c, sig){
 
   // receipt.html ECR-style — compact, top-aligned, light
   const html = `
-  <div style="width:780px;margin:0;padding:28px 36px;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:12px;line-height:1.55;background:#fff;box-sizing:border-box">
+  <div style="width:200mm;max-width:200mm;margin:0;padding:10mm 12mm;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:11px;line-height:1.55;background:#fff;box-sizing:border-box">
 
     <!-- header (receipt style) -->
     <div style="text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:10px">
@@ -561,40 +561,22 @@ async function buildRxPdf(n, c, sig){
     </div>
   </div>`;
 
-  // ম্যানুয়াল html2canvas → jsPDF (উপর থেকে বসে, html2pdf-এর center-bug এড়ায়)
+  // html2pdf — কাজ-করা version (receipt.html-এর মতো, margin:0, windowWidth নেই)
   const holder = document.createElement('div');
   holder.style.position='absolute'; holder.style.left='0'; holder.style.top='0';
   holder.style.opacity='0'; holder.style.pointerEvents='none'; holder.style.zIndex='-1';
-  holder.style.width='780px';
   holder.innerHTML = html;
   document.body.appendChild(holder);
   const sheet = holder.firstElementChild;
-
+  const opt = {
+    margin: 0,
+    image: { type:'jpeg', quality:0.96 },
+    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff' },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
+  };
   let blob;
   try{
-    // fonts লোড নিশ্চিত
-    if(document.fonts && document.fonts.ready) await document.fonts.ready;
-    const canvas = await html2canvas(sheet, { scale:2, useCORS:true, backgroundColor:'#ffffff' });
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait', compress:true });
-    const pageW = pdf.internal.pageSize.getWidth();   // 210
-    const pageH = pdf.internal.pageSize.getHeight();  // 297
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    let heightLeft = imgH;
-    let position = 0;
-    // প্রথম পেজ — উপর থেকে (y=0)
-    pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
-    heightLeft -= pageH;
-    // অতিরিক্ত পেজ (যদি লাগে)
-    while(heightLeft > 0){
-      position -= pageH;
-      pdf.addPage();
-      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
-      heightLeft -= pageH;
-    }
-    blob = pdf.output('blob');
+    blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
   } finally {
     document.body.removeChild(holder);
   }
