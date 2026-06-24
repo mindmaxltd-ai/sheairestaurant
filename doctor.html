@@ -243,10 +243,13 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
         </div>
       </div>
 
-      <!-- সবসময় দৃশ্যমান: অনুমোদিত প্রেসক্রিপশন PDF -->
+      <!-- সবসময় দৃশ্যমান, collapsible: অনুমোদিত প্রেসক্রিপশন PDF -->
       <div class="card" style="margin-bottom:1rem" id="myRxCard">
-        <div class="card-title">📄 আমার অনুমোদিত প্রেসক্রিপশন</div>
-        <div id="myRxBox"></div>
+        <div class="card-title" onclick="toggleRxPanel()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+          <span>📄 আমার প্রেসক্রিপশন</span>
+          <span id="rxPanelArrow" style="transition:transform .2s">▼</span>
+        </div>
+        <div id="myRxBox" style="margin-top:.75rem"></div>
       </div>
 
       <div class="card">
@@ -583,6 +586,16 @@ async function sendForApproval(){
 }
 
 // ── approved prescription PDF link দেখানো ──
+// প্রেসক্রিপশন panel collapsible
+function toggleRxPanel(){
+  const box = document.getElementById('myRxBox');
+  const arrow = document.getElementById('rxPanelArrow');
+  if(!box) return;
+  const hidden = box.style.display === 'none';
+  box.style.display = hidden ? 'block' : 'none';
+  if(arrow) arrow.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+}
+
 async function loadApprovedRx(){
   const card = document.getElementById('myRxCard');
   const box = document.getElementById('myRxBox');
