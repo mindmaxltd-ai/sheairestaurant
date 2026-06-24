@@ -532,8 +532,12 @@ function renderMetricsFallback(){
 }
 
 // ── AI ANALYSIS via Anthropic API ──
-// ── পেমেন্টের পর সর্বোচ্চ ১ বার analysis ──
+// ── এক ফি = এক prescription; super admin (01767626653) এর কোনো limit নেই ──
 function checkAnalysisLimit(){
+  // super admin — unlimited, fee ছাড়াই যত খুশি
+  const myPhone = (patient && patient.phone) || JSON.parse(localStorage.getItem('sar_customer')||'{}').phone || '';
+  if(myPhone === SUPER_ADMIN_PHONE) return true;
+
   const cid = (patient && patient.id) || 'guest';
   const key = 'sar_analysis_count_' + cid;
   let rec = {};
