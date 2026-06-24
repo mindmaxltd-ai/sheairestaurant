@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAR — PDF Upload টেস্ট</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:2rem;background:#1a0f1c;color:#fff;line-height:1.7}
+  h1{color:#FFD43B;font-size:1.2rem}
+  button{background:#E91E8C;color:#fff;border:none;border-radius:10px;padding:1rem 1.5rem;font-size:1rem;cursor:pointer;margin:1rem 0}
+  .log{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:1rem;margin-top:1rem;white-space:pre-wrap;font-family:monospace;font-size:.82rem;min-height:100px}
+  .ok{color:#34D399}.err{color:#FF6B6B}.info{color:#8CB4FF}
+</style>
+</head>
+<body>
+<h1>🔬 SAR — PDF তৈরি ও আপলোড টেস্ট</h1>
+<p style="font-size:.88rem;color:rgba(255,255,255,.6)">এই বোতাম চাপুন। প্রতিটা ধাপের ফলাফল নিচে দেখাবে — কোথায় সমস্যা তা স্পষ্ট হবে।</p>
+<button onclick="runTest()">▶️ টেস্ট চালান</button>
+<div class="log" id="log">অপেক্ষা করছি...</div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+
+function log(msg, cls){
+  const el = document.getElementById('log');
+  el.innerHTML += `\n<span class="${cls||''}">${msg}</span>`;
+}
+
+async function runTest(){
+  document.getElementById('log').innerHTML = '🚀 টেস্ট শুরু...';
+
+  // ধাপ ১: jsPDF লোড হয়েছে?
+  try{
+    const { jsPDF } = window.jspdf;
+    if(!jsPDF){ log('❌ ধাপ ১: jsPDF লোড হয়নি!', 'err'); return; }
+    log('✅ ধাপ ১: jsPDF লোড হয়েছে', 'ok');
+
+    // ধাপ ২: PDF বানানো
+    const doc = new jsPDF();
+    doc.setFontSize(16); doc.text('SAR Test Prescription', 20, 30);
+    doc.setFontSize(11); doc.text('Digitally signed test — ' + new Date().toLocaleString(), 20, 45);
+    const blob = doc.output('blob');
+    log('✅ ধাপ ২: PDF তৈরি হয়েছে (' + Math.round(blob.size/1024) + ' KB)', 'ok');
+
+    // ধাপ ৩: reports bucket-এ upload
+    const path = `rx/test/test-${Date.now()}.pdf`;
+    log('ℹ️ ধাপ ৩: reports bucket-এ আপলোড চেষ্টা... path=' + path, 'info');
+    const up = await fetch(`${SUPA}/storage/v1/object/reports/${encodeURIComponent(path)}`, {
+      method:'POST',
+      headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/pdf', 'x-upsert':'true' },
+      body: blob
+    });
+    const upText = await up.text().catch(()=>'');
+    if(up.ok){
+      log('✅ ধাপ ৩: আপলোড সফল! status=' + up.status, 'ok');
+      const url = `${SUPA}/storage/v1/object/public/reports/${path}`;
+      log('✅ ধাপ ৪: PDF লিংক:\n' + url, 'ok');
+      log('\n🎉 সব ঠিক আছে! PDF তৈরি ও আপলোড কাজ করছে।', 'ok');
+      log('👉 এই লিংকটা নতুন ট্যাবে খুলে দেখুন PDF আসে কিনা।', 'info');
+    } else {
+      log('❌ ধাপ ৩: আপলোড ব্যর্থ! status=' + up.status, 'err');
+      log('সার্ভারের জবাব: ' + upText, 'err');
+      log('\n👉 status 400/403 = RLS policy সমস্যা (anon upload অনুমতি নেই)।', 'info');
+      log('👉 status 404 = bucket "reports" পাওয়া যায়নি।', 'info');
+    }
+  }catch(e){
+    log('❌ ত্রুটি: ' + (e.message||e), 'err');
+  }
+}
+</script>
+</body>
+</html>
