@@ -532,7 +532,7 @@ function renderMetricsFallback(){
 }
 
 // ── AI ANALYSIS via Anthropic API ──
-// ── ১ ঘণ্টায় সর্বোচ্চ ৩ বার analysis ──
+// ── পেমেন্টের পর সর্বোচ্চ ১ বার analysis ──
 function checkAnalysisLimit(){
   const cid = (patient && patient.id) || 'guest';
   const key = 'sar_analysis_count_' + cid;
@@ -540,14 +540,12 @@ function checkAnalysisLimit(){
   try{ rec = JSON.parse(localStorage.getItem(key) || '{}'); }catch(e){}
   const now = Date.now();
   if(!rec.start || (now - rec.start) > 3600000){ rec = { start: now, count: 0 }; }
-  if(rec.count >= 3){
-    const mins = Math.ceil((3600000 - (now - rec.start)) / 60000);
-    showToast(`⚠️ ১ ঘণ্টায় সর্বোচ্চ ৩ বার। আবার চেষ্টা করুন ${mins} মিনিট পর।`);
+  if(rec.count >= 1){
+    showToast('⚠️ এই পরামর্শে একবারই বিশ্লেষণ করা যায়। নতুন পরামর্শের জন্য আবার ফি দিন।');
     return false;
   }
   rec.count++;
   localStorage.setItem(key, JSON.stringify(rec));
-  showToast(`বিশ্লেষণ ${rec.count}/৩ (এই ঘণ্টায়)`);
   return true;
 }
 
@@ -644,23 +642,37 @@ async function runAIAnalysis(){
   document.getElementById('aiAssessText').innerHTML = '<span class="spinner-inline"></span> বিশ্লেষণ করা হচ্ছে...';
 
   const m = patient.metrics || {};
-  const metricsStr = Object.entries({
-    'BMI': m.bmi || patient.bmi,
-    'FBG': m.fbg_mmol,
-    'HbA1c': m.hba1c_percent,
-    'BP সিস্টোলিক': m.systolic_bp,
-    'BP ডায়াস্টোলিক': m.diastolic_bp,
-    'কোলেস্টেরল': m.total_cholesterol,
-    'হিমোগ্লোবিন': m.hemoglobin_g_dl,
-    'ALT': m.alt_u_l,
-    'ক্রিয়েটিনিন': m.creatinine_mg_dl,
-    'ট্রাইগ্লিসেরাইড': m.triglycerides,
-    'ওজন': m.weight_kg,
-    'উচ্চতা': m.height_cm,
-  }).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join('\n') || 'মেট্রিক্স পাওয়া যায়নি';
+  // ── পথ A: customer_metrics-এর সব column পাঠাই (যেগুলোতে value আছে) ──
+  // শুধু ১২টা নয় — ২৫০ metrics-এর মধ্যে যা পাওয়া যায় সব AI বিবেচনা করবে
+  const skipCols = ['id','customer_id','created_at','updated_at'];
+  const labelMap = {
+    bmi:'BMI', fbg_mmol:'FBG', hba1c_percent:'HbA1c', systolic_bp:'BP সিস্টোলিক',
+    diastolic_bp:'BP ডায়াস্টোলিক', total_cholesterol:'কোলেস্টেরল', hemoglobin_g_dl:'হিমোগ্লোবিন',
+    alt_u_l:'ALT', creatinine_mg_dl:'ক্রিয়েটিনিন', triglycerides:'ট্রাইগ্লিসেরাইড',
+    weight_kg:'ওজন', height_cm:'উচ্চতা', stress_level:'মানসিক চাপ', sleep_hours:'ঘুম(ঘণ্টা)',
+    activity_level:'কার্যকলাপ', mood:'মন-মেজাজ', last_period_date:'শেষ মাসিক',
+    cycle_length_days:'মাসিক চক্র(দিন)', menstrual_status:'মাসিক অবস্থা'
+  };
+  const metricsStr = Object.entries(m)
+    .filter(([k,v]) => !skipCols.includes(k) && v!=null && v!=='' && String(v).trim()!=='')
+    .map(([k,v]) => `${labelMap[k] || k}: ${v}`)
+    .join('\n') || 'মেট্রিক্স পাওয়া যায়নি';
 
   const catNames = {DM:'ডায়াবেটিস',OB:'স্থূলতা/Weight Management',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
   const cat = catNames[patient.category||'DM'] || patient.category;
+
+  // ── আগের ২টা prescription আনি (history — AI continuity রাখবে) ──
+  let prevRxStr = 'আগের কোনো প্রেসক্রিপশন নেই।';
+  try{
+    const pr = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&order=created_at.desc&limit=2&select=created_at,note_text_bn`, {headers:H});
+    const prev = pr.ok ? await pr.json() : [];
+    if(Array.isArray(prev) && prev.length){
+      prevRxStr = prev.map((p,i)=>{
+        const d = (p.created_at||'').split('T')[0];
+        return `[প্রেসক্রিপশন ${i+1} — ${d}]\n${(p.note_text_bn||'').slice(0,500)}`;
+      }).join('\n\n');
+    }
+  }catch(e){}
 
   const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল AI সহকারী। একজন MBBS ডাক্তারকে সহায়তা করছ।
 
@@ -669,12 +681,15 @@ async function runAIAnalysis(){
 বয়স: ${patient.age || 'অজানা'}
 বিভাগ: ${cat}
 
-স্বাস্থ্য মেট্রিক্স (২৫০-এর মধ্যে উপলব্ধ):
+স্বাস্থ্য মেট্রিক্স (২৫০-এর মধ্যে উপলব্ধ সব):
 ${metricsStr}
+
+আগের প্রেসক্রিপশন (সর্বশেষ ২টি — পুনরাবৃত্তি এড়াতে ও ধারাবাহিকতা রাখতে বিবেচনা করো):
+${prevRxStr}
 
 আজকের অভিযোগ: ${complaint}
 
-অনুরোধ: নিচের JSON structure-এ ক্লিনিক্যাল বিশ্লেষণ দাও। শুধু JSON, কোনো markdown নয়:
+অনুরোধ: উপরের সব মেট্রিক্স, আগের প্রেসক্রিপশন ও আজকের অভিযোগ বিবেচনা করে নিচের JSON structure-এ ক্লিনিক্যাল বিশ্লেষণ দাও। শুধু JSON, কোনো markdown নয়:
 {
   "assessment": "ক্লিনিক্যাল মূল্যায়ন (বাংলায়, ২-৩ বাক্য)",
   "rx": [
