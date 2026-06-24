@@ -367,9 +367,10 @@ async function approveRx(idx){
   let pdfUrl = '';
 
   // ── 1) Mayo Clinic-স্টাইল prescription PDF তৈরি (digital signature সহ) ──
+  let pdfErr = '';
   try{
     pdfUrl = await buildRxPdf(n, c, { name, reg, desig, approvedAt });
-  }catch(e){ console.warn('PDF build:', e); }
+  }catch(e){ pdfErr = String(e.message||e); console.warn('PDF build:', e); }
 
   // ── 2) status=approved + signature + pdf_url সেভ ──
   try{
@@ -427,9 +428,10 @@ async function approveRx(idx){
 
   msg.style.color='#34D399';
   const parts = [];
-  parts.push(pdfUrl ? 'PDF তৈরি ✓' : 'PDF তৈরি হয়নি (bucket চেক করুন)');
+  parts.push(pdfUrl ? 'PDF তৈরি ✓' : ('PDF ব্যর্থ: ' + (pdfErr||'অজানা')));
   if(c.phone) parts.push(smsOk?'SMS ✓':'SMS ব্যর্থ');
   if(c.email) parts.push(emailOk?'Email ✓':'Email ব্যর্থ');
+  msg.style.color = pdfUrl ? '#34D399' : '#EF4444';
   msg.textContent = '✓ অনুমোদিত — ' + parts.join(' · ');
   showToast('✓ প্রেসক্রিপশন অনুমোদিত');
   setTimeout(loadRx, 1300);
@@ -489,26 +491,19 @@ async function buildRxPdf(n, c, sig){
   doc.setFontSize(7.5); doc.setTextColor(150,150,150);
   doc.text('This is a digitally signed prescription. SAR is a wellness platform; consult your doctor for treatment.', M, y);
 
-  // upload to Supabase storage (prescriptions bucket)
+  // upload to Supabase storage — বিদ্যমান public "reports" bucket, rx/ prefix-এ আলাদা
   const blob = doc.output('blob');
   const token = (crypto.randomUUID ? crypto.randomUUID().slice(0,12) : Date.now().toString(36));
-  const path = `${n.customer_id||'cust'}/rx-${n.id}-${token}.pdf`;
-  const up = await fetch(`${SUPA}/storage/v1/object/prescriptions/${encodeURIComponent(path)}`, {
+  const path = `rx/${n.customer_id||'cust'}/rx-${n.id}-${token}.pdf`;
+  const up = await fetch(`${SUPA}/storage/v1/object/reports/${encodeURIComponent(path)}`, {
     method:'POST',
     headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/pdf', 'x-upsert':'true' },
     body: blob
   });
   if(!up.ok) throw new Error('upload failed '+up.status);
 
-  // signed URL (private bucket হলে ৩০ দিন) — নাহলে public fallback
-  let url = `${SUPA}/storage/v1/object/public/prescriptions/${path}`;
-  try{
-    const s = await fetch(`${SUPA}/storage/v1/object/sign/prescriptions/${encodeURIComponent(path)}`, {
-      method:'POST', headers:{ apikey:KEY, Authorization:'Bearer '+KEY, 'Content-Type':'application/json' },
-      body: JSON.stringify({ expiresIn: 60*60*24*30 })
-    });
-    if(s.ok){ const sd=await s.json(); if(sd&&sd.signedURL) url = `${SUPA}/storage/v1${sd.signedURL}`; }
-  }catch(e){}
+  // reports bucket public — সরাসরি public URL (token-এর কারণে অনুমান-অযোগ্য, নিরাপদ)
+  const url = `${SUPA}/storage/v1/object/public/reports/${path}`;
   return url;
 }
 
