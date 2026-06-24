@@ -505,7 +505,7 @@ async function buildRxPdf(n, c, sig){
 
   // receipt.html ECR-style — compact, top-aligned, light
   const html = `
-  <div style="width:180mm;margin:0;padding:8mm;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:11px;line-height:1.5;background:#fff;box-sizing:border-box">
+  <div style="width:720px;margin:0 auto;padding:28px 32px;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:12px;line-height:1.55;background:#fff;box-sizing:border-box">
 
     <!-- header (receipt style) -->
     <div style="text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:10px">
@@ -550,10 +550,11 @@ async function buildRxPdf(n, c, sig){
   holder.style.position='fixed'; holder.style.left='-9999px'; holder.innerHTML = html;
   document.body.appendChild(holder);
   const opt = {
-    margin: [0,0,0,0],
+    margin: [8, 8, 8, 8],
     image: { type:'jpeg', quality:0.92 },
-    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff', scrollY:0, windowWidth:760 },
-    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
+    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff', scrollX:0, scrollY:0, windowWidth:784 },
+    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true },
+    pagebreak: { mode:['avoid-all','css','legacy'] }
   };
   let blob;
   try{
