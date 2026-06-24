@@ -450,7 +450,7 @@ async function init(){
       category:sc.sar_category, bmi:sc.bmi, age:'', metrics:{}, complaint:'' };
   }
   renderPatientCard();
-  loadApprovedRx();   // approved prescription PDF link দেখাও
+  loadApprovedRx();
 
   // Load metrics from Supabase
   if(patient.id){
@@ -523,17 +523,14 @@ function renderMetricsFallback(){
 }
 
 // ── AI ANALYSIS via Anthropic API ──
-// ── ১ ঘণ্টায় সর্বোচ্চ ৩ বার analysis (localStorage-ভিত্তিক) ──
+// ── ১ ঘণ্টায় সর্বোচ্চ ৩ বার analysis ──
 function checkAnalysisLimit(){
   const cid = (patient && patient.id) || 'guest';
   const key = 'sar_analysis_count_' + cid;
   let rec = {};
   try{ rec = JSON.parse(localStorage.getItem(key) || '{}'); }catch(e){}
   const now = Date.now();
-  // ১ ঘণ্টা পেরোলে রিসেট
-  if(!rec.start || (now - rec.start) > 3600000){
-    rec = { start: now, count: 0 };
-  }
+  if(!rec.start || (now - rec.start) > 3600000){ rec = { start: now, count: 0 }; }
   if(rec.count >= 3){
     const mins = Math.ceil((3600000 - (now - rec.start)) / 60000);
     showToast(`⚠️ ১ ঘণ্টায় সর্বোচ্চ ৩ বার। আবার চেষ্টা করুন ${mins} মিনিট পর।`);
@@ -545,7 +542,41 @@ function checkAnalysisLimit(){
   return true;
 }
 
-// ── approved prescription-এর PDF link দেখানো (doctor.html-এ) ──
+// ── prescription কে pending হিসেবে consultation-এ পাঠায় (ডাক্তার-sign ছাড়া) ──
+async function sendForApproval(){
+  const rows = document.querySelectorAll('#rxRows .rx-grid');
+  const editedRx = [...rows].map(row => {
+    const inputs = row.querySelectorAll('.rx-input');
+    return { cat:inputs[0]?.value, generic:inputs[1]?.value, note:inputs[2]?.value };
+  }).filter(r=>r.generic);
+  const complaint = document.getElementById('complaint').value || '';
+  const aiAssess  = document.getElementById('aiAssessText').textContent || '';
+  const general   = (document.getElementById('rxGeneral')||{}).value || '';
+  const home      = (document.getElementById('rxHome')||{}).value || '';
+  const dangers   = (document.getElementById('rxDangers')||{}).value || '';
+  if(!editedRx.length && !aiAssess){ showSignMsg('আগে AI বিশ্লেষণ চালান।', false); return; }
+  const noteText =
+    `অভিযোগ: ${complaint}\n\nAI মূল্যায়ন: ${aiAssess}\n\n`
+    + `ঔষধ:\n${editedRx.map((r,i)=>`${i+1}. ${r.generic} — ${r.note}`).join('\n')}\n\n`
+    + `সাধারণ নির্দেশনা: ${general}\n\nঘরোয়া প্রতিকার: ${home}\n\nবিপদ সংকেত: ${dangers}`;
+  try{
+    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes`,{
+      method:'POST', headers:{...H,'Prefer':'return=minimal'},
+      body:JSON.stringify({
+        customer_id: patient.id, note_type: 'prescription',
+        rx_status: 'pending', is_resolved: false, note_text_bn: noteText,
+      })
+    });
+    if(r.ok){
+      showSignMsg('✅ প্রেসক্রিপশন অনুমোদনের জন্য পাঠানো হয়েছে। ডাক্তার অনুমোদন দিলে SMS পাবেন ও এখানে PDF লিংক আসবে।', true);
+      showToast('📤 অনুমোদনের জন্য পাঠানো হয়েছে');
+    }else{
+      const t = await r.text().catch(()=>''); showSignMsg('❌ পাঠানো যায়নি: '+t, false);
+    }
+  }catch(e){ showSignMsg('❌ পাঠানো ব্যর্থ: '+e.message, false); }
+}
+
+// ── approved prescription PDF link দেখানো ──
 async function loadApprovedRx(){
   const box = document.getElementById('approvedRxBox');
   if(!box || !patient || !patient.id) return;
@@ -566,56 +597,10 @@ async function loadApprovedRx(){
   }catch(e){}
 }
 
-// ── customer: prescription কে pending হিসেবে consultation-এ পাঠায় (ডাক্তার-sign ছাড়া) ──
-async function sendForApproval(){
-  // edited rx সংগ্রহ
-  const rows = document.querySelectorAll('#rxRows .rx-grid');
-  const editedRx = [...rows].map(row => {
-    const inputs = row.querySelectorAll('.rx-input');
-    return { cat:inputs[0]?.value, generic:inputs[1]?.value, note:inputs[2]?.value };
-  }).filter(r=>r.generic);
-
-  const complaint = document.getElementById('complaint').value || '';
-  const aiAssess  = document.getElementById('aiAssessText').textContent || '';
-  const general   = (document.getElementById('rxGeneral')||{}).value || '';
-  const home      = (document.getElementById('rxHome')||{}).value || '';
-  const dangers   = (document.getElementById('rxDangers')||{}).value || '';
-
-  if(!editedRx.length && !aiAssess){ showSignMsg('আগে AI বিশ্লেষণ চালান।', false); return; }
-
-  const noteText =
-    `অভিযোগ: ${complaint}\n\nAI মূল্যায়ন: ${aiAssess}\n\n`
-    + `ঔষধ:\n${editedRx.map((r,i)=>`${i+1}. ${r.generic} — ${r.note}`).join('\n')}\n\n`
-    + `সাধারণ নির্দেশনা: ${general}\n\nঘরোয়া প্রতিকার: ${home}\n\nবিপদ সংকেত: ${dangers}`;
-
-  try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes`,{
-      method:'POST', headers:{...H,'Prefer':'return=minimal'},
-      body:JSON.stringify({
-        customer_id: patient.id,
-        note_type: 'prescription',
-        rx_status: 'pending',          // ডাক্তার অনুমোদনের অপেক্ষায়
-        is_resolved: false,
-        note_text_bn: noteText,
-      })
-    });
-    if(r.ok){
-      showSignMsg('✅ প্রেসক্রিপশন অনুমোদনের জন্য পাঠানো হয়েছে। ডাক্তার যাচাই করে অনুমোদন দিলে SMS পাবেন ও এখানে PDF লিংক আসবে।', true);
-      showToast('📤 অনুমোদনের জন্য পাঠানো হয়েছে');
-    }else{
-      const t = await r.text().catch(()=>'');
-      showSignMsg('❌ পাঠানো যায়নি: '+t, false);
-    }
-  }catch(e){
-    showSignMsg('❌ পাঠানো ব্যর্থ: '+e.message, false);
-  }
-}
-
 async function runAIAnalysis(){
   const complaint = document.getElementById('complaint').value.trim();
   if(!complaint){ showToast('⚠️ আজকের অভিযোগ লিখুন'); return; }
 
-  // ── ১ ঘণ্টায় সর্বোচ্চ ৩ বার analysis ──
   if(!checkAnalysisLimit()){ return; }
 
   const btn = document.getElementById('analyzeBtn');
