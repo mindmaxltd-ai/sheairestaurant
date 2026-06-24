@@ -393,34 +393,46 @@ async function approveRx(idx){
     msg.style.color='var(--red)'; msg.textContent='❌ '+e.message; return;
   }
 
-  // ── 3) approved হলে customer-কে অটো SMS + email (PDF link) ──
-  if(pdfUrl){
-    const who = c.full_name || 'আপা';
-    if(c.phone){
-      fetch('/.netlify/functions/send-sms', {
+  // ── 3) approved হলে customer-কে অটো SMS + email (সবসময়, PDF থাকলে link সহ) ──
+  const who = c.full_name || 'আপা';
+  let smsOk=false, emailOk=false;
+  const linkLine = pdfUrl ? `\nদেখুন/ডাউনলোড: ${pdfUrl}` : '';
+
+  if(c.phone){
+    try{
+      const sr = await fetch('/.netlify/functions/send-sms', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ to:c.phone,
-          msg:`SAR: প্রিয় ${who}, আপনার ডাক্তার-অনুমোদিত প্রেসক্রিপশন প্রস্তুত (Dr. ${name})। দেখুন: ${pdfUrl}` })
-      }).catch(()=>{});
-    }
-    if(c.email){
+          msg:`SAR: প্রিয় ${who}, আপনার প্রেসক্রিপশন SAR থেকে প্রস্তুত ও ডাক্তার-অনুমোদিত (Dr. ${name})।${linkLine}` })
+      });
+      const sd = await sr.json().catch(()=>({})); smsOk = !!(sd && sd.sent);
+    }catch(e){}
+  }
+  if(c.email){
+    try{
+      const btn = pdfUrl
+        ? `<p><a href="${pdfUrl}" target="_blank" style="display:inline-block;background:#E91E8C;color:#fff;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 প্রেসক্রিপশন দেখুন (PDF)</a></p>`
+        : `<p>আপনার ড্যাশবোর্ডে প্রেসক্রিপশন PDF শীঘ্রই পাওয়া যাবে।</p>`;
       const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
         <h2 style="color:#E91E8C">🌸 SAR — অনুমোদিত প্রেসক্রিপশন</h2>
-        <p>প্রিয় ${who},</p><p>আপনার প্রেসক্রিপশন ডাক্তার কর্তৃক যাচাই ও অনুমোদিত হয়েছে।</p>
-        <p><a href="${pdfUrl}" target="_blank" style="display:inline-block;background:#E91E8C;color:#fff;
-          padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 প্রেসক্রিপশন দেখুন (PDF)</a></p>
+        <p>প্রিয় ${who},</p><p>আপনার প্রেসক্রিপশন ডাক্তার কর্তৃক যাচাই ও অনুমোদিত হয়েছে।</p>${btn}
         <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only</p></div>`;
-      fetch('/.netlify/functions/send-email', {
+      const er = await fetch('/.netlify/functions/send-email', {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ to:c.email, subject:'SAR — অনুমোদিত প্রেসক্রিপশন', html })
-      }).catch(()=>{});
-    }
+      });
+      const ed = await er.json().catch(()=>({})); emailOk = !!(ed && (ed.sent||ed.id));
+    }catch(e){}
   }
 
   msg.style.color='#34D399';
-  msg.textContent = pdfUrl ? '✓ অনুমোদিত, PDF তৈরি ও গ্রাহককে পাঠানো হয়েছে।' : '✓ অনুমোদিত (PDF তৈরি হয়নি — bucket চেক করুন)।';
-  showToast('✓ প্রেসক্রিপশন অনুমোদিত ও পাঠানো হয়েছে');
-  setTimeout(loadRx, 1100);
+  const parts = [];
+  parts.push(pdfUrl ? 'PDF তৈরি ✓' : 'PDF তৈরি হয়নি (bucket চেক করুন)');
+  if(c.phone) parts.push(smsOk?'SMS ✓':'SMS ব্যর্থ');
+  if(c.email) parts.push(emailOk?'Email ✓':'Email ব্যর্থ');
+  msg.textContent = '✓ অনুমোদিত — ' + parts.join(' · ');
+  showToast('✓ প্রেসক্রিপশন অনুমোদিত');
+  setTimeout(loadRx, 1300);
 }
 
 // ── Mayo Clinic-স্টাইল prescription PDF → Supabase storage → public/signed URL ──
