@@ -246,10 +246,10 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
       <!-- সবসময় দৃশ্যমান, collapsible: অনুমোদিত প্রেসক্রিপশন PDF -->
       <div class="card" style="margin-bottom:1rem" id="myRxCard">
         <div class="card-title" onclick="toggleRxPanel()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
-          <span>📄 আমার প্রেসক্রিপশন</span>
-          <span id="rxPanelArrow" style="transition:transform .2s">▼</span>
+          <span>📄 আমার প্রেসক্রিপশন (সর্বশেষ ৫টি)</span>
+          <span id="rxPanelArrow" style="transition:transform .2s;transform:rotate(-90deg)">▼</span>
         </div>
-        <div id="myRxBox" style="margin-top:.75rem"></div>
+        <div id="myRxBox" style="margin-top:.75rem;display:none"></div>
       </div>
 
       <div class="card">
@@ -329,8 +329,8 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
           <textarea class="field-textarea" id="docNote" rows="2"
             placeholder="AI-এর পরামর্শে কোনো পরিবর্তন করলে উল্লেখ করুন"></textarea>
         </div>
-        <div style="display:flex;gap:.65rem;flex-wrap:wrap">
-          <button class="sign-btn" onclick="sendForApproval()">📤 অনুমোদনের জন্য পাঠান</button>
+        <div style="padding:.7rem .9rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;font-size:.82rem;color:#34D399">
+          ℹ️ বিশ্লেষণের পর প্রেসক্রিপশন স্বয়ংক্রিয়ভাবে ডাক্তারের অনুমোদনের জন্য পাঠানো হয়। অনুমোদনের পর SMS ও PDF লিংক পাবেন।
         </div>
         <div class="sign-msg" id="signMsg"></div>
         <div id="approvedRxBox" style="display:none;margin-top:1rem"></div>
@@ -603,7 +603,7 @@ async function loadApprovedRx(){
   if(card) card.style.display = 'block';   // সবসময় দেখাই
   box.innerHTML = '<div style="font-size:.8rem;color:rgba(255,255,255,.4)">লোড হচ্ছে...</div>';
   try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&order=created_at.desc&limit=8&select=*`, {headers:H});
+    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&order=created_at.desc&limit=5&select=*`, {headers:H});
     const list = r.ok ? await r.json() : [];
     if(!Array.isArray(list) || !list.length){
       box.innerHTML = '<div style="font-size:.82rem;color:rgba(255,255,255,.45)">এখনো কোনো প্রেসক্রিপশন নেই। উপরে অভিযোগ লিখে AI বিশ্লেষণ করুন।</div>';
@@ -781,6 +781,9 @@ function renderAIResult(data){
   document.getElementById('rxAlerts').value  = data.alerts  || '';
 
   rxCard.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // analysis-এর পর raw prescription দেখানোর পর স্বয়ংক্রিয়ভাবে consultation-এ পাঠাই
+  sendForApproval();
 }
 
 function rxRowHTML(cat, drug, note, idx){
