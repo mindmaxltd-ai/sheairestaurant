@@ -243,6 +243,12 @@ nav{position:sticky;top:2px;z-index:100;background:rgba(6,6,8,.9);backdrop-filte
         </div>
       </div>
 
+      <!-- সবসময় দৃশ্যমান: অনুমোদিত প্রেসক্রিপশন PDF -->
+      <div class="card" style="margin-bottom:1rem;display:none" id="myRxCard">
+        <div class="card-title">📄 আমার অনুমোদিত প্রেসক্রিপশন</div>
+        <div id="myRxBox"></div>
+      </div>
+
       <div class="card">
         <div class="card-title">💬 আজকের অভিযোগ</div>
         <textarea class="complaint-area" id="complaint"
@@ -578,21 +584,33 @@ async function sendForApproval(){
 
 // ── approved prescription PDF link দেখানো ──
 async function loadApprovedRx(){
-  const box = document.getElementById('approvedRxBox');
+  const card = document.getElementById('myRxCard');
+  const box = document.getElementById('myRxBox');
   if(!box || !patient || !patient.id) return;
   try{
-    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&rx_status=eq.approved&order=approved_at.desc&limit=5&select=*`, {headers:H});
+    // approved + pending দুটোই আনি (approved=PDF link, pending=raw text)
+    const r = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&order=created_at.desc&limit=8&select=*`, {headers:H});
     const list = r.ok ? await r.json() : [];
     if(Array.isArray(list) && list.length){
-      box.style.display = 'block';
-      box.innerHTML = '<div style="font-size:.85rem;color:#10B981;font-weight:600;margin-bottom:.5rem">✓ অনুমোদিত প্রেসক্রিপশন</div>' +
-        list.map(n=>{
-          const date = (n.approved_at||n.created_at||'').split('T')[0];
-          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;margin-bottom:.4rem">
-            <span style="font-size:.82rem">${date} · ${n.approved_by||'অনুমোদিত'}</span>
-            ${n.pdf_url ? `<a href="${n.pdf_url}" target="_blank" style="background:#10B981;color:#fff;padding:.3rem .8rem;border-radius:6px;text-decoration:none;font-size:.78rem">📄 PDF</a>` : '<span style="font-size:.72rem;color:#888">PDF তৈরি হচ্ছে</span>'}
+      if(card) card.style.display = 'block';
+      box.innerHTML = list.map(n=>{
+        const status = n.rx_status || (n.is_resolved ? 'approved' : 'pending');
+        const date = (n.approved_at||n.created_at||'').split('T')[0];
+        if(status === 'approved'){
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:8px;margin-bottom:.5rem">
+            <div><div style="font-size:.85rem;color:#10B981;font-weight:600">✓ অনুমোদিত</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.5)">${date} · ${n.approved_by||''}</div></div>
+            ${n.pdf_url ? `<a href="${n.pdf_url}" target="_blank" style="background:#10B981;color:#fff;padding:.45rem 1rem;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600">📄 PDF ডাউনলোড</a>` : '<span style="font-size:.72rem;color:#888">PDF তৈরি হচ্ছে</span>'}
           </div>`;
-        }).join('');
+        } else {
+          // pending — raw text দেখায়, PDF নেই (ডাক্তার অনুমোদনের অপেক্ষায়)
+          return `<div style="padding:.6rem .85rem;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:8px;margin-bottom:.5rem">
+            <div style="font-size:.82rem;color:#FFD43B;font-weight:600;margin-bottom:.3rem">⏳ ডাক্তার অনুমোদনের অপেক্ষায় (${date})</div>
+            <div style="font-size:.78rem;color:rgba(255,255,255,.6);white-space:pre-wrap;max-height:120px;overflow:auto">${(n.note_text_bn||'').slice(0,300)}${(n.note_text_bn||'').length>300?'...':''}</div>
+            <div style="font-size:.7rem;color:#888;margin-top:.3rem">অনুমোদনের পর PDF ডাউনলোড করা যাবে।</div>
+          </div>`;
+        }
+      }).join('');
     }
   }catch(e){}
 }
