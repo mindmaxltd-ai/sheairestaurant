@@ -95,6 +95,20 @@ async function load(){
 function render(ai, c){
   const dt = ai.analysis_date ? new Date(ai.analysis_date) : new Date();
   const score = ai.health_score || ai.meal_score || 0;
+  const cid = new URLSearchParams(location.search).get('customer_id')||'';
+
+  // ── meal-score link — আজকের AI report-এর hint সহ (focus, category, score) ──
+  // meal-score.html এই param পড়ে আজকের বিশ্লেষণ অনুযায়ী মেনু দেখাতে পারে
+  const hints = new URLSearchParams({ customer_id: cid });
+  if(ai.category) hints.set('cat', ai.category);
+  if(ai.focus) hints.set('focus', ai.focus);
+  if(score) hints.set('score', score);
+  if(ai.daily_kcal) hints.set('kcal', ai.daily_kcal);
+  if(ai.daily_protein) hints.set('protein', ai.daily_protein);
+  // আজকের menu hint (প্রথম কয়েকটা)
+  const menuHint = arr(ai.daily_menu_recommendation_json).filter(Boolean).slice(0,3).map(x=>jstr(x)).join(' | ');
+  if(menuHint) hints.set('menu_hint', menuHint.slice(0,200));
+  const mealLink = `meal-score.html?${hints.toString()}`;
 
   // text sections (যেগুলো আছে)
   const sections = [
@@ -153,6 +167,12 @@ function render(ai, c){
     ${menuHtml}
     <div class="dlabel">মূল তথ্য / Key Information</div>
     <table class="info">${infoRows}</table>
+    <div style="text-align:center;margin:18px 0">
+      <a href="${mealLink}" target="_blank"
+         style="display:inline-block;background:#C2185B;color:#fff;padding:11px 22px;border-radius:10px;
+                text-decoration:none;font-weight:700;font-size:14px">🍽️ আজকের কাস্টমাইজড মেনু দেখুন →</a>
+      <div style="font-size:.72rem;color:#888;margin-top:6px">আজকের স্বাস্থ্য বিশ্লেষণ অনুযায়ী মেনু</div>
+    </div>
     <div class="disc">এটি একটি AI-জেনারেটেড স্বাস্থ্য রিপোর্ট। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।</div>
   `;
   document.getElementById('loading').style.display='none';
