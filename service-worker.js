@@ -173,7 +173,7 @@ self.addEventListener('push', event => {
     requireInteraction: data.requireInteraction || false,
   };
   event.waitUntil(
-    self.registration.showNotification(data.title || 'SAR রেস্তোরাঁ', options)
+    self.registration.showNotification(data.title || 'SAR সার', options)
   );
 });
 
