@@ -618,7 +618,7 @@ async function loadApprovedRx(){
         return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:8px;margin-bottom:.5rem">
           <div><div style="font-size:.85rem;color:#10B981;font-weight:600">✓ অনুমোদিত</div>
           <div style="font-size:.72rem;color:rgba(255,255,255,.5)">${date} · ${n.approved_by||''}</div></div>
-          ${n.pdf_url ? `<a href="${n.pdf_url}" target="_blank" style="background:#10B981;color:#fff;padding:.45rem 1rem;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600">📄 PDF ডাউনলোড</a>` : '<span style="font-size:.72rem;color:#888">PDF তৈরি হচ্ছে</span>'}
+          ${n.pdf_url ? `<a href="${n.pdf_url}" target="_blank" style="background:#10B981;color:#fff;padding:.45rem 1rem;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600">📄 প্রেসক্রিপশন দেখুন</a>` : '<span style="font-size:.72rem;color:#888">অপেক্ষমাণ</span>'}
         </div>`;
       } else {
         return `<div style="padding:.6rem .85rem;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:8px;margin-bottom:.5rem">
