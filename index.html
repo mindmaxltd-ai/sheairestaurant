@@ -6,6 +6,12 @@
 <title>She Ai Revolution — SAR সার · নারীর স্বাস্থ্য, ওয়েলনেস ও ক্ষমতায়ন প্ল্যাটফর্ম</title>
 <meta name="description" content="She Ai Revolution - SAR সার · নারী-পরিচালিত AI ওয়েলনেস ও ক্ষমতায়ন প্ল্যাটফর্ম। ২৫০টি স্বাস্থ্য-মেট্রিকের AI বিশ্লেষণে ব্যক্তিগত মিল প্ল্যান ও ওয়েলনেস পরামর্শ — তেল, চিনি, লবণ ও কৃত্রিম রং মুক্ত, হালাল, আয়ুর্বেদিক, অর্গানিক, ব্লকচেইন-যাচাইকৃত।">
 <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B7A3D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SAR সার">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="icon" type="image/png" href="icons/icon-192x192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
@@ -483,6 +489,12 @@ function setNavRole(){
   else if(sc&&sc.id){hide('.public-only');hide('.admin-only');show('.customer-only');}
 }
 setNavRole();
+// PWA — service worker register (offline + installable)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
