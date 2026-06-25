@@ -1737,12 +1737,18 @@ async function fetchMetrics() {
 async function fetchAnalysis() {
   try {
     if (!CID) return null;
-    const r = await fetch(
+    // ১) আগে health_score-যুক্ত সর্বশেষ row আনি (৬টার AI report) — যাতে score missing না হয়
+    let r = await fetch(
+      `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&health_score=not.is.null&order=created_at.desc&limit=1&select=*`,
+      {headers:H});
+    let d = r.ok ? await r.json() : [];
+    if (Array.isArray(d) && d.length) return d[0];
+    // ২) না পেলে — যেকোনো সর্বশেষ row (পুরোনো আচরণ, fallback)
+    r = await fetch(
       `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1&select=*`,
       {headers:H});
-    if (!r.ok) return null;
-    const d = await r.json();
-    return d?.[0] || null;
+    d = r.ok ? await r.json() : [];
+    return (Array.isArray(d) && d[0]) || null;
   } catch(e) { return null; }
 }
 
