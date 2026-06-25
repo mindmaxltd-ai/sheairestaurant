@@ -397,18 +397,14 @@ async function approveRx(idx){
   msg.style.color='var(--ink-2)'; msg.textContent='';
 
   const approvedAt = new Date();
-  let pdfUrl = '';
-
-  // edited text PDF-এ ব্যবহারের জন্য n-এ সেট করি
   n.note_text_bn = editedText;
 
-  // ── 1) Mayo Clinic-স্টাইল prescription PDF তৈরি (digital signature সহ) ──
+  // ── PDF-এর বদলে HTML প্রেসক্রিপশন পেজ link (নিখুঁত বাংলা, কোনো layout সমস্যা নেই) ──
+  const SITE = location.origin;   // sheairestaurant.com
+  const pdfUrl = `${SITE}/prescription.html?rx=${n.id}`;
   let pdfErr = '';
-  try{
-    pdfUrl = await buildRxPdf(n, c, { name, reg, desig, approvedAt });
-  }catch(e){ pdfErr = String(e.message||e); console.warn('PDF build:', e); }
 
-  // ── 2) status=approved + edited text + signature + pdf_url সেভ ──
+  // ── status=approved + edited text + signature + link সেভ ──
   try{
     const r = await fetch(`${SUPA}/rest/v1/sar_notes?id=eq.${n.id}`, {
       method:'PATCH', headers:{...H, Prefer:'return=minimal'},
@@ -418,7 +414,7 @@ async function approveRx(idx){
         approved_by:`Dr. ${name} (BMDC: ${reg})`,
         designation: desig,
         approved_at: approvedAt.toISOString(),
-        pdf_url: pdfUrl || null,
+        pdf_url: pdfUrl,
       })
     });
     if(!r.ok){
@@ -431,10 +427,10 @@ async function approveRx(idx){
     msg.style.color='var(--red)'; msg.textContent='❌ '+e.message; return;
   }
 
-  // ── 3) approved হলে customer-কে অটো SMS + email (সবসময়, PDF থাকলে link সহ) ──
+  // ── 3) approved হলে customer-কে অটো SMS + email (প্রেসক্রিপশন link সহ) ──
   const who = c.full_name || 'আপা';
   let smsOk=false, emailOk=false;
-  const linkLine = pdfUrl ? `\nদেখুন/ডাউনলোড: ${pdfUrl}` : '';
+  const linkLine = `\nদেখুন: ${pdfUrl}`;
 
   if(c.phone){
     try{
@@ -448,12 +444,10 @@ async function approveRx(idx){
   }
   if(c.email){
     try{
-      const btn = pdfUrl
-        ? `<p><a href="${pdfUrl}" target="_blank" style="display:inline-block;background:#E91E8C;color:#fff;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 প্রেসক্রিপশন দেখুন (PDF)</a></p>`
-        : `<p>আপনার ড্যাশবোর্ডে প্রেসক্রিপশন PDF শীঘ্রই পাওয়া যাবে।</p>`;
+      const linkBtn = `<p><a href="${pdfUrl}" target="_blank" style="display:inline-block;background:#E91E8C;color:#fff;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 প্রেসক্রিপশন দেখুন</a></p>`;
       const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
         <h2 style="color:#E91E8C">🌸 SAR — অনুমোদিত প্রেসক্রিপশন</h2>
-        <p>প্রিয় ${who},</p><p>আপনার প্রেসক্রিপশন ডাক্তার কর্তৃক যাচাই ও অনুমোদিত হয়েছে।</p>${btn}
+        <p>প্রিয় ${who},</p><p>আপনার প্রেসক্রিপশন ডাক্তার কর্তৃক যাচাই ও অনুমোদিত হয়েছে।</p>${linkBtn}
         <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only</p></div>`;
       const er = await fetch('/.netlify/functions/send-email', {
         method:'POST', headers:{'Content-Type':'application/json'},
@@ -464,11 +458,9 @@ async function approveRx(idx){
   }
 
   msg.style.color='#34D399';
-  const parts = [];
-  parts.push(pdfUrl ? 'PDF তৈরি ✓' : ('PDF ব্যর্থ: ' + (pdfErr||'অজানা')));
+  const parts = ['প্রেসক্রিপশন ✓'];
   if(c.phone) parts.push(smsOk?'SMS ✓':'SMS ব্যর্থ');
   if(c.email) parts.push(emailOk?'Email ✓':'Email ব্যর্থ');
-  msg.style.color = pdfUrl ? '#34D399' : '#EF4444';
   msg.textContent = '✓ অনুমোদিত — ' + parts.join(' · ');
   showToast('✓ প্রেসক্রিপশন অনুমোদিত');
   setTimeout(loadRx, 1300);
