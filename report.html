@@ -97,15 +97,14 @@ function render(ai, c){
   const score = ai.health_score || ai.meal_score || 0;
   const cid = new URLSearchParams(location.search).get('customer_id')||'';
 
-  // ── meal-score link — আজকের AI report-এর hint সহ (focus, category, score) ──
-  // meal-score.html এই param পড়ে আজকের বিশ্লেষণ অনুযায়ী মেনু দেখাতে পারে
+  // ── meal-score link — customer_id + আজকের AI report-এর hint (extra context) ──
+  // meal-score নিজেই DB থেকে আজকের report পড়ে, তবু hint থাকলে DB দেরি/মিস হলেও context পায়
   const hints = new URLSearchParams({ customer_id: cid });
   if(ai.category) hints.set('cat', ai.category);
   if(ai.focus) hints.set('focus', ai.focus);
   if(score) hints.set('score', score);
   if(ai.daily_kcal) hints.set('kcal', ai.daily_kcal);
   if(ai.daily_protein) hints.set('protein', ai.daily_protein);
-  // আজকের menu hint (প্রথম কয়েকটা)
   const menuHint = arr(ai.daily_menu_recommendation_json).filter(Boolean).slice(0,3).map(x=>jstr(x)).join(' | ');
   if(menuHint) hints.set('menu_hint', menuHint.slice(0,200));
   const mealLink = `meal-score.html?${hints.toString()}`;
