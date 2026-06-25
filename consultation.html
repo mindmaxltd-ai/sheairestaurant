@@ -127,6 +127,11 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- PDF render container — receipt.html .sheet-এর মতো (দৃশ্যমান অবস্থায় render) -->
+<div id="rxSheetWrap" style="position:fixed;left:0;top:0;width:200mm;background:#fff;z-index:-1;visibility:hidden">
+  <div id="rxSheet" style="width:200mm;background:#fff;padding:10mm 12mm;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:11px;line-height:1.55;box-sizing:border-box"></div>
+</div>
+
 <script>
 const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
 const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
@@ -519,10 +524,8 @@ async function buildRxPdf(n, c, sig){
   const rxBody = esc(n.note_text_bn || n.note_text || '').replace(/\n/g,'<br>');
   const dt = sig.approvedAt;
 
-  // receipt.html ECR-style — compact, top-aligned, light
+  // receipt.html ECR-style — compact, light (wrapper #rxSheet-এই style)
   const html = `
-  <div style="width:200mm;max-width:200mm;margin:0;padding:10mm 12mm;font-family:'Hind Siliguri',Arial,sans-serif;color:#1a1a1a;font-size:11px;line-height:1.55;background:#fff;box-sizing:border-box">
-
     <!-- header (receipt style) -->
     <div style="text-align:center;border-bottom:2px solid #C2185B;padding-bottom:8px;margin-bottom:10px">
       <div style="font-size:22px;font-weight:800;color:#C2185B;letter-spacing:1px">SAR</div>
@@ -558,16 +561,16 @@ async function buildRxPdf(n, c, sig){
     </div>
     <div style="text-align:center;color:#aaa;font-size:7.5px;margin-top:8px;border-top:1px dashed #ddd;padding-top:5px">
       এটি একটি ডিজিটালি স্বাক্ষরিত প্রেসক্রিপশন। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।
-    </div>
-  </div>`;
+    </div>`;
 
-  // html2pdf — কাজ-করা version (receipt.html-এর মতো, margin:0, windowWidth নেই)
-  const holder = document.createElement('div');
-  holder.style.position='absolute'; holder.style.left='0'; holder.style.top='0';
-  holder.style.opacity='0'; holder.style.pointerEvents='none'; holder.style.zIndex='-1';
-  holder.innerHTML = html;
-  document.body.appendChild(holder);
-  const sheet = holder.firstElementChild;
+  // receipt.html-এর মতো — দৃশ্যমান অবস্থায় render (off-screen নয়), তাই html2pdf উচ্চতা ঠিক মাপে
+  const sheet = document.getElementById('rxSheet');
+  const wrap = document.getElementById('rxSheetWrap');
+  sheet.innerHTML = html;
+  wrap.style.visibility = 'visible';   // render-এর সময় দৃশ্যমান
+  // font/layout settle হতে দিই
+  if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+  await new Promise(r=> setTimeout(r, 200));
   const opt = {
     margin: 0,
     image: { type:'jpeg', quality:0.96 },
@@ -578,7 +581,8 @@ async function buildRxPdf(n, c, sig){
   try{
     blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
   } finally {
-    document.body.removeChild(holder);
+    wrap.style.visibility = 'hidden';   // লুকাই
+    sheet.innerHTML = '';
   }
 
   // upload to Supabase storage — public "reports" bucket, rx/ prefix
