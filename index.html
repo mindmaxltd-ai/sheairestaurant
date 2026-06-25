@@ -89,7 +89,9 @@ nav.scrolled{padding:.5rem 2rem;box-shadow:0 4px 24px rgba(27,58,47,.08)}
 .nb-staff{color:var(--sage);border-color:rgba(45,90,61,.2)}
 .nb-staff:hover{background:rgba(45,90,61,.08)}
 .nb-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;font-weight:700;border-color:var(--gold)}
-.nb-gold:hover{box-shadow:0 4px 16px rgba(201,169,97,.4);transform:translateY(-1px);color:#fff}
+.nb-gold:hover{box-shadow:0 4px 16px rgba(255,167,38,.4);transform:translateY(-1px);color:#fff}
+.nb-menu{background:linear-gradient(135deg,var(--orange),var(--lotus));color:#fff;font-weight:700;border-color:var(--orange)}
+.nb-menu:hover{box-shadow:0 4px 18px rgba(236,64,122,.4);transform:translateY(-1px);color:#fff}
 .nav-toggle{display:none;background:none;border:none;color:var(--forest);font-size:1.5rem;cursor:pointer}
 
 /* ══════════ HERO ══════════ */
@@ -213,7 +215,7 @@ section{position:relative;z-index:2}
 .duo-item .d{font-size:.82rem;color:var(--ink3)}
 
 /* WHY — principles cards */
-.why{background:var(--forest);color:var(--cream)}
+.why{background:linear-gradient(160deg,var(--green-vivid),var(--forest));color:var(--cream)}
 .why .eyebrow{color:var(--gold-light)}
 .why .sec-head h2{color:var(--cream)}
 .why .sec-head p{color:rgba(247,243,233,.7)}
@@ -227,7 +229,8 @@ section{position:relative;z-index:2}
 .princ p{font-size:.86rem;color:rgba(247,243,233,.65);line-height:1.65}
 
 /* HOW — steps */
-.how{background:linear-gradient(180deg,var(--paper),var(--cream))}
+.how{background:linear-gradient(180deg,var(--pink-soft),#FFF0F5)}
+.how .step-num{background:linear-gradient(135deg,var(--lotus),var(--lotus2))}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;counter-reset:step}
 .step{position:relative;padding:2.5rem 1.8rem 2rem;background:var(--paper);border:1px solid var(--line2);
   border-radius:22px;box-shadow:var(--shadow-sm);transition:all .35s}
@@ -241,7 +244,7 @@ section{position:relative;z-index:2}
 .step p{color:var(--ink2);font-size:.92rem}
 
 /* MENUS — categories */
-.menus{background:var(--forest2);color:var(--cream)}
+.menus{background:linear-gradient(160deg,var(--orange),var(--orange2));color:#fff}
 .menus .eyebrow{color:var(--gold-light)}
 .menus .sec-head h2{color:var(--cream)}
 .menus .sec-head p{color:rgba(247,243,233,.7)}
@@ -256,6 +259,16 @@ section{position:relative;z-index:2}
 .menus-cta{text-align:center}
 
 /* IMPACT — stats */
+/* ══════════ FOOD GALLERY ══════════ */
+.gallery{position:relative;z-index:2;overflow:hidden;background:var(--forest);padding:0}
+.gal-track{display:grid;grid-template-columns:repeat(6,1fr);gap:0}
+.gal-img{aspect-ratio:1;overflow:hidden;position:relative}
+.gal-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s;filter:saturate(1.1)}
+.gal-img:hover img{transform:scale(1.08)}
+.gal-img::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(27,94,32,.3));pointer-events:none}
+@media(max-width:680px){.gal-track{grid-template-columns:repeat(3,1fr)}}
+
+/* ══════════ IMPACT ══════════ */
 .impact{background:linear-gradient(180deg,var(--cream),var(--paper))}
 .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:3rem}
 .stat{text-align:center;padding:2rem 1rem}
@@ -281,6 +294,10 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
 .foot-col h5{font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:.1em;color:var(--gold-light);margin-bottom:1.1rem;text-transform:uppercase}
 .foot-col a{display:block;color:rgba(247,243,233,.65);text-decoration:none;font-size:.88rem;padding:.3rem 0;transition:color .2s}
 .foot-col a:hover{color:var(--gold-light)}
+.eco-chip{display:inline-flex!important;align-items:center;gap:.5rem;padding:.4rem .9rem;margin-top:.4rem;
+  background:rgba(247,243,233,.06);border:1px solid rgba(255,167,38,.25);border-radius:50px;font-size:.82rem}
+.eco-chip:hover{background:rgba(247,243,233,.1);border-color:var(--gold)}
+.eco-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .foot-social{display:flex;gap:.7rem;margin-top:1rem}
 .foot-social a{width:38px;height:38px;border-radius:50%;border:1px solid rgba(201,169,97,.3);display:grid;place-items:center;
   color:var(--gold-light);text-decoration:none;font-size:1rem;transition:all .25s}
@@ -346,23 +363,14 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
   </a>
   <button class="nav-toggle" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
   <div class="nav-links" id="navlinks">
-    <a href="#what" class="nb">দর্শন</a>
-    <a href="#menus" class="nb">মেনু</a>
-    <a href="#roadmap" class="nb">লক্ষ্য</a>
-    <a href="menu.html" target="_blank" class="nb">🍱 মেনু দেখুন</a>
-    <!-- public — সবসময় -->
     <a href="register.html" target="_blank" class="nb public-only">📝 নিবন্ধন</a>
     <a href="login.html" target="_blank" class="nb public-only">🔐 লগইন</a>
-    <!-- customer — login পরে -->
     <a href="dashboard.html" target="_blank" class="nb nb-staff customer-only" style="display:none">📊 ড্যাশবোর্ড</a>
-    <a href="order.html" target="_blank" class="nb nb-staff customer-only" style="display:none">🛒 অর্ডার</a>
-    <a href="metrics.html" target="_blank" class="nb nb-staff customer-only" style="display:none">📈 মেট্রিক</a>
-    <a href="receipt.html" target="_blank" class="nb nb-staff customer-only" style="display:none">🧾 রসিদ</a>
-    <a href="profile.html" target="_blank" class="nb nb-staff customer-only" style="display:none">👤 প্রোফাইল</a>
-    <!-- admin/staff — login পরে -->
+    <a href="payment.html" target="_blank" class="nb nb-staff customer-only" style="display:none">💳 পেমেন্ট</a>
     <a href="dashboard.html" target="_blank" class="nb nb-staff admin-only" style="display:none">📊 ড্যাশবোর্ড</a>
     <a href="kitchen.html" target="_blank" class="nb nb-staff admin-only" style="display:none">👩‍🍳 কিচেন</a>
     <a href="admin.html" target="_blank" class="nb nb-gold admin-only" style="display:none">⚙️ অ্যাডমিন</a>
+    <a href="menu.html" target="_blank" class="nb nb-menu">🍱 মেনু</a>
   </div>
 </nav>
 
@@ -392,7 +400,7 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
 <!-- ══════════ BIG FOOD SHOWCASE ══════════ -->
 <section class="showcase">
   <div class="showcase-img">
-    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1600&q=80" alt="রঙিন স্বাস্থ্যকর খাবার" loading="lazy">
+    <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1600&q=80" alt="রঙিন স্বাস্থ্যকর খাবার" loading="lazy">
     <div class="showcase-overlay">
       <div class="showcase-text">
         <span class="eyebrow" style="color:var(--gold-light)">প্রতিটি পাত একটি প্রতিশ্রুতি</span>
@@ -507,6 +515,18 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
   </div>
 </section>
 
+<!-- ══════════ FOOD GALLERY ══════════ -->
+<section class="gallery">
+  <div class="gal-track">
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80" alt="সালাদ বোল" loading="lazy"></div>
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1512852939750-1305098529bf?auto=format&fit=crop&w=600&q=80" alt="রঙিন বোল" loading="lazy"></div>
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=600&q=80" alt="তাজা খাবার" loading="lazy"></div>
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80" alt="স্বাস্থ্যকর প্লেট" loading="lazy"></div>
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?auto=format&fit=crop&w=600&q=80" alt="ফল ও সবজি" loading="lazy"></div>
+    <div class="gal-img"><img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80" alt="রঙিন উপকরণ" loading="lazy"></div>
+  </div>
+</section>
+
 <!-- ══════════ IMPACT — Stats ══════════ -->
 <section class="sec impact" id="impact">
   <div class="wrap">
@@ -562,43 +582,45 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
       <div class="nav-name"><span class="n1 cinzel" style="color:var(--gold-light);font-size:1.1rem">SAR · সার</span></div>
       <p>She Ai Revolution — বিশ্বের প্রথম নারী-পরিচালিত AI ওয়েলনেস রেস্তোরাঁ। প্রকৃতির নিরাময়, নারীর শক্তি।</p>
       <div class="foot-social">
-        <a href="https://wa.me/8801346098892" title="WhatsApp">📱</a>
-        <a href="https://www.facebook.com/profile.php?id=61576437045217" title="Facebook">f</a>
-        <a href="https://www.facebook.com/profile.php?id=61590191923285" title="Facebook">f</a>
-        <a href="https://www.youtube.com/@user-oz6ro8gz4e" title="YouTube">▶</a>
+        <a href="https://www.facebook.com/profile.php?id=61576437045217" target="_blank" title="SAR Facebook">📘</a>
+        <a href="https://www.facebook.com/profile.php?id=61590191923285" target="_blank" title="MindMax Facebook">📗</a>
+        <a href="https://www.youtube.com/@user-oz6ro8gz4e" target="_blank" title="YouTube">▶️</a>
+        <a href="https://wa.me/8801346098892" target="_blank" title="WhatsApp">💬</a>
+        <a href="mailto:mindmaxltd@gmail.com" title="Email">📧</a>
+        <a href="https://mindmaxbd.xyz" target="_blank" title="MindMax Web">🌐</a>
       </div>
     </div>
     <div class="foot-col">
       <h5>আবিষ্কার</h5>
-      <a href="#what">আমাদের দর্শন</a>
-      <a href="#why">কেন SAR</a>
-      <a href="#how">কীভাবে কাজ করে</a>
+      <a href="#what">SAR কী?</a>
+      <a href="#why">কেন SAR?</a>
+      <a href="#menus">থেরাপিউটিক মেনু</a>
+      <a href="#how">SAR কীভাবে কাজ করে</a>
+      <a href="#impact">SAR-এর প্রভাব</a>
       <a href="#roadmap">২০৩০ লক্ষ্য</a>
-      <a href="menu.html">মেনু</a>
-      <a href="why-sar.html">কেন SAR বিস্তারিত</a>
+      <a href="why-sar.html" target="_blank">আর্টিকেল ও আপডেট</a>
     </div>
     <div class="foot-col">
-      <h5>অ্যাকাউন্ট</h5>
-      <a href="register.html">নিবন্ধন</a>
-      <a href="login.html">লগইন</a>
-      <a href="dashboard.html">ড্যাশবোর্ড</a>
-      <a href="order.html">অর্ডার</a>
-      <a href="track.html">অর্ডার ট্র্যাক</a>
-      <a href="receipt.html">রসিদ</a>
+      <h5>সেবাসমূহ</h5>
+      <a href="register.html" target="_blank">নিবন্ধন করুন</a>
+      <a href="login.html" target="_blank">লগইন করুন</a>
+      <a href="dashboard.html" target="_blank">ড্যাশবোর্ড</a>
+      <a href="metrics.html" target="_blank">স্বাস্থ্য মেট্রিক্স</a>
+      <a href="order.html" target="_blank">অর্ডার করুন</a>
+      <a href="track.html" target="_blank">অর্ডার ট্র্যাক</a>
+      <a href="payment.html" target="_blank">পেমেন্ট</a>
+      <a href="receipt.html" target="_blank">রিসিট দেখুন</a>
+      <a href="profile.html" target="_blank">আমার প্রোফাইল</a>
     </div>
     <div class="foot-col">
-      <h5>যোগাযোগ</h5>
+      <h5>যোগাযোগ ও গ্রুপ</h5>
       <a href="tel:+8801346098892">📞 ০১৩৪৬০৯৮৮৯২</a>
-      <a href="mailto:mindmaxltd@gmail.com">✉️ ইমেইল</a>
-      <a href="https://mindmaxbd.xyz">MindMax</a>
-      <a href="https://mindmaxbd.xyz/she-ai-restaurant-2/">She Ai Restaurant</a>
-      <a href="https://mindmaxbd.xyz/kotha/">কথা</a>
-      <a href="https://mindmaxbd.xyz/sundar/">সুন্দর</a>
-      <a href="metrics.html">স্বাস্থ্য মেট্রিক</a>
-      <a href="profile.html">প্রোফাইল</a>
-      <a href="payment.html">পেমেন্ট</a>
-      <a href="kitchen.html">কিচেন</a>
-      <a href="admin.html">অ্যাডমিন</a>
+      <a href="mailto:mindmaxltd@gmail.com">📧 mindmaxltd@gmail.com</a>
+      <a href="https://mindmaxbd.xyz" target="_blank">🌐 mindmaxbd.xyz</a>
+      <a href="https://mindmaxbd.xyz/she-ai-restaurant-2/" target="_blank" class="eco-chip"><span class="dot" style="background:#FFA726"></span>SAR Official Site</a>
+      <a href="https://mindmaxbd.xyz/sundar/" target="_blank" class="eco-chip"><span class="dot" style="background:#43A047"></span>SUNDAR — Bank Supervisor</a>
+      <a href="https://mindmaxbd.xyz/kotha/" target="_blank" class="eco-chip"><span class="dot" style="background:#EC407A"></span>KOTHA — পেডিয়াট্রিক AI</a>
+      <a href="https://mindmaxbd.xyz" target="_blank" class="eco-chip"><span class="dot" style="background:#FF6F3C"></span>MindMax Group</a>
     </div>
   </div>
   <div class="foot-bottom">
