@@ -1,11 +1,11 @@
 {
-  "name": "SAR — She AI Restaurant",
-  "short_name": "SAR",
-  "description": "শি এআই রেস্তোরাঁ — বাংলাদেশের প্রথম নারী-নেতৃত্বাধীন AI থেরাপিউটিক ফুড প্ল্যাটফর্ম",
+  "name": "She Ai Revolution - SAR সার",
+  "short_name": "SAR সার",
+  "description": "নারীর স্বাস্থ্য, ওয়েলনেস ও ক্ষমতায়ন প্ল্যাটফর্ম — AI বিশ্লেষণে ব্যক্তিগত মিল প্ল্যান ও ওয়েলনেস পরামর্শ",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#0A0A0F",
-  "theme_color": "#E91E8C",
+  "background_color": "#FFFBF5",
+  "theme_color": "#1B7A3D",
   "orientation": "portrait-primary",
   "lang": "bn",
   "scope": "/",
@@ -81,31 +81,55 @@
       "short_name": "মেনু",
       "description": "SAR থেরাপিউটিক মেনু",
       "url": "/menu.html",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "অর্ডার দিন",
       "short_name": "অর্ডার",
       "description": "নতুন অর্ডার করুন",
       "url": "/order.html",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "অর্ডার ট্র্যাক",
       "short_name": "ট্র্যাক",
       "description": "অর্ডার ট্র্যাক করুন",
       "url": "/track.html",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "ড্যাশবোর্ড",
       "short_name": "ড্যাশ",
       "description": "আপনার ড্যাশবোর্ড",
       "url": "/dashboard.html",
-      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
-  "categories": ["food", "health", "lifestyle"],
+  "categories": [
+    "food",
+    "health",
+    "lifestyle"
+  ],
   "related_applications": [],
   "prefer_related_applications": false
 }
