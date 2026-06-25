@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SAR — ডাক্তার পরামর্শ ও অনুমোদন কেন্দ্র</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -563,25 +565,47 @@ async function buildRxPdf(n, c, sig){
       এটি একটি ডিজিটালি স্বাক্ষরিত প্রেসক্রিপশন। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।
     </div>`;
 
-  // receipt.html-এর মতো — দৃশ্যমান অবস্থায় render (off-screen নয়), তাই html2pdf উচ্চতা ঠিক মাপে
+  // ── নির্ভরযোগ্য: html2canvas → jsPDF ম্যানুয়াল (content উপর থেকে, center-bug নেই) ──
   const sheet = document.getElementById('rxSheet');
   const wrap = document.getElementById('rxSheetWrap');
   sheet.innerHTML = html;
-  wrap.style.visibility = 'visible';   // render-এর সময় দৃশ্যমান
-  // font/layout settle হতে দিই
+  wrap.style.visibility = 'visible';
   if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
-  await new Promise(r=> setTimeout(r, 200));
-  const opt = {
-    margin: 0,
-    image: { type:'jpeg', quality:0.96 },
-    html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff' },
-    jsPDF: { unit:'mm', format:'a4', orientation:'portrait', compress:true }
-  };
+  await new Promise(r=> setTimeout(r, 250));
+
+  // html2canvas ও jsPDF — html2pdf bundle থেকে বা global
+  const h2c = window.html2canvas || (window.html2pdf && window.html2pdf.html2canvas);
+  const JsPDFCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+
   let blob;
   try{
-    blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
+    if(h2c && JsPDFCtor){
+      // ম্যানুয়াল — content উপর থেকে (y=0) বসাই, multi-page সঠিক
+      const canvas = await h2c(sheet, { scale:2, useCORS:true, backgroundColor:'#ffffff' });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new JsPDFCtor({ unit:'mm', format:'a4', orientation:'portrait', compress:true });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pageW) / canvas.width;
+      let heightLeft = imgH, position = 0;
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, imgH);
+      heightLeft -= pageH;
+      while(heightLeft > 0){
+        position -= pageH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pageW, imgH);
+        heightLeft -= pageH;
+      }
+      blob = pdf.output('blob');
+    } else {
+      // fallback — html2pdf
+      const opt = { margin:0, image:{type:'jpeg',quality:0.95},
+        html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+        jsPDF:{unit:'mm',format:'a4',orientation:'portrait',compress:true} };
+      blob = await html2pdf().set(opt).from(sheet).outputPdf('blob');
+    }
   } finally {
-    wrap.style.visibility = 'hidden';   // লুকাই
+    wrap.style.visibility = 'hidden';
     sheet.innerHTML = '';
   }
 
