@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAR — প্রেসক্রিপশন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Hind Siliguri',Arial,sans-serif;background:#f4eef2;color:#1a1a1a;
+    line-height:1.6;padding:1rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.12)}
+  .pad{padding:28px 32px}
+  .rhead{text-align:center;border-bottom:2px solid #C2185B;padding-bottom:12px;margin-bottom:16px}
+  .rhead .brand{font-size:30px;font-weight:800;color:#C2185B;letter-spacing:2px}
+  .rhead .sub{font-size:15px;font-weight:700;color:#333;margin-top:2px}
+  .rhead .tag{font-size:10px;color:#999;margin-top:3px}
+  .rhead .ph{font-size:11px;color:#888;margin-top:4px}
+  .rhead .title{font-size:16px;font-weight:700;color:#C2185B;margin-top:12px;
+    border-top:1px dashed #ddd;padding-top:10px}
+  .meta{width:100%;font-size:13px;border-collapse:collapse;margin-bottom:16px}
+  .meta td{padding:4px 0}
+  .meta .k{color:#666}.meta .v{text-align:right;font-weight:600}
+  .meta .v.mono{font-family:monospace}
+  .dlabel{background:#C2185B;color:#fff;font-size:13px;font-weight:700;
+    padding:6px 12px;border-radius:4px;margin:14px 0 8px}
+  .rxbody{padding:4px 6px 12px;font-size:14px;white-space:pre-wrap}
+  .info{width:100%;border-collapse:collapse;font-size:12.5px}
+  .info td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+  .info .k{font-weight:600;color:#444;width:34%}
+  .sig{border-top:2px solid #10B981;padding-top:12px;margin-top:18px}
+  .sig .ok{color:#0a9d6b;font-weight:700;font-size:13px}
+  .sig .dn{font-weight:700;font-size:15px;margin-top:4px}
+  .sig .dd{color:#555;font-size:12px;margin-top:2px}
+  .disc{text-align:center;color:#aaa;font-size:10px;margin-top:14px;
+    border-top:1px dashed #ddd;padding-top:8px}
+  .printbtn{display:block;max-width:800px;margin:0 auto 1rem;background:#C2185B;color:#fff;
+    border:none;border-radius:10px;padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;
+    font-family:inherit;text-align:center}
+  .loading,.error{text-align:center;padding:3rem 1rem;color:#888;max-width:800px;margin:0 auto}
+  @media print{
+    body{background:#fff;padding:0}
+    .sheet{box-shadow:none;border-radius:0;max-width:100%}
+    .printbtn{display:none}
+  }
+</style>
+</head>
+<body>
+
+<button class="printbtn" onclick="window.print()" id="printBtn" style="display:none">🖨️ প্রিন্ট / সেভ করুন (PDF)</button>
+
+<div class="loading" id="loading">⏳ প্রেসক্রিপশন লোড হচ্ছে...</div>
+
+<div class="sheet" id="sheet" style="display:none">
+  <div class="pad" id="sheetBody"></div>
+</div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H = {apikey:KEY, Authorization:'Bearer '+KEY};
+
+const esc = (s)=> String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const jstr = (v)=>{
+  if(!v) return '';
+  if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return v; } }
+  if(Array.isArray(v)) return v.map(x=> typeof x==='object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
+  if(typeof v === 'object') return Object.values(v).map(x=> typeof x==='object'?JSON.stringify(x):x).join(', ');
+  return String(v);
+};
+
+async function load(){
+  const rxId = new URLSearchParams(location.search).get('rx');
+  if(!rxId){ showError('প্রেসক্রিপশন আইডি পাওয়া যায়নি।'); return; }
+  try{
+    // prescription আনি
+    const r = await fetch(`${SUPA}/rest/v1/sar_notes?id=eq.${rxId}&select=*`, {headers:H});
+    const arr = r.ok ? await r.json() : [];
+    if(!arr.length){ showError('প্রেসক্রিপশন পাওয়া যায়নি।'); return; }
+    const n = arr[0];
+
+    // customer আনি
+    let c = {};
+    if(n.customer_id){
+      const cr = await fetch(`${SUPA}/rest/v1/customers?id=eq.${n.customer_id}&select=full_name,phone,email,bmi,sar_category`, {headers:H});
+      const ca = cr.ok ? await cr.json() : [];
+      if(ca.length) c = ca[0];
+    }
+
+    // সর্বশেষ AI analysis আনি (২০টা তথ্য)
+    let ai = {};
+    if(n.customer_id){
+      const ar = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${n.customer_id}&order=analysis_date.desc&limit=1&select=*`, {headers:H});
+      const aa = ar.ok ? await ar.json() : [];
+      if(aa.length) ai = aa[0];
+    }
+
+    render(n, c, ai);
+  }catch(e){
+    showError('লোড করা যায়নি — আবার চেষ্টা করুন।');
+  }
+}
+
+function render(n, c, ai){
+  const dt = n.approved_at ? new Date(n.approved_at) : (n.created_at ? new Date(n.created_at) : new Date());
+  const approved = (n.rx_status === 'approved' || n.is_resolved);
+
+  const rows = [
+    ['Health Score', ai.health_score!=null ? ai.health_score+' / 100' : ''],
+    ['Disease Category', ai.category || c.sar_category || ''],
+    ['BMI', c.bmi || ''],
+    ['Daily Calorie', ai.daily_kcal ? ai.daily_kcal+' kcal' : ''],
+    ['Daily Protein', ai.daily_protein ? ai.daily_protein+' g' : ''],
+    ['Meal Score', ai.meal_score!=null ? ai.meal_score : ''],
+    ['Focus', ai.focus || ''],
+    ['Health Summary', ai.health_summary_bn || ''],
+    ['Problems', jstr(ai.problems_json)],
+    ['Complication Risk', jstr(ai.complications_risk_json)],
+    ['Nutrition Advice', ai.nutrition_advice_bn || ''],
+    ['Conventional Medicine', jstr(ai.conventional_medicines_json)],
+    ['Ayurvedic', ai.ayurvedic_bn || ''],
+    ['Homeopathic', ai.homeopathic_bn || ''],
+    ['Home Remedies', ai.home_remedies_bn || ''],
+    ['Medicinal Plants', jstr(ai.medicinal_plants_json)],
+    ['Daily Menu', jstr(ai.daily_menu_recommendation_json)],
+    ['General Suggestions', ai.general_suggestions_bn || ''],
+    ['Motivation', ai.motivational_message_bn || ''],
+    ['Analysis Date', ai.analysis_date || ''],
+  ].filter(x=> x[1]!=='' && x[1]!=null);
+
+  const infoRows = rows.map(x=>
+    `<tr><td class="k">${x[0]}</td><td>${esc(x[1])}</td></tr>`).join('');
+
+  const sig = approved ? `
+    <div class="sig">
+      <div class="ok">✓ Digitally Verified &amp; Approved</div>
+      <div class="dn">${esc(n.approved_by||'')}</div>
+      <div class="dd">${esc(n.designation||'')}</div>
+      <div class="dd">Verifier: SAR Medical Panel · Signed: ${dt.toLocaleString('en-GB')}</div>
+    </div>` : `
+    <div class="sig" style="border-top-color:#F5A623">
+      <div style="color:#c98a00;font-weight:700;font-size:13px">⏳ ডাক্তার অনুমোদনের অপেক্ষায়</div>
+      <div class="dd">অনুমোদনের পর এটি ডিজিটালি স্বাক্ষরিত হবে।</div>
+    </div>`;
+
+  document.getElementById('sheetBody').innerHTML = `
+    <div class="rhead">
+      <div class="brand">SAR</div>
+      <div class="sub">She AI Revolution</div>
+      <div class="tag">AI + EI + Blockchain · women-led · women-run · women-only wellness platform</div>
+      <div class="ph">📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com</div>
+      <div class="title">℞ Medical Prescription / প্রেসক্রিপশন</div>
+    </div>
+    <table class="meta">
+      <tr><td class="k">গ্রাহক / Patient</td><td class="v">${esc(c.full_name||'—')}</td></tr>
+      <tr><td class="k">ফোন / Phone</td><td class="v mono">${esc(c.phone||'—')}</td></tr>
+      <tr><td class="k">বিভাগ / Category</td><td class="v">${esc(ai.category||c.sar_category||'—')}</td></tr>
+      <tr><td class="k">তারিখ / Date</td><td class="v">${dt.toLocaleDateString('en-GB')}</td></tr>
+      <tr><td class="k">Rx ID</td><td class="v mono">${String(n.id).slice(0,8)}</td></tr>
+    </table>
+    <div class="dlabel">প্রেসক্রিপশন / Prescription</div>
+    <div class="rxbody">${esc(n.note_text_bn||n.note_text||'')}</div>
+    <div class="dlabel">দৈনিক AI স্বাস্থ্য তথ্য / Daily AI Health Report</div>
+    <table class="info">${infoRows}</table>
+    ${sig}
+    <div class="disc">এটি একটি ডিজিটালি স্বাক্ষরিত প্রেসক্রিপশন। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।</div>
+  `;
+  document.getElementById('loading').style.display='none';
+  document.getElementById('sheet').style.display='block';
+  document.getElementById('printBtn').style.display='block';
+}
+
+function showError(m){
+  document.getElementById('loading').className='error';
+  document.getElementById('loading').textContent='⚠️ '+m;
+}
+
+load();
+</script>
+</body>
+</html>
