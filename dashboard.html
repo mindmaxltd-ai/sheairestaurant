@@ -936,6 +936,17 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
             </div>
           </div>
 
+          <!-- দৈনিক স্বাস্থ্য রিপোর্ট link (৬টার AI report) -->
+          <div id="reportCard" style="display:none;margin-bottom:14px;padding:16px;
+               background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.25);
+               border-radius:12px;text-align:center">
+            <div style="font-weight:600;color:#34D399;margin-bottom:8px">📄 আজকের স্বাস্থ্য রিপোর্ট</div>
+            <a id="reportLink" href="#" target="_blank"
+               style="display:inline-block;background:#059669;color:#fff;padding:9px 18px;
+                      border-radius:9px;text-decoration:none;font-weight:600">পূর্ণ রিপোর্ট দেখুন →</a>
+            <div id="reportDate" style="font-size:.72rem;color:#888;margin-top:8px"></div>
+          </div>
+
           <!-- AI ANALYSIS -->
           <div class="dcard analysis-card" id="analysisSection">
             <div class="dcard-header">
@@ -1458,6 +1469,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       renderDailyMenu(analysis, cust);
       renderSubAlert(cust);
       removePendingBanner();
+      loadLatestReport();   // ৬টার দৈনিক রিপোর্ট link
     } else {
       // LIMITED ACCESS — show status banner, lock premium sections
     showAccessBanner(cust, paidReg, memApproved, subApproved);
@@ -1732,6 +1744,24 @@ async function fetchAnalysis() {
     const d = await r.json();
     return d?.[0] || null;
   } catch(e) { return null; }
+}
+
+// ৬টার দৈনিক রিপোর্ট link দেখায় (reports টেবিল থেকে)
+async function loadLatestReport() {
+  try {
+    if (!CID) return;
+    const r = await fetch(
+      `${SUPA}/rest/v1/reports?customer_id=eq.${CID}&order=report_date.desc&limit=1&select=*`,
+      { headers: H });
+    if (!r.ok) return;
+    const data = await r.json();
+    const rep = data && data[0];
+    if (!rep || !rep.pdf_url) return;
+    document.getElementById('reportLink').href = rep.pdf_url;
+    document.getElementById('reportDate').textContent =
+      'তারিখ: ' + (rep.report_date||'') + ' · স্কোর: ' + (rep.meal_score ?? '—') + '/100';
+    document.getElementById('reportCard').style.display = 'block';
+  } catch (e) {}
 }
 
 async function fetchOrders() {
