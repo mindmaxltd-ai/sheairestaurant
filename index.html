@@ -11,25 +11,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* palette — logo-derived: forest green, gold, warm cream, sage, lotus pink */
-  --forest:#1B3A2F;
-  --forest2:#23493B;
-  --sage:#2D5A3D;
-  --gold:#C9A961;
-  --gold2:#B8954A;
-  --gold-light:#E3CE9B;
-  --cream:#F7F3E9;
-  --cream2:#EFE8D6;
-  --paper:#FBF8F0;
-  --lotus:#D4849A;
-  --lotus2:#C26B84;
-  --ink:#1F2A22;
-  --ink2:#4A5750;
-  --ink3:#7A857E;
-  --line:rgba(27,58,47,.12);
-  --line2:rgba(201,169,97,.35);
-  --shadow:0 20px 60px rgba(27,58,47,.12);
-  --shadow-sm:0 8px 28px rgba(27,58,47,.09);
+  /* palette — vivid orange + pink + green over warm cream */
+  --forest:#1B5E20;
+  --forest2:#246B2A;
+  --sage:#388E3C;
+  --green-vivid:#43A047;
+  --orange:#FF6F3C;
+  --orange2:#F4511E;
+  --gold:#FFA726;
+  --gold2:#FB8C00;
+  --gold-light:#FFD180;
+  --cream:#FFF8F0;
+  --cream2:#FFEFE0;
+  --paper:#FFFCF7;
+  --lotus:#EC407A;
+  --lotus2:#D81B60;
+  --pink-soft:#FCE4EC;
+  --ink:#2E2A26;
+  --ink2:#5A524A;
+  --ink3:#8A817A;
+  --line:rgba(27,94,32,.12);
+  --line2:rgba(255,167,38,.4);
+  --shadow:0 20px 60px rgba(216,27,96,.12);
+  --shadow-sm:0 8px 28px rgba(255,111,60,.12);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -158,6 +162,17 @@ nav.scrolled{padding:.5rem 2rem;box-shadow:0 4px 24px rgba(27,58,47,.08)}
   font-size:1.4rem;animation:bob 2s ease-in-out infinite;z-index:2}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
 
+/* ══════════ BIG FOOD SHOWCASE ══════════ */
+.showcase{position:relative;z-index:2}
+.showcase-img{position:relative;height:clamp(360px,55vh,560px);overflow:hidden}
+.showcase-img img{width:100%;height:100%;object-fit:cover;display:block}
+.showcase-overlay{position:absolute;inset:0;display:flex;align-items:center;
+  background:linear-gradient(100deg,rgba(27,94,32,.85) 0%,rgba(216,27,96,.4) 55%,rgba(255,111,60,.15) 100%)}
+.showcase-text{max-width:560px;padding:0 clamp(1.5rem,6vw,5rem);color:var(--cream)}
+.showcase-text h2{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(2rem,5vw,3.4rem);
+  margin:.6rem 0 1rem;color:#fff;line-height:1.1;text-shadow:0 2px 20px rgba(0,0,0,.3)}
+.showcase-text p{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:rgba(255,255,255,.92);margin-bottom:1.6rem;line-height:1.5}
+
 /* ══════════ TICKER ══════════ */
 .ticker{overflow:hidden;background:var(--forest);padding:.7rem 0;position:relative;z-index:2}
 .ticker-track{display:flex;gap:3rem;white-space:nowrap;animation:scroll 30s linear infinite;width:max-content}
@@ -273,6 +288,25 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
 .foot-bottom{max-width:1180px;margin:0 auto;padding-top:2rem;border-top:1px solid rgba(201,169,97,.15);
   display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;font-size:.8rem;color:rgba(247,243,233,.5)}
 
+/* ROADMAP timeline */
+.roadmap{background:var(--forest);color:var(--cream)}
+.roadmap .eyebrow{color:var(--gold-light)}
+.roadmap .sec-head h2{color:var(--cream)}
+.roadmap .sec-head p{color:rgba(247,243,233,.7)}
+.timeline{display:grid;gap:1.1rem;max-width:820px;margin:0 auto}
+.tl-item{display:grid;grid-template-columns:80px 1fr auto;gap:1.3rem;align-items:center;
+  padding:1.2rem 1.6rem;background:rgba(247,243,233,.05);border:1px solid rgba(201,169,97,.2);
+  border-radius:16px;transition:all .35s}
+.tl-item:hover{background:rgba(247,243,233,.08);border-color:var(--gold);transform:translateX(5px)}
+.tl-item.goal{background:linear-gradient(135deg,rgba(201,169,97,.18),rgba(201,169,97,.06));border-color:var(--gold)}
+.tl-year{font-family:'Cinzel',serif;font-weight:700;font-size:1.2rem;color:var(--gold-light)}
+.tl-bar{height:8px;background:rgba(247,243,233,.1);border-radius:99px;overflow:hidden}
+.tl-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--lotus));border-radius:99px;
+  animation:grow 1.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{width:0!important}}
+.tl-goal{font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--cream);text-align:right;white-space:nowrap}
+.tl-note{grid-column:2/4;font-size:.8rem;color:rgba(247,243,233,.55);margin-top:-.5rem}
+
 /* reveal on scroll */
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s}
 .reveal.in{opacity:1;transform:none}
@@ -312,13 +346,23 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
   </a>
   <button class="nav-toggle" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
   <div class="nav-links" id="navlinks">
-    <a href="menu.html" target="_blank" class="nb">🍱 মেনু</a>
-    <a href="register.html" target="_blank" class="nb">📝 নিবন্ধন</a>
-    <a href="login.html" target="_blank" class="nb">🔐 লগইন</a>
-    <a href="dashboard.html" target="_blank" class="nb nb-staff">📊 ড্যাশবোর্ড</a>
-    <a href="payment.html" target="_blank" class="nb nb-staff">💳 পেমেন্ট</a>
-    <a href="kitchen.html" target="_blank" class="nb nb-staff">👩‍🍳 কিচেন</a>
-    <a href="admin.html" target="_blank" class="nb nb-gold">⚙️ অ্যাডমিন</a>
+    <a href="#what" class="nb">দর্শন</a>
+    <a href="#menus" class="nb">মেনু</a>
+    <a href="#roadmap" class="nb">লক্ষ্য</a>
+    <a href="menu.html" target="_blank" class="nb">🍱 মেনু দেখুন</a>
+    <!-- public — সবসময় -->
+    <a href="register.html" target="_blank" class="nb public-only">📝 নিবন্ধন</a>
+    <a href="login.html" target="_blank" class="nb public-only">🔐 লগইন</a>
+    <!-- customer — login পরে -->
+    <a href="dashboard.html" target="_blank" class="nb nb-staff customer-only" style="display:none">📊 ড্যাশবোর্ড</a>
+    <a href="order.html" target="_blank" class="nb nb-staff customer-only" style="display:none">🛒 অর্ডার</a>
+    <a href="metrics.html" target="_blank" class="nb nb-staff customer-only" style="display:none">📈 মেট্রিক</a>
+    <a href="receipt.html" target="_blank" class="nb nb-staff customer-only" style="display:none">🧾 রসিদ</a>
+    <a href="profile.html" target="_blank" class="nb nb-staff customer-only" style="display:none">👤 প্রোফাইল</a>
+    <!-- admin/staff — login পরে -->
+    <a href="dashboard.html" target="_blank" class="nb nb-staff admin-only" style="display:none">📊 ড্যাশবোর্ড</a>
+    <a href="kitchen.html" target="_blank" class="nb nb-staff admin-only" style="display:none">👩‍🍳 কিচেন</a>
+    <a href="admin.html" target="_blank" class="nb nb-gold admin-only" style="display:none">⚙️ অ্যাডমিন</a>
   </div>
 </nav>
 
@@ -341,19 +385,24 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
     <a href="register.html" target="_blank" class="cta cta-gold">🌸 এখনই নিবন্ধন করুন</a>
     <a href="menu.html" target="_blank" class="cta cta-outline">🍱 মেনু দেখুন</a>
     <a href="login.html" target="_blank" class="cta cta-outline">🔐 লগইন</a>
-    <a href="dashboard.html" target="_blank" class="cta cta-outline">📊 ড্যাশবোর্ড</a>
-  </div>
-  <div class="hero-cta" style="margin-top:.9rem">
-    <a href="order.html" target="_blank" class="cta-mini">🛒 অর্ডার</a>
-    <a href="track.html" target="_blank" class="cta-mini">📦 ট্র্যাক</a>
-    <a href="metrics.html" target="_blank" class="cta-mini">📈 স্বাস্থ্য মেট্রিক</a>
-    <a href="payment.html" target="_blank" class="cta-mini">💳 পেমেন্ট</a>
-    <a href="profile.html" target="_blank" class="cta-mini">👤 প্রোফাইল</a>
-    <a href="receipt.html" target="_blank" class="cta-mini">🧾 রসিদ</a>
-    <a href="why-sar.html" target="_blank" class="cta-mini">❓ কেন SAR</a>
   </div>
   <div class="scroll-hint">⌄</div>
 </header>
+
+<!-- ══════════ BIG FOOD SHOWCASE ══════════ -->
+<section class="showcase">
+  <div class="showcase-img">
+    <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1600&q=80" alt="রঙিন স্বাস্থ্যকর খাবার" loading="lazy">
+    <div class="showcase-overlay">
+      <div class="showcase-text">
+        <span class="eyebrow" style="color:var(--gold-light)">প্রতিটি পাত একটি প্রতিশ্রুতি</span>
+        <h2 class="display">রঙিন · বিশুদ্ধ · নিরাময়ী</h2>
+        <p>প্রকৃতির রঙে সাজানো প্রতিটি খাবার — আপনার শরীরের জন্য একান্ত, বিজ্ঞানে গড়া।</p>
+        <a href="menu.html" target="_blank" class="cta cta-gold">🍱 আমাদের মেনু দেখুন</a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ══════════ TICKER ══════════ -->
 <div class="ticker">
@@ -386,7 +435,7 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
         <h3>সার — জীবনের মূল নির্যাস</h3>
         <div class="lead">বাংলায় "সার" মানে নির্যাস, সারমর্ম — যা কিছুর প্রাণ।</div>
         <p>SAR প্রতিটি নারীর শরীর, মন আর জীবনের গল্প পড়ে। ২৫০টি স্বাস্থ্য-মেট্রিক, দৈনিক মন ও শরীরের অবস্থা, এমনকি মাসিক চক্রের ধাপ — সব বিবেচনা করে AI ও আবেগীয় বুদ্ধিমত্তা প্রতিদিন তৈরি করে একান্ত ব্যক্তিগত থেরাপিউটিক মেনু।</p>
-        <p>তেল নেই, চিনি নেই, লবণ নেই (শুধু পিংক সল্ট), কৃত্রিম রং নেই, দুধ নেই, আগুন নেই — শুধু বাষ্প, বেক আর অর্গানিক আয়ুর্বেদিক উপাদান।</p>
+        <p>তেল নেই, চিনি নেই, লবণ নেই (শুধু পিংক সল্ট), কৃত্রিম রং নেই — শুধু অর্গানিক আয়ুর্বেদিক উপাদান, প্রকৃতির বিশুদ্ধ পুষ্টি।</p>
         <div class="philo-quote">"নারীর শরীর প্রকৃতির সবচেয়ে জটিল কবিতা — তাকে বুঝতে হলে ভালোবাসা ও বিজ্ঞান, দুটোই লাগে।"</div>
       </div>
       <div class="philo-visual reveal">
@@ -414,7 +463,7 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
     <div class="princ-grid">
       <div class="princ reveal"><div class="princ-ic">🌿</div><h4>১০০% অর্গানিক</h4><p>কোনো কীটনাশক নয়, কোনো প্রক্রিয়াজাত নয় — শুধু প্রকৃতির বিশুদ্ধ উপহার।</p></div>
       <div class="princ reveal"><div class="princ-ic">💧</div><h4>তেল-চিনি-লবণ মুক্ত</h4><p>শূন্য তেল, শূন্য চিনি, শুধু পিংক সল্ট — হৃদয় ও বিপাকের জন্য নিরাপদ।</p></div>
-      <div class="princ reveal"><div class="princ-ic">🔥</div><h4>আগুন-মুক্ত রান্না</h4><p>বাষ্প, বেক ও এয়ার-ফ্রাই — পুষ্টি অক্ষত, ক্ষতিকর যৌগ অনুপস্থিত।</p></div>
+      <div class="princ reveal"><div class="princ-ic">🌿</div><h4>আয়ুর্বেদিক প্রজ্ঞা</h4><p>হাজার বছরের নিরাময় জ্ঞান — প্রতিটি উপাদান শরীরের ভারসাম্যের জন্য বাছাই।</p></div>
       <div class="princ reveal"><div class="princ-ic">👩</div><h4>নারীদের জন্য, নারীদের দ্বারা</h4><p>নারী-পরিচালিত, নারী-চালিত, শুধু নারীদের — একটি নিরাপদ বিশ্বস্ত পরিসর।</p></div>
     </div>
   </div>
@@ -467,13 +516,31 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
     </div>
     <div class="stat-grid">
       <div class="stat reveal"><div class="num">২৫০+</div><div class="lbl">স্বাস্থ্য মেট্রিক বিশ্লেষণ</div></div>
-      <div class="stat reveal"><div class="num">১০৫</div><div class="lbl">থেরাপিউটিক খাবার</div></div>
-      <div class="stat reveal"><div class="num">৬</div><div class="lbl">রোগ-বিভাগ বিশেষায়িত</div></div>
-      <div class="stat reveal"><div class="num">১ম</div><div class="lbl">বিশ্বে এমন প্ল্যাটফর্ম</div></div>
+      <div class="stat reveal"><div class="num">১০৫</div><div class="lbl">থেরাপিউটিক হিলিং রেসিপি</div></div>
+      <div class="stat reveal"><div class="num">১,২৪৭</div><div class="lbl">নিবন্ধিত নারী</div></div>
+      <div class="stat reveal"><div class="num">২৪/৭</div><div class="lbl">AI সহায়তা</div></div>
     </div>
     <div class="impact-quote reveal">
       <div class="q">"আমরা শুধু খাবার পরিবেশন করি না — আমরা প্রতিটি নারীর শরীরের ভাষা শুনি, আর প্রকৃতির নিরাময় দিয়ে উত্তর দিই।"</div>
       <div class="a">— She Ai Revolution · SAR সার</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ROADMAP — 2030 vision ══════════ -->
+<section class="sec roadmap" id="roadmap">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">আমাদের লক্ষ্য</span>
+      <h2>২০৩০-এর মধ্যে<br>১০ লাখ নারী</h2>
+      <p>প্রতিটি বছর — আরও বেশি নারীর জীবনে প্রকৃতির নিরাময়।</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-item reveal"><div class="tl-year">২০২৬</div><div class="tl-bar"><span style="width:8%"></span></div><div class="tl-goal">১,০০০ নারী</div><div class="tl-note">যাত্রা শুরু · বাংলাদেশ</div></div>
+      <div class="tl-item reveal"><div class="tl-year">২০২৭</div><div class="tl-bar"><span style="width:22%"></span></div><div class="tl-goal">৫০,০০০ নারী</div><div class="tl-note">সম্প্রসারণ ও বিশ্বাস</div></div>
+      <div class="tl-item reveal"><div class="tl-year">২০২৮</div><div class="tl-bar"><span style="width:45%"></span></div><div class="tl-goal">২ লাখ নারী</div><div class="tl-note">জাতীয় উপস্থিতি</div></div>
+      <div class="tl-item reveal"><div class="tl-year">২০২৯</div><div class="tl-bar"><span style="width:70%"></span></div><div class="tl-goal">৫ লাখ নারী</div><div class="tl-note">আঞ্চলিক নেতৃত্ব</div></div>
+      <div class="tl-item reveal goal"><div class="tl-year">২০৩০</div><div class="tl-bar"><span style="width:100%"></span></div><div class="tl-goal">১০ লাখ নারী</div><div class="tl-note">🎯 মূল লক্ষ্য অর্জন</div></div>
     </div>
   </div>
 </section>
@@ -506,6 +573,7 @@ footer{background:var(--forest);color:rgba(247,243,233,.7);padding:4rem 1.8rem 2
       <a href="#what">আমাদের দর্শন</a>
       <a href="#why">কেন SAR</a>
       <a href="#how">কীভাবে কাজ করে</a>
+      <a href="#roadmap">২০৩০ লক্ষ্য</a>
       <a href="menu.html">মেনু</a>
       <a href="why-sar.html">কেন SAR বিস্তারিত</a>
     </div>
@@ -548,6 +616,21 @@ document.querySelectorAll('#navlinks a').forEach(a=>a.addEventListener('click',(
 // scroll reveal
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ══ ROLE-BASED NAV — login হলে button দেখায় ══
+function setNavRole(){
+  const sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
+  const isAdmin=sessionStorage.getItem('sar_admin')==='true';
+  const show=(sel)=>document.querySelectorAll(sel).forEach(el=>el.style.display='inline-flex');
+  const hide=(sel)=>document.querySelectorAll(sel).forEach(el=>el.style.display='none');
+  if(isAdmin){
+    hide('.public-only'); hide('.customer-only'); show('.admin-only');
+  } else if(sc&&sc.id){
+    hide('.public-only'); hide('.admin-only'); show('.customer-only');
+  }
+  // public হলে — কিছু করতে হবে না (public-only এমনিতেই দৃশ্যমান, বাকিরা display:none)
+}
+setNavRole();
 </script>
 </body>
 </html>
