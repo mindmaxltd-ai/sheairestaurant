@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAR সার — অফলাইন</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Hind Siliguri',sans-serif;background:linear-gradient(135deg,#FFFBF5,#FFF4E6);
+    color:#2A241F;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;text-align:center}
+  .box{max-width:420px}
+  .icon{font-size:4rem;margin-bottom:1rem}
+  h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:#1B7A3D;margin-bottom:.6rem}
+  p{color:#5A524A;margin-bottom:1.8rem;line-height:1.7}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2rem;border-radius:50px;
+    background:linear-gradient(135deg,#F4631E,#E0218A);color:#fff;text-decoration:none;font-weight:700;
+    border:none;cursor:pointer;font-family:inherit;font-size:.95rem}
+  .brand{font-family:'Playfair Display',serif;font-weight:700;color:#1B7A3D;font-size:1.1rem;margin-top:2rem}
+  .brand span{color:#E0218A}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="icon">🌸</div>
+    <h1>আপনি এখন অফলাইন</h1>
+    <p>ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না। সংযোগ ফিরে এলে আবার চেষ্টা করুন — SAR সার আপনার অপেক্ষায়।</p>
+    <button class="btn" onclick="location.reload()">↻ আবার চেষ্টা করুন</button>
+    <div class="brand">SAR <span>·</span> সার</div>
+  </div>
+</body>
+</html>
