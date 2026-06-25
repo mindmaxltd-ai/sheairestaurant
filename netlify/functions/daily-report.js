@@ -34,6 +34,9 @@ const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 const CRON_SECRET  = process.env.CRON_SECRET || '';
 const PUBLIC_SITE  = process.env.PUBLIC_SITE || 'https://sheairestaurant.com';
 
+// Claude AI key (doctor.html এর মতো আসল AI বিশ্লেষণের জন্য)
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_KEY || '';
+
 const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
 const TWILIO_FROM  = process.env.TWILIO_FROM || '';
@@ -91,78 +94,95 @@ exports.handler = async (event) => {
       const name = cust.full_name || 'আপা';
 
       try {
-        // ── 2. বিশ্লেষণ চালানো ও সেভ করা ──
+        // ── 2. আসল Claude AI বিশ্লেষণ (২৫০ metrics + prescription + order) ──
         const cat = pickCat(m);
-        const a   = localScore(m, cat);
+        const ai  = await aiAnalyze(m, cat, cust, cid);   // Claude AI
+        const a   = localScore(m, cat);                    // fallback সংখ্যা
+
+        // AI সফল হলে AI data, নাহলে localScore
+        const healthScore = (ai && ai.health_score) ? ai.health_score : a.score;
+        const dailyKcal   = (ai && ai.daily_kcal)   ? ai.daily_kcal   : a.target;
+        const dailyProt   = (ai && ai.daily_protein)? ai.daily_protein: a.protein;
+        const focusV      = (ai && ai.focus)        ? ai.focus        : a.focus;
+
         const analysisRow = {
           customer_id:   cid,
-          analysis_type: 'meal_score',
+          analysis_date: today,
+          analysis_type: 'daily_6am',
           category:      cat,
+          health_score:  healthScore,                      // dashboard এটাই পড়ে
           meal_score:    a.score,
-          daily_kcal:    a.target,
-          daily_protein: a.protein,
-          focus:         a.focus,
-          result_json:   { ...a, score_date: today, source: 'daily 6AM' },
+          daily_kcal:    dailyKcal,
+          daily_protein: dailyProt,
+          focus:         focusV,
+          // AI text fields (থাকলে)
+          health_summary_bn:      ai ? ai.health_summary_bn      : null,
+          nutrition_advice_bn:    ai ? ai.nutrition_advice_bn    : null,
+          general_suggestions_bn: ai ? ai.general_suggestions_bn : null,
+          home_remedies_bn:       ai ? ai.home_remedies_bn       : null,
+          ayurvedic_bn:           ai ? ai.ayurvedic_bn           : null,
+          motivational_message_bn:ai ? ai.motivational_message_bn: null,
+          problems_json:          ai ? ai.problems_json          : null,
+          daily_menu_recommendation_json: ai ? ai.daily_menu_recommendation_json : null,
+          result_json:   { ...(ai||a), score_date: today, source: 'daily 6AM AI' },
         };
+        // analysis_date+customer_id unique — merge-duplicates দিয়ে upsert
         await fetch(`${SUPABASE_URL}/rest/v1/ai_analysis`, {
-          method: 'POST', headers: { ...SB, Prefer: 'return=minimal' },
+          method: 'POST', headers: { ...SB, Prefer: 'resolution=merge-duplicates,return=minimal' },
           body: JSON.stringify(analysisRow),
         });
         summary.analyzed++;
 
-        // ── 3. reports টেবিলে সেভ (dashboard এ দেখানোর জন্য) ──
-        try {
-          const rRes = await fetch(`${SUPABASE_URL}/rest/v1/reports`, {
-            method: 'POST',
-            headers: { ...SB, Prefer: 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({
-              customer_id: cid, report_date: today, pdf_url: null,
-              meal_score: a.score, category: cat,
-            }),
-          });
-          if (rRes.ok) summary.reports++;
-          else summary.errors.push(`report save (${name}): ${rRes.status} ${await rRes.text().catch(()=>'')}`);
-        } catch (e) { summary.errors.push(`report save (${name}): ${e.message}`); }
+        // ── 3. reports টেবিলে সেভ (dashboard report card-এর জন্য) — HTML report link ──
+        const reportUrl = `${PUBLIC_SITE}/report.html?customer_id=${cid}`;
+        await fetch(`${SUPABASE_URL}/rest/v1/reports`, {
+          method: 'POST',
+          headers: { ...SB, Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify({
+            customer_id: cid,
+            report_date: today,
+            pdf_url:     reportUrl,        // HTML report পেজ link (PDF না)
+            meal_score:  healthScore,
+            category:    cat,
+          }),
+        });
 
-        // ── 4. SMS + ইমেইল — SAR-এর নিজের কাজ-করা function দিয়ে ──
-        const mealUrl = `${PUBLIC_SITE}/meal-score.html?customer_id=${cid}`;
+        // ── 4. SMS/WhatsApp + ইমেইল পাঠানো (report link সহ) ──
+        const mealUrl = reportUrl;
         const shortMsg =
           `প্রিয় ${name}, আজকের আপনার SAR স্বাস্থ্য রিপোর্ট তৈরি!\n`
-          + `খাবার স্কোর: ${a.score}/100\n`
-          + `মেনু দেখুন: ${mealUrl}`;
+          + `স্বাস্থ্য স্কোর: ${healthScore}/100\n`
+          + `রিপোর্ট দেখুন: ${mealUrl}`;
 
-        // SMS — send-sms function (OTP-তে কাজ করছে; param: to, msg)
+        // SAR-এর নিজের কাজ-করা send-sms function
         if (cust.phone) {
           try {
             const sr = await fetch(`${PUBLIC_SITE}/.netlify/functions/send-sms`, {
-              method:'POST', headers:{'Content-Type':'application/json'},
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ to: cust.phone, msg: shortMsg }),
             });
             const sd = await sr.json().catch(()=>({}));
             if (sd && sd.sent) summary.sms++;
-            else summary.errors.push(`SMS (${name}): ${(sd&&sd.error)||sr.status}`);
-          } catch (e) { summary.errors.push(`SMS (${name}): ${e.message}`); }
+            else summary.errors.push(`SMS fail: ${name}`);
+          } catch(e){ summary.errors.push(`SMS err: ${name}`); }
         }
-
-        // Email — send-email function (param: to, subject, html)
+        // SAR-এর নিজের কাজ-করা send-email function
         if (cust.email) {
           try {
-            const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
+            const emailHtml = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:1rem">
               <h2 style="color:#E91E8C">🌸 SAR — আজকের স্বাস্থ্য রিপোর্ট</h2>
               <p>প্রিয় ${name},</p>
-              <p>আপনার আজকের খাবার স্কোর: <strong>${a.score}/100</strong></p>
-              <p><a href="${mealUrl}" style="display:inline-block;background:#E91E8C;color:#fff;
-                padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">আজকের মেনু দেখুন</a></p>
-              <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only<br>
-              এটি চিকিৎসা নয়; ডাক্তারের পরামর্শ নিন।</p></div>`;
+              <p>আজকের আপনার স্বাস্থ্য স্কোর: <b>${healthScore}/100</b></p>
+              <p><a href="${mealUrl}" target="_blank" style="display:inline-block;background:#059669;color:#fff;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none">📄 পূর্ণ রিপোর্ট দেখুন</a></p>
+              <p style="color:#999;font-size:.75rem;margin-top:1.5rem">SAR — women-led · women-run · women-only</p></div>`;
             const er = await fetch(`${PUBLIC_SITE}/.netlify/functions/send-email`, {
-              method:'POST', headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({ to: cust.email, subject:'SAR — আজকের স্বাস্থ্য রিপোর্ট', html }),
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ to: cust.email, subject: 'SAR — আজকের স্বাস্থ্য রিপোর্ট', html: emailHtml }),
             });
             const ed = await er.json().catch(()=>({}));
             if (ed && (ed.sent || ed.id)) summary.email++;
-            else summary.errors.push(`Email (${name}): ${(ed&&ed.error)||er.status}`);
-          } catch (e) { summary.errors.push(`Email (${name}): ${e.message}`); }
+            else summary.errors.push(`Email fail: ${name}`);
+          } catch(e){ summary.errors.push(`Email err: ${name}`); }
         }
 
       } catch (perErr) {
@@ -265,6 +285,97 @@ function buildReportHTML({ name, cid, today, cat, a, m }) {
         এই রিপোর্ট স্বয়ংক্রিয়ভাবে তৈরি — She AI Revolution · নারীর জন্য, নারীর দ্বারা
       </p>
     </body></html>`;
+}
+
+// ── আসল Claude AI বিশ্লেষণ (২৫০ metrics + আগের prescription + food order) ──
+async function aiAnalyze(m, cat, cust, cid) {
+  if (!ANTHROPIC_KEY) return null;   // key না থাকলে localScore fallback
+
+  // সব metrics (যেগুলোর value আছে)
+  const skip = ['id','customer_id','created_at','updated_at'];
+  const metricsStr = Object.entries(m)
+    .filter(([k,v]) => !skip.includes(k) && v!=null && v!=='' && String(v).trim()!=='')
+    .map(([k,v]) => `${k}: ${v}`).join('\n') || 'নেই';
+
+  // আগের ২টা prescription
+  let prevRx = 'নেই';
+  try {
+    const pr = await fetch(`${SUPABASE_URL}/rest/v1/sar_notes?customer_id=eq.${cid}&note_type=eq.prescription&order=created_at.desc&limit=2&select=note_text_bn,created_at`, { headers: SB });
+    const arr = pr.ok ? await pr.json() : [];
+    if (arr.length) prevRx = arr.map((p,i)=>`[${i+1}] ${(p.note_text_bn||'').slice(0,400)}`).join('\n\n');
+  } catch(e){}
+
+  // আগের food order (পছন্দ বোঝাতে)
+  let prevOrders = 'নেই';
+  try {
+    const or = await fetch(`${SUPABASE_URL}/rest/v1/orders?customer_id=eq.${cid}&order=created_at.desc&limit=3&select=items_json,created_at`, { headers: SB });
+    const arr = or.ok ? await or.json() : [];
+    if (arr.length) prevOrders = arr.map(o=> JSON.stringify(o.items_json||'').slice(0,200)).join('; ');
+  } catch(e){}
+
+  // আগের ২টা AI report (ধারাবাহিকতা রাখতে)
+  let prevReports = 'নেই';
+  try {
+    const rr = await fetch(`${SUPABASE_URL}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=analysis_date.desc&limit=2&select=analysis_date,health_score,health_summary_bn,focus`, { headers: SB });
+    const arr = rr.ok ? await rr.json() : [];
+    if (arr.length) prevReports = arr.map(p=>`[${p.analysis_date}] স্কোর ${p.health_score||'—'}, ফোকাস: ${p.focus||''} — ${(p.health_summary_bn||'').slice(0,200)}`).join('\n');
+  } catch(e){}
+
+  const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল পুষ্টি AI। নিচের নারী গ্রাহকের সম্পূর্ণ তথ্য বিশ্লেষণ করে দৈনিক স্বাস্থ্য রিপোর্ট দাও।
+
+নাম: ${cust.full_name||'গ্রাহক'}
+বিভাগ: ${cat}
+
+স্বাস্থ্য মেট্রিক্স (২৫০-এর মধ্যে উপলব্ধ সব + আজকের দৈনিক আপডেট):
+${metricsStr}
+
+আগের প্রেসক্রিপশন (সর্বশেষ ২টি):
+${prevRx}
+
+আগের খাবার অর্ডার (পছন্দ বোঝাতে):
+${prevOrders}
+
+আগের AI রিপোর্ট (সর্বশেষ ২টি — ধারাবাহিকতা ও অগ্রগতি বিবেচনা করো):
+${prevReports}
+
+অনুরোধ: সব তথ্য বিবেচনা করে নিচের JSON structure-এ রিপোর্ট দাও। প্রতিটি অংশ সংক্ষিপ্ত। সম্পূর্ণ valid JSON, কাটা যাবে না। শুধু JSON object, markdown নয়:
+{
+  "health_score": <১-১০০ সংখ্যা>,
+  "health_summary_bn": "সার্বিক স্বাস্থ্য মূল্যায়ন (২-৩ বাক্য বাংলায়)",
+  "problems_json": ["সমস্যা ১", "সমস্যা ২"],
+  "nutrition_advice_bn": "পুষ্টি পরামর্শ (অয়েল-ফ্রি, চিনি-ফ্রি, পিংক সল্ট)",
+  "general_suggestions_bn": "সাধারণ পরামর্শ",
+  "home_remedies_bn": "ঘরোয়া প্রতিকার",
+  "ayurvedic_bn": "আয়ুর্বেদিক পরামর্শ",
+  "motivational_message_bn": "অনুপ্রেরণামূলক বার্তা",
+  "daily_kcal": <সংখ্যা>,
+  "daily_protein": <সংখ্যা>,
+  "focus": "আজকের মূল ফোকাস",
+  "daily_menu_recommendation_json": ["সকাল: ...", "দুপুর: ...", "রাত: ..."]
+}`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    let txt = (d.content && d.content[0] && d.content[0].text) || '';
+    txt = txt.replace(/```json|```/g, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a>-1 && b>a) txt = txt.slice(a, b+1);
+    return JSON.parse(txt);
+  } catch(e) { return null; }
 }
 
 // ── ক্যাটাগরি বাছাই (sar.js এর মূল লজিকের সরল রূপ) ──
