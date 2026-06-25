@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAR — দৈনিক স্বাস্থ্য রিপোর্ট</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Hind Siliguri',Arial,sans-serif;background:#f4eef2;color:#1a1a1a;
+    line-height:1.6;padding:1rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sheet{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,.12)}
+  .pad{padding:28px 32px}
+  .rhead{text-align:center;border-bottom:2px solid #059669;padding-bottom:12px;margin-bottom:16px}
+  .rhead .brand{font-size:30px;font-weight:800;color:#C2185B;letter-spacing:2px}
+  .rhead .sub{font-size:15px;font-weight:700;color:#333;margin-top:2px}
+  .rhead .tag{font-size:10px;color:#999;margin-top:3px}
+  .rhead .ph{font-size:11px;color:#888;margin-top:4px}
+  .rhead .title{font-size:16px;font-weight:700;color:#059669;margin-top:12px;
+    border-top:1px dashed #ddd;padding-top:10px}
+  .scorebox{text-align:center;margin:16px 0;padding:18px;background:#f0fdf4;border-radius:12px;
+    border:1px solid rgba(5,150,105,.2)}
+  .scorebox .num{font-size:42px;font-weight:800;color:#059669;line-height:1}
+  .scorebox .lbl{font-size:13px;color:#666;margin-top:4px}
+  .meta{width:100%;font-size:13px;border-collapse:collapse;margin-bottom:16px}
+  .meta td{padding:4px 0}
+  .meta .k{color:#666}.meta .v{text-align:right;font-weight:600}
+  .meta .v.mono{font-family:monospace}
+  .dlabel{background:#059669;color:#fff;font-size:13px;font-weight:700;
+    padding:6px 12px;border-radius:4px;margin:14px 0 8px}
+  .sec{padding:4px 6px 12px;font-size:13.5px;white-space:pre-wrap}
+  .info{width:100%;border-collapse:collapse;font-size:12.5px}
+  .info td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+  .info .k{font-weight:600;color:#444;width:34%}
+  .menu{list-style:none;padding:0}
+  .menu li{padding:6px 10px;border-bottom:1px solid #f0f0f0;font-size:13px}
+  .disc{text-align:center;color:#aaa;font-size:10px;margin-top:14px;
+    border-top:1px dashed #ddd;padding-top:8px}
+  .printbtn{display:block;max-width:800px;margin:0 auto 1rem;background:#059669;color:#fff;
+    border:none;border-radius:10px;padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;
+    font-family:inherit;text-align:center}
+  .loading,.error{text-align:center;padding:3rem 1rem;color:#888;max-width:800px;margin:0 auto}
+  @media print{ body{background:#fff;padding:0} .sheet{box-shadow:none;border-radius:0;max-width:100%} .printbtn{display:none} }
+</style>
+</head>
+<body>
+
+<button class="printbtn" onclick="window.print()" id="printBtn" style="display:none">🖨️ প্রিন্ট / সেভ করুন (PDF)</button>
+<div class="loading" id="loading">⏳ রিপোর্ট লোড হচ্ছে...</div>
+
+<div class="sheet" id="sheet" style="display:none">
+  <div class="pad" id="sheetBody"></div>
+</div>
+
+<script>
+const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
+const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
+const H = {apikey:KEY, Authorization:'Bearer '+KEY};
+
+const esc = (s)=> String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const jstr = (v)=>{
+  if(!v) return '';
+  if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return v; } }
+  if(Array.isArray(v)) return v.map(x=> typeof x==='object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
+  if(typeof v === 'object') return Object.values(v).map(x=> typeof x==='object'?JSON.stringify(x):x).join(', ');
+  return String(v);
+};
+const arr = (v)=>{
+  if(!v) return [];
+  if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return [v]; } }
+  return Array.isArray(v) ? v : [v];
+};
+
+async function load(){
+  const cid = new URLSearchParams(location.search).get('customer_id');
+  if(!cid){ showError('গ্রাহক আইডি পাওয়া যায়নি।'); return; }
+  try{
+    // সর্বশেষ AI analysis
+    const r = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=analysis_date.desc&limit=1&select=*`, {headers:H});
+    const a = r.ok ? await r.json() : [];
+    if(!a.length){ showError('আজকের রিপোর্ট এখনো তৈরি হয়নি।'); return; }
+    const ai = a[0];
+
+    // customer
+    let c = {};
+    const cr = await fetch(`${SUPA}/rest/v1/customers?id=eq.${cid}&select=full_name,phone,bmi,sar_category`, {headers:H});
+    const ca = cr.ok ? await cr.json() : [];
+    if(ca.length) c = ca[0];
+
+    render(ai, c);
+  }catch(e){ showError('লোড করা যায়নি — আবার চেষ্টা করুন।'); }
+}
+
+function render(ai, c){
+  const dt = ai.analysis_date ? new Date(ai.analysis_date) : new Date();
+  const score = ai.health_score || ai.meal_score || 0;
+
+  // text sections (যেগুলো আছে)
+  const sections = [
+    ['স্বাস্থ্য সারসংক্ষেপ / Health Summary', ai.health_summary_bn || ai.analysis_bn],
+    ['পুষ্টি পরামর্শ / Nutrition Advice', ai.nutrition_advice_bn],
+    ['সাধারণ পরামর্শ / General Suggestions', ai.general_suggestions_bn],
+    ['ঘরোয়া প্রতিকার / Home Remedies', ai.home_remedies_bn],
+    ['আয়ুর্বেদিক / Ayurvedic', ai.ayurvedic_bn],
+    ['অনুপ্রেরণা / Motivation', ai.motivational_message_bn],
+  ].filter(s=> s[1] && String(s[1]).trim());
+
+  const secHtml = sections.map(s=>
+    `<div class="dlabel">${s[0]}</div><div class="sec">${esc(s[1])}</div>`).join('');
+
+  // problems
+  const problems = arr(ai.problems_json).filter(Boolean);
+  const probHtml = problems.length
+    ? `<div class="dlabel">সমস্যা / Problems</div><div class="sec">${problems.map(p=>'• '+esc(jstr(p))).join('<br>')}</div>` : '';
+
+  // daily menu
+  const menu = arr(ai.daily_menu_recommendation_json).filter(Boolean);
+  const menuHtml = menu.length
+    ? `<div class="dlabel">আজকের মেনু / Daily Menu</div><ul class="menu">${menu.map(x=>`<li>${esc(jstr(x))}</li>`).join('')}</ul>` : '';
+
+  // key numbers table
+  const rows = [
+    ['Disease Category', ai.category || c.sar_category || ''],
+    ['BMI', c.bmi || ''],
+    ['Daily Calorie', ai.daily_kcal ? ai.daily_kcal+' kcal' : ''],
+    ['Daily Protein', ai.daily_protein ? ai.daily_protein+' g' : ''],
+    ['Meal Score', ai.meal_score!=null ? ai.meal_score : ''],
+    ['Focus', ai.focus || ''],
+    ['Analysis Date', ai.analysis_date || ''],
+  ].filter(x=> x[1]!=='' && x[1]!=null);
+  const infoRows = rows.map(x=>`<tr><td class="k">${x[0]}</td><td>${esc(x[1])}</td></tr>`).join('');
+
+  document.getElementById('sheetBody').innerHTML = `
+    <div class="rhead">
+      <div class="brand">SAR</div>
+      <div class="sub">She AI Revolution</div>
+      <div class="tag">AI + EI + Blockchain · women-led · women-run · women-only wellness platform</div>
+      <div class="ph">📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com</div>
+      <div class="title">📊 দৈনিক স্বাস্থ্য রিপোর্ট / Daily AI Health Report</div>
+    </div>
+    <table class="meta">
+      <tr><td class="k">গ্রাহক / Patient</td><td class="v">${esc(c.full_name||'—')}</td></tr>
+      <tr><td class="k">ফোন / Phone</td><td class="v mono">${esc(c.phone||'—')}</td></tr>
+      <tr><td class="k">তারিখ / Date</td><td class="v">${dt.toLocaleDateString('en-GB')}</td></tr>
+    </table>
+    <div class="scorebox">
+      <div class="num">${score}<span style="font-size:20px;color:#999">/100</span></div>
+      <div class="lbl">আজকের স্বাস্থ্য স্কোর / Health Score</div>
+    </div>
+    ${secHtml}
+    ${probHtml}
+    ${menuHtml}
+    <div class="dlabel">মূল তথ্য / Key Information</div>
+    <table class="info">${infoRows}</table>
+    <div class="disc">এটি একটি AI-জেনারেটেড স্বাস্থ্য রিপোর্ট। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।</div>
+  `;
+  document.getElementById('loading').style.display='none';
+  document.getElementById('sheet').style.display='block';
+  document.getElementById('printBtn').style.display='block';
+}
+
+function showError(m){
+  document.getElementById('loading').className='error';
+  document.getElementById('loading').textContent='⚠️ '+m;
+}
+
+load();
+</script>
+</body>
+</html>
