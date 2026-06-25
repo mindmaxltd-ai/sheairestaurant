@@ -610,7 +610,9 @@ async function fetchCustomerVitals(cid){
   }catch(e){return {};}
 }
 const _sc=JSON.parse(localStorage.getItem('sar_customer')||'{}');
-const CID=_sc.id||localStorage.getItem('sar_customer_id')||'demo';
+// URL-এ customer_id থাকলে সেটা priority (report.html থেকে আসা link-এর জন্য), নাহলে session
+const _urlCid=new URLSearchParams(location.search).get('customer_id');
+const CID=_urlCid||_sc.id||localStorage.getItem('sar_customer_id')||'demo';
 const CNAME=_sc.full_name||localStorage.getItem('sar_customer_name')||'আপা';
 
 const PRICE_PER_COURSE=90, VAT_RATE=0.05, MIX_RATE=0.25, MAX_COURSES=5;
@@ -933,7 +935,29 @@ async function runAnalysis(silent){
     }
   }catch(e){/* Supabase না পেলে নিচে local হিসাব */}
 
-  // ── সংরক্ষিত কিছু না পেলে — local deterministic হিসাব (AI ছাড়া) ──
+  // ── DB-তে না পেলে — URL hint (report.html থেকে আসা) ফলব্যাক হিসেবে ব্যবহার ──
+  if(!result){
+    const p=new URLSearchParams(location.search);
+    const hintCat=normalizeCat(p.get('cat'));
+    if(hintCat&&CAT_INFO[hintCat]) activeCat=hintCat;
+    const base=localEngine(activeCat);
+    const hScore=parseFloat(p.get('score'));
+    const hKcal=parseFloat(p.get('kcal'));
+    const hProt=parseFloat(p.get('protein'));
+    if(p.get('focus')||!isNaN(hScore)){
+      result=Object.assign({}, base, {
+        cat:activeCat,
+        score:!isNaN(hScore)?hScore:base.score,
+        target:!isNaN(hKcal)?hKcal:base.target,
+        protein:!isNaN(hProt)?hProt:base.protein,
+        focus:p.get('focus')||base.focus,
+        bmi:(metrics.bmi||'—'),
+        source:'আজকের রিপোর্ট অনুযায়ী',
+      });
+    }
+  }
+
+  // ── তাও কিছু না পেলে — local deterministic হিসাব (AI ছাড়া) ──
   if(!result) result=localEngine(activeCat);
 
   // AI যদি সংরক্ষিত titles/daily দিয়ে থাকে, সেগুলো ব্যবহার করি
