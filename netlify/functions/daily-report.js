@@ -85,10 +85,23 @@ exports.handler = async (event) => {
     const custMap = {};
     if (Array.isArray(custList)) custList.forEach(c => { custMap[c.id] = c; });
 
-    // PDF browser বাদ — সরাসরি analysis loop
+    // ── আজ যাদের report হয়ে গেছে তাদের বাদ দেওয়া (দিনে একবার) ──
+    const doneSet = new Set();
+    try {
+      const dr = await fetch(
+        `${SUPABASE_URL}/rest/v1/ai_analysis?analysis_date=eq.${today}&select=customer_id`,
+        { headers: SB });
+      const doneRows = dr.ok ? await dr.json() : [];
+      if (Array.isArray(doneRows)) doneRows.forEach(r => doneSet.add(r.customer_id));
+    } catch (e) { /* doneSet খালি থাকলে সবাইকে করবে */ }
 
-    // ── প্রত্যেক আপার জন্য লুপ ──
-    for (const m of people) {
+    // বাকি যাদের আজ এখনো হয়নি
+    const pending = people.filter(m => !doneSet.has(m.customer_id));
+    summary.pending_total = pending.length;
+    summary.skipped_done  = people.length - pending.length;
+
+    // ── একজন আপাকে process করার কাজ (আগের loop body হুবহু) ──
+    async function processOne(m) {
       const cid  = m.customer_id;
       const cust = custMap[cid] || {};
       const name = cust.full_name || 'আপা';
@@ -188,6 +201,20 @@ exports.handler = async (event) => {
       } catch (perErr) {
         summary.errors.push(`${name}: ${String(perErr.message || perErr)}`);
       }
+    }
+
+    // ── ব্যাচে parallel চালানো (timeout এড়াতে) ──
+    const BATCH    = 8;        // একসাথে কতজন
+    const TIME_CAP = 50000;    // 50s — Netlify 60s এর নিরাপদ সীমা
+    const startTs  = Date.now();
+
+    for (let i = 0; i < pending.length; i += BATCH) {
+      if (Date.now() - startTs > TIME_CAP) {
+        summary.stopped_early = true;   // বাকিরা পরের রাউন্ডে হবে
+        break;
+      }
+      const slice = pending.slice(i, i + BATCH);
+      await Promise.all(slice.map(m => processOne(m)));
     }
 
     return reply(200, summary);
@@ -416,5 +443,5 @@ function localScore(m, cat) {
 // (১০০০+ গ্রাহক হলে সাপ্তাহিক করতে চাইলে "0 0 * * 5" = শুক্রবার ৬টা)
 // ═══════════════════════════════════════════════════════════════
 exports.config = {
-  schedule: "0 0 * * *"
+  schedule: "*/5 * * * *"
 };
