@@ -204,7 +204,7 @@ exports.handler = async (event) => {
     }
 
     // ── ব্যাচে parallel চালানো (timeout এড়াতে) ──
-    const BATCH    = 8;        // একসাথে কতজন
+    const BATCH    = 5;        // একসাথে কতজন (এক ব্যাচে ৫টি রিপোর্ট)
     const TIME_CAP = 50000;    // 50s — Netlify 60s এর নিরাপদ সীমা
     const startTs  = Date.now();
 
@@ -333,11 +333,12 @@ async function aiAnalyze(m, cat, cust, cid) {
   } catch(e){}
 
   // আগের food order (পছন্দ বোঝাতে)
+  // আগের food order (সাম্প্রতিক খাবার/পছন্দ বোঝাতে — তারিখসহ)
   let prevOrders = 'নেই';
   try {
-    const or = await fetch(`${SUPABASE_URL}/rest/v1/orders?customer_id=eq.${cid}&order=created_at.desc&limit=3&select=items_json,created_at`, { headers: SB });
+    const or = await fetch(`${SUPABASE_URL}/rest/v1/orders?customer_id=eq.${cid}&order=created_at.desc&limit=5&select=items_json,created_at`, { headers: SB });
     const arr = or.ok ? await or.json() : [];
-    if (arr.length) prevOrders = arr.map(o=> JSON.stringify(o.items_json||'').slice(0,200)).join('; ');
+    if (arr.length) prevOrders = arr.map(o=> `[${(o.created_at||'').slice(0,10)}] ${JSON.stringify(o.items_json||'').slice(0,160)}`).join('\n');
   } catch(e){}
 
   // আগের ২টা AI report (ধারাবাহিকতা রাখতে)
@@ -348,6 +349,45 @@ async function aiAnalyze(m, cat, cust, cid) {
     if (arr.length) prevReports = arr.map(p=>`[${p.analysis_date}] স্কোর ${p.health_score||'—'}, ফোকাস: ${p.focus||''} — ${(p.health_summary_bn||'').slice(0,200)}`).join('\n');
   } catch(e){}
 
+  // ── বিগত ৩ দিনের দৈনিক অবস্থা (daily_health_log) — জ্বর/স্ট্রেস/মাসিক/খাবার/ঘুম ইত্যাদি ──
+  let todayCond = 'বিগত ৩ দিনে কোনো দৈনিক আপডেট দেননি';
+  try {
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10);
+    const since = new Date(now.getTime() - 3 * 86400000).toISOString().slice(0, 10); // ৩ দিন আগে
+    const dl = await fetch(`${SUPABASE_URL}/rest/v1/daily_health_log?customer_id=eq.${cid}&log_date=gte.${since}&order=log_date.desc&limit=3&select=*`, { headers: SB });
+    const dlArr = dl.ok ? await dl.json() : [];
+    if (dlArr.length) {
+      const dayLines = dlArr.map(L => {
+        const parts = [];
+        if (L.fever) parts.push(`জ্বর${L.fever_temp ? ' ('+L.fever_temp+'°F)' : ''}`);
+        if (L.cold_cough)    parts.push('সর্দি-কাশি');
+        if (L.stomach_upset) parts.push('পেট খারাপ');
+        if (L.loose_motion)  parts.push('পাতলা পায়খানা');
+        if (L.headache)      parts.push('মাথাব্যথা');
+        if (L.body_pain)     parts.push('শরীরব্যথা');
+        if (L.period_today)  parts.push('মাসিক চলছে');
+        if (L.cramping)      parts.push(`ক্র্যাম্প (মাত্রা ${L.cramping_level ?? '—'}/১০)`);
+        if (L.health_condition) parts.push(`অবস্থা: ${L.health_condition}`);
+        if (L.mood)          parts.push(`মুড: ${L.mood}`);
+        if (L.mental_condition) parts.push(`মানসিক: ${L.mental_condition}`);
+        if (L.stress_level != null) parts.push(`স্ট্রেস: ${L.stress_level}/১০`);
+        if (L.sleep_hours != null)  parts.push(`ঘুম: ${L.sleep_hours} ঘণ্টা (${L.sleep_quality||'—'})`);
+        if (L.exercise_done) parts.push(`ব্যায়াম: ${L.exercise_type||'হ্যাঁ'}`);
+        if (L.water_intake != null) parts.push(`পানি: ${L.water_intake} লিটার`);
+        if (L.coffee_cups)   parts.push(`কফি: ${L.coffee_cups} কাপ`);
+        if (L.food_eaten)    parts.push(`খেয়েছেন: ${L.food_eaten}`);
+        if (L.food_preference_today) parts.push(`পছন্দ: ${L.food_preference_today}`);
+        if (L.avoid_foods)   parts.push(`এড়াতে চান: ${L.avoid_foods}`);
+        if (L.drinks_taken)  parts.push(`পানীয়: ${L.drinks_taken}`);
+        if (L.notes)         parts.push(`নোট: ${L.notes}`);
+        const tag = (L.log_date === todayStr) ? 'আজ' : L.log_date;
+        return `[${tag}] ${parts.length ? parts.join(', ') : 'বিশেষ লক্ষণ নেই'}`;
+      });
+      todayCond = dayLines.join('\n');
+    }
+  } catch(e){}
+
   const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল পুষ্টি AI। নিচের নারী গ্রাহকের সম্পূর্ণ তথ্য বিশ্লেষণ করে দৈনিক স্বাস্থ্য রিপোর্ট দাও।
 
 নাম: ${cust.full_name||'গ্রাহক'}
@@ -355,6 +395,9 @@ async function aiAnalyze(m, cat, cust, cid) {
 
 স্বাস্থ্য মেট্রিক্স (২৫০-এর মধ্যে উপলব্ধ সব + আজকের দৈনিক আপডেট):
 ${metricsStr}
+
+🔴 বিগত ৩ দিনের অবস্থা (সবচেয়ে গুরুত্বপূর্ণ — আজকের রিপোর্ট, চাটনি, ঔষধি গুঁড়া ও মেনু এই সাম্প্রতিক অবস্থার সাথে অবশ্যই মানানসই হতে হবে। সবচেয়ে নতুন দিনকে বেশি গুরুত্ব দাও):
+${todayCond}
 
 আগের প্রেসক্রিপশন (সর্বশেষ ২টি):
 ${prevRx}
