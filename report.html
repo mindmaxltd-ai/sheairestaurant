@@ -9,44 +9,111 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Hind Siliguri',Arial,sans-serif;background:#f4eef2;color:#1a1a1a;
     line-height:1.6;padding:1rem;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .sheet{max-width:800px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;
-    box-shadow:0 10px 40px rgba(0,0,0,.12)}
+  .sheet{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;
+    box-shadow:0 12px 48px rgba(0,0,0,.13)}
   .pad{padding:28px 32px}
-  .rhead{text-align:center;border-bottom:2px solid #059669;padding-bottom:12px;margin-bottom:16px}
-  .rhead .brand{font-size:30px;font-weight:800;color:#C2185B;letter-spacing:2px}
-  .rhead .sub{font-size:15px;font-weight:700;color:#333;margin-top:2px}
+
+  /* ── HEADER ── */
+  .rhead{text-align:center;padding-bottom:14px;margin-bottom:18px;
+    border-bottom:2px solid #059669}
+  .rhead .brand{font-size:32px;font-weight:800;color:#C2185B;letter-spacing:3px}
+  .rhead .sub{font-size:14px;font-weight:700;color:#333;margin-top:2px}
   .rhead .tag{font-size:10px;color:#999;margin-top:3px}
   .rhead .ph{font-size:11px;color:#888;margin-top:4px}
-  .rhead .title{font-size:16px;font-weight:700;color:#059669;margin-top:12px;
+  .rhead .title{font-size:17px;font-weight:700;color:#059669;margin-top:12px;
     border-top:1px dashed #ddd;padding-top:10px}
-  .scorebox{text-align:center;margin:16px 0;padding:18px;background:#f0fdf4;border-radius:12px;
-    border:1px solid rgba(5,150,105,.2)}
-  .scorebox .num{font-size:42px;font-weight:800;color:#059669;line-height:1}
-  .scorebox .lbl{font-size:13px;color:#666;margin-top:4px}
+
+  /* ── PATIENT META ── */
   .meta{width:100%;font-size:13px;border-collapse:collapse;margin-bottom:16px}
   .meta td{padding:4px 0}
-  .meta .k{color:#666}.meta .v{text-align:right;font-weight:600}
+  .meta .k{color:#666;width:50%}
+  .meta .v{text-align:right;font-weight:600}
   .meta .v.mono{font-family:monospace}
-  .dlabel{background:#059669;color:#fff;font-size:13px;font-weight:700;
-    padding:6px 12px;border-radius:4px;margin:14px 0 8px}
-  .sec{padding:4px 6px 12px;font-size:13.5px;white-space:pre-wrap}
-  .info{width:100%;border-collapse:collapse;font-size:12.5px}
-  .info td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top}
-  .info .k{font-weight:600;color:#444;width:34%}
-  .menu{list-style:none;padding:0}
-  .menu li{padding:6px 10px;border-bottom:1px solid #f0f0f0;font-size:13px}
-  .disc{text-align:center;color:#aaa;font-size:10px;margin-top:14px;
-    border-top:1px dashed #ddd;padding-top:8px}
-  .printbtn{display:block;max-width:800px;margin:0 auto 1rem;background:#059669;color:#fff;
-    border:none;border-radius:10px;padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;
-    font-family:inherit;text-align:center}
+
+  /* ── SCORE BOX ── */
+  .scorebox{display:flex;align-items:center;justify-content:space-between;
+    margin:16px 0;padding:20px 24px;border-radius:14px;
+    background:linear-gradient(135deg,#f0fdf4,#ecfdf5);
+    border:1px solid rgba(5,150,105,.25);gap:16px;flex-wrap:wrap}
+  .scorebox-left{text-align:center;min-width:90px}
+  .scorebox .num{font-size:52px;font-weight:800;line-height:1}
+  .scorebox .num-denom{font-size:18px;color:#999;font-weight:600}
+  .scorebox .lbl{font-size:12px;color:#666;margin-top:4px}
+  .scorebox-right{flex:1;min-width:180px}
+  .scorebar-wrap{background:#e5e7eb;border-radius:99px;height:12px;overflow:hidden;margin:6px 0}
+  .scorebar{height:100%;border-radius:99px;transition:width .8s ease}
+  .score-meta{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .score-meta span{background:#f3f4f6;padding:2px 8px;border-radius:99px;font-size:11px}
+
+  /* ── SECTION LABELS ── */
+  .dlabel{display:flex;align-items:center;gap:8px;
+    background:linear-gradient(90deg,#059669,#047857);color:#fff;
+    font-size:13px;font-weight:700;padding:7px 14px;border-radius:6px;margin:16px 0 8px}
+  .dlabel .ic{font-size:15px}
+
+  /* ── TEXT SECTIONS ── */
+  .sec{font-size:13.5px;line-height:1.8;padding:4px 4px 12px;color:#222;white-space:pre-wrap}
+
+  /* ── PROBLEMS LIST ── */
+  .prob-list{list-style:none;padding:0;margin-bottom:4px}
+  .prob-list li{padding:6px 10px;border-left:3px solid #F87171;background:#fef2f2;
+    border-radius:0 6px 6px 0;margin-bottom:6px;font-size:13px;color:#333}
+  .prob-list li::before{content:'⚠ ';color:#ef4444;font-size:11px}
+
+  /* ── MENU LIST ── */
+  .menu-list{list-style:none;padding:0;margin-bottom:4px}
+  .menu-list li{padding:8px 12px;background:#f0fdf4;border-radius:8px;
+    margin-bottom:6px;font-size:13px;color:#166534;border:1px solid rgba(5,150,105,.15)}
+  .menu-list li .meal-label{font-weight:700;color:#059669;font-size:11px;
+    display:block;margin-bottom:2px}
+
+  /* ── INFO TABLE ── */
+  .info{width:100%;border-collapse:collapse;font-size:13px}
+  .info td{padding:7px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top}
+  .info tr:last-child td{border-bottom:none}
+  .info .k{font-weight:600;color:#444;width:38%;background:#f9fafb}
+  .info .v{color:#222}
+
+  /* ── MENU BUTTON ── */
+  .menu-btn{display:block;text-align:center;background:linear-gradient(135deg,#C2185B,#E91E8C);
+    color:#fff;padding:13px 22px;border-radius:12px;text-decoration:none;
+    font-weight:700;font-size:15px;margin:20px 0 8px}
+  .menu-btn-hint{text-align:center;font-size:.72rem;color:#888;margin-bottom:12px}
+
+  /* ── DISCLAIMER ── */
+  .disc{text-align:center;color:#aaa;font-size:10.5px;margin-top:14px;
+    border-top:1px dashed #ddd;padding-top:10px;line-height:1.7}
+
+  /* ── PRINT BUTTON ── */
+  .printbtn{display:block;max-width:800px;margin:0 auto 1rem;
+    background:linear-gradient(135deg,#059669,#047857);color:#fff;
+    border:none;border-radius:12px;padding:1rem;font-size:1rem;
+    font-weight:700;cursor:pointer;font-family:inherit;text-align:center;letter-spacing:.5px}
+
   .loading,.error{text-align:center;padding:3rem 1rem;color:#888;max-width:800px;margin:0 auto}
-  @media print{ body{background:#fff;padding:0} .sheet{box-shadow:none;border-radius:0;max-width:100%} .printbtn{display:none} }
+
+  /* ── BADGE ── */
+  .badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700}
+  .badge-green{background:#dcfce7;color:#166534}
+  .badge-yellow{background:#fef9c3;color:#854d0e}
+  .badge-red{background:#fee2e2;color:#991b1b}
+
+  @media print{
+    body{background:#fff;padding:0}
+    .sheet{box-shadow:none;border-radius:0;max-width:100%}
+    .printbtn{display:none}
+  }
+  @media(max-width:500px){
+    .pad{padding:18px 16px}
+    .scorebox{flex-direction:column;align-items:flex-start}
+  }
 </style>
 </head>
 <body>
 
-<button class="printbtn" onclick="window.print()" id="printBtn" style="display:none">🖨️ প্রিন্ট / সেভ করুন (PDF)</button>
+<button class="printbtn" onclick="window.print()" id="printBtn" style="display:none">
+  🖨️ প্রিন্ট / সেভ করুন (PDF)
+</button>
 <div class="loading" id="loading">⏳ রিপোর্ট লোড হচ্ছে...</div>
 
 <div class="sheet" id="sheet" style="display:none">
@@ -56,132 +123,210 @@
 <script>
 const SUPA = 'https://xlkrggspepnysbouatec.supabase.co';
 const KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhsa3JnZ3NwZXBueXNib3VhdGVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTU0OTEsImV4cCI6MjA5NTA5MTQ5MX0.dCAkAXL1EDNsxTBn8mcHcUHlXJ1xDBirwBdTgIq927U';
-const H = {apikey:KEY, Authorization:'Bearer '+KEY};
+const H = { apikey: KEY, Authorization: 'Bearer ' + KEY };
 
-const esc = (s)=> String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const jstr = (v)=>{
-  if(!v) return '';
-  if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return v; } }
-  if(Array.isArray(v)) return v.map(x=> typeof x==='object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
-  if(typeof v === 'object') return Object.values(v).map(x=> typeof x==='object'?JSON.stringify(x):x).join(', ');
+const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* JSON field → readable string */
+const jstr = v => {
+  if (!v) return '';
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch(e) { return v; } }
+  if (Array.isArray(v)) return v.map(x => typeof x === 'object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
+  if (typeof v === 'object') return Object.values(v).map(x => typeof x==='object'?JSON.stringify(x):x).join(', ');
   return String(v);
 };
-const arr = (v)=>{
-  if(!v) return [];
-  if(typeof v === 'string'){ try{ v = JSON.parse(v); }catch(e){ return [v]; } }
+
+/* JSON field → array */
+const toArr = v => {
+  if (!v) return [];
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch(e) { return [v]; } }
   return Array.isArray(v) ? v : [v];
 };
 
-async function load(){
-  const cid = new URLSearchParams(location.search).get('customer_id');
-  if(!cid){ showError('গ্রাহক আইডি পাওয়া যায়নি।'); return; }
-  try{
-    // সর্বশেষ AI analysis
-    const r = await fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=analysis_date.desc&limit=1&select=*`, {headers:H});
-    const a = r.ok ? await r.json() : [];
-    if(!a.length){ showError('আজকের রিপোর্ট এখনো তৈরি হয়নি।'); return; }
-    const ai = a[0];
+/* score → color */
+const scoreColor = n => n >= 70 ? '#059669' : n >= 40 ? '#D97706' : '#DC2626';
+const scoreClass = n => n >= 70 ? 'badge-green' : n >= 40 ? 'badge-yellow' : 'badge-red';
 
-    // customer
-    let c = {};
-    const cr = await fetch(`${SUPA}/rest/v1/customers?id=eq.${cid}&select=full_name,phone,bmi,sar_category`, {headers:H});
-    const ca = cr.ok ? await cr.json() : [];
-    if(ca.length) c = ca[0];
-
-    render(ai, c);
-  }catch(e){ showError('লোড করা যায়নি — আবার চেষ্টা করুন।'); }
+/* Parse menu item into label + text */
+function parseMenuItem(x) {
+  if (typeof x === 'object' && x !== null) {
+    const label = x.meal || x.time || x.type || '';
+    const text  = x.description || x.name || x.text || JSON.stringify(x);
+    return { label, text };
+  }
+  const s = String(x);
+  const colon = s.indexOf(':');
+  if (colon > 0 && colon < 10) return { label: s.slice(0, colon).trim(), text: s.slice(colon+1).trim() };
+  return { label: '', text: s };
 }
 
-function render(ai, c){
-  const dt = ai.analysis_date ? new Date(ai.analysis_date) : new Date();
-  const score = ai.health_score || ai.meal_score || 0;
-  const cid = new URLSearchParams(location.search).get('customer_id')||'';
+async function load() {
+  const cid = new URLSearchParams(location.search).get('customer_id');
+  if (!cid) { showError('গ্রাহক আইডি পাওয়া যায়নি।'); return; }
 
-  // ── meal-score link — customer_id + আজকের AI report-এর hint (extra context) ──
-  // meal-score নিজেই DB থেকে আজকের report পড়ে, তবু hint থাকলে DB দেরি/মিস হলেও context পায়
+  try {
+    /* সর্বশেষ AI analysis (daily_6am প্রাধান্য, নইলে যেটাই থাক) */
+    const [r1, r2, r3] = await Promise.all([
+      fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&analysis_type=eq.daily_6am&order=analysis_date.desc&limit=1&select=*`, {headers:H}),
+      fetch(`${SUPA}/rest/v1/ai_analysis?customer_id=eq.${cid}&order=analysis_date.desc&limit=1&select=*`, {headers:H}),
+      fetch(`${SUPA}/rest/v1/customers?id=eq.${cid}&select=full_name,phone,bmi,sar_category`, {headers:H}),
+    ]);
+
+    const a1 = r1.ok ? await r1.json() : [];
+    const a2 = r2.ok ? await r2.json() : [];
+    const ca = r3.ok ? await r3.json() : [];
+
+    const ai = (a1.length ? a1 : a2)[0];
+    if (!ai) { showError('আজকের রিপোর্ট এখনো তৈরি হয়নি। সকাল ৬টার পরে আবার দেখুন।'); return; }
+    const c = ca[0] || {};
+
+    render(ai, c, cid);
+  } catch(e) {
+    showError('লোড করা যায়নি — ইন্টারনেট সংযোগ চেক করুন।');
+  }
+}
+
+function render(ai, c, cid) {
+  const score   = parseInt(ai.health_score || ai.meal_score) || 0;
+  const dt      = ai.analysis_date ? new Date(ai.analysis_date + 'T00:00:00') : new Date();
+  const dateStr = dt.toLocaleDateString('bn-BD', { year:'numeric', month:'long', day:'numeric' });
+  const clr     = scoreColor(score);
+  const barPct  = Math.min(100, score);
+
+  /* meal-score link */
   const hints = new URLSearchParams({ customer_id: cid });
-  if(ai.category) hints.set('cat', ai.category);
-  if(ai.focus) hints.set('focus', ai.focus);
-  if(score) hints.set('score', score);
-  if(ai.daily_kcal) hints.set('kcal', ai.daily_kcal);
-  if(ai.daily_protein) hints.set('protein', ai.daily_protein);
-  const menuHint = arr(ai.daily_menu_recommendation_json).filter(Boolean).slice(0,3).map(x=>jstr(x)).join(' | ');
-  if(menuHint) hints.set('menu_hint', menuHint.slice(0,200));
+  if (ai.category)      hints.set('cat',     ai.category);
+  if (ai.focus)         hints.set('focus',   ai.focus);
+  if (score)            hints.set('score',   score);
+  if (ai.daily_kcal)    hints.set('kcal',    ai.daily_kcal);
+  if (ai.daily_protein) hints.set('protein', ai.daily_protein);
+  const menuArr = toArr(ai.daily_menu_recommendation_json).filter(Boolean);
+  const menuHintStr = menuArr.slice(0,3).map(x => jstr(x)).join(' | ');
+  if (menuHintStr) hints.set('menu_hint', menuHintStr.slice(0,200));
   const mealLink = `meal-score.html?${hints.toString()}`;
 
-  // text sections (যেগুলো আছে)
-  const sections = [
-    ['স্বাস্থ্য সারসংক্ষেপ / Health Summary', ai.health_summary_bn || ai.analysis_bn],
-    ['পুষ্টি পরামর্শ / Nutrition Advice', ai.nutrition_advice_bn],
-    ['সাধারণ পরামর্শ / General Suggestions', ai.general_suggestions_bn],
-    ['ঘরোয়া প্রতিকার / Home Remedies', ai.home_remedies_bn],
-    ['আয়ুর্বেদিক / Ayurvedic', ai.ayurvedic_bn],
-    ['অনুপ্রেরণা / Motivation', ai.motivational_message_bn],
-  ].filter(s=> s[1] && String(s[1]).trim());
+  /* text sections */
+  const textSections = [
+    { ic:'🩺', label:'স্বাস্থ্য সারসংক্ষেপ', text: ai.health_summary_bn || ai.analysis_bn },
+    { ic:'🥗', label:'পুষ্টি পরামর্শ',        text: ai.nutrition_advice_bn },
+    { ic:'💡', label:'সাধারণ পরামর্শ',         text: ai.general_suggestions_bn },
+    { ic:'🌿', label:'ঘরোয়া প্রতিকার',        text: ai.home_remedies_bn },
+    { ic:'🪷', label:'আয়ুর্বেদিক পরামর্শ',    text: ai.ayurvedic_bn },
+    { ic:'💪', label:'অনুপ্রেরণা',             text: ai.motivational_message_bn },
+  ].filter(s => s.text && String(s.text).trim());
 
-  const secHtml = sections.map(s=>
-    `<div class="dlabel">${s[0]}</div><div class="sec">${esc(s[1])}</div>`).join('');
+  /* problems */
+  const problems = toArr(ai.problems_json).filter(Boolean);
 
-  // problems
-  const problems = arr(ai.problems_json).filter(Boolean);
-  const probHtml = problems.length
-    ? `<div class="dlabel">সমস্যা / Problems</div><div class="sec">${problems.map(p=>'• '+esc(jstr(p))).join('<br>')}</div>` : '';
+  /* menu */
+  const menuItems = menuArr.map(parseMenuItem).filter(x => x.text);
 
-  // daily menu
-  const menu = arr(ai.daily_menu_recommendation_json).filter(Boolean);
-  const menuHtml = menu.length
-    ? `<div class="dlabel">আজকের মেনু / Daily Menu</div><ul class="menu">${menu.map(x=>`<li>${esc(jstr(x))}</li>`).join('')}</ul>` : '';
+  /* key info table */
+  const cat = ai.category || c.sar_category || '';
+  const catNames = { DM:'ডায়াবেটিস', OB:'স্থূলতা', FL:'ফ্যাটি লিভার', IB:'IBS/গ্যাস্ট্রিক', PR:'গর্ভাবস্থা', GEN:'সার্বিক' };
+  const infoRows = [
+    ['বিভাগ / Category',      cat ? `${catNames[cat]||cat} (${cat})` : ''],
+    ['BMI',                    c.bmi || ''],
+    ['দৈনিক ক্যালরি',         ai.daily_kcal  ? ai.daily_kcal  + ' kcal' : ''],
+    ['দৈনিক প্রোটিন',         ai.daily_protein ? ai.daily_protein + ' g' : ''],
+    ['মেনু স্কোর',             ai.meal_score != null ? ai.meal_score + ' / 100' : ''],
+    ['আজকের ফোকাস',           ai.focus || ''],
+    ['বিশ্লেষণের তারিখ',      ai.analysis_date || ''],
+  ].filter(x => x[1] !== '' && x[1] != null);
 
-  // key numbers table
-  const rows = [
-    ['Disease Category', ai.category || c.sar_category || ''],
-    ['BMI', c.bmi || ''],
-    ['Daily Calorie', ai.daily_kcal ? ai.daily_kcal+' kcal' : ''],
-    ['Daily Protein', ai.daily_protein ? ai.daily_protein+' g' : ''],
-    ['Meal Score', ai.meal_score!=null ? ai.meal_score : ''],
-    ['Focus', ai.focus || ''],
-    ['Analysis Date', ai.analysis_date || ''],
-  ].filter(x=> x[1]!=='' && x[1]!=null);
-  const infoRows = rows.map(x=>`<tr><td class="k">${x[0]}</td><td>${esc(x[1])}</td></tr>`).join('');
-
+  /* ── BUILD HTML ── */
   document.getElementById('sheetBody').innerHTML = `
+
+    <!-- HEADER -->
     <div class="rhead">
       <div class="brand">SAR</div>
       <div class="sub">She AI Revolution</div>
       <div class="tag">AI + EI + Blockchain · women-led · women-run · women-only wellness platform</div>
       <div class="ph">📞 ০১৩৪৬০৯৮৮৯২ · sheairestaurant.com</div>
-      <div class="title">📊 দৈনিক স্বাস্থ্য রিপোর্ট / Daily AI Health Report</div>
+      <div class="title">📊 দৈনিক AI স্বাস্থ্য রিপোর্ট / Daily AI Health Report</div>
     </div>
+
+    <!-- PATIENT META -->
     <table class="meta">
-      <tr><td class="k">গ্রাহক / Patient</td><td class="v">${esc(c.full_name||'—')}</td></tr>
-      <tr><td class="k">ফোন / Phone</td><td class="v mono">${esc(c.phone||'—')}</td></tr>
-      <tr><td class="k">তারিখ / Date</td><td class="v">${dt.toLocaleDateString('en-GB')}</td></tr>
+      <tr><td class="k">গ্রাহক / Patient</td><td class="v">${esc(c.full_name || '—')}</td></tr>
+      <tr><td class="k">ফোন / Phone</td><td class="v mono">${esc(c.phone || '—')}</td></tr>
+      <tr><td class="k">তারিখ / Date</td><td class="v">${dateStr}</td></tr>
     </table>
+
+    <!-- SCORE BOX -->
     <div class="scorebox">
-      <div class="num">${score}<span style="font-size:20px;color:#999">/100</span></div>
-      <div class="lbl">আজকের স্বাস্থ্য স্কোর / Health Score</div>
+      <div class="scorebox-left">
+        <div class="num" style="color:${clr}">${score}<span class="num-denom">/100</span></div>
+        <div class="lbl">স্বাস্থ্য স্কোর</div>
+      </div>
+      <div class="scorebox-right">
+        <div style="font-size:13px;font-weight:700;color:${clr};margin-bottom:4px">
+          ${score >= 70 ? '✅ ভালো অবস্থায় আছেন' : score >= 40 ? '⚠️ উন্নতির সুযোগ আছে' : '🔴 বিশেষ মনোযোগ প্রয়োজন'}
+        </div>
+        <div class="scorebar-wrap">
+          <div class="scorebar" style="width:${barPct}%;background:${clr}"></div>
+        </div>
+        <div class="score-meta">
+          ${ai.category ? `<span>বিভাগ: ${catNames[ai.category]||ai.category}</span>` : ''}
+          ${ai.daily_kcal ? `<span>🔥 ${ai.daily_kcal} kcal</span>` : ''}
+          ${ai.daily_protein ? `<span>💪 ${ai.daily_protein}g প্রোটিন</span>` : ''}
+        </div>
+      </div>
     </div>
-    ${secHtml}
-    ${probHtml}
-    ${menuHtml}
-    <div class="dlabel">মূল তথ্য / Key Information</div>
-    <table class="info">${infoRows}</table>
-    <div style="text-align:center;margin:18px 0">
-      <a href="${mealLink}" target="_blank"
-         style="display:inline-block;background:#C2185B;color:#fff;padding:11px 22px;border-radius:10px;
-                text-decoration:none;font-weight:700;font-size:14px">🍽️ আজকের কাস্টমাইজড মেনু দেখুন →</a>
-      <div style="font-size:.72rem;color:#888;margin-top:6px">আজকের স্বাস্থ্য বিশ্লেষণ অনুযায়ী মেনু</div>
+
+    <!-- PROBLEMS -->
+    ${problems.length ? `
+      <div class="dlabel"><span class="ic">⚠️</span> সমস্যা / Problems Identified</div>
+      <ul class="prob-list">
+        ${problems.map(p => `<li>${esc(jstr(p))}</li>`).join('')}
+      </ul>
+    ` : ''}
+
+    <!-- TEXT SECTIONS -->
+    ${textSections.map(s => `
+      <div class="dlabel"><span class="ic">${s.ic}</span> ${esc(s.label)}</div>
+      <div class="sec">${esc(s.text)}</div>
+    `).join('')}
+
+    <!-- DAILY MENU -->
+    ${menuItems.length ? `
+      <div class="dlabel"><span class="ic">🍽️</span> আজকের মেনু সুপারিশ / Daily Menu</div>
+      <ul class="menu-list">
+        ${menuItems.map(m => `
+          <li>
+            ${m.label ? `<span class="meal-label">${esc(m.label)}</span>` : ''}
+            ${esc(m.text)}
+          </li>`).join('')}
+      </ul>
+    ` : ''}
+
+    <!-- KEY INFO TABLE -->
+    <div class="dlabel"><span class="ic">📋</span> মূল তথ্য / Key Information</div>
+    <table class="info">
+      ${infoRows.map(x => `<tr><td class="k">${esc(x[0])}</td><td class="v">${esc(x[1])}</td></tr>`).join('')}
+    </table>
+
+    <!-- MEAL-SCORE LINK -->
+    <a class="menu-btn" href="${mealLink}" target="_blank">
+      🍽️ আজকের কাস্টমাইজড মেনু দেখুন →
+    </a>
+    <div class="menu-btn-hint">আজকের স্বাস্থ্য বিশ্লেষণ অনুযায়ী ব্যক্তিগত মেনু</div>
+
+    <!-- DISCLAIMER -->
+    <div class="disc">
+      এটি একটি AI-জেনারেটেড দৈনিক স্বাস্থ্য রিপোর্ট।<br>
+      SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।
     </div>
-    <div class="disc">এটি একটি AI-জেনারেটেড স্বাস্থ্য রিপোর্ট। SAR একটি wellness platform; চিকিৎসার জন্য নিবন্ধিত ডাক্তারের পরামর্শ নিন।</div>
   `;
-  document.getElementById('loading').style.display='none';
-  document.getElementById('sheet').style.display='block';
-  document.getElementById('printBtn').style.display='block';
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('sheet').style.display   = 'block';
+  document.getElementById('printBtn').style.display = 'block';
 }
 
-function showError(m){
-  document.getElementById('loading').className='error';
-  document.getElementById('loading').textContent='⚠️ '+m;
+function showError(m) {
+  document.getElementById('loading').className    = 'error';
+  document.getElementById('loading').textContent = '⚠️ ' + m;
 }
 
 load();
