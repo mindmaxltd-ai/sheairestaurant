@@ -35,7 +35,7 @@ const CRON_SECRET  = process.env.CRON_SECRET || '';
 const PUBLIC_SITE  = process.env.PUBLIC_SITE || 'https://sheairestaurant.com';
 
 // Claude AI key (doctor.html এর মতো আসল AI বিশ্লেষণের জন্য)
-const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_KEY || '';
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || '';
 
 const TWILIO_SID   = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
@@ -89,7 +89,7 @@ exports.handler = async (event) => {
     const doneSet = new Set();
     try {
       const dr = await fetch(
-        `${SUPABASE_URL}/rest/v1/ai_analysis?analysis_date=eq.${today}&select=customer_id`,
+        `${SUPABASE_URL}/rest/v1/ai_analysis?analysis_date=eq.${today}&analysis_type=eq.daily_6am&health_summary_bn=not.is.null&select=customer_id`,
         { headers: SB });
       const doneRows = dr.ok ? await dr.json() : [];
       if (Array.isArray(doneRows)) doneRows.forEach(r => doneSet.add(r.customer_id));
