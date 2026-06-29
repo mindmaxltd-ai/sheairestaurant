@@ -204,8 +204,8 @@ exports.handler = async (event) => {
     }
 
     // ── ব্যাচে parallel চালানো (timeout এড়াতে) ──
-    const BATCH    = 5;        // একসাথে কতজন (এক ব্যাচে ৫টি রিপোর্ট)
-    const TIME_CAP = 50000;    // 50s — Netlify 60s এর নিরাপদ সীমা
+    const BATCH    = 1;        // একসাথে ১জন — Claude API slow, timeout এড়াতে
+    const TIME_CAP = 25000;    // 25s — Netlify 30s এর নিরাপদ সীমা
     const startTs  = Date.now();
 
     for (let i = 0; i < pending.length; i += BATCH) {
@@ -425,19 +425,23 @@ ${prevReports}
 }`;
 
   try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000); // 20s timeout
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
+      signal: ctrl.signal,
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_KEY,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1500,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 800,
         messages: [{ role: 'user', content: prompt }],
       }),
     });
+    clearTimeout(timer);
     if (!r.ok) return null;
     const d = await r.json();
     let txt = (d.content && d.content[0] && d.content[0].text) || '';
