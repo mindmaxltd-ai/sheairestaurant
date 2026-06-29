@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --pink:#C9962E;--pink2:#E6BE5A;--pink3:rgba(201,150,46,.14);
-  --purple:#8B5A2B;--purple2:#C08552;--purple3:rgba(139,90,43,.14);
-  --yellow:#D9A441;--yellow2:#F0C674;--yellow3:rgba(217,164,65,.14);
-  --red:#B23A2E;--red2:#D9745F;
-  --green:#A6803F;--green2:#CDA35A;--green3:rgba(166,128,63,.14);
-  --orange:#C56A2C;--orange2:#E08C4A;
-  --dark:#1C120C;--dark2:#241710;--dark3:#2E1E14;
-  --glass:rgba(255,245,225,.05);--glass2:rgba(255,245,225,.09);
-  --border:rgba(230,190,90,.14);--border2:rgba(230,190,90,.22);
-  --ink:#F5E9D6;--ink-soft:rgba(245,233,214,.6);
+  --pink:#E91E8C;--pink2:#FF6BB5;--pink3:rgba(233,30,140,.12);
+  --purple:#6B21A8;--purple2:#A855F7;--purple3:rgba(107,33,168,.12);
+  --yellow:#F59E0B;--yellow2:#FCD34D;--yellow3:rgba(245,158,11,.12);
+  --red:#DC2626;--red2:#F87171;
+  --green:#059669;--green2:#34D399;--green3:rgba(5,150,105,.12);
+  --orange:#F97316;--orange2:#FB923C;
+  --dark:#0A0A0F;--dark2:#0F0F1A;--dark3:#141428;
+  --glass:rgba(255,255,255,.048);--glass2:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.14);
+  --ink:#fff;--ink-soft:rgba(255,255,255,.6);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -2205,10 +2205,15 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
   };
 
   try {
+    // ── নতুন analyzeOne mode (v3) — customer_id থাকলে full pipeline চালায় ──
+    // না থাকলে পুরনো prompt mode fallback করে
+    const useV3 = !!CID;
     const r = await fetch('/.netlify/functions/analyze', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify(useV3
+        ? { action: 'analyzeOne', customer_id: CID }
+        : { prompt })
     });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const d  = await r.json();
@@ -4028,11 +4033,6 @@ function mVoice(targetId) {
         💡 ছবি শুধু আপনার এই ডিভাইসে থাকে, নিরাপদ।</p>
     </div>
   </div>
-</div>
-
-<!-- ═══ SSLCommerz Pay-With logo (disclaimer er age) ═══ -->
-<div style="text-align:center;margin:2rem 0 0">
-  <a target="_blank" href="https://www.sslcommerz.com/" title="SSLCommerz" alt="SSLCommerz"><img style="width:100%;max-width:1100px;height:auto;" src="https://securepay.sslcommerz.com/public/image/SSLCommerz-Pay-With-logo-All-Size-05.png" /></a>
 </div>
 
 <!-- ═══ SAR DISCLAIMER — full width, high contrast ═══ -->
