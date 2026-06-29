@@ -411,6 +411,23 @@ body{background:var(--dark);color:#fff;font-family:'Hind Siliguri',sans-serif;mi
       <!-- ══ ANALYTICS ══ -->
       <div class="section" id="sec-analytics">
         <div class="kpi-grid" id="analyticsKpi"></div>
+
+        <!-- SAR AI সব গ্রাহক বিশ্লেষণ -->
+        <div style="background:rgba(107,33,168,.08);border:1px solid rgba(168,85,247,.2);border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+            <div>
+              <div style="font-size:.72rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem">SAR AI v3 — Rule Engine + Claude</div>
+              <div style="font-size:1rem;font-weight:700;color:#fff">🤖 সব গ্রাহকের AI স্বাস্থ্য বিশ্লেষণ</div>
+              <div style="font-size:.78rem;color:rgba(255,255,255,.45);margin-top:.25rem">প্রতিটি গ্রাহকের জন্য আলাদা — Rule Engine + Nutrition + Meal + Claude AI</div>
+            </div>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+              <button onclick="runAllAnalysis()" id="btnRunAll" style="background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;padding:.6rem 1.4rem;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">🚀 সব বিশ্লেষণ চালাও</button>
+              <button onclick="runScheduler()" id="btnScheduler" style="background:rgba(5,150,105,.12);border:1px solid rgba(52,211,153,.25);border-radius:10px;padding:.6rem 1.2rem;color:var(--green2);font-family:'Hind Siliguri',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer">📅 Scheduler চালাও</button>
+            </div>
+          </div>
+          <div id="allAnalysisStatus" style="margin-top:1rem;display:none;font-size:.82rem;line-height:1.7;color:rgba(255,255,255,.75)"></div>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
           <div class="chart-box">
             <div class="chart-title">🍽️ রোগ বিভাগ অনুযায়ী অর্ডার</div>
@@ -2082,6 +2099,68 @@ function getApiKey(key){
 // ════════════════════════════════════════════════
 // CUSTOMER ANALYSIS — analyze all metrics + share PDF
 // ════════════════════════════════════════════════
+// ── সব গ্রাহকের AI বিশ্লেষণ (v3 analyzeOne) ──────────────────────
+async function runAllAnalysis() {
+  const btn = document.getElementById('btnRunAll');
+  const statusEl = document.getElementById('allAnalysisStatus');
+  if(btn) { btn.disabled=true; btn.textContent='⏳ চলছে...'; }
+  if(statusEl) { statusEl.style.display='block'; statusEl.innerHTML='<span style="color:var(--yellow2)">⏳ শুরু হচ্ছে...</span>'; }
+
+  // সব active customer আনো
+  try {
+    const r = await fetch(`${SUPA}/rest/v1/customers?is_active=eq.true&select=id,full_name&order=created_at.asc`, { headers: H });
+    const customers = await r.json().catch(()=>[]);
+    if(!Array.isArray(customers)||!customers.length) {
+      if(statusEl) statusEl.innerHTML='<span style="color:var(--red2)">❌ কোনো active customer পাওয়া যায়নি</span>';
+      if(btn) { btn.disabled=false; btn.textContent='🚀 সব বিশ্লেষণ চালাও'; }
+      return;
+    }
+
+    let done=0, failed=0;
+    if(statusEl) statusEl.innerHTML=`<span style="color:var(--yellow2)">⏳ ${customers.length} জন গ্রাহকের বিশ্লেষণ শুরু...</span>`;
+
+    for(const c of customers) {
+      try {
+        const ar = await fetch('/.netlify/functions/analyze', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'analyzeOne', customer_id: c.id })
+        });
+        const ad = await ar.json().catch(()=>({}));
+        if(ad.ok) { done++; }
+        else { failed++; console.warn('Failed:', c.full_name, ad.error); }
+      } catch(e) { failed++; }
+
+      // প্রতি ৫ জনের পর status update
+      if((done+failed) % 5 === 0 || done+failed === customers.length) {
+        if(statusEl) statusEl.innerHTML=`✅ সম্পন্ন: <b>${done}</b> | ❌ ব্যর্থ: <b>${failed}</b> | মোট: ${customers.length}<br>
+          <div style="background:rgba(255,255,255,.08);border-radius:6px;height:8px;margin-top:.5rem">
+            <div style="background:var(--green2);height:8px;border-radius:6px;width:${Math.round((done+failed)/customers.length*100)}%;transition:width .3s"></div>
+          </div>`;
+      }
+      await new Promise(res=>setTimeout(res,500)); // rate limit
+    }
+
+    if(statusEl) statusEl.innerHTML=`🎉 <b>বিশ্লেষণ সম্পন্ন!</b> ✅ ${done} জন সফল, ❌ ${failed} জন ব্যর্থ`;
+    showToast(`✅ ${done} জনের AI বিশ্লেষণ সম্পন্ন`, false);
+  } catch(e) {
+    if(statusEl) statusEl.innerHTML=`<span style="color:var(--red2)">❌ Error: ${e.message}</span>`;
+    showToast('❌ বিশ্লেষণ ব্যর্থ: '+e.message, true);
+  }
+  if(btn) { btn.disabled=false; btn.textContent='🚀 সব বিশ্লেষণ চালাও'; }
+}
+
+// ── Scheduler চালাও (analysis_queue তৈরি করে) ──────────────────
+async function runScheduler() {
+  const btn = document.getElementById('btnScheduler');
+  if(btn) { btn.disabled=true; btn.textContent='⏳ চলছে...'; }
+  try {
+    const r = await fetch('/.netlify/functions/scheduler', { method:'GET' });
+    const d = await r.json().catch(()=>({}));
+    showToast(d.ok ? `✅ Scheduler: ${d.queued||0} জন queue-এ যোগ হয়েছে` : '❌ Scheduler ব্যর্থ: '+(d.error||''), !d.ok);
+  } catch(e) { showToast('❌ Scheduler error: '+e.message, true); }
+  if(btn) { btn.disabled=false; btn.textContent='📅 Scheduler চালাও'; }
+}
+
 async function analyzeCustomer(id){
   const c = allCustomers.find(x=>x.id===id);
   if(!c){ showToast('গ্রাহক পাওয়া যায়নি', true); return; }
@@ -2101,7 +2180,7 @@ async function analyzeCustomer(id){
       const prompt = `তুমি SAR (She AI Restaurant) — একটি women-only থেরাপিউটিক ফুড প্ল্যাটফর্মের ক্লিনিক্যাল বিশ্লেষক। নিচের গ্রাহকের সব মেট্রিক বিশ্লেষণ করে বাংলায় একটি সংক্ষিপ্ত স্বাস্থ্য ও সম্পৃক্ততা রিপোর্ট দাও (৬-৮ লাইন): নাম ${c.full_name}, সদস্য আইডি ${c.member_id}, রোগ বিভাগ ${getCatLabel(c.sar_category)}, BMI ${c.bmi}, লয়্যালটি পয়েন্ট ${c.loyalty_points}, মোট অর্ডার ${orderCount}, মোট ব্যয় ৳${totalSpent}, সাবস্ক্রিপশন ${c.monthly_sub_paid?'সক্রিয়':'নিষ্ক্রিয়'}।`;
       const r = await fetch('https://api.anthropic.com/v1/messages',{
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:600, messages:[{role:'user',content:prompt}] })
+        body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:600, messages:[{role:'user',content:prompt}] })
       });
       const d = await r.json();
       aiText = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
