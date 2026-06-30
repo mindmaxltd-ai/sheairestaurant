@@ -5,29 +5,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>ড্যাশবোর্ড — SAR She AI Restaurant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* SAR cream/green identity — mapped onto old variable names so all
-     existing classes (pink/purple/yellow/green/red/glass/border) keep working */
-  --green-deep:#1B7A3D;--green-ink:#15301E;--cream:#FBF6EC;--rose:#E07B5A;
-  --gold:#C99A2E;--sage:#E6EEDF;--paper:#FFFFFF;
-  --pink:#1B7A3D;--pink2:#2F9B54;--pink3:rgba(27,122,61,.12);
-  --purple:#9c4a32;--purple2:#E07B5A;--purple3:rgba(224,123,90,.12);
-  --yellow:#C99A2E;--yellow2:#D9AE4E;--yellow3:rgba(201,154,46,.14);
-  --red:#C0392B;--red2:#E07B5A;
-  --green:#1B7A3D;--green2:#2F9B54;--green3:rgba(27,122,61,.12);
-  --dark:#E9E2D2;--dark2:#FBF6EC;--dark3:#FFFFFF;
+  /* bKash-style identity — mapped onto old variable names so every
+     existing class (pink/purple/yellow/green/glass/border/ink) keeps working */
+  --bkash-pink:#E2136E;--bkash-pink-dark:#C20F5E;--bkash-green:#00A651;--bkash-green-dark:#00873F;
+  --pink:#E2136E;--pink2:#FF4D94;--pink3:rgba(226,19,110,.10);
+  --purple:#00A651;--purple2:#2ECC71;--purple3:rgba(0,166,81,.10);
+  --yellow:#F59E0B;--yellow2:#FBBF24;--yellow3:rgba(245,158,11,.10);
+  --red:#E11D48;--red2:#F43F5E;
+  --green:#00A651;--green2:#2ECC71;--green3:rgba(0,166,81,.10);
+  --orange:#F97316;--orange2:#FB923C;
+  --dark:#F5F5F7;--dark2:#FFFFFF;--dark3:#FFFFFF;
   --glass:#FFFFFF;--glass2:#FFFFFF;
-  --border:rgba(21,48,30,.14);--border2:rgba(21,48,30,.22);
-  --shadow:0 18px 40px -22px rgba(21,48,30,.35);
+  --border:rgba(20,20,20,.08);--border2:rgba(20,20,20,.14);
+  --ink:#1A1A1A;--ink-soft:rgba(20,20,20,.55);
+  --shadow:0 4px 18px -6px rgba(226,19,110,.14);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ── BG (flat cream, no glow orbs in new design) ── */
-.bg-wrap{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;display:none}
+/* ── BG (flat, bKash apps don't use glow orbs) ── */
+.bg-wrap{display:none}
 .orb{display:none}
 .grid-bg{display:none}
 
@@ -37,42 +38,43 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 /* ── SIDEBAR ── */
 .sidebar{
   width:240px;flex-shrink:0;
-  background:rgba(251,246,236,.92);backdrop-filter:blur(24px);
+  background:#FFFFFF;
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
   position:fixed;top:0;left:0;bottom:0;z-index:100;
   transition:transform .35s cubic-bezier(.4,0,.2,1);
+  box-shadow:2px 0 16px -8px rgba(20,20,20,.08);
 }
 .sb-brand{padding:1.5rem 1.4rem 1rem;border-bottom:1px solid var(--border)}
 .sb-logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;margin-bottom:.6rem}
 .sb-logo-icon{width:38px;height:38px;border-radius:11px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
   display:flex;align-items:center;justify-content:center;color:#fff;
-  font-weight:900;font-size:1.1rem;box-shadow:0 0 18px rgba(233,30,140,.4)}
-.sb-logo-text{font-family:'Fraunces',serif;font-size:1.1rem;
+  font-weight:900;font-size:1.1rem;box-shadow:0 0 18px rgba(226,19,110,.35)}
+.sb-logo-text{font-family:'Hind Siliguri',sans-serif;font-size:1.1rem;
   background:linear-gradient(90deg,var(--pink),var(--purple2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .sb-member{font-family:'Inter',sans-serif;font-size:.66rem;
-  color:rgba(21,48,30,.35);letter-spacing:.06em}
+  color:rgba(20,20,20,.35);letter-spacing:.06em}
 .sb-member span{color:var(--pink2)}
 
 .sb-nav{flex:1;padding:1rem .75rem;overflow-y:auto}
 .sb-section{font-family:'Inter',sans-serif;font-size:.62rem;
   letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(21,48,30,.25);padding:.4rem .65rem;margin-bottom:.3rem;margin-top:.8rem}
+  color:rgba(20,20,20,.25);padding:.4rem .65rem;margin-bottom:.3rem;margin-top:.8rem}
 .sb-item{
   display:flex;align-items:center;gap:.7rem;
   padding:.62rem .75rem;border-radius:11px;
-  color:rgba(21,48,30,.5);text-decoration:none;
+  color:rgba(20,20,20,.5);text-decoration:none;
   font-size:.85rem;font-weight:500;cursor:pointer;
   transition:all .25s;border:1px solid transparent;
   background:transparent;width:100%;text-align:left;
 }
-.sb-item:hover{color:var(--green-ink);background:var(--glass);border-color:var(--border)}
-.sb-item.active{color:var(--green-ink);background:linear-gradient(135deg,var(--pink3),var(--purple3));
+.sb-item:hover{color:var(--ink);background:var(--glass);border-color:var(--border)}
+.sb-item.active{color:var(--ink);background:linear-gradient(135deg,var(--pink3),var(--purple3));
   border-color:rgba(233,30,140,.22);box-shadow:0 0 14px rgba(233,30,140,.1)}
 .sb-item-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
-.sb-badge{margin-left:auto;background:var(--pink);color:var(--green-ink);
+.sb-badge{margin-left:auto;background:var(--pink);color:var(--ink);
   font-size:.62rem;font-weight:700;padding:.1rem .45rem;border-radius:50px}
 
 .sb-bottom{padding:.75rem;border-top:1px solid var(--border)}
@@ -80,18 +82,18 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   border-radius:11px;background:var(--glass);border:1px solid var(--border)}
 .sb-avatar{width:34px;height:34px;border-radius:50%;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;color:#fff;
   font-weight:700;font-size:.85rem;flex-shrink:0}
-.sb-pname{font-size:.82rem;font-weight:600;color:var(--green-ink);line-height:1.2}
-.sb-ptier{font-size:.68rem;color:rgba(21,48,30,.38)}
-.sb-logout{margin-left:auto;background:none;border:none;color:rgba(21,48,30,.35);
+.sb-pname{font-size:.82rem;font-weight:600;color:var(--ink);line-height:1.2}
+.sb-ptier{font-size:.68rem;color:rgba(20,20,20,.38)}
+.sb-logout{margin-left:auto;background:none;border:none;color:rgba(20,20,20,.35);
   font-size:.9rem;cursor:pointer;transition:color .3s;padding:.2rem}
 .sb-logout:hover{color:var(--red2)}
 
 /* ── MOBILE TOPBAR ── */
 .topbar{
   display:none;position:fixed;top:0;left:0;right:0;z-index:200;
-  height:56px;background:rgba(251,246,236,.92);backdrop-filter:blur(20px);
+  height:56px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   align-items:center;justify-content:space-between;padding:0 1rem;
 }
@@ -99,10 +101,10 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .topbar-logo-icon{width:32px;height:32px;border-radius:9px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
   display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;color:#fff}
-.topbar-logo-text{font-family:'Fraunces',serif;font-size:1rem;
+.topbar-logo-text{font-family:'Hind Siliguri',sans-serif;font-size:1rem;
   background:linear-gradient(90deg,var(--pink),var(--purple2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hamburger{background:none;border:none;color:rgba(21,48,30,.7);font-size:1.3rem;cursor:pointer;padding:.3rem}
+.hamburger{background:none;border:none;color:rgba(20,20,20,.7);font-size:1.3rem;cursor:pointer;padding:.3rem}
 
 /* ── MAIN CONTENT ── */
 .main{margin-left:240px;min-height:100vh;padding:2rem 1.75rem 4rem}
@@ -113,23 +115,23 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .greet-left{}
 .greet-time{font-family:'Inter',sans-serif;font-size:.72rem;
   letter-spacing:.1em;color:var(--pink2);margin-bottom:.35rem}
-.greet-name{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:900;
-  background:linear-gradient(135deg,var(--green-ink),var(--green-deep));
+.greet-name{font-family:'Hind Siliguri',sans-serif;font-size:1.9rem;font-weight:900;
+  background:linear-gradient(135deg,var(--ink),var(--pink));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   line-height:1.2;margin-bottom:.25rem}
-.greet-sub{font-size:.85rem;color:rgba(21,48,30,.42)}
+.greet-sub{font-size:.85rem;color:rgba(20,20,20,.42)}
 .greet-right{display:flex;gap:.75rem;flex-wrap:wrap}
 .hdr-btn{
   display:flex;align-items:center;gap:.5rem;
   padding:.6rem 1.1rem;border-radius:50px;
   font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:600;
   cursor:pointer;transition:all .3s;text-decoration:none;
-  border:1px solid var(--border2);background:var(--glass2);color:var(--green-ink);
+  border:1px solid var(--border2);background:var(--glass2);color:var(--ink);
 }
 .hdr-btn:hover{border-color:var(--pink);transform:translateY(-1px)}
 .hdr-btn.primary{
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  border-color:transparent;box-shadow:0 0 18px rgba(233,30,140,.28);color:#fff;
+  border-color:transparent;box-shadow:0 0 18px rgba(226,19,110,.28);color:#fff;
 }
 .hdr-btn.primary:hover{box-shadow:0 0 32px rgba(233,30,140,.45)}
 
@@ -147,7 +149,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .alert-icon{font-size:1.5rem;flex-shrink:0}
 .alert-body{flex:1}
 .alert-title{font-size:.88rem;font-weight:700;margin-bottom:.18rem}
-.alert-desc{font-size:.78rem;color:rgba(21,48,30,.5)}
+.alert-desc{font-size:.78rem;color:rgba(20,20,20,.5)}
 .alert-btn{
   padding:.5rem 1.1rem;border-radius:50px;
   background:linear-gradient(135deg,var(--green),var(--yellow));
@@ -166,7 +168,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   padding:1.2rem 1.2rem 1rem;box-shadow:var(--shadow);
   position:relative;overflow:hidden;transition:all .35s;
 }
-.stat-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 38px -18px rgba(21,48,30,.4)}
+.stat-card:hover{transform:translateY(-4px);border-color:var(--border2);box-shadow:0 16px 38px -16px rgba(226,19,110,.22)}
 .stat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s}
 .stat-card:hover::before{opacity:1}
 .sc-pink::before{background:linear-gradient(135deg,var(--pink3),transparent)}
@@ -176,12 +178,12 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .sc-red::before{background:linear-gradient(135deg,rgba(220,38,38,.1),transparent)}
 .stat-icon{font-size:1.5rem;margin-bottom:.7rem;display:block}
 .stat-val{font-family:'Inter',sans-serif;font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:.22rem}
-.stat-lbl{font-size:.75rem;color:rgba(21,48,30,.42);font-weight:500}
+.stat-lbl{font-size:.75rem;color:rgba(20,20,20,.42);font-weight:500}
 .stat-trend{position:absolute;top:.9rem;right:.9rem;
   font-size:.68rem;padding:.18rem .5rem;border-radius:50px;font-weight:700}
 .up{background:rgba(5,150,105,.18);color:var(--green2)}
 .down{background:rgba(220,38,38,.18);color:var(--red2)}
-.neu{background:rgba(21,48,30,.08);color:rgba(21,48,30,.4)}
+.neu{background:rgba(20,20,20,.08);color:rgba(20,20,20,.4)}
 
 /* ── GRID LAYOUT ── */
 .dash-grid{display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start}
@@ -198,7 +200,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid var(--border);
 }
-.dcard-title{font-size:.88rem;font-weight:700;color:var(--green-ink);display:flex;align-items:center;gap:.5rem}
+.dcard-title{font-size:.88rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:.5rem}
 .dcard-title-icon{font-size:1rem}
 .dcard-action{font-size:.75rem;color:var(--pink2);text-decoration:none;
   background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;
@@ -215,11 +217,11 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .cycle-ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center}
 .cycle-day{font-family:'Inter',sans-serif;font-size:1.1rem;font-weight:700;color:var(--pink2)}
-.cycle-total{font-size:.62rem;color:rgba(21,48,30,.38)}
+.cycle-total{font-size:.62rem;color:rgba(20,20,20,.38)}
 .cycle-info{}
-.cycle-phase{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;
+.cycle-phase{font-family:'Hind Siliguri',sans-serif;font-size:1.1rem;font-weight:700;
   color:var(--pink2);margin-bottom:.3rem}
-.cycle-desc{font-size:.8rem;color:rgba(21,48,30,.5);line-height:1.6;margin-bottom:.6rem}
+.cycle-desc{font-size:.8rem;color:rgba(20,20,20,.5);line-height:1.6;margin-bottom:.6rem}
 .cycle-tags{display:flex;gap:.4rem;flex-wrap:wrap}
 .ctag{font-size:.7rem;padding:.2rem .6rem;border-radius:50px;
   background:rgba(233,30,140,.12);color:var(--pink2);border:1px solid rgba(233,30,140,.2)}
@@ -231,9 +233,9 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   background:linear-gradient(135deg,rgba(107,33,168,.07),rgba(233,30,140,.05));
 }
 .lock-icon{font-size:2.5rem;margin-bottom:.75rem;display:block}
-.lock-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;
-  color:rgba(21,48,30,.55);margin-bottom:.4rem}
-.lock-desc{font-size:.78rem;color:rgba(21,48,30,.35);line-height:1.6;margin-bottom:1.1rem}
+.lock-title{font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;
+  color:rgba(20,20,20,.55);margin-bottom:.4rem}
+.lock-desc{font-size:.78rem;color:rgba(20,20,20,.35);line-height:1.6;margin-bottom:1.1rem}
 .lock-btn{
   display:inline-block;padding:.65rem 1.5rem;border-radius:50px;
   background:linear-gradient(135deg,var(--purple),var(--pink));
@@ -245,30 +247,30 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 
 .analysis-content{}
 .health-score-row{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.2rem;
-  padding:.9rem;background:rgba(21,48,30,.035);border-radius:14px}
+  padding:.9rem;background:rgba(20,20,20,.035);border-radius:14px}
 .hs-ring{position:relative;width:70px;height:70px;flex-shrink:0}
 .hs-ring svg{transform:rotate(-90deg)}
 .hs-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .hs-num{font-family:'Inter',sans-serif;font-size:1rem;font-weight:700}
-.hs-lbl{font-size:.58rem;color:rgba(21,48,30,.38)}
+.hs-lbl{font-size:.58rem;color:rgba(20,20,20,.38)}
 .hs-right{}
-.hs-title{font-size:.82rem;font-weight:600;color:var(--green-ink);margin-bottom:.2rem}
-.hs-msg{font-size:.78rem;color:rgba(21,48,30,.5);line-height:1.5}
+.hs-title{font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.2rem}
+.hs-msg{font-size:.78rem;color:rgba(20,20,20,.5);line-height:1.5}
 
 .analysis-section{margin-bottom:.9rem}
 .as-label{font-family:'Inter',sans-serif;font-size:.64rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(21,48,30,.32);margin-bottom:.5rem}
-.as-content{font-size:.82rem;color:rgba(21,48,30,.68);line-height:1.7}
+  text-transform:uppercase;color:rgba(20,20,20,.32);margin-bottom:.5rem}
+.as-content{font-size:.82rem;color:rgba(20,20,20,.68);line-height:1.7}
 .as-tags{display:flex;flex-direction:column;gap:.4rem}
 .as-tag{display:flex;align-items:flex-start;gap:.55rem;
-  background:rgba(21,48,30,.038);border-radius:9px;padding:.6rem .8rem;
-  font-size:.78rem;color:rgba(21,48,30,.65);line-height:1.5}
+  background:rgba(20,20,20,.038);border-radius:9px;padding:.6rem .8rem;
+  font-size:.78rem;color:rgba(20,20,20,.65);line-height:1.5}
 .as-tag-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:.3rem}
 .disclaimer-mini{
   background:linear-gradient(135deg,rgba(220,38,38,.07),rgba(107,33,168,.05));
   border:1px solid rgba(220,38,38,.14);border-radius:11px;
   padding:.75rem .9rem;margin-top:.75rem;
-  font-size:.74rem;color:rgba(21,48,30,.42);line-height:1.6;
+  font-size:.74rem;color:rgba(20,20,20,.42);line-height:1.6;
 }
 .disclaimer-mini strong{color:var(--red2)}
 
@@ -279,14 +281,14 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .menu-item{
   display:flex;align-items:center;gap:1rem;
   padding:.85rem 1rem;border-radius:14px;
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
   transition:all .3s;cursor:pointer;
 }
 .menu-item:hover{border-color:rgba(233,30,140,.3);background:rgba(233,30,140,.06);transform:translateX(4px)}
 .menu-item-emoji{font-size:1.6rem;flex-shrink:0}
 .menu-item-info{flex:1}
-.menu-item-name{font-size:.85rem;font-weight:600;color:var(--green-ink);margin-bottom:.18rem}
-.menu-item-meta{font-size:.72rem;color:rgba(21,48,30,.4);display:flex;gap:.6rem}
+.menu-item-name{font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:.18rem}
+.menu-item-meta{font-size:.72rem;color:rgba(20,20,20,.4);display:flex;gap:.6rem}
 .menu-item-kcal{font-family:'Inter',sans-serif;font-size:.7rem;color:var(--yellow2)}
 .menu-item-type{
   font-size:.68rem;padding:.15rem .55rem;border-radius:50px;
@@ -309,14 +311,14 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .order-row{
   display:flex;align-items:center;gap:.85rem;
   padding:.75rem .9rem;border-radius:13px;
-  background:rgba(21,48,30,.038);border:1px solid var(--border);
+  background:rgba(20,20,20,.038);border:1px solid var(--border);
   transition:all .3s;
 }
-.order-row:hover{border-color:var(--border2);background:rgba(21,48,30,.06)}
-.order-num{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(21,48,30,.35);width:90px}
+.order-row:hover{border-color:var(--border2);background:rgba(20,20,20,.06)}
+.order-num{font-family:'Inter',sans-serif;font-size:.7rem;color:rgba(20,20,20,.35);width:90px}
 .order-info{flex:1}
-.order-items-txt{font-size:.82rem;color:var(--green-ink);font-weight:500}
-.order-date{font-size:.7rem;color:rgba(21,48,30,.35);margin-top:.1rem}
+.order-items-txt{font-size:.82rem;color:var(--ink);font-weight:500}
+.order-date{font-size:.7rem;color:rgba(20,20,20,.35);margin-top:.1rem}
 .order-total{font-family:'Inter',sans-serif;font-size:.82rem;color:var(--yellow2);flex-shrink:0}
 .order-status{
   font-size:.68rem;padding:.2rem .6rem;border-radius:50px;
@@ -326,23 +328,23 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .os-preparing{background:rgba(245,158,11,.16);color:var(--yellow2)}
 .os-pending{background:rgba(107,33,168,.16);color:var(--purple2)}
 .os-cancelled{background:rgba(220,38,38,.16);color:var(--red2)}
-.empty-state{text-align:center;padding:1.5rem;color:rgba(21,48,30,.28);font-size:.82rem}
+.empty-state{text-align:center;padding:1.5rem;color:rgba(20,20,20,.28);font-size:.82rem}
 
 /* ── HEALTH METRICS WIDGET ── */
 .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
 .metric-chip{
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
   border-radius:12px;padding:.8rem .9rem;transition:all .3s;
 }
-.metric-chip:hover{border-color:var(--border2);background:rgba(21,48,30,.07)}
-.mc-label{font-size:.7rem;color:rgba(21,48,30,.38);margin-bottom:.25rem}
+.metric-chip:hover{border-color:var(--border2);background:rgba(20,20,20,.07)}
+.mc-label{font-size:.7rem;color:rgba(20,20,20,.38);margin-bottom:.25rem}
 .mc-val{font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;line-height:1}
-.mc-unit{font-size:.62rem;color:rgba(21,48,30,.3);margin-left:.2rem}
+.mc-unit{font-size:.62rem;color:rgba(20,20,20,.3);margin-left:.2rem}
 .mc-status{font-size:.65rem;margin-top:.22rem;font-weight:600}
 .s-normal{color:var(--green2)}
 .s-low{color:var(--yellow2)}
 .s-high{color:var(--red2)}
-.s-na{color:rgba(21,48,30,.25)}
+.s-na{color:rgba(20,20,20,.25)}
 
 /* ── LOYALTY CARD ── */
 .loyalty-card{background:linear-gradient(135deg,rgba(245,158,11,.09),rgba(233,30,140,.06));
@@ -356,42 +358,42 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   font-size:1.4rem;box-shadow:0 0 16px rgba(245,158,11,.35);flex-shrink:0;
 }
 .tier-info{}
-.tier-name{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--yellow2)}
-.tier-pts{font-family:'Inter',sans-serif;font-size:.72rem;color:rgba(21,48,30,.45);margin-top:.1rem}
+.tier-name{font-family:'Hind Siliguri',sans-serif;font-size:1rem;font-weight:700;color:var(--yellow2)}
+.tier-pts{font-family:'Inter',sans-serif;font-size:.72rem;color:rgba(20,20,20,.45);margin-top:.1rem}
 .tier-pts span{color:var(--yellow2);font-weight:700}
 .pts-bar-wrap{margin-bottom:.75rem}
-.pts-bar-info{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(21,48,30,.4);margin-bottom:.4rem}
-.pts-bar-bg{height:6px;background:rgba(21,48,30,.08);border-radius:6px;overflow:hidden}
+.pts-bar-info{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(20,20,20,.4);margin-bottom:.4rem}
+.pts-bar-bg{height:6px;background:rgba(20,20,20,.08);border-radius:6px;overflow:hidden}
 .pts-bar-fill{height:100%;border-radius:6px;
   background:linear-gradient(90deg,var(--yellow),var(--pink));
   transition:width .8s ease;box-shadow:0 0 8px rgba(245,158,11,.35)}
-.pts-next{font-size:.74rem;color:rgba(21,48,30,.38);text-align:center}
+.pts-next{font-size:.74rem;color:rgba(20,20,20,.38);text-align:center}
 
 /* ── SAR NOTES WIDGET ── */
 .notes-list{display:flex;flex-direction:column;gap:.6rem}
 .note-item{
   padding:.8rem .9rem;border-radius:12px;
-  background:rgba(21,48,30,.038);border-left:3px solid;
-  font-size:.8rem;color:rgba(21,48,30,.65);line-height:1.6;
+  background:rgba(20,20,20,.038);border-left:3px solid;
+  font-size:.8rem;color:rgba(20,20,20,.65);line-height:1.6;
 }
 .note-item.low{border-color:var(--green)}
 .note-item.medium{border-color:var(--yellow)}
 .note-item.high{border-color:var(--red)}
 .note-item.critical{border-color:var(--red);background:rgba(220,38,38,.07)}
-.note-date{font-size:.68rem;color:rgba(21,48,30,.28);margin-top:.3rem;font-family:'Inter',sans-serif}
+.note-date{font-size:.68rem;color:rgba(20,20,20,.28);margin-top:.3rem;font-family:'Inter',sans-serif}
 
 /* ── QUICK ACTIONS ── */
 .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 .qa-btn{
   display:flex;flex-direction:column;align-items:center;gap:.45rem;
   padding:.9rem .5rem;border-radius:14px;
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
-  text-decoration:none;color:var(--green-ink);cursor:pointer;transition:all .3s;
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
+  text-decoration:none;color:var(--ink);cursor:pointer;transition:all .3s;
   font-family:'Hind Siliguri',sans-serif;
 }
-.qa-btn:hover{transform:translateY(-3px);border-color:var(--border2);background:rgba(21,48,30,.08)}
+.qa-btn:hover{transform:translateY(-3px);border-color:var(--border2);background:rgba(20,20,20,.08)}
 .qa-icon{font-size:1.4rem}
-.qa-label{font-size:.76rem;font-weight:600;color:rgba(21,48,30,.65);text-align:center}
+.qa-label{font-size:.76rem;font-weight:600;color:rgba(20,20,20,.65);text-align:center}
 .qa-btn.highlight{background:linear-gradient(135deg,var(--pink3),var(--purple3));
   border-color:rgba(233,30,140,.22)}
 .qa-btn.highlight .qa-label{color:var(--pink2)}
@@ -401,10 +403,10 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   border:1px solid rgba(107,33,168,.18)}
 .mem-body{padding:1.2rem 1.4rem}
 .mem-row{display:flex;justify-content:space-between;align-items:center;
-  padding:.5rem 0;border-bottom:1px solid rgba(21,48,30,.05)}
+  padding:.5rem 0;border-bottom:1px solid rgba(20,20,20,.05)}
 .mem-row:last-child{border:none;padding-bottom:0}
-.mem-k{font-size:.78rem;color:rgba(21,48,30,.38)}
-.mem-v{font-size:.78rem;color:var(--green-ink);font-weight:600;text-align:right}
+.mem-k{font-size:.78rem;color:rgba(20,20,20,.38)}
+.mem-v{font-size:.78rem;color:var(--ink);font-weight:600;text-align:right}
 .mem-v.active{color:var(--green2)}
 .mem-v.expired{color:var(--red2)}
 .mem-v.pending{color:var(--yellow2)}
@@ -416,9 +418,9 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   text-align:center;padding:1.4rem;
 }
 .moti-icon{font-size:2rem;margin-bottom:.75rem;display:block}
-.moti-text{font-family:'Fraunces',serif;font-size:.95rem;font-style:italic;
-  color:rgba(21,48,30,.72);line-height:1.6;margin-bottom:.4rem}
-.moti-source{font-size:.72rem;color:rgba(21,48,30,.3);font-family:'Inter',sans-serif}
+.moti-text{font-family:'Hind Siliguri',sans-serif;font-size:.95rem;font-style:italic;
+  color:rgba(20,20,20,.72);line-height:1.6;margin-bottom:.4rem}
+.moti-source{font-size:.72rem;color:rgba(20,20,20,.3);font-family:'Inter',sans-serif}
 
 /* ── LOADING ── */
 .loader{display:none;position:fixed;inset:0;z-index:9999;
@@ -429,14 +431,14 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   border:3px solid rgba(233,30,140,.18);border-top-color:var(--pink);
   animation:sp .75s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.load-txt{font-size:.88rem;color:rgba(21,48,30,.45)}
+.load-txt{font-size:.88rem;color:rgba(20,20,20,.45)}
 
 /* ── TOAST ── */
 .toast{
   position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
   background:rgba(20,20,30,.95);backdrop-filter:blur(16px);
   border:1px solid var(--border2);border-radius:14px;
-  padding:.85rem 1.2rem;font-size:.84rem;color:var(--green-ink);
+  padding:.85rem 1.2rem;font-size:.84rem;color:var(--ink);
   display:flex;align-items:center;gap:.7rem;
   transform:translateY(80px);opacity:0;
   transition:all .4s cubic-bezier(.4,0,.2,1);max-width:320px;
@@ -445,7 +447,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .toast-icon{font-size:1.1rem;flex-shrink:0}
 
 /* ── SIDEBAR OVERLAY ── */
-.sb-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+.sb-overlay{display:none;position:fixed;top:0;right:0;bottom:0;left:240px;z-index:99;background:rgba(0,0,0,.5)}
 
 /* ── RESPONSIVE ── */
 @media(max-width:1100px){
@@ -454,7 +456,8 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 }
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0)}
+  .sidebar.open{transform:translateX(0);z-index:150;pointer-events:auto}
+  .sidebar.open *{pointer-events:auto}
   .sb-overlay.show{display:block}
   .topbar{display:flex}
   .main{margin-left:0;padding:4.5rem 1rem 4rem}
@@ -472,21 +475,21 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
    ══════════════════════════════════════════ */
 
 /* ── INPUT FIELD BASE ── */
-.sar-input{width:100%;background:rgba(21,48,30,.06);border:1px solid rgba(21,48,30,.15);
-  border-radius:10px;padding:.65rem .9rem;color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;
+.sar-input{width:100%;background:rgba(20,20,20,.06);border:1px solid rgba(20,20,20,.15);
+  border-radius:10px;padding:.65rem .9rem;color:var(--ink);font-family:'Hind Siliguri',sans-serif;
   font-size:.88rem;outline:none;transition:border-color .3s}
 .sar-input:focus{border-color:var(--pink)}
 .sar-textarea{resize:vertical;min-height:70px}
-.sar-select{background:var(--cream);cursor:pointer}
+.sar-select{background:#F5F5F7;cursor:pointer}
 
 /* ── CHECKBOX ROW ── */
 .check-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.6rem}
 .check-label{display:flex;align-items:center;gap:.55rem;cursor:pointer;
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
-  border-radius:9px;padding:.5rem .75rem;transition:all .25s;font-size:.83rem;color:rgba(21,48,30,.7)}
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
+  border-radius:9px;padding:.5rem .75rem;transition:all .25s;font-size:.83rem;color:rgba(20,20,20,.7)}
 .check-label:hover{border-color:var(--pink);background:rgba(233,30,140,.06)}
 .check-label input[type=checkbox]{width:16px;height:16px;accent-color:var(--pink);cursor:pointer}
-.check-label.checked{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.08);color:var(--green-ink)}
+.check-label.checked{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.08);color:var(--ink)}
 
 /* ── RANGE SLIDER ── */
 .range-row{display:flex;align-items:center;gap:.75rem;margin-top:.5rem}
@@ -496,13 +499,13 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 
 /* ── SECTION HEADER ── */
 .sec-head{font-family:'Inter',sans-serif;font-size:.62rem;letter-spacing:.14em;
-  text-transform:uppercase;color:rgba(21,48,30,.3);margin:1rem 0 .5rem}
+  text-transform:uppercase;color:rgba(20,20,20,.3);margin:1rem 0 .5rem}
 
 /* ── MOOD PILLS ── */
 .mood-grid{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem}
-.mood-pill{background:rgba(21,48,30,.06);border:1px solid var(--border);
+.mood-pill{background:rgba(20,20,20,.06);border:1px solid var(--border);
   border-radius:20px;padding:.3rem .8rem;font-size:.8rem;cursor:pointer;
-  color:rgba(21,48,30,.6);transition:all .25s}
+  color:rgba(20,20,20,.6);transition:all .25s}
 .mood-pill:hover{border-color:var(--pink);color:var(--pink2)}
 .mood-pill.selected{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
 
@@ -520,7 +523,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 /* ── SAVE LOG BTN ── */
 .save-log-btn{width:100%;padding:1rem;border:none;border-radius:14px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:1rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:1rem;
   font-weight:700;cursor:pointer;transition:all .3s;margin-top:.5rem}
 .save-log-btn:hover{box-shadow:0 0 24px rgba(233,30,140,.4);transform:translateY(-2px)}
 .save-log-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
@@ -530,12 +533,12 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   border-radius:16px;overflow:hidden;margin-bottom:.75rem}
 .report-toggle{display:flex;align-items:center;justify-content:space-between;
   padding:1rem 1.25rem;cursor:pointer;transition:background .25s}
-.report-toggle:hover{background:rgba(21,48,30,.04)}
+.report-toggle:hover{background:rgba(20,20,20,.04)}
 .report-score-badge{font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;
   padding:.25rem .65rem;border-radius:50px}
 .report-body{padding:1.1rem 1.25rem;border-top:1px solid var(--border);
-  font-size:.83rem;color:rgba(21,48,30,.65);line-height:1.75}
-.report-arrow{font-size:.7rem;color:rgba(21,48,30,.3);transition:transform .3s}
+  font-size:.83rem;color:rgba(20,20,20,.65);line-height:1.75}
+.report-arrow{font-size:.7rem;color:rgba(20,20,20,.3);transition:transform .3s}
 .report-item.open .report-arrow{transform:rotate(180deg)}
 .report-item.open .report-body{display:block}
 .report-item:not(.open) .report-body{display:none}
@@ -547,23 +550,23 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 /* ── DOCTOR PANEL ── */
 .consult-fee-box{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
   border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.83rem;
-  color:rgba(21,48,30,.65);line-height:1.75}
+  color:rgba(20,20,20,.65);line-height:1.75}
 .consult-fee-box strong{color:var(--yellow2)}
 .consult-list{list-style:none;margin:.4rem 0 0;padding:0}
 .consult-list li::before{content:'✦ ';color:var(--yellow2);font-size:.7rem}
 .consult-btn{width:100%;padding:.9rem;border:none;border-radius:12px;
   background:linear-gradient(135deg,var(--green),#059669);
-  color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.95rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;
   font-weight:700;cursor:pointer;transition:all .3s;margin-top:.75rem}
 .consult-btn:hover{box-shadow:0 0 24px rgba(5,150,105,.4);transform:translateY(-2px)}
 
 /* ── WRITE TO SAR ── */
-.feedback-type-select{width:100%;padding:.65rem .9rem;background:var(--cream);
-  border:1px solid rgba(21,48,30,.15);border-radius:10px;color:var(--green-ink);
+.feedback-type-select{width:100%;padding:.65rem .9rem;background:#F5F5F7;
+  border:1px solid rgba(20,20,20,.15);border-radius:10px;color:var(--ink);
   font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer;
   margin-bottom:.75rem;outline:none}
 .send-feedback-btn{background:linear-gradient(135deg,var(--purple),var(--pink));
-  border:none;border-radius:10px;padding:.7rem 1.5rem;color:var(--green-ink);
+  border:none;border-radius:10px;padding:.7rem 1.5rem;color:#fff;
   font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
 .send-feedback-btn:hover{opacity:.9}
 
@@ -578,17 +581,17 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
    ══════════════════════════════════════════════ */
 .sar-overlay{
   position:fixed;inset:0;z-index:5000;
-  background:rgba(21,48,30,.55);backdrop-filter:blur(10px);
+  background:rgba(20,20,20,.55);backdrop-filter:blur(10px);
   display:none;align-items:center;justify-content:center;
   padding:1rem;
 }
 .sar-overlay.open{display:flex}
 
 .sar-modal{
-  background:var(--paper);border:1px solid rgba(21,48,30,.12);
+  background:#FFFFFF;border:1px solid rgba(20,20,20,.12);
   border-radius:20px;width:100%;max-width:640px;
   max-height:88vh;display:flex;flex-direction:column;
-  box-shadow:0 24px 80px rgba(21,48,30,.35);
+  box-shadow:0 24px 80px rgba(20,20,20,.25);
   animation:modalIn .28s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes modalIn{
@@ -598,44 +601,44 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 .modal-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:1.1rem 1.4rem .9rem;
-  border-bottom:1px solid rgba(21,48,30,.08);flex-shrink:0;
+  border-bottom:1px solid rgba(20,20,20,.08);flex-shrink:0;
 }
 .modal-title{
-  font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;
-  display:flex;align-items:center;gap:.55rem;color:var(--green-ink);
+  font-family:'Hind Siliguri',sans-serif;font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;gap:.55rem;color:var(--ink);
 }
 .modal-close{
-  background:rgba(21,48,30,.07);border:none;border-radius:50%;
-  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(21,48,30,.6);
+  background:rgba(20,20,20,.07);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(20,20,20,.6);
   display:flex;align-items:center;justify-content:center;transition:all .25s;
 }
 .modal-close:hover{background:rgba(220,38,38,.2);color:#F87171}
 
 .modal-body{
   flex:1;overflow-y:auto;padding:1.2rem 1.4rem;
-  scrollbar-width:thin;scrollbar-color:rgba(21,48,30,.1) transparent;
+  scrollbar-width:thin;scrollbar-color:rgba(20,20,20,.1) transparent;
 }
 .modal-body::-webkit-scrollbar{width:4px}
-.modal-body::-webkit-scrollbar-thumb{background:rgba(21,48,30,.1);border-radius:4px}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(20,20,20,.1);border-radius:4px}
 
 .modal-foot{
-  padding:.85rem 1.4rem;border-top:1px solid rgba(21,48,30,.06);
+  padding:.85rem 1.4rem;border-top:1px solid rgba(20,20,20,.06);
   display:flex;gap:.7rem;align-items:center;flex-shrink:0;
 }
 
 /* ── Profile rows ── */
 .p-row{display:flex;justify-content:space-between;align-items:center;
-  padding:.5rem 0;border-bottom:1px solid rgba(21,48,30,.05)}
+  padding:.5rem 0;border-bottom:1px solid rgba(20,20,20,.05)}
 .p-row:last-child{border:none}
-.p-k{font-size:.78rem;color:rgba(21,48,30,.4)}
-.p-v{font-size:.82rem;color:var(--green-ink);font-weight:500;text-align:right;max-width:60%}
+.p-k{font-size:.78rem;color:rgba(20,20,20,.4)}
+.p-v{font-size:.82rem;color:var(--ink);font-weight:500;text-align:right;max-width:60%}
 .p-v.ok{color:#34D399}.p-v.warn{color:#F87171}.p-v.pend{color:#FCD34D}
 
 /* ── Modal form controls ── */
 .m-label{font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(21,48,30,.3);margin:.85rem 0 .4rem}
-.m-input{width:100%;background:rgba(21,48,30,.06);border:1px solid rgba(21,48,30,.13);
-  border-radius:10px;padding:.65rem .9rem;color:var(--green-ink);
+  text-transform:uppercase;color:rgba(20,20,20,.3);margin:.85rem 0 .4rem}
+.m-input{width:100%;background:rgba(20,20,20,.06);border:1px solid rgba(20,20,20,.13);
+  border-radius:10px;padding:.65rem .9rem;color:var(--ink);
   font-family:'Hind Siliguri',sans-serif;font-size:.88rem;outline:none;
   transition:border-color .25s}
 .m-input:focus{border-color:var(--pink)}
@@ -644,18 +647,18 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
 /* ── Symptom checkboxes ── */
 .sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.4rem}
 .sym-cb{display:flex;align-items:center;gap:.5rem;cursor:pointer;
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
   border-radius:9px;padding:.45rem .7rem;transition:all .22s;
-  font-size:.82rem;color:rgba(21,48,30,.65)}
+  font-size:.82rem;color:rgba(20,20,20,.65)}
 .sym-cb:hover{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.06)}
 .sym-cb input{accent-color:var(--pink);width:15px;height:15px}
-.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:var(--green-ink)}
+.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:var(--ink)}
 
 /* ── Mood pills ── */
 .mood-wrap{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.4rem}
-.m-mood{background:rgba(21,48,30,.05);border:1px solid var(--border);
+.m-mood{background:rgba(20,20,20,.05);border:1px solid var(--border);
   border-radius:18px;padding:.28rem .7rem;font-size:.8rem;cursor:pointer;
-  color:rgba(21,48,30,.55);transition:all .22s}
+  color:rgba(20,20,20,.55);transition:all .22s}
 .m-mood:hover{border-color:var(--pink);color:var(--pink2)}
 .m-mood.sel{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
 
@@ -676,60 +679,64 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
   color:var(--red2);animation:mpulse .7s ease infinite;border-style:solid}
 @keyframes mpulse{0%,100%{opacity:1}50%{opacity:.55}}
 
+.m-mic-mini{position:absolute;right:.5rem;bottom:.6rem;width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:rgba(233,30,140,.12);color:var(--pink2,#FF7EB8);cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:.15s}
+.m-mic-mini:hover{background:rgba(233,30,140,.22)}
+.m-mic-mini.rec{background:rgba(220,38,38,.2);border-color:var(--red2,#F87171);color:var(--red2,#F87171);animation:mpulse .7s ease infinite}
+
 /* ── Report cards ── */
-.rpt-card{background:rgba(21,48,30,.035);border:1px solid var(--border);
+.rpt-card{background:rgba(20,20,20,.035);border:1px solid var(--border);
   border-radius:14px;overflow:hidden;margin-bottom:.7rem}
 .rpt-head{display:flex;align-items:center;justify-content:space-between;
   padding:.85rem 1.1rem;cursor:pointer;transition:background .2s}
-.rpt-head:hover{background:rgba(21,48,30,.04)}
+.rpt-head:hover{background:rgba(20,20,20,.04)}
 .rpt-score{font-family:'Inter',sans-serif;font-size:.82rem;
   font-weight:700;padding:.2rem .6rem;border-radius:50px}
-.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(21,48,30,.06);
-  font-size:.82rem;color:rgba(21,48,30,.65);line-height:1.75;display:none}
+.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(20,20,20,.06);
+  font-size:.82rem;color:rgba(20,20,20,.65);line-height:1.75;display:none}
 .rpt-card.open .rpt-body{display:block}
-.rpt-arrow{font-size:.65rem;color:rgba(21,48,30,.3);transition:transform .25s}
+.rpt-arrow{font-size:.65rem;color:rgba(20,20,20,.3);transition:transform .25s}
 .rpt-card.open .rpt-arrow{transform:rotate(180deg)}
 .rpt-section{margin-bottom:.75rem}
 .rpt-section-title{font-family:'Inter',sans-serif;font-size:.6rem;
-  letter-spacing:.12em;text-transform:uppercase;color:rgba(21,48,30,.3);
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(20,20,20,.3);
   margin-bottom:.4rem}
 .rpt-tags{display:flex;flex-direction:column;gap:.3rem}
-.rpt-tag{background:rgba(21,48,30,.04);border-radius:8px;
-  padding:.45rem .7rem;font-size:.8rem;color:rgba(21,48,30,.6)}
+.rpt-tag{background:rgba(20,20,20,.04);border-radius:8px;
+  padding:.45rem .7rem;font-size:.8rem;color:rgba(20,20,20,.6)}
 .rpt-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.4rem}
-.rpt-meal{background:rgba(21,48,30,.04);border-radius:10px;
+.rpt-meal{background:rgba(20,20,20,.04);border-radius:10px;
   padding:.6rem .7rem;text-align:center}
-.rpt-meal-time{font-size:.65rem;color:rgba(21,48,30,.35);margin-bottom:.2rem}
-.rpt-meal-name{font-size:.78rem;color:var(--green-ink);font-weight:600;line-height:1.3}
+.rpt-meal-time{font-size:.65rem;color:rgba(20,20,20,.35);margin-bottom:.2rem}
+.rpt-meal-name{font-size:.78rem;color:var(--ink);font-weight:600;line-height:1.3}
 .rpt-meal-kcal{font-family:'Inter',sans-serif;font-size:.65rem;
   color:var(--yellow2);margin-top:.2rem}
 
 /* ── Modal action btn ── */
 .m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
   font-weight:700;cursor:pointer;transition:all .3s}
 .m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
 .m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
-.m-btn.outline{background:transparent;border:1px solid rgba(21,48,30,.15);
-  color:rgba(21,48,30,.65);flex:unset;padding:.7rem 1.2rem}
+.m-btn.outline{background:transparent;border:1px solid rgba(20,20,20,.15);
+  color:rgba(20,20,20,.65);flex:unset;padding:.7rem 1.2rem}
 .m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
 
 /* ── Profile avatar ── */
 .prof-avatar{width:68px;height:68px;border-radius:50%;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;color:#fff;
   font-size:1.8rem;font-weight:700;flex-shrink:0;
-  box-shadow:0 0 20px rgba(233,30,140,.3)}
-.prof-name{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--green-ink)}
+  box-shadow:0 0 20px rgba(226,19,110,.3)}
+.prof-name{font-family:'Hind Siliguri',sans-serif;font-size:1.2rem;font-weight:700;color:var(--ink)}
 .prof-mid{font-family:'Inter',sans-serif;font-size:.7rem;color:var(--pink2);margin-top:.1rem}
 .prof-tier{display:inline-block;margin-top:.3rem;background:rgba(245,158,11,.12);
   border:1px solid rgba(245,158,11,.25);border-radius:50px;
   padding:.15rem .65rem;font-size:.72rem;color:var(--yellow2)}
 .p-section-head{font-family:'Inter',sans-serif;font-size:.62rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(21,48,30,.25);margin:1rem 0 .5rem;
-  padding-bottom:.3rem;border-bottom:1px solid rgba(21,48,30,.06)}
+  text-transform:uppercase;color:rgba(20,20,20,.25);margin:1rem 0 .5rem;
+  padding-bottom:.3rem;border-bottom:1px solid rgba(20,20,20,.06)}
 
 /* ── Password status msg ── */
 .pw-msg{font-size:.82rem;min-height:1.1rem;margin:.4rem 0}
@@ -853,10 +860,19 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       <!-- GREETING -->
       <div class="dash-header">
         <div class="greet-row">
-          <div class="greet-left">
+          <div class="greet-left" style="display:flex;align-items:center;gap:14px">
+            <div id="custPhotoWrap" onclick="openPhotoStudio()" title="ছবি দেখুন / সাজান"
+              style="width:64px;height:64px;border-radius:50%;flex-shrink:0;cursor:pointer;
+                border:3px solid var(--orange);overflow:hidden;background:var(--glass2);
+                display:flex;align-items:center;justify-content:center;font-size:28px">
+              <img id="custPhotoThumb" style="width:100%;height:100%;object-fit:cover;display:none" alt="ছবি"/>
+              <span id="custPhotoPlaceholder">📷</span>
+            </div>
+            <div>
             <div class="greet-time" id="greetTime">আজকের তারিখ লোড হচ্ছে...</div>
             <div class="greet-name" id="greetName">স্বাগতম, আপা!</div>
             <div class="greet-sub">আপনার স্বাস্থ্য যাত্রার ড্যাশবোর্ড</div>
+            </div>
           </div>
           <div class="greet-right">
             <a href="meal-score.html" class="hdr-btn primary">🥗 আজকের মেনু</a>
@@ -915,15 +931,26 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
               <a href="metrics.html" class="dcard-action">আপডেট →</a>
             </div>
             <div class="cycle-inner" id="cycleInner">
-              <div style="text-align:center;color:rgba(21,48,30,.35);font-size:.82rem;padding:1rem">তারিখ দিন...</div>
+              <div style="text-align:center;color:rgba(20,20,20,.35);font-size:.82rem;padding:1rem">তারিখ দিন...</div>
             </div>
+          </div>
+
+          <!-- দৈনিক স্বাস্থ্য রিপোর্ট link (৬টার AI report) -->
+          <div id="reportCard" style="display:none;margin-bottom:14px;padding:16px;
+               background:rgba(5,150,105,.08);border:1px solid rgba(52,211,153,.25);
+               border-radius:12px;text-align:center">
+            <div style="font-weight:600;color:#34D399;margin-bottom:8px">📄 আজকের স্বাস্থ্য রিপোর্ট</div>
+            <a id="reportLink" href="#" target="_blank"
+               style="display:inline-block;background:#059669;color:var(--ink);padding:9px 18px;
+                      border-radius:9px;text-decoration:none;font-weight:600">পূর্ণ রিপোর্ট দেখুন →</a>
+            <div id="reportDate" style="font-size:.72rem;color:#888;margin-top:8px"></div>
           </div>
 
           <!-- AI ANALYSIS -->
           <div class="dcard analysis-card" id="analysisSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🔬</span>AI স্বাস্থ্য বিশ্লেষণ</span>
-              <span class="dcard-action" id="analysisDate" style="color:rgba(21,48,30,.3)"></span>
+              <span class="dcard-action" id="analysisDate" style="color:rgba(20,20,20,.3)"></span>
             </div>
             <div id="analysisContent">
               <div class="analysis-locked">
@@ -1120,7 +1147,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="profileModalBody">
-      <div style="text-align:center;padding:2rem;color:rgba(21,48,30,.35)">লোড হচ্ছে...</div>
+      <div style="text-align:center;padding:2rem;color:rgba(20,20,20,.35)">লোড হচ্ছে...</div>
     </div>
     <div class="modal-foot">
       <a href="metrics.html" class="m-btn green" style="text-align:center;text-decoration:none">
@@ -1170,9 +1197,9 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
         </label>
       </div>
       <div id="diFevrRow" style="display:none;margin-top:.5rem;display:flex;align-items:center;gap:.6rem">
-        <span style="font-size:.8rem;color:rgba(21,48,30,.5)">তাপমাত্রা:</span>
+        <span style="font-size:.8rem;color:rgba(20,20,20,.5)">তাপমাত্রা:</span>
         <input type="number" id="di2_temp" placeholder="98.6" step="0.1" class="m-input" style="width:100px">
-        <span style="font-size:.78rem;color:rgba(21,48,30,.35)">°F</span>
+        <span style="font-size:.78rem;color:rgba(20,20,20,.35)">°F</span>
       </div>
 
       <!-- মাসিক -->
@@ -1186,12 +1213,12 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
         </label>
       </div>
       <div style="margin-top:.6rem">
-        <div style="font-size:.76rem;color:rgba(21,48,30,.4)">ব্যথার মাত্রা</div>
+        <div style="font-size:.76rem;color:rgba(20,20,20,.4)">ব্যথার মাত্রা</div>
         <div class="m-range-row">
           <input type="range" id="di2_clvl" min="1" max="10" value="5"
             oninput="document.getElementById('diClVal').textContent=this.value">
           <span class="m-range-val" id="diClVal">5</span>
-          <span style="font-size:.72rem;color:rgba(21,48,30,.3)">/10</span>
+          <span style="font-size:.72rem;color:rgba(20,20,20,.3)">/10</span>
         </div>
       </div>
 
@@ -1206,28 +1233,34 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
         <button class="m-mood" onclick="mMood(this,'😴 ক্লান্ত')">😴 ক্লান্ত</button>
       </div>
       <div style="margin-top:.6rem">
-        <div style="font-size:.76rem;color:rgba(21,48,30,.4)">চাপের মাত্রা</div>
+        <div style="font-size:.76rem;color:rgba(20,20,20,.4)">চাপের মাত্রা</div>
         <div class="m-range-row">
           <input type="range" id="di2_stress" min="1" max="10" value="5"
             oninput="document.getElementById('diStVal').textContent=this.value">
           <span class="m-range-val" id="diStVal">5</span>
-          <span style="font-size:.72rem;color:rgba(21,48,30,.3)">/10</span>
+          <span style="font-size:.72rem;color:rgba(20,20,20,.3)">/10</span>
         </div>
       </div>
-      <textarea id="di2_mental" class="m-input m-textarea" style="margin-top:.5rem"
-        placeholder="মানসিক অবস্থা বিস্তারিত বলুন..."></textarea>
+      <div style="position:relative">
+        <textarea id="di2_mental" class="m-input m-textarea" style="margin-top:.5rem"
+          placeholder="মানসিক অবস্থা বিস্তারিত বলুন..."></textarea>
+        <button class="m-mic-mini" id="mentalVoiceBtn" type="button" onclick="mVoice('di2_mental')" title="কণ্ঠে বলুন">🎤</button>
+      </div>
 
       <!-- খাবার -->
       <div class="m-label">🍽️ আজকের খাবার ও পানীয়</div>
-      <textarea id="di2_food" class="m-input m-textarea"
-        placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+      <div style="position:relative">
+        <textarea id="di2_food" class="m-input m-textarea"
+          placeholder="সকাল, দুপুর, রাতের খাবার..."></textarea>
+        <button class="m-mic-mini" id="foodVoiceBtn" type="button" onclick="mVoice('di2_food')" title="কণ্ঠে বলুন">🎤</button>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem">
         <div>
-          <div style="font-size:.74rem;color:rgba(21,48,30,.4);margin-bottom:.3rem">☕ কফি (কাপ)</div>
+          <div style="font-size:.74rem;color:rgba(20,20,20,.4);margin-bottom:.3rem">☕ কফি (কাপ)</div>
           <input type="number" id="di2_coffee" min="0" max="20" value="0" class="m-input">
         </div>
         <div>
-          <div style="font-size:.74rem;color:rgba(21,48,30,.4);margin-bottom:.3rem">💧 পানি (লিটার)</div>
+          <div style="font-size:.74rem;color:rgba(20,20,20,.4);margin-bottom:.3rem">💧 পানি (লিটার)</div>
           <input type="number" id="di2_water" min="0" max="10" step="0.5" value="2" class="m-input">
         </div>
       </div>
@@ -1238,12 +1271,12 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       <div class="m-label">😴 ঘুম ও বিবিধ</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
         <div>
-          <div style="font-size:.74rem;color:rgba(21,48,30,.4);margin-bottom:.3rem">ঘুম (ঘণ্টা)</div>
+          <div style="font-size:.74rem;color:rgba(20,20,20,.4);margin-bottom:.3rem">ঘুম (ঘণ্টা)</div>
           <input type="number" id="di2_sleep" min="0" max="24" step="0.5" value="7" class="m-input">
         </div>
         <div>
-          <div style="font-size:.74rem;color:rgba(21,48,30,.4);margin-bottom:.3rem">ঘুমের মান</div>
-          <select id="di2_sleepq" class="m-input" style="background:var(--cream);cursor:pointer">
+          <div style="font-size:.74rem;color:rgba(20,20,20,.4);margin-bottom:.3rem">ঘুমের মান</div>
+          <select id="di2_sleepq" class="m-input" style="background:#F5F5F7;cursor:pointer">
             <option value="ভালো">ভালো</option>
             <option value="মাঝারি" selected>মাঝারি</option>
             <option value="খারাপ">খারাপ</option>
@@ -1268,7 +1301,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:.83rem;color:rgba(21,48,30,.5);line-height:1.7;margin-bottom:1rem">
+      <p style="font-size:.83rem;color:rgba(20,20,20,.5);line-height:1.7;margin-bottom:1rem">
         আপনার মতামত, পরামর্শ, অভিযোগ বা যেকোনো কথা আমাদের জানান।
         আমরা প্রতিটি বার্তা পড়ি। 🙏
       </p>
@@ -1282,7 +1315,7 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       </button>
 
       <div class="m-label" style="margin-top:.9rem">বিষয়</div>
-      <select id="sarType" class="m-input" style="background:var(--cream);cursor:pointer">
+      <select id="sarType" class="m-input" style="background:#F5F5F7;cursor:pointer">
         <option value="general">সাধারণ মতামত</option>
         <option value="suggestion">পরামর্শ</option>
         <option value="complaint">অভিযোগ</option>
@@ -1310,13 +1343,13 @@ body{background:#E9E2D2;color:var(--green-ink);font-family:'Hind Siliguri','Inte
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="aiReportBody">
-      <div style="text-align:center;padding:2rem;color:rgba(21,48,30,.35)">
+      <div style="text-align:center;padding:2rem;color:rgba(20,20,20,.35)">
         <div style="font-size:1.8rem;margin-bottom:.5rem">📋</div>
         রিপোর্ট লোড হচ্ছে...
       </div>
     </div>
     <div class="modal-foot">
-      <span style="font-size:.74rem;color:rgba(21,48,30,.3)">শেষ ৭ দিনের রিপোর্ট · স্বয়ংক্রিয়ভাবে মুছে যায়</span>
+      <span style="font-size:.74rem;color:rgba(20,20,20,.3)">শেষ ৭ দিনের রিপোর্ট · স্বয়ংক্রিয়ভাবে মুছে যায়</span>
       <button class="m-btn outline" onclick="mLoadReports()">🔄 রিফ্রেশ</button>
     </div>
   </div><!-- end modal-ai-report -->
@@ -1422,8 +1455,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Always render these (all users)
     renderCustomer(cust);
-    renderMembership(cust);
-    renderLoyalty(cust);
+    // (renderCustomer already fills membership + loyalty sections)
 
     // Metrics data entry always available
     renderMetrics(metrics, cust);
@@ -1436,6 +1468,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       renderDailyMenu(analysis, cust);
       renderSubAlert(cust);
       removePendingBanner();
+      loadLatestReport();   // ৬টার দৈনিক রিপোর্ট link
     } else {
       // LIMITED ACCESS — show status banner, lock premium sections
     showAccessBanner(cust, paidReg, memApproved, subApproved);
@@ -1462,15 +1495,15 @@ function lockSection(sectionId, title, msg) {
   const overlay = document.createElement('div');
   overlay.className = 'lock-overlay';
   overlay.style.cssText = `position:absolute;inset:0;z-index:20;
-    background:rgba(21,48,30,.55);backdrop-filter:blur(6px);
+    background:rgba(20,20,20,.55);backdrop-filter:blur(6px);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     border-radius:inherit;gap:.6rem;text-align:center;padding:1.5rem`;
   overlay.innerHTML = `
     <div style="font-size:2rem">🔒</div>
-    <div style="font-family:'Fraunces',serif;font-size:.95rem;color:#FCD34D;font-weight:700">${title}</div>
-    <div style="font-size:.78rem;color:rgba(21,48,30,.45);max-width:280px;line-height:1.6">${msg}</div>
+    <div style="font-family:'Hind Siliguri',sans-serif;font-size:.95rem;color:#FCD34D;font-weight:700">${title}</div>
+    <div style="font-size:.78rem;color:rgba(20,20,20,.45);max-width:280px;line-height:1.6">${msg}</div>
     <button onclick="checkApprovalStatus()" style="margin-top:.4rem;background:linear-gradient(135deg,#E91E8C,#6B21A8);
-      border:none;border-radius:10px;padding:.5rem 1.25rem;color:var(--green-ink);
+      border:none;border-radius:10px;padding:.5rem 1.25rem;color:var(--ink);
       font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer">
       🔄 অনুমোদন পরীক্ষা করুন
     </button>`;
@@ -1490,7 +1523,7 @@ function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
   let stageTitle, stageMsg, stageColor;
   if(!paidReg){
     stageTitle  = '⏳ নিবন্ধন ফি প্রদানের অপেক্ষায়';
-    stageMsg    = 'নিবন্ধন ফি <strong style="color:var(--green-ink)">৳১,০০০</strong> পরিশোধ করুন এবং WhatsApp-এ স্ক্রিনশট পাঠান। অ্যাডমিন মেম্বারশিপ অনুমোদন করবেন।';
+    stageMsg    = 'নিবন্ধন ফি <strong style="color:var(--ink)">৳১,০০০</strong> পরিশোধ করুন এবং WhatsApp-এ স্ক্রিনশট পাঠান। অ্যাডমিন মেম্বারশিপ অনুমোদন করবেন।';
     stageColor  = '#F59E0B';
   } else if(!memApproved){
     stageTitle  = '📝 মেম্বারশিপ অনুমোদনের অপেক্ষায়';
@@ -1498,7 +1531,7 @@ function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
     stageColor  = '#E91E8C';
   } else {
     stageTitle  = '📅 সাবস্ক্রিপশন অনুমোদনের অপেক্ষায়';
-    stageMsg    = 'মেম্বারশিপ অনুমোদিত! এখন মাসিক সাবস্ক্রিপশন <strong style="color:var(--green-ink)">৳৫০০</strong> পরিশোধ করুন এবং স্ক্রিনশট পাঠান। অ্যাডমিন সাবস্ক্রিপশন সক্রিয় করলে সব features চালু হবে।';
+    stageMsg    = 'মেম্বারশিপ অনুমোদিত! এখন মাসিক সাবস্ক্রিপশন <strong style="color:var(--ink)">৳৫০০</strong> পরিশোধ করুন এবং স্ক্রিনশট পাঠান। অ্যাডমিন সাবস্ক্রিপশন সক্রিয় করলে সব features চালু হবে।';
     stageColor  = '#6B21A8';
   }
 
@@ -1511,11 +1544,11 @@ function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
   banner.id = 'accessBanner';
   banner.style.cssText = `position:relative;z-index:50;margin:0 0 1.25rem;`;
   banner.innerHTML = `
-    <div style="background:rgba(255,255,255,.85);border:1px solid rgba(${stageColor==='#F59E0B'?'245,158,11':'E91E8C'?'233,30,140,':'107,33,168,'},.25);border-radius:18px;padding:1.25rem 1.5rem;border-color:${stageColor}40">
+    <div style="background:rgba(255,255,255,.92);border:1px solid rgba(${stageColor==='#F59E0B'?'245,158,11':'E91E8C'?'233,30,140,':'107,33,168,'},.25);border-radius:18px;padding:1.25rem 1.5rem;border-color:${stageColor}40">
 
       <!-- Progress bar -->
       <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap">
-        <span style="font-size:.7rem;color:rgba(21,48,30,.4)">অগ্রগতি:</span>
+        <span style="font-size:.7rem;color:rgba(20,20,20,.4)">অগ্রগতি:</span>
         ${[
           {icon:step1, label:'নিবন্ধন ফি'},
           {icon:'→', label:'', small:true},
@@ -1525,27 +1558,27 @@ function showAccessBanner(cust, paidReg, memApproved=false, subApproved=false) {
           {icon:'→', label:'', small:true},
           {icon:subApproved?'🌟':'⭕', label:'সম্পূর্ণ'},
         ].map(s => s.small
-          ? `<span style="font-size:.7rem;color:rgba(21,48,30,.2)">${s.icon}</span>`
+          ? `<span style="font-size:.7rem;color:rgba(20,20,20,.2)">${s.icon}</span>`
           : `<div style="display:flex;flex-direction:column;align-items:center;gap:.1rem">
               <span style="font-size:.9rem">${s.icon}</span>
-              <span style="font-size:.58rem;color:rgba(21,48,30,.35)">${s.label}</span>
+              <span style="font-size:.58rem;color:rgba(20,20,20,.35)">${s.label}</span>
             </div>`
         ).join('')}
       </div>
 
       <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
         <div style="flex:1">
-          <div style="font-family:'Fraunces',serif;font-size:.95rem;color:${stageColor};font-weight:700;margin-bottom:.35rem">${stageTitle}</div>
-          <div style="font-size:.8rem;color:rgba(21,48,30,.55);line-height:1.75;margin-bottom:.85rem">${stageMsg}</div>
+          <div style="font-family:'Hind Siliguri',sans-serif;font-size:.95rem;color:${stageColor};font-weight:700;margin-bottom:.35rem">${stageTitle}</div>
+          <div style="font-size:.8rem;color:rgba(20,20,20,.55);line-height:1.75;margin-bottom:.85rem">${stageMsg}</div>
           <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center">
-            ${!paidReg ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:10px;padding:.52rem 1.2rem;color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 নিবন্ধন ফি দিন ৳১,০০০</a>` : ''}
-            ${memApproved && !subApproved ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#6B21A8,#A855F7);border:none;border-radius:10px;padding:.52rem 1.2rem;color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 সাবস্ক্রিপশন দিন ৳৫০০</a>` : ''}
+            ${!paidReg ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:10px;padding:.52rem 1.2rem;color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 নিবন্ধন ফি দিন ৳১,০০০</a>` : ''}
+            ${memApproved && !subApproved ? `<a href="payment.html" target="_blank" style="background:linear-gradient(135deg,#6B21A8,#A855F7);border:none;border-radius:10px;padding:.52rem 1.2rem;color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:.8rem;font-weight:700;text-decoration:none">💳 সাবস্ক্রিপশন দিন ৳৫০০</a>` : ''}
             <a href="${waUrl}" target="_blank" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);border-radius:10px;padding:.5rem 1rem;color:#4ade80;font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;text-decoration:none">💬 WhatsApp স্ক্রিনশট</a>
             <button onclick="checkApprovalStatus()" id="checkApprovalBtn" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:.5rem .9rem;color:#FCD34D;font-family:'Hind Siliguri',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer">🔄 স্ট্যাটাস পরীক্ষা করুন</button>
           </div>
         </div>
         <div style="flex-shrink:0;text-align:right">
-          <div style="font-family:'Inter',sans-serif;font-size:.62rem;color:rgba(21,48,30,.25)">সদস্য নং</div>
+          <div style="font-family:'Inter',sans-serif;font-size:.62rem;color:rgba(20,20,20,.25)">সদস্য নং</div>
           <div style="font-family:'Inter',sans-serif;font-size:.8rem;color:#FCD34D">${mid}</div>
           <a href="metrics.html" target="_blank" style="display:inline-block;margin-top:.65rem;background:rgba(5,150,105,.1);border:1px solid rgba(52,211,153,.2);border-radius:9px;padding:.38rem .75rem;color:#34D399;font-size:.72rem;font-weight:600;text-decoration:none">📊 মেট্রিক্স পূরণ</a>
         </div>
@@ -1691,7 +1724,7 @@ async function fetchMetrics() {
   try {
     if (!CID) return {};
     console.log('🔄 Fetching metrics, customer_id=', CID);
-    const r = await fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
+    const r = await fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&select=*&limit=1`, {headers:H});
     console.log('fetchMetrics response:', r.status);
     if (!r.ok) { console.warn('fetchMetrics error:', r.status); return {}; }
     const d = await r.json();
@@ -1703,13 +1736,37 @@ async function fetchMetrics() {
 async function fetchAnalysis() {
   try {
     if (!CID) return null;
-    const r = await fetch(
+    // ১) আগে health_score-যুক্ত সর্বশেষ row আনি (৬টার AI report) — যাতে score missing না হয়
+    let r = await fetch(
+      `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&health_score=not.is.null&order=created_at.desc&limit=1&select=*`,
+      {headers:H});
+    let d = r.ok ? await r.json() : [];
+    if (Array.isArray(d) && d.length) return d[0];
+    // ২) না পেলে — যেকোনো সর্বশেষ row (পুরোনো আচরণ, fallback)
+    r = await fetch(
       `${SUPA}/rest/v1/ai_analysis?customer_id=eq.${CID}&order=created_at.desc&limit=1&select=*`,
       {headers:H});
-    if (!r.ok) return null;
-    const d = await r.json();
-    return d?.[0] || null;
+    d = r.ok ? await r.json() : [];
+    return (Array.isArray(d) && d[0]) || null;
   } catch(e) { return null; }
+}
+
+// ৬টার দৈনিক রিপোর্ট link দেখায় (reports টেবিল থেকে)
+async function loadLatestReport() {
+  try {
+    if (!CID) return;
+    const r = await fetch(
+      `${SUPA}/rest/v1/reports?customer_id=eq.${CID}&order=report_date.desc&limit=1&select=*`,
+      { headers: H });
+    if (!r.ok) return;
+    const data = await r.json();
+    const rep = data && data[0];
+    if (!rep || !rep.pdf_url) return;
+    document.getElementById('reportLink').href = rep.pdf_url;
+    document.getElementById('reportDate').textContent =
+      'তারিখ: ' + (rep.report_date||'') + ' · স্কোর: ' + (rep.meal_score ?? '—') + '/100';
+    document.getElementById('reportCard').style.display = 'block';
+  } catch (e) {}
 }
 
 async function fetchOrders() {
@@ -1821,7 +1878,7 @@ function renderMetrics(m, cust) {
   const get = (...keys) => { for(const k of keys){ if(m&&m[k]!=null&&m[k]!=='') return m[k]; } return null; };
 
   // ── BMI ──
-  // First try customer-metrics, fallback to customers table (registration data)
+  // First try customer_metrics, fallback to customers table (registration data)
   const bmi = get('bmi','body_mass_index') || cust?.bmi || null;
   if(bmi){
     const b = parseFloat(bmi);
@@ -1921,7 +1978,7 @@ function renderMetrics(m, cust) {
   if(wtEl && wt) wtEl.textContent = parseFloat(wt).toFixed(1) + ' কেজি';
   if(htEl && ht) htEl.textContent = parseFloat(ht).toFixed(0) + ' সেমি';
 
-  // ── Show fill-metrics banner if no customer-metrics data ──
+  // ── Show fill-metrics banner if no customer_metrics data ──
   const hasMetrics = m && Object.keys(m).length > 2;
   if(!hasMetrics){
     const banner = document.getElementById('metricsFillBanner');
@@ -1930,7 +1987,7 @@ function renderMetrics(m, cust) {
       if(km){
         const div = document.createElement('div');
         div.id = 'metricsFillBanner';
-        div.style.cssText = 'grid-column:1/-1;background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:.75rem 1rem;text-align:center;font-size:.8rem;color:rgba(21,48,30,.5)';
+        div.style.cssText = 'grid-column:1/-1;background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:12px;padding:.75rem 1rem;text-align:center;font-size:.8rem;color:rgba(20,20,20,.5)';
         div.innerHTML = `📊 বিস্তারিত স্বাস্থ্য তথ্য পেতে <a href="metrics.html" target="_blank" style="color:var(--pink2);font-weight:700">মেট্রিক্স ফর্ম পূরণ করুন →</a>`;
         km.appendChild(div);
       }
@@ -1944,7 +2001,7 @@ function renderMetrics(m, cust) {
 function renderCyclePhase(m) {
   if (!m || !m.last_period_date || !m.cycle_length_days) {
     document.getElementById('cycleInner').innerHTML =
-      `<div style="padding:1.2rem;color:rgba(21,48,30,.38);font-size:.82rem;text-align:center">
+      `<div style="padding:1.2rem;color:rgba(20,20,20,.38);font-size:.82rem;text-align:center">
         মাসিক চক্রের তারিখ দিন → <a href="metrics.html" style="color:var(--pink2)">মেট্রিক্স আপডেট</a></div>`;
     return;
   }
@@ -1980,7 +2037,7 @@ function renderCyclePhase(m) {
   document.getElementById('cycleInner').innerHTML = `
     <div class="cycle-ring">
       <svg width="90" height="90" viewBox="0 0 90 90">
-        <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(21,48,30,.08)" stroke-width="6"/>
+        <circle cx="45" cy="45" r="38" fill="none" stroke="rgba(20,20,20,.08)" stroke-width="6"/>
         <circle cx="45" cy="45" r="38" fill="none" stroke="${color}" stroke-width="6"
           stroke-dasharray="${circum}" stroke-dashoffset="${offset}" stroke-linecap="round"
           style="transition:stroke-dashoffset .8s ease"/>
@@ -2010,12 +2067,12 @@ function renderAnalysis(a, c) {
     el.innerHTML = `
       <div style="text-align:center;padding:1.5rem 1rem">
         <div style="font-size:2.2rem;margin-bottom:.65rem">🤖</div>
-        <div style="font-size:.83rem;color:rgba(21,48,30,.45);margin-bottom:1rem;line-height:1.7">
+        <div style="font-size:.83rem;color:rgba(20,20,20,.45);margin-bottom:1rem;line-height:1.7">
           আপনার ২৫০ মেট্রিক্স বিশ্লেষণ করে AI একটি ব্যক্তিগত স্বাস্থ্য মূল্যায়ন তৈরি করবে।
         </div>
         <button onclick="triggerAnalysis()" id="analyzeBtn"
           style="background:linear-gradient(135deg,#E91E8C,#6B21A8);border:none;border-radius:12px;
-          padding:.7rem 1.6rem;color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.88rem;
+          padding:.7rem 1.6rem;color:var(--ink);font-family:'Hind Siliguri',sans-serif;font-size:.88rem;
           font-weight:700;cursor:pointer">
           🔬 AI বিশ্লেষণ শুরু করুন
         </button>
@@ -2037,23 +2094,23 @@ function renderAnalysis(a, c) {
       <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
         <div style="position:relative;flex-shrink:0">
           <svg width="70" height="70" viewBox="0 0 70 70">
-            <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(21,48,30,.08)" stroke-width="5"/>
+            <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(20,20,20,.08)" stroke-width="5"/>
             <circle cx="35" cy="35" r="28" fill="none" stroke="${scoreColor}" stroke-width="5"
               stroke-dasharray="${circum}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 35 35)"/>
           </svg>
           <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <span style="font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;color:${scoreColor}">${score}</span>
-            <span style="font-size:.55rem;color:rgba(21,48,30,.3)">/100</span>
+            <span style="font-size:.55rem;color:rgba(20,20,20,.3)">/100</span>
           </div>
         </div>
         <div style="flex:1">
-          <div style="font-weight:700;font-size:.9rem;color:var(--green-ink);margin-bottom:.25rem">
+          <div style="font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:.25rem">
             ${score>=70?'ভালো 👍':score>=40?'মাঝারি ⚠️':'মনোযোগ দরকার 🔴'}
           </div>
-          <div style="font-size:.82rem;color:rgba(21,48,30,.55);line-height:1.65">${a.analysis_bn || a.health_summary_bn || '—'}</div>
+          <div style="font-size:.82rem;color:rgba(20,20,20,.55);line-height:1.65">${a.analysis_bn || a.health_summary_bn || '—'}</div>
         </div>
       </div>
-      ${a.recommendations||a.general_suggestions_bn?`<div style="font-size:.78rem;color:rgba(21,48,30,.45);line-height:1.7;
+      ${a.recommendations||a.general_suggestions_bn?`<div style="font-size:.78rem;color:rgba(20,20,20,.45);line-height:1.7;
         background:rgba(245,200,66,.04);border-left:2px solid rgba(245,200,66,.25);
         padding:.6rem .85rem;border-radius:0 10px 10px 0;margin-bottom:.85rem">
         ${a.recommendations||a.general_suggestions_bn}</div>`:''}
@@ -2067,7 +2124,7 @@ function renderAnalysis(a, c) {
 
 async function triggerAnalysis() {
   const el = document.getElementById('analysisContent');
-  if(el) el.innerHTML = `<div style="text-align:center;padding:2rem;color:rgba(21,48,30,.5)">
+  if(el) el.innerHTML = `<div style="text-align:center;padding:2rem;color:rgba(20,20,20,.5)">
     <div style="width:36px;height:36px;border:3px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
       border-radius:50%;animation:dashSpin .8s linear infinite;margin:0 auto 1rem"></div>
     AI বিশ্লেষণ চলছে...</div>`;
@@ -2085,16 +2142,42 @@ async function triggerAnalysis() {
     .filter(([k,v])=>v&&!['id','customer_id','created_at','updated_at'].includes(k))
     .map(([k,v])=>`${k}: ${v}`).join(', ') || 'মেট্রিক্স পাওয়া যায়নি';
 
-  const prompt = `তুমি SAR She AI Restaurant-এর বিশেষজ্ঞ AI স্বাস্থ্য বিশ্লেষক।
+  // ── মাসিক চক্রের ফেজ হিসাব করে AI-কে স্পষ্ট জানাই ──
+  let cycleStr = 'মাসিক চক্রের তথ্য নেই';
+  if (m && m.last_period_date && m.cycle_length_days) {
+    const _last = new Date(m.last_period_date);
+    const _len = parseInt(m.cycle_length_days) || 28;
+    const _day = Math.floor((new Date() - _last) / 86400000) % _len + 1;
+    let _ph, _adv;
+    if (_day <= 5)      { _ph='মাসিক ফেজ';     _adv='আয়রন ও ফোলেট সমৃদ্ধ খাবার, উষ্ণ পানীয়, বিশ্রাম'; }
+    else if (_day <= 13){ _ph='ফলিকুলার ফেজ'; _adv='হালকা প্রোটিন ও সবজি, শক্তি বেশি'; }
+    else if (_day <= 16){ _ph='ওভুলেশন ফেজ';  _adv='অ্যান্টিঅক্সিডেন্ট ও জিংক সমৃদ্ধ খাবার'; }
+    else                { _ph='লুটিয়াল ফেজ';  _adv='ম্যাগনেসিয়াম ও বি৬, চিনি-ক্যাফেইন কমানো'; }
+    cycleStr = `${_ph} (চক্রের দিন ${_day}/${_len}) — পুষ্টি ফোকাস: ${_adv}`;
+  }
+
+  const prompt = `তুমি SAR (She AI Revolution) — women-led, women-run, women-only AI+EI+blockchain ভিত্তিক খাদ্য ও পুষ্টি আন্দোলনের বিশেষজ্ঞ AI পুষ্টি ও স্বাস্থ্য বিশ্লেষক।
+
+SAR-এর সব খাবার অবশ্যই: তেল-মুক্ত, চিনি-মুক্ত, লবণ-মুক্ত (pink salt ব্যবহার), কৃত্রিম রং-মুক্ত, দুধ-মুক্ত, আয়ুর্বেদিক ও অর্গানিক। রান্না steam/bake/air-fry (আগুন-মুক্ত)। অনুমোদিত: মাখন, টক দই, বোনলেস মাছ, দেশি মুরগি (boneless), দেশি ডিম, মৌসুমি ফল।
 
 গ্রাহক: ${cust?.full_name||'SAR গ্রাহক'}, বয়স: ${age||'অজানা'}, রোগ: ${catMap[cat]||cat}
+উচ্চতা: ${cust?.height_cm||'?'} সেমি, ওজন: ${cust?.weight_kg||'?'} কেজি, BMI: ${cust?.bmi||'?'}
+মাসিক চক্র: ${cycleStr}
 ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
 মেট্রিক্স: ${mStr}
+
+তুমি উচ্চতা, ওজন, BMI, বয়স, রোগ, কার্যকলাপ ও মাসিক চক্রের ফেজ বিবেচনা করে ব্যক্তিগত দৈনিক ক্যালরি লক্ষ্য (Mifflin-St Jeor ভিত্তিক) ও প্রোটিন হিসাব করবে। মাসিক ফেজ অনুযায়ী পুষ্টি সমন্বয় করো (মাসিক→আয়রন, লুটিয়াল→ম্যাগনেসিয়াম ও কম চিনি, ইত্যাদি)। রোগ অনুযায়ী সমন্বয়: স্থূলতা→ঘাটতি, গর্ভাবস্থা→বেশি, ডায়াবেটিস→স্থিতিশীল। meal split ও course সংখ্যা target অনুযায়ী দাও (কম target→কম course; সকাল ২-৩, দুপুর/রাত ৩-৫)।
 
 নিচের JSON-এ বাংলায় উত্তর দাও (শুধু JSON):
 {
   "health_score": 0থেকে100,
   "analysis_bn": "৩-৪ বাক্যে স্বাস্থ্য মূল্যায়ন",
+  "daily_kcal_target": <ব্যক্তিগত সংখ্যা, যেমন 1450>,
+  "daily_protein": <গ্রাম, যেমন 65>,
+  "meal_split": {"breakfast":0.3,"lunch":0.4,"dinner":0.3},
+  "course_count": {"breakfast":3,"lunch":4,"dinner":4},
+  "condition_powders": ["আজকের কন্ডিশন (জ্বর/মাসিক/স্ট্রেস) অনুযায়ী ৩টি"],
+  "chutney": "আজকের জন্য একটি থেরাপিউটিক চাটনি",
   "problems": ["সমস্যা ১","সমস্যা ২"],
   "solutions": ["সমাধান ১","সমাধান ২"],
   "conventional_medicine": ["প্রচলিত ওষুধ Generic নাম ও ডোজ"],
@@ -2120,17 +2203,37 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
   };
 
   try {
+    // ── নতুন analyzeOne mode (v3) — customer_id থাকলে full pipeline চালায় ──
+    // না থাকলে পুরনো prompt mode fallback করে
+    const useV3 = !!CID;
     const r = await fetch('/.netlify/functions/analyze', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ prompt })
+      body: JSON.stringify(useV3
+        ? { action: 'analyzeOne', customer_id: CID }
+        : { prompt })
     });
     if(!r.ok) throw new Error('HTTP ' + r.status);
     const d  = await r.json();
-    const raw = d.text || '{}';
-    let parsed;
-    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
-    catch(e) { parsed = {health_score:65, analysis_bn: raw.substring(0,300)}; }
+
+    // analyze.js নিজেই parsed object + সব field spread করে ফেরত দেয় — সেটা আগে ব্যবহার করি
+    let parsed = null;
+    if (d.parsed && typeof d.parsed === 'object' && d.parsed.health_score != null) {
+      parsed = d.parsed;
+    } else if (d.health_score != null || d.analysis_bn) {
+      parsed = d;  // field গুলো top-level এ spread করা আছে
+    } else {
+      // fallback: কাঁচা text থেকে নিজে JSON বের করি (```fence বা বাড়তি লেখা থাকলেও)
+      const raw = d.text || '{}';
+      let clean = raw.replace(/```json|```/g,'').trim();
+      const a = clean.indexOf('{'), b = clean.lastIndexOf('}');
+      if (a > -1 && b > a) clean = clean.slice(a, b+1);
+      try { parsed = JSON.parse(clean); }
+      catch(e) {
+        console.error('JSON parse ব্যর্থ:', e.message, '| raw:', raw.slice(0,200));
+        parsed = { health_score: null, analysis_bn: clean.slice(0,300) };
+      }
+    }
     Object.assign(demo, parsed);
     toast('✅ AI বিশ্লেষণ সম্পন্ন!', true);
   } catch(e) {
@@ -2138,15 +2241,61 @@ ${isBday?'🎂 আজ গ্রাহকের জন্মদিন!':''}
     toast('⚠️ ' + e.message + ' — Demo দেখাচ্ছে', false);
   }
 
-  // Save to Supabase
+  // Save to Supabase — টেবিলের আসল column নামে map করো
   try {
-    const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis`,{
-      method:'POST', headers:{...H,'Prefer':'return=representation'},
-      body: JSON.stringify(demo)
+    const toJson = (v) => (v == null ? null : (typeof v === 'string' ? v : JSON.stringify(v)));
+    const rowToSave = {
+      customer_id:                    CID,
+      analysis_date:                  today,
+      health_score:                   demo.health_score ?? null,
+      health_summary_bn:              demo.analysis_bn || demo.health_summary_bn || null,
+      general_suggestions_bn:         demo.recommendations || demo.general_suggestions_bn || null,
+      problems_json:                  toJson(demo.problems || demo.problems_json || null),
+      nutrition_advice_bn:            demo.nutrition_advice_bn || null,
+      conventional_medicines_json:    toJson(demo.conventional_medicine || demo.conventional_medicines_json || null),
+      ayurvedic_bn:                   Array.isArray(demo.ayurvedic) ? demo.ayurvedic.join('\n') : (demo.ayurvedic_bn || null),
+      homeopathic_bn:                 Array.isArray(demo.homeopathic) ? demo.homeopathic.join('\n') : (demo.homeopathic_bn || null),
+      home_remedies_bn:               Array.isArray(demo.food_remedies) ? demo.food_remedies.join('\n') : (demo.home_remedies_bn || null),
+      medicinal_plants_json:          toJson(demo.medicinal_plants_json || null),
+      motivational_message_bn:        demo.islamic_remedy ? (Array.isArray(demo.islamic_remedy) ? demo.islamic_remedy.join('\n') : demo.islamic_remedy) : (demo.motivational_message_bn || null),
+      daily_menu_recommendation_json: toJson(demo.daily_menu_recommendation_json || null),
+      // ── meal-score/receipt-এর জন্য coordinated nutrition (hybrid) ──
+      analysis_type:                  'meal_score',
+      category:                       (typeof cat!=='undefined' ? cat : null),
+      meal_score:                     demo.health_score ?? null,
+      daily_kcal:                     demo.daily_kcal_target ?? null,
+      daily_protein:                  demo.daily_protein ?? null,
+      focus:                          demo.recommendations || demo.analysis_bn || null,
+      // result_json — meal-score এখান থেকে split/course/powder/chutney পড়বে
+      result_json:                    toJson({
+                                        target:           demo.daily_kcal_target ?? null,
+                                        protein:          demo.daily_protein ?? null,
+                                        split:            demo.meal_split || null,
+                                        course_count:     demo.course_count || null,
+                                        condition_powders: demo.condition_powders || null,
+                                        chutney:          demo.chutney || null,
+                                        score:            demo.health_score ?? null,
+                                      }),
+      disclaimer_shown:               true
+    };
+    const r2 = await fetch(`${SUPA}/rest/v1/ai_analysis?on_conflict=customer_id,analysis_date`,{
+      method:'POST',
+      headers:{...H,'Prefer':'resolution=merge-duplicates,return=representation'},
+      body: JSON.stringify(rowToSave)
     });
+    if(!r2.ok){
+      const errTxt = await r2.text();
+      console.error('ai_analysis save failed:', r2.status, errTxt);
+      toast('⚠️ সেভ ব্যর্থ ('+r2.status+') — Console দেখুন', false);
+      renderAnalysis({...rowToSave, id:'temp', analysis_bn:rowToSave.health_summary_bn, recommendations:rowToSave.general_suggestions_bn}, null);
+      return;
+    }
     const d2 = await r2.json();
-    renderAnalysis(d2[0]||demo, null);
-  } catch(e) { renderAnalysis(demo, null); }
+    renderAnalysis(d2[0]||rowToSave, null);
+  } catch(e) {
+    console.error('ai_analysis save error:', e);
+    renderAnalysis({...demo, id:'temp'}, null);
+  }
 }
 // ═══════════════════════════════════════
 // RENDER DAILY MENU
@@ -2468,6 +2617,36 @@ async function saveDailyLog() {
 }
 
 // ── Load Analysis Reports ──────────────────────────────
+// রিপোর্ট/প্রেসক্রিপশন HTML রূপে নতুন উইন্ডোতে খোলে — print/PDF করা যায় (PDF না থাকলে)
+function openReportHTML(title, bodyHtml){
+  const w = window.open('', '_blank');
+  if(!w){ alert('পপ-আপ ব্লক করা — অনুমতি দিন।'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="bn"><head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>${title} — SAR</title>
+    <style>
+      body{font-family:'Segoe UI',system-ui,sans-serif;max-width:760px;margin:0 auto;
+        padding:2rem 1.5rem;color:#1a1a1a;line-height:1.7;background:#fff}
+      .rh{text-align:center;border-bottom:3px solid #E91E8C;padding-bottom:1rem;margin-bottom:1.5rem}
+      .rh h1{color:#E91E8C;font-size:1.5rem;margin:0}
+      .rh p{color:#888;font-size:.85rem;margin:.3rem 0 0}
+      .sec{margin:1.2rem 0;padding:1rem;background:#FFF4FA;border-radius:10px;border-left:4px solid #E91E8C}
+      .sec b{color:#C2185B;display:block;margin-bottom:.4rem}
+      .foot{text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;
+        color:#aaa;font-size:.75rem}
+      .pbtn{display:block;width:100%;background:#E91E8C;color:var(--ink);border:none;border-radius:10px;
+        padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;margin:1.5rem 0}
+      @media print{.pbtn{display:none}}
+    </style></head><body>
+    <div class="rh"><h1>🌸 SAR — She AI Revolution</h1><p>${title}</p></div>
+    <button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট / PDF সংরক্ষণ করুন</button>
+    ${bodyHtml}
+    <div class="foot">SAR — women-led · women-run · women-only · © MindMax Enterprises<br>
+    এটি চিকিৎসা নয়; ডাক্তারের পরামর্শ নিন।</div>
+    </body></html>`);
+  w.document.close();
+}
+
 async function loadAnalysisReports() {
   const el = document.getElementById('reportsList');
   if (!el || !CID) return;
@@ -2514,15 +2693,15 @@ async function loadAnalysisReports() {
       const score = rpt.health_score || rpt.report_json?.health_score || '—';
       const scoreNum = parseInt(score);
       const scoreColor = scoreNum >= 70 ? '#34D399' : scoreNum >= 40 ? '#FCD34D' : '#F87171';
-      const analysis = rpt.analysis_bn || rpt.report_json?.analysis_bn || 'বিশ্লেষণ পাওয়া যায়নি';
-      const recs = rpt.recommendations || rpt.report_json?.recommendations || '';
+      const analysis = rpt.health_summary_bn || rpt.analysis_bn || rpt.report_json?.analysis_bn || 'বিশ্লেষণ পাওয়া যায়নি';
+      const recs = rpt.general_suggestions_bn || rpt.recommendations || rpt.report_json?.recommendations || '';
       const date = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
       const pdfUrl = rpt.pdf_url || '';
 
       return `<div class="report-item" id="rpt-${i}">
         <div class="report-toggle" onclick="toggleReport(${i})">
           <div style="display:flex;align-items:center;gap:.75rem">
-            <span style="font-size:.85rem;color:rgba(21,48,30,.55)">${date}</span>
+            <span style="font-size:.85rem;color:rgba(20,20,20,.55)">${date}</span>
             <span class="report-score-badge"
               style="background:${scoreColor}20;color:${scoreColor};border:1px solid ${scoreColor}40">
               স্কোর: ${score}/100
@@ -2534,11 +2713,50 @@ async function loadAnalysisReports() {
           <p>${analysis}</p>
           ${recs ? `<p style="margin-top:.75rem;padding:.6rem .9rem;background:rgba(245,200,66,.05);
             border-left:2px solid rgba(245,200,66,.3);border-radius:0 8px 8px 0;
-            font-size:.8rem;color:rgba(21,48,30,.55)">${recs}</p>` : ''}
-          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="report-pdf-link">📄 PDF ডাউনলোড</a>` : ''}
+            font-size:.8rem;color:rgba(20,20,20,.55)">${recs}</p>` : ''}
+          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" class="report-pdf-link">📄 PDF ডাউনলোড</a>`
+            : `<button class="report-pdf-link" style="border:none;cursor:pointer"
+                onclick='openReportHTML("AI স্বাস্থ্য রিপোর্ট — ${date}", ${JSON.stringify(
+                  `<div class="sec"><b>স্বাস্থ্য স্কোর</b>${score}/100</div>`+
+                  `<div class="sec"><b>বিশ্লেষণ</b>${(analysis||"").replace(/"/g,"&quot;")}</div>`+
+                  (recs?`<div class="sec"><b>পরামর্শ</b>${(recs||"").replace(/"/g,"&quot;")}</div>`:"")
+                )})'>📄 রিপোর্ট দেখুন / PDF</button>`}
         </div>
       </div>`;
     }).join('');
+
+    // ── ডাক্তার প্রেসক্রিপশন (sar_notes থেকে) — HTML printable link সহ ──
+    try{
+      const pr = await fetch(`${SUPA}/rest/v1/sar_notes?customer_id=eq.${CID}&note_type=eq.prescription&order=created_at.desc&limit=5&select=*`, {headers:H});
+      const pres = pr.ok ? await pr.json() : [];
+      if(Array.isArray(pres) && pres.length){
+        const presHtml = pres.map((n,j)=>{
+          const txt = n.note_text_bn || n.note_text || '';
+          const m = txt.match(/PDF:\s*(https?:\/\/[^\s]+)/);
+          const pdf = n.pdf_url || (m ? m[1] : '');
+          const date = (n.created_at||'').split('T')[0] || '—';
+          const clean = txt.replace(/—?\s*PDF:\s*https?:\/\/[^\s]+/,'').trim() || 'ডাক্তার প্রেসক্রিপশন';
+          const viewBtn = pdf
+            ? `<a href="${pdf}" target="_blank" class="report-pdf-link">📄 প্রেসক্রিপশন PDF</a>`
+            : `<button class="report-pdf-link" style="border:none;cursor:pointer"
+                onclick='openReportHTML("ডাক্তার প্রেসক্রিপশন — ${date}", ${JSON.stringify(
+                  `<div class="sec"><b>প্রেসক্রিপশন</b>${(clean).replace(/"/g,"&quot;")}</div>`
+                )})'>📄 প্রেসক্রিপশন দেখুন / PDF</button>`;
+          return `<div class="report-item" id="pres-${j}">
+            <div class="report-toggle" onclick="document.getElementById('pres-${j}').classList.toggle('open')">
+              <div style="display:flex;align-items:center;gap:.75rem">
+                <span style="font-size:.85rem;color:rgba(20,20,20,.55)">${date}</span>
+                <span class="report-score-badge" style="background:rgba(233,30,140,.15);color:#FF6BB5;border:1px solid rgba(233,30,140,.4)">💊 প্রেসক্রিপশন</span>
+              </div>
+              <span class="report-arrow">▼</span>
+            </div>
+            <div class="report-body"><p>${clean}</p>${viewBtn}</div>
+          </div>`;
+        }).join('');
+        el.innerHTML += `<div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid rgba(20,20,20,.08);
+          font-size:.72rem;color:rgba(20,20,20,.4);text-transform:uppercase;letter-spacing:.1em">💊 ডাক্তার প্রেসক্রিপশন</div>` + presHtml;
+      }
+    }catch(e){ /* prescription optional */ }
 
   } catch(e) {
     console.error('loadAnalysisReports error:', e);
@@ -2569,7 +2787,7 @@ async function startConsultation() {
   if (!outDiv || !outContent) return;
 
   outDiv.style.display = 'block';
-  outContent.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(21,48,30,.5)">
+  outContent.innerHTML = `<div style="text-align:center;padding:1.5rem;color:rgba(20,20,20,.5)">
     <div style="width:32px;height:32px;border:3px solid rgba(233,30,140,.3);border-top-color:#E91E8C;
       border-radius:50%;animation:sp .75s linear infinite;margin:0 auto .75rem"></div>
     AI প্রেসক্রিপশন তৈরি হচ্ছে...
@@ -2623,41 +2841,41 @@ JSON-এ দাও:
 
         ${rx.conventional?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">💊 প্রচলিত ওষুধ</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.conventional,'#34D399')}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.conventional,'#34D399')}</ul>
         </div>` : ''}
 
         ${rx.homeopathic?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">🌿 হোমিওপ্যাথিক</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.homeopathic)}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.homeopathic)}</ul>
         </div>` : ''}
 
         ${rx.ayurvedic?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">🌱 আয়ুর্বেদিক</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.ayurvedic)}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.ayurvedic)}</ul>
         </div>` : ''}
 
         ${rx.home_remedy?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">🏠 ঘরোয়া প্রতিকার</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.home_remedy)}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.home_remedy)}</ul>
         </div>` : ''}
 
         ${rx.islamic?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">☪️ ইসলামিক পরামর্শ</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.islamic)}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.islamic)}</ul>
         </div>` : ''}
 
         ${rx.food_guide?.length ? `<div style="margin-bottom:.9rem">
           <div class="as-label">🍽️ খাদ্য নির্দেশিকা</div>
-          <ul style="padding-left:1.2rem;color:rgba(21,48,30,.7)">${renderList(rx.food_guide)}</ul>
+          <ul style="padding-left:1.2rem;color:rgba(20,20,20,.7)">${renderList(rx.food_guide)}</ul>
         </div>` : ''}
 
         ${rx.follow_up ? `<div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);
-          border-radius:10px;padding:.75rem 1rem;font-size:.8rem;color:rgba(21,48,30,.6)">
+          border-radius:10px;padding:.75rem 1rem;font-size:.8rem;color:rgba(20,20,20,.6)">
           📅 <b style="color:var(--yellow2)">পুনরায় দেখানো:</b> ${rx.follow_up}
         </div>` : ''}
 
-        <div style="margin-top:.75rem;font-size:.72rem;color:rgba(21,48,30,.3);
-          border-top:1px solid rgba(21,48,30,.07);padding-top:.75rem">
+        <div style="margin-top:.75rem;font-size:.72rem;color:rgba(20,20,20,.3);
+          border-top:1px solid rgba(20,20,20,.07);padding-top:.75rem">
           ⚠️ এটি AI-জেনারেটেড পরামর্শ। অনুগ্রহ করে একজন নিবন্ধিত চিকিৎসকের পরামর্শ নিন।
         </div>
       </div>`;
@@ -2698,17 +2916,17 @@ function printPrescription() {
    ══════════════════════════════════════════════ */
 .sar-overlay{
   position:fixed;inset:0;z-index:5000;
-  background:rgba(21,48,30,.55);backdrop-filter:blur(10px);
+  background:rgba(20,20,20,.55);backdrop-filter:blur(10px);
   display:none;align-items:center;justify-content:center;
   padding:1rem;
 }
 .sar-overlay.open{display:flex}
 
 .sar-modal{
-  background:var(--paper);border:1px solid rgba(21,48,30,.12);
+  background:#FFFFFF;border:1px solid rgba(20,20,20,.12);
   border-radius:20px;width:100%;max-width:640px;
   max-height:88vh;display:flex;flex-direction:column;
-  box-shadow:0 24px 80px rgba(21,48,30,.35);
+  box-shadow:0 24px 80px rgba(20,20,20,.25);
   animation:modalIn .28s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes modalIn{
@@ -2718,44 +2936,44 @@ function printPrescription() {
 .modal-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:1.1rem 1.4rem .9rem;
-  border-bottom:1px solid rgba(21,48,30,.08);flex-shrink:0;
+  border-bottom:1px solid rgba(20,20,20,.08);flex-shrink:0;
 }
 .modal-title{
-  font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;
-  display:flex;align-items:center;gap:.55rem;color:var(--green-ink);
+  font-family:'Hind Siliguri',sans-serif;font-size:1.1rem;font-weight:700;
+  display:flex;align-items:center;gap:.55rem;color:var(--ink);
 }
 .modal-close{
-  background:rgba(21,48,30,.07);border:none;border-radius:50%;
-  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(21,48,30,.6);
+  background:rgba(20,20,20,.07);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:1rem;cursor:pointer;color:rgba(20,20,20,.6);
   display:flex;align-items:center;justify-content:center;transition:all .25s;
 }
 .modal-close:hover{background:rgba(220,38,38,.2);color:#F87171}
 
 .modal-body{
   flex:1;overflow-y:auto;padding:1.2rem 1.4rem;
-  scrollbar-width:thin;scrollbar-color:rgba(21,48,30,.1) transparent;
+  scrollbar-width:thin;scrollbar-color:rgba(20,20,20,.1) transparent;
 }
 .modal-body::-webkit-scrollbar{width:4px}
-.modal-body::-webkit-scrollbar-thumb{background:rgba(21,48,30,.1);border-radius:4px}
+.modal-body::-webkit-scrollbar-thumb{background:rgba(20,20,20,.1);border-radius:4px}
 
 .modal-foot{
-  padding:.85rem 1.4rem;border-top:1px solid rgba(21,48,30,.06);
+  padding:.85rem 1.4rem;border-top:1px solid rgba(20,20,20,.06);
   display:flex;gap:.7rem;align-items:center;flex-shrink:0;
 }
 
 /* ── Profile rows ── */
 .p-row{display:flex;justify-content:space-between;align-items:center;
-  padding:.5rem 0;border-bottom:1px solid rgba(21,48,30,.05)}
+  padding:.5rem 0;border-bottom:1px solid rgba(20,20,20,.05)}
 .p-row:last-child{border:none}
-.p-k{font-size:.78rem;color:rgba(21,48,30,.4)}
-.p-v{font-size:.82rem;color:var(--green-ink);font-weight:500;text-align:right;max-width:60%}
+.p-k{font-size:.78rem;color:rgba(20,20,20,.4)}
+.p-v{font-size:.82rem;color:var(--ink);font-weight:500;text-align:right;max-width:60%}
 .p-v.ok{color:#34D399}.p-v.warn{color:#F87171}.p-v.pend{color:#FCD34D}
 
 /* ── Modal form controls ── */
 .m-label{font-family:'Inter',sans-serif;font-size:.6rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(21,48,30,.3);margin:.85rem 0 .4rem}
-.m-input{width:100%;background:rgba(21,48,30,.06);border:1px solid rgba(21,48,30,.13);
-  border-radius:10px;padding:.65rem .9rem;color:var(--green-ink);
+  text-transform:uppercase;color:rgba(20,20,20,.3);margin:.85rem 0 .4rem}
+.m-input{width:100%;background:rgba(20,20,20,.06);border:1px solid rgba(20,20,20,.13);
+  border-radius:10px;padding:.65rem .9rem;color:var(--ink);
   font-family:'Hind Siliguri',sans-serif;font-size:.88rem;outline:none;
   transition:border-color .25s}
 .m-input:focus{border-color:var(--pink)}
@@ -2764,18 +2982,18 @@ function printPrescription() {
 /* ── Symptom checkboxes ── */
 .sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.4rem}
 .sym-cb{display:flex;align-items:center;gap:.5rem;cursor:pointer;
-  background:rgba(21,48,30,.04);border:1px solid var(--border);
+  background:rgba(20,20,20,.04);border:1px solid var(--border);
   border-radius:9px;padding:.45rem .7rem;transition:all .22s;
-  font-size:.82rem;color:rgba(21,48,30,.65)}
+  font-size:.82rem;color:rgba(20,20,20,.65)}
 .sym-cb:hover{border-color:rgba(233,30,140,.4);background:rgba(233,30,140,.06)}
 .sym-cb input{accent-color:var(--pink);width:15px;height:15px}
-.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:var(--green-ink)}
+.sym-cb.on{border-color:rgba(233,30,140,.45);background:rgba(233,30,140,.1);color:var(--ink)}
 
 /* ── Mood pills ── */
 .mood-wrap{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:.4rem}
-.m-mood{background:rgba(21,48,30,.05);border:1px solid var(--border);
+.m-mood{background:rgba(20,20,20,.05);border:1px solid var(--border);
   border-radius:18px;padding:.28rem .7rem;font-size:.8rem;cursor:pointer;
-  color:rgba(21,48,30,.55);transition:all .22s}
+  color:rgba(20,20,20,.55);transition:all .22s}
 .m-mood:hover{border-color:var(--pink);color:var(--pink2)}
 .m-mood.sel{background:rgba(233,30,140,.15);border-color:var(--pink);color:var(--pink2)}
 
@@ -2797,59 +3015,59 @@ function printPrescription() {
 @keyframes mpulse{0%,100%{opacity:1}50%{opacity:.55}}
 
 /* ── Report cards ── */
-.rpt-card{background:rgba(21,48,30,.035);border:1px solid var(--border);
+.rpt-card{background:rgba(20,20,20,.035);border:1px solid var(--border);
   border-radius:14px;overflow:hidden;margin-bottom:.7rem}
 .rpt-head{display:flex;align-items:center;justify-content:space-between;
   padding:.85rem 1.1rem;cursor:pointer;transition:background .2s}
-.rpt-head:hover{background:rgba(21,48,30,.04)}
+.rpt-head:hover{background:rgba(20,20,20,.04)}
 .rpt-score{font-family:'Inter',sans-serif;font-size:.82rem;
   font-weight:700;padding:.2rem .6rem;border-radius:50px}
-.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(21,48,30,.06);
-  font-size:.82rem;color:rgba(21,48,30,.65);line-height:1.75;display:none}
+.rpt-body{padding:.9rem 1.1rem;border-top:1px solid rgba(20,20,20,.06);
+  font-size:.82rem;color:rgba(20,20,20,.65);line-height:1.75;display:none}
 .rpt-card.open .rpt-body{display:block}
-.rpt-arrow{font-size:.65rem;color:rgba(21,48,30,.3);transition:transform .25s}
+.rpt-arrow{font-size:.65rem;color:rgba(20,20,20,.3);transition:transform .25s}
 .rpt-card.open .rpt-arrow{transform:rotate(180deg)}
 .rpt-section{margin-bottom:.75rem}
 .rpt-section-title{font-family:'Inter',sans-serif;font-size:.6rem;
-  letter-spacing:.12em;text-transform:uppercase;color:rgba(21,48,30,.3);
+  letter-spacing:.12em;text-transform:uppercase;color:rgba(20,20,20,.3);
   margin-bottom:.4rem}
 .rpt-tags{display:flex;flex-direction:column;gap:.3rem}
-.rpt-tag{background:rgba(21,48,30,.04);border-radius:8px;
-  padding:.45rem .7rem;font-size:.8rem;color:rgba(21,48,30,.6)}
+.rpt-tag{background:rgba(20,20,20,.04);border-radius:8px;
+  padding:.45rem .7rem;font-size:.8rem;color:rgba(20,20,20,.6)}
 .rpt-menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.4rem}
-.rpt-meal{background:rgba(21,48,30,.04);border-radius:10px;
+.rpt-meal{background:rgba(20,20,20,.04);border-radius:10px;
   padding:.6rem .7rem;text-align:center}
-.rpt-meal-time{font-size:.65rem;color:rgba(21,48,30,.35);margin-bottom:.2rem}
-.rpt-meal-name{font-size:.78rem;color:var(--green-ink);font-weight:600;line-height:1.3}
+.rpt-meal-time{font-size:.65rem;color:rgba(20,20,20,.35);margin-bottom:.2rem}
+.rpt-meal-name{font-size:.78rem;color:var(--ink);font-weight:600;line-height:1.3}
 .rpt-meal-kcal{font-family:'Inter',sans-serif;font-size:.65rem;
   color:var(--yellow2);margin-top:.2rem}
 
 /* ── Modal action btn ── */
 .m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:var(--green-ink);font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
+  color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
   font-weight:700;cursor:pointer;transition:all .3s}
 .m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
 .m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
-.m-btn.outline{background:transparent;border:1px solid rgba(21,48,30,.15);
-  color:rgba(21,48,30,.65);flex:unset;padding:.7rem 1.2rem}
+.m-btn.outline{background:transparent;border:1px solid rgba(20,20,20,.15);
+  color:rgba(20,20,20,.65);flex:unset;padding:.7rem 1.2rem}
 .m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
 
 /* ── Profile avatar ── */
 .prof-avatar{width:68px;height:68px;border-radius:50%;
   background:linear-gradient(135deg,var(--pink),var(--purple));
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;color:#fff;
   font-size:1.8rem;font-weight:700;flex-shrink:0;
-  box-shadow:0 0 20px rgba(233,30,140,.3)}
-.prof-name{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--green-ink)}
+  box-shadow:0 0 20px rgba(226,19,110,.3)}
+.prof-name{font-family:'Hind Siliguri',sans-serif;font-size:1.2rem;font-weight:700;color:var(--ink)}
 .prof-mid{font-family:'Inter',sans-serif;font-size:.7rem;color:var(--pink2);margin-top:.1rem}
 .prof-tier{display:inline-block;margin-top:.3rem;background:rgba(245,158,11,.12);
   border:1px solid rgba(245,158,11,.25);border-radius:50px;
   padding:.15rem .65rem;font-size:.72rem;color:var(--yellow2)}
 .p-section-head{font-family:'Inter',sans-serif;font-size:.62rem;letter-spacing:.12em;
-  text-transform:uppercase;color:rgba(21,48,30,.25);margin:1rem 0 .5rem;
-  padding-bottom:.3rem;border-bottom:1px solid rgba(21,48,30,.06)}
+  text-transform:uppercase;color:rgba(20,20,20,.25);margin:1rem 0 .5rem;
+  padding-bottom:.3rem;border-bottom:1px solid rgba(20,20,20,.06)}
 
 /* ── Password status msg ── */
 .pw-msg{font-size:.82rem;min-height:1.1rem;margin:.4rem 0}
@@ -3041,12 +3259,12 @@ function renderProfilePanel(cust, metrics) {
     <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1.2rem">
       <div style="width:64px;height:64px;border-radius:50%;
         background:linear-gradient(135deg,var(--pink),var(--purple));
-        display:flex;align-items:center;justify-content:center;
+        display:flex;align-items:center;justify-content:center;color:#fff;
         font-size:1.6rem;font-weight:700;flex-shrink:0">
         ${(cust?.full_name||'?').charAt(0).toUpperCase()}
       </div>
       <div>
-        <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700">
+        <div style="font-family:'Hind Siliguri',sans-serif;font-size:1.2rem;font-weight:700">
           ${cust?.full_name || '—'}
         </div>
         <div style="font-family:'Inter',sans-serif;font-size:.72rem;color:var(--pink2)">
@@ -3183,7 +3401,7 @@ async function loadAndRenderProfile() {
   try {
     const [custArr, metricsArr] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}).then(r=>r.json()),
-      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
+      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H}).then(r=>r.json())
     ]);
     renderProfilePanel(custArr?.[0] || {}, metricsArr?.[0] || {});
   } catch(e) {
@@ -3237,12 +3455,12 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 async function mLoadProfile() {
   const body = document.getElementById('profileModalBody');
   if (!body || !CID) return;
-  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(21,48,30,.35)">⏳ লোড হচ্ছে...</div>';
+  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(20,20,20,.35)">⏳ লোড হচ্ছে...</div>';
 
   try {
     const [custR, metR] = await Promise.all([
       fetch(`${SUPA}/rest/v1/customers?id=eq.${CID}&select=*`, {headers:H}),
-      fetch(`${SUPA}/rest/v1/customer-metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
+      fetch(`${SUPA}/rest/v1/customer_metrics?customer_id=eq.${CID}&limit=1&select=*`, {headers:H})
     ]);
     const cust    = (await custR.json())?.[0] || {};
     const metrics = (await metR.json())?.[0]  || {};
@@ -3344,18 +3562,25 @@ async function mSaveDailyLog() {
   };
 
   try {
-    const r = await fetch(`${SUPA}/rest/v1/daily_health_log`, {
+    // ── 1) save the full daily log (UPSERT so saving twice in one
+    //        day UPDATES instead of throwing a 409 duplicate error) ──
+    const r = await fetch(
+      `${SUPA}/rest/v1/daily_health_log?on_conflict=customer_id,log_date`, {
       method: 'POST',
-      headers: { ...H, 'Prefer': 'return=minimal' },
+      headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify(data)
     });
     if (r.ok || r.status === 201 || r.status === 204) {
+      // ── 2) mirror the AI-relevant signals into customer_metrics so
+      //        the 6 AM meal-score AI reads today's mood/stress/sleep
+      //        directly. Non-blocking: if it fails the log is still saved. ──
+      await mUpdateMetricsFromLog(data);
+
       if (status) { status.style.color='#34D399'; status.textContent='✅ সংরক্ষিত!'; }
       toast('✅ আজকের স্বাস্থ্য আপডেট সংরক্ষিত হয়েছে!', true);
       setTimeout(closeModal, 1200);
     } else {
       const err = await r.text();
-      // If 404 = table missing
       if (r.status === 404) throw new Error('daily_health_log table নেই। Supabase-এ SQL রান করুন।');
       throw new Error(`HTTP ${r.status}: ${err.substring(0,80)}`);
     }
@@ -3365,6 +3590,37 @@ async function mSaveDailyLog() {
   } finally {
     if (btn) { btn.textContent = '💾 Save করুন'; btn.disabled = false; }
   }
+}
+
+// ── push today's mood/stress/sleep into customer_metrics ──
+// Only the few fields the 6 AM AI actually uses are mirrored here;
+// the full 250-metric profile is NOT overwritten. Uses PATCH so the
+// existing row is updated in place. Silent on failure (non-critical).
+async function mUpdateMetricsFromLog(log) {
+  if (!CID) return;
+  try {
+    const patch = {
+      mood:         log.mood || null,
+      stress_level: log.stress_level,
+      sleep_hours:  log.sleep_hours,
+      updated_at:   new Date().toISOString(),
+    };
+    // PATCH the existing metrics row for this customer
+    const r = await fetch(
+      `${SUPA}/rest/v1/customer_metrics?customer_id=eq.${encodeURIComponent(CID)}`, {
+      method: 'PATCH',
+      headers: { ...H, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(patch),
+    });
+    // If no metrics row exists yet, create a minimal one so AI has signals
+    if (r.status === 404 || r.status === 406) {
+      await fetch(`${SUPA}/rest/v1/customer_metrics?on_conflict=customer_id`, {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({ customer_id: CID, ...patch }),
+      }).catch(()=>{});
+    }
+  } catch(e) { /* non-critical: log already saved */ }
 }
 
 // Pre-load today's saved data into daily input form
@@ -3468,7 +3724,7 @@ async function mSubmitFeedback() {
 async function mLoadReports() {
   const body = document.getElementById('aiReportBody');
   if (!body || !CID) return;
-  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(21,48,30,.35)">⏳ রিপোর্ট লোড হচ্ছে...</div>';
+  body.innerHTML = '<div style="text-align:center;padding:2rem;color:rgba(20,20,20,.35)">⏳ রিপোর্ট লোড হচ্ছে...</div>';
 
   try {
     // Try analysis_reports first, fallback to ai_analysis
@@ -3497,7 +3753,7 @@ async function mLoadReports() {
       body.innerHTML = `
         <div style="text-align:center;padding:2.5rem">
           <div style="font-size:2rem;margin-bottom:.6rem">📋</div>
-          <div style="color:rgba(21,48,30,.4);font-size:.85rem;line-height:1.7">
+          <div style="color:rgba(20,20,20,.4);font-size:.85rem;line-height:1.7">
             এখনো কোনো রিপোর্ট নেই।<br>
             প্রতিদিন সকাল ৬টায় AI বিশ্লেষণের পরে এখানে দেখাবে।
           </div>
@@ -3513,11 +3769,14 @@ async function mLoadReports() {
       const scoreN    = parseInt(score) || 0;
       const scoreClr  = scoreN >= 70 ? '#34D399' : scoreN >= 40 ? '#FCD34D' : '#F87171';
       const date      = rpt.report_date || rpt.created_at?.split('T')[0] || '—';
-      const analysis  = rpt.analysis_bn || '—';
-      const recs      = rpt.recommendations || '';
-      const problems  = Array.isArray(rpt.problems) ? rpt.problems : [];
-      const solutions = Array.isArray(rpt.solutions) ? rpt.solutions : [];
-      const menu      = rpt.daily_menu_recommendation_json || rpt.daily_menu || null;
+      const analysis  = rpt.health_summary_bn || rpt.analysis_bn || rpt.report_json?.analysis_bn || '—';
+      const recs      = rpt.general_suggestions_bn || rpt.recommendations || rpt.nutrition_advice_bn || '';
+      // problems/solutions — JSON column অথবা array, যেটাই থাকুক
+      const parseArr  = (v) => { if(!v) return []; if(Array.isArray(v)) return v; try{ const x=JSON.parse(v); return Array.isArray(x)?x:[]; }catch(e){ return []; } };
+      const problems  = parseArr(rpt.problems_json || rpt.problems);
+      const solutions = parseArr(rpt.solutions_json || rpt.solutions);
+      let menu        = rpt.daily_menu_recommendation_json || rpt.daily_menu || null;
+      if (typeof menu === 'string') { try { menu = JSON.parse(menu); } catch(e){ menu = null; } }
       const pdfUrl    = rpt.pdf_url || '';
       const morning   = rpt.morning_greeting || '';
       const bday      = rpt.birthday_message || '';
@@ -3544,7 +3803,7 @@ async function mLoadReports() {
       <div class="rpt-card" id="rpt2-${i}">
         <div class="rpt-head" onclick="toggleRpt2(${i})">
           <div style="display:flex;align-items:center;gap:.65rem;flex:1">
-            <span style="font-size:.82rem;color:rgba(21,48,30,.5)">${date}</span>
+            <span style="font-size:.82rem;color:rgba(20,20,20,.5)">${date}</span>
             <span class="rpt-score" style="background:${scoreClr}1a;color:${scoreClr};border:1px solid ${scoreClr}40">
               স্কোর: ${scoreN}/100
             </span>
@@ -3553,12 +3812,12 @@ async function mLoadReports() {
           <span class="rpt-arrow">▼</span>
         </div>
         <div class="rpt-body">
-          ${morning ? `<div style="background:rgba(5,150,105,.07);border-left:2px solid var(--green2);padding:.5rem .8rem;border-radius:0 8px 8px 0;margin-bottom:.7rem;font-size:.8rem;color:rgba(21,48,30,.6)">${morning}</div>` : ''}
+          ${morning ? `<div style="background:rgba(5,150,105,.07);border-left:2px solid var(--green2);padding:.5rem .8rem;border-radius:0 8px 8px 0;margin-bottom:.7rem;font-size:.8rem;color:rgba(20,20,20,.6)">${morning}</div>` : ''}
           ${bday ? `<div style="background:rgba(233,30,140,.08);border:1px solid rgba(233,30,140,.2);border-radius:10px;padding:.6rem .9rem;margin-bottom:.7rem;font-size:.82rem;color:var(--pink2)">🎂 ${bday}</div>` : ''}
 
           <div class="rpt-section">
             <div class="rpt-section-title">📊 স্বাস্থ্য মূল্যায়ন</div>
-            <p style="font-size:.83rem;color:rgba(21,48,30,.65);line-height:1.7">${analysis}</p>
+            <p style="font-size:.83rem;color:rgba(20,20,20,.65);line-height:1.7">${analysis}</p>
           </div>
 
           ${problems.length ? `<div class="rpt-section">
@@ -3573,12 +3832,17 @@ async function mLoadReports() {
 
           ${recs ? `<div class="rpt-section">
             <div class="rpt-section-title">💡 পরামর্শ</div>
-            <p style="font-size:.8rem;color:rgba(21,48,30,.55);line-height:1.7;background:rgba(245,200,66,.04);border-left:2px solid rgba(245,200,66,.25);padding:.5rem .8rem;border-radius:0 8px 8px 0">${recs}</p>
+            <p style="font-size:.8rem;color:rgba(20,20,20,.55);line-height:1.7;background:rgba(245,200,66,.04);border-left:2px solid rgba(245,200,66,.25);padding:.5rem .8rem;border-radius:0 8px 8px 0">${recs}</p>
           </div>` : ''}
 
           ${menuHtml}
 
-          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.25);border-radius:8px;padding:.35rem .85rem;color:var(--pink2);text-decoration:none;font-size:.78rem">📄 PDF ডাউনলোড</a>` : ''}
+          ${pdfUrl ? `<a href="${pdfUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.25);border-radius:8px;padding:.35rem .85rem;color:var(--pink2);text-decoration:none;font-size:.78rem">📄 PDF ডাউনলোড</a>`
+            : `<button onclick='openReportHTML("AI স্বাস্থ্য রিপোর্ট — ${date}", ${JSON.stringify(
+                  `<div class="sec"><b>স্বাস্থ্য স্কোর</b>${scoreN}/100</div>`+
+                  `<div class="sec"><b>বিশ্লেষণ</b>${(analysis||"").replace(/"/g,"&quot;")}</div>`+
+                  (recs?`<div class="sec"><b>পরামর্শ</b>${(recs||"").replace(/"/g,"&quot;")}</div>`:"")
+                )})' style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;background:rgba(233,30,140,.1);border:1px solid rgba(233,30,140,.25);border-radius:8px;padding:.35rem .85rem;color:var(--pink2);cursor:pointer;font-size:.78rem;font-family:inherit">📄 রিপোর্ট দেখুন / PDF</button>`}
         </div>
       </div>`;
     }).join('');
@@ -3654,7 +3918,8 @@ function mVoice(targetId) {
   if (!SR) { toast('Voice: Chrome browser-এ কাজ করে।', false); return; }
 
   // Determine button to style
-  const btnMap = { diNotes:'diVoiceBtn', sarText:'sarVoiceBtn' };
+  const btnMap = { diNotes:'diVoiceBtn', sarText:'sarVoiceBtn',
+                   di2_mental:'mentalVoiceBtn', di2_food:'foodVoiceBtn' };
   const voiceBtn = document.getElementById(btnMap[targetId]) ||
     document.querySelector('[onclick*="mVoice"]');
 
@@ -3693,6 +3958,218 @@ function mVoice(targetId) {
   _voiceRecog.start();
 }
 
+</script>
+
+<!-- ════════ ছবি স্টুডিও (আপলোড + বড় দেখা + ফ্রি beauty ফিল্টার) ════════ -->
+<div id="photoStudio" style="display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(20,20,20,.55);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--dark2);border:2px solid var(--orange);border-radius:20px;
+    max-width:440px;width:100%;max-height:92vh;overflow-y:auto;padding:20px;
+    box-shadow:0 24px 60px -16px rgba(20,20,20,.35)">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="color:var(--purple);margin:0">📷 আমার ছবি</h3>
+      <button onclick="closePhotoStudio()" style="background:none;border:none;
+        font-size:24px;color:var(--ink);cursor:pointer">×</button>
+    </div>
+
+    <!-- বড় ছবি (ফিল্টার এখানে দেখা যায়) -->
+    <div style="text-align:center;margin-bottom:14px">
+      <img id="studioImg" style="max-width:100%;max-height:300px;border-radius:14px;
+        border:2px solid var(--border);display:none" alt="ছবি"/>
+      <div id="studioEmpty" style="padding:40px;color:var(--ink-soft)">
+        এখনো ছবি নেই — নিচে আপলোড করুন
+      </div>
+    </div>
+
+    <!-- আপলোড বোতাম -->
+    <label style="display:block;text-align:center;background:linear-gradient(135deg,var(--orange),var(--orange2));
+      color:#fff;padding:11px;border-radius:10px;cursor:pointer;font-weight:600;margin-bottom:14px">
+      📤 ছবি আপলোড / বদল করুন
+      <input type="file" id="photoInput" accept="image/*" hidden onchange="loadPhoto(event)"/>
+    </label>
+
+    <!-- Beauty ফিল্টার স্লাইডার -->
+    <div id="beautyControls" style="display:none">
+      <p style="color:var(--purple);font-weight:600;margin:0 0 8px">✨ সৌন্দর্য সমন্বয়</p>
+
+      <div style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--ink)">উজ্জ্বলতা</label>
+        <input type="range" id="fBright" min="80" max="140" value="100"
+          oninput="applyBeauty()" style="width:100%;accent-color:var(--orange)"/>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--ink)">ত্বকের উষ্ণতা/টোন</label>
+        <input type="range" id="fWarm" min="80" max="130" value="100"
+          oninput="applyBeauty()" style="width:100%;accent-color:var(--orange)"/>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--ink)">মসৃণতা (soft glow)</label>
+        <input type="range" id="fSmooth" min="0" max="8" value="0"
+          oninput="applyBeauty()" style="width:100%;accent-color:var(--orange)"/>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:13px;color:var(--ink)">ঠোঁটের আভা (লিপস্টিক)</label>
+        <input type="range" id="fLip" min="0" max="100" value="0"
+          oninput="applyBeauty()" style="width:100%;accent-color:var(--pink)"/>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:13px;color:var(--ink)">গালের আভা (blush)</label>
+        <input type="range" id="fBlush" min="0" max="100" value="0"
+          oninput="applyBeauty()" style="width:100%;accent-color:var(--pink2)"/>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button onclick="resetBeauty()" style="flex:1;background:var(--glass2);
+          border:1px solid var(--border);color:var(--ink);padding:9px;border-radius:8px;cursor:pointer">
+          রিসেট</button>
+        <button onclick="savePhoto()" style="flex:1;background:linear-gradient(135deg,var(--green),var(--green2));
+          color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-weight:600">
+          ✓ সংরক্ষণ</button>
+      </div>
+      <p style="font-size:11px;color:var(--ink-soft);text-align:center;margin:10px 0 0">
+        💡 ছবি শুধু আপনার এই ডিভাইসে থাকে, নিরাপদ।</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SAR DISCLAIMER — full width, high contrast ═══ -->
+<div style="
+  width:100%;margin:2.2rem 0 0;padding:1.5rem 1.6rem;
+  background:#1a0f1c;border-top:2px solid #E91E8C;
+  line-height:1.75;font-family:'Segoe UI',system-ui,sans-serif;box-sizing:border-box">
+  <div style="max-width:1100px;margin:0 auto">
+    <div style="text-align:center;font-weight:800;font-size:1rem;color:#FFD43B;
+      margin-bottom:1rem;letter-spacing:.3px">
+      ⚕️ গুরুত্বপূর্ণ আইনি ও স্বাস্থ্য দাবিত্যাগ
+      <br><span style="font-size:.82rem;color:#FF6BB5">IMPORTANT LEGAL &amp; HEALTH DISCLAIMER</span>
+    </div>
+    <div style="font-size:.86rem;color:#FFFFFF;margin-bottom:1rem;
+      background:rgba(20,20,20,.04);padding:1rem;border-radius:10px;border-left:4px solid #E91E8C">
+      <strong style="color:#FFD43B;display:block;margin-bottom:.4rem">🇧🇩 বাংলা</strong>
+      SAR (She AI Revolution) একটি নারী-পরিচালিত স্বাস্থ্য সচেতনতা, সুস্থতা ও নারী-ক্ষমতায়ন প্ল্যাটফর্ম।
+      এটি <strong style="color:#FFD43B">কোনো হাসপাতাল, ক্লিনিক, ডায়াগনস্টিক কেন্দ্র বা চিকিৎসা প্রতিষ্ঠান নয়</strong>
+      এবং কোনো রোগ নির্ণয়, চিকিৎসা, নিরাময় বা প্রতিরোধের দাবি করে না। এই প্ল্যাটফর্মের সকল খাদ্য, পুষ্টি,
+      জীবনধারা ও সুস্থতাবিষয়ক তথ্য শুধুমাত্র <strong style="color:#FFD43B">সাধারণ সচেতনতা ও শিক্ষামূলক উদ্দেশ্যে</strong>
+      প্রদত্ত এবং এটি কোনো নিবন্ধিত চিকিৎসক, পুষ্টিবিদ বা স্বাস্থ্যসেবা পেশাজীবীর পরামর্শের বিকল্প নয়।
+      AI দ্বারা প্রদত্ত তথ্য স্বয়ংক্রিয় ও সাধারণ প্রকৃতির — ব্যক্তিগত চিকিৎসা পরামর্শ নয়।
+      কোনো ওষুধ, সম্পূরক বা থেরাপি গ্রহণের আগে অবশ্যই
+      <strong style="color:#FFD43B">আপনার নিবন্ধিত চিকিৎসকের পরামর্শ নিন</strong>।
+      জরুরি অবস্থায় নিকটস্থ হাসপাতালে যোগাযোগ করুন। SAR ব্যবহারের মাধ্যমে আপনি স্বীকার করছেন যে সিদ্ধান্ত
+      আপনার নিজ দায়িত্বে নেওয়া এবং এর ফলাফলের জন্য SAR বা MindMax Enterprises দায়ী নয়।
+    </div>
+    <div style="font-size:.82rem;color:#E8E8E8;
+      background:rgba(20,20,20,.04);padding:1rem;border-radius:10px;border-left:4px solid #F5A623">
+      <strong style="color:#FFD43B;display:block;margin-bottom:.4rem">🌐 English</strong>
+      SAR (She AI Revolution) is a women-led health-awareness, wellness and women-empowerment platform.
+      It is <strong style="color:#FFD43B">not a hospital, clinic, diagnostic centre or medical institution</strong>,
+      and does not diagnose, treat, cure or prevent any disease. All food, nutrition, lifestyle and wellness
+      information here is for <strong style="color:#FFD43B">general awareness and educational purposes only</strong>
+      and is not a substitute for advice from a registered physician, dietitian or qualified healthcare provider.
+      Any AI-generated information is automated and general in nature — not personalised medical advice.
+      Always <strong style="color:#FFD43B">consult your registered doctor</strong> before taking any medicine,
+      supplement or therapy, or changing your health or diet. In an emergency, contact your nearest hospital.
+      By using SAR you acknowledge that decisions are made at your own discretion and responsibility, and that
+      neither SAR nor MindMax Enterprises is liable for any outcome.
+    </div>
+    <div style="text-align:center;font-size:.74rem;color:#FF6BB5;margin-top:1rem;font-weight:600">
+      SAR — She AI Revolution · women-led · women-run · women-only · © MindMax Enterprises
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ছবি স্টুডিও — সম্পূর্ণ ফ্রি, ব্রাউজারের ভেতরেই কাজ করে ──
+(function(){
+  var KEY = 'sar_customer_photo';
+
+  // পেজ লোডে সেভ করা ছবি থাকলে thumbnail-এ দেখাই
+  function showSaved(){
+    try{
+      var saved = localStorage.getItem(KEY);
+      if(saved){
+        var t = document.getElementById('custPhotoThumb');
+        var ph = document.getElementById('custPhotoPlaceholder');
+        if(t){ t.src = saved; t.style.display='block'; }
+        if(ph) ph.style.display='none';
+      }
+    }catch(e){}
+  }
+
+  window.openPhotoStudio = function(){
+    document.getElementById('photoStudio').style.display='flex';
+    try{
+      var saved = localStorage.getItem(KEY);
+      if(saved){
+        var img = document.getElementById('studioImg');
+        img.src = saved; img.style.display='inline-block';
+        img.style.filter='none';
+        document.getElementById('studioEmpty').style.display='none';
+        document.getElementById('beautyControls').style.display='block';
+      }
+    }catch(e){}
+  };
+  window.closePhotoStudio = function(){
+    document.getElementById('photoStudio').style.display='none';
+  };
+
+  // নতUN ছবি লোড
+  window.loadPhoto = function(ev){
+    var file = ev.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = document.getElementById('studioImg');
+      img.src = e.target.result;
+      img.style.display='inline-block';
+      img.style.filter='none';
+      document.getElementById('studioEmpty').style.display='none';
+      document.getElementById('beautyControls').style.display='block';
+      resetBeauty();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ফিল্টার প্রয়োগ — CSS filter দিয়ে (ফ্রি, ব্রাউজারেই)
+  window.applyBeauty = function(){
+    var img = document.getElementById('studioImg');
+    if(!img) return;
+    var b  = document.getElementById('fBright').value;
+    var w  = document.getElementById('fWarm').value;
+    var sm = document.getElementById('fSmooth').value;
+    var lip   = document.getElementById('fLip').value;
+    var blush = document.getElementById('fBlush').value;
+    // উজ্জ্বলতা + উষ্ণতা (sepia=উষ্ণ টোন) + মসৃণতা (blur অল্প)
+    img.style.filter =
+      'brightness('+(b/100)+') '
+      + 'sepia('+((w-100)/100)+') saturate('+(1+(w-100)/200)+') '
+      + 'blur('+(sm/10)+'px)';
+    // ঠোঁট/গালের গোলাপি আভা — পুরো ছবিতে হালকা গোলাপি overlay (drop-shadow ট্রিক)
+    var pink = (parseInt(lip)+parseInt(blush))/2;
+    img.style.boxShadow = pink>0
+      ? 'inset 0 0 '+(pink)+'px rgba(233,30,140,'+(pink/300)+')' : 'none';
+  };
+
+  window.resetBeauty = function(){
+    ['fBright','fWarm'].forEach(function(id){document.getElementById(id).value=100;});
+    ['fSmooth','fLip','fBlush'].forEach(function(id){document.getElementById(id).value=0;});
+    applyBeauty();
+  };
+
+  // সংরক্ষণ — থাম্বনেইলে দেখাই ও localStorage-এ রাখি
+  window.savePhoto = function(){
+    var img = document.getElementById('studioImg');
+    if(!img || !img.src) return;
+    try{
+      localStorage.setItem(KEY, img.src);
+      showSaved();
+      closePhotoStudio();
+    }catch(e){ alert('ছবি সংরক্ষণে সমস্যা (হয়তো ছবি অনেক বড়)। ছোট ছবি দিন।'); }
+  };
+
+  showSaved();  // পেজ খুললেই সেভ করা ছবি দেখাও
+})();
 </script>
 </body>
 </html>
