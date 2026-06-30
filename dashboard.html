@@ -87,14 +87,14 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 }
 .hero-action-btn{
   flex:1;display:flex;align-items:center;justify-content:center;gap:.5rem;
-  background:rgba(255,255,255,.14);border:2px solid var(--gold);border-radius:14px;
+  background:linear-gradient(150deg,#26A65B,#157A3E);border:2px solid var(--gold);border-radius:14px;
   padding:.75rem .6rem;color:#fff;font-family:'Hind Siliguri',sans-serif;
   font-size:.86rem;font-weight:700;cursor:pointer;text-decoration:none;
-  transition:all .2s;
+  transition:all .2s;box-shadow:0 4px 10px -4px rgba(20,20,20,.32);
 }
-.hero-action-btn:hover{background:rgba(255,255,255,.24);transform:translateY(-2px)}
-.hero-action-btn.solid{background:#fff;color:var(--bkash-pink-dark)}
-.hero-action-btn.solid:hover{background:#fff;opacity:.92}
+.hero-action-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.42)}
+.hero-action-btn.solid{background:linear-gradient(150deg,#FB923C,#C2570A)}
+.hero-action-btn.solid:hover{transform:translateY(-2px)}
 
 /* ── WHITE SERVICES PANEL (new) — Rocket-style icon-circle grid, colorful icons,
    FULL WIDTH edge-to-edge, no blank space, compact ── */
@@ -243,16 +243,17 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .hdr-btn{
   display:flex;align-items:center;gap:.5rem;
   padding:.6rem 1.1rem;border-radius:50px;
-  font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:600;
-  cursor:pointer;transition:all .3s;text-decoration:none;
-  border:1px solid var(--border2);background:var(--glass2);color:var(--ink);
+  font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:700;
+  cursor:pointer;transition:all .2s;text-decoration:none;
+  border:2px solid var(--gold);background:linear-gradient(150deg,#9C5FE0,#6A2DA8);color:#fff;
+  box-shadow:0 4px 10px -4px rgba(20,20,20,.28);
 }
-.hdr-btn:hover{border-color:var(--pink);transform:translateY(-1px)}
+.hdr-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 .hdr-btn.primary{
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  border-color:transparent;box-shadow:0 0 18px rgba(226,19,110,.28);color:#fff;
+  background:linear-gradient(150deg,#F06292,#C2185B);
+  border-color:var(--gold);box-shadow:0 4px 10px -4px rgba(20,20,20,.28);color:#fff;
 }
-.hdr-btn.primary:hover{box-shadow:0 0 32px rgba(233,30,140,.45)}
+.hdr-btn.primary:hover{box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 
 /* ── SUBSCRIPTION ALERT ── */
 .sub-alert{
@@ -271,12 +272,12 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .alert-desc{font-size:.78rem;color:rgba(20,20,20,.5)}
 .alert-btn{
   padding:.5rem 1.1rem;border-radius:50px;
-  background:linear-gradient(135deg,var(--green),var(--yellow));
-  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
+  background:linear-gradient(150deg,#26A65B,#157A3E);
+  border:2px solid var(--gold);color:#fff;font-family:'Hind Siliguri',sans-serif;
   font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;
-  transition:all .3s;text-decoration:none;display:inline-block;
+  transition:all .2s;text-decoration:none;display:inline-block;
 }
-.alert-btn.pay{background:linear-gradient(135deg,var(--pink),var(--purple))}
+.alert-btn.pay{background:linear-gradient(150deg,#FB923C,#C2570A)}
 .alert-btn:hover{transform:scale(1.04)}
 
 /* ── STATS ROW ── */
@@ -357,12 +358,12 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .lock-desc{font-size:.78rem;color:rgba(20,20,20,.35);line-height:1.6;margin-bottom:1.1rem}
 .lock-btn{
   display:inline-block;padding:.65rem 1.5rem;border-radius:50px;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
+  background:linear-gradient(150deg,#26C6DA,#00838F);
   color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.82rem;font-weight:700;
-  text-decoration:none;border:none;cursor:pointer;
-  box-shadow:0 0 18px rgba(107,33,168,.28);transition:all .3s;
+  text-decoration:none;border:2px solid var(--gold);cursor:pointer;
+  box-shadow:0 4px 10px -4px rgba(20,20,20,.28);transition:all .2s;
 }
-.lock-btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(107,33,168,.45)}
+.lock-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 
 .analysis-content{}
 .health-score-row{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.2rem;
@@ -418,11 +419,11 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .mt-d{background:rgba(107,33,168,.14);color:var(--purple2)}
 .menu-order-btn{
   padding:.38rem .85rem;border-radius:50px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  border:none;color:#fff;font-family:'Hind Siliguri',sans-serif;
-  font-size:.72rem;font-weight:700;cursor:pointer;transition:all .3s;
+  background:linear-gradient(150deg,#3B9CE8,#1565C0);
+  border:2px solid var(--gold);color:#fff;font-family:'Hind Siliguri',sans-serif;
+  font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;
 }
-.menu-order-btn:hover{transform:scale(1.06);box-shadow:0 0 12px rgba(233,30,140,.35)}
+.menu-order-btn:hover{transform:scale(1.06);box-shadow:0 6px 14px -6px rgba(20,20,20,.4)}
 .menu-order-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
 /* ── RECENT ORDERS ── */
@@ -501,21 +502,36 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .note-item.critical{border-color:var(--red);background:rgba(220,38,38,.07)}
 .note-date{font-size:.68rem;color:rgba(20,20,20,.28);margin-top:.3rem;font-family:'Inter',sans-serif}
 
-/* ── QUICK ACTIONS ── */
+/* ── QUICK ACTIONS (now colorful, gold-bordered, matches top services grid) ── */
 .qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
 .qa-btn{
-  display:flex;flex-direction:column;align-items:center;gap:.45rem;
-  padding:.9rem .5rem;border-radius:14px;
-  background:rgba(20,20,20,.04);border:1px solid var(--border);
-  text-decoration:none;color:var(--ink);cursor:pointer;transition:all .3s;
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  padding:.85rem .5rem;border-radius:14px;
+  border:2px solid var(--gold);
+  text-decoration:none;color:#fff;cursor:pointer;transition:all .2s;
   font-family:'Hind Siliguri',sans-serif;
+  box-shadow:0 4px 10px -4px rgba(20,20,20,.28);
 }
-.qa-btn:hover{transform:translateY(-3px);border-color:var(--border2);background:rgba(20,20,20,.08)}
-.qa-icon{font-size:1.4rem}
-.qa-label{font-size:.76rem;font-weight:600;color:rgba(20,20,20,.65);text-align:center}
-.qa-btn.highlight{background:linear-gradient(135deg,var(--pink3),var(--purple3));
-  border-color:rgba(233,30,140,.22)}
-.qa-btn.highlight .qa-label{color:var(--pink2)}
+.qa-btn:hover{transform:translateY(-3px);box-shadow:0 10px 20px -8px rgba(20,20,20,.4)}
+.qa-icon{font-size:1.3rem;width:38px;height:38px;border-radius:11px;
+  background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center}
+.qa-label{font-size:.76rem;font-weight:700;color:#fff;text-align:center}
+.qa-btn.highlight{box-shadow:0 6px 16px -6px rgba(20,20,20,.4)}
+/* reuse the 8-color vivid palette */
+.qa-btn.qc1{background:linear-gradient(150deg,#F06292,#C2185B)}
+.qa-btn.qc2{background:linear-gradient(150deg,#26A65B,#157A3E)}
+.qa-btn.qc3{background:linear-gradient(150deg,#9C5FE0,#6A2DA8)}
+.qa-btn.qc4{background:linear-gradient(150deg,#3B9CE8,#1565C0)}
+.qa-btn.qc5{background:linear-gradient(150deg,#FB923C,#C2570A)}
+.qa-btn.qc6{background:linear-gradient(150deg,#F4C430,#C99A0E)}
+.qa-btn.qc7{background:linear-gradient(150deg,#8A9A3C,#5E6B22)}
+.qa-btn.qc1 .qa-icon{color:#C2185B}
+.qa-btn.qc2 .qa-icon{color:#157A3E}
+.qa-btn.qc3 .qa-icon{color:#6A2DA8}
+.qa-btn.qc4 .qa-icon{color:#1565C0}
+.qa-btn.qc5 .qa-icon{color:#C2570A}
+.qa-btn.qc6 .qa-icon{color:#A37E00}
+.qa-btn.qc7 .qa-icon{color:#5E6B22}
 
 /* ── MEMBERSHIP STATUS ── */
 .mem-card{background:linear-gradient(135deg,rgba(107,33,168,.09),rgba(233,30,140,.06));
@@ -638,11 +654,11 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 
 /* ── SAVE LOG BTN ── */
-.save-log-btn{width:100%;padding:1rem;border:none;border-radius:14px;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
+.save-log-btn{width:100%;padding:1rem;border:2px solid var(--gold);border-radius:14px;
+  background:linear-gradient(150deg,#F4C430,#C99A0E);
   color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:1rem;
-  font-weight:700;cursor:pointer;transition:all .3s;margin-top:.5rem}
-.save-log-btn:hover{box-shadow:0 0 24px rgba(233,30,140,.4);transform:translateY(-2px)}
+  font-weight:700;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.save-log-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 .save-log-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
 /* ── REPORT CARD (collapsible) ── */
@@ -671,21 +687,21 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .consult-fee-box strong{color:var(--yellow2)}
 .consult-list{list-style:none;margin:.4rem 0 0;padding:0}
 .consult-list li::before{content:'✦ ';color:var(--yellow2);font-size:.7rem}
-.consult-btn{width:100%;padding:.9rem;border:none;border-radius:12px;
-  background:linear-gradient(135deg,var(--green),#059669);
+.consult-btn{width:100%;padding:.9rem;border:2px solid var(--gold);border-radius:12px;
+  background:linear-gradient(150deg,#26A65B,#157A3E);
   color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.95rem;
-  font-weight:700;cursor:pointer;transition:all .3s;margin-top:.75rem}
-.consult-btn:hover{box-shadow:0 0 24px rgba(5,150,105,.4);transform:translateY(-2px)}
+  font-weight:700;cursor:pointer;transition:all .2s;margin-top:.75rem}
+.consult-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 
 /* ── WRITE TO SAR ── */
 .feedback-type-select{width:100%;padding:.65rem .9rem;background:#F5F5F7;
   border:1px solid rgba(20,20,20,.15);border-radius:10px;color:var(--ink);
   font-family:'Hind Siliguri',sans-serif;font-size:.88rem;cursor:pointer;
   margin-bottom:.75rem;outline:none}
-.send-feedback-btn{background:linear-gradient(135deg,var(--purple),var(--pink));
-  border:none;border-radius:10px;padding:.7rem 1.5rem;color:#fff;
-  font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
-.send-feedback-btn:hover{opacity:.9}
+.send-feedback-btn{background:linear-gradient(150deg,#9C5FE0,#6A2DA8);
+  border:2px solid var(--gold);border-radius:10px;padding:.7rem 1.5rem;color:#fff;
+  font-family:'Hind Siliguri',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s}
+.send-feedback-btn:hover{transform:translateY(-2px)}
 
 /* ── PANEL WRAPPER ── */
 .new-panel{max-width:720px}
@@ -829,13 +845,13 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
   color:var(--yellow2);margin-top:.2rem}
 
 /* ── Modal action btn ── */
-.m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
+.m-btn{flex:1;padding:.7rem;border:2px solid var(--gold);border-radius:11px;
+  background:linear-gradient(150deg,#F06292,#C2185B);
   color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
-  font-weight:700;cursor:pointer;transition:all .3s}
-.m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
+  font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 10px -4px rgba(20,20,20,.28)}
+.m-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 .m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
+.m-btn.green{background:linear-gradient(150deg,#26A65B,#157A3E)}
 .m-btn.outline{background:transparent;border:1px solid rgba(20,20,20,.15);
   color:rgba(20,20,20,.65);flex:unset;padding:.7rem 1.2rem}
 .m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
@@ -1071,38 +1087,38 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
             </div>
             <div class="dcard-body" id="quickActionsSection">
               <div class="qa-grid">
-                <a href="order.html" target="_blank" class="qa-btn highlight approved-only" id="qaOrder"
+                <a href="order.html" target="_blank" class="qa-btn qc1 approved-only" id="qaOrder"
                   onclick="return checkApprovalGate(event,'অর্ডার করতে')">
                   <span class="qa-icon">🛒</span>
                   <span class="qa-label">অর্ডার করুন</span>
                 </a>
-                <a href="track.html" target="_blank" class="qa-btn">
+                <a href="track.html" target="_blank" class="qa-btn qc2">
                   <span class="qa-icon">📍</span>
                   <span class="qa-label">ট্র্যাক করুন</span>
                 </a>
-                <a href="metrics.html" target="_blank" class="qa-btn">
+                <a href="metrics.html" target="_blank" class="qa-btn qc3">
                   <span class="qa-icon">📊</span>
                   <span class="qa-label">মেট্রিক্স আপডেট</span>
                 </a>
-                <a href="dashboard-receipts.html" target="_blank" class="qa-btn">
+                <a href="dashboard-receipts.html" target="_blank" class="qa-btn qc4">
                   <span class="qa-icon">🧾</span>
                   <span class="qa-label">রিসিট দেখুন</span>
                 </a>
-                <a href="meal-score.html" target="_blank" class="qa-btn approved-only"
+                <a href="meal-score.html" target="_blank" class="qa-btn qc5 approved-only"
                   onclick="return checkApprovalGate(event,'মেনু দেখতে')">
                   <span class="qa-icon">🍱</span>
                   <span class="qa-label">মেনু দেখুন</span>
                 </a>
-                <a href="payment.html" target="_blank" class="qa-btn highlight">
+                <a href="payment.html" target="_blank" class="qa-btn qc6">
                   <span class="qa-icon">💳</span>
                   <span class="qa-label">পেমেন্ট করুন</span>
                 </a>
                 <!-- DOCTOR CONSULTATION BUTTON -->
-                <a href="javascript:void(0)" class="qa-btn approved-only"
+                <a href="javascript:void(0)" class="qa-btn qc7 approved-only"
                   onclick="return openDoctorPortal(event)"
-                  style="grid-column:1/-1;background:linear-gradient(135deg,rgba(5,150,105,.15),rgba(52,211,153,.08));border-color:rgba(52,211,153,.3)">
+                  style="grid-column:1/-1">
                   <span class="qa-icon">👨‍⚕️</span>
-                  <span class="qa-label" style="color:var(--green2)">ডাক্তার পরামর্শ — AI + ২৫০ মেট্রিক্স বিশ্লেষণ ও প্রেসক্রিপশন</span>
+                  <span class="qa-label">ডাক্তার পরামর্শ — AI + ২৫০ মেট্রিক্স বিশ্লেষণ ও প্রেসক্রিপশন</span>
                 </a>
               </div>
             </div>
@@ -2727,14 +2743,14 @@ function openReportHTML(title, bodyHtml){
       .sec b{color:#C2185B;display:block;margin-bottom:.4rem}
       .foot{text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;
         color:#aaa;font-size:.75rem}
-      .pbtn{display:block;width:100%;background:#E91E8C;color:var(--ink);border:none;border-radius:10px;
+      .pbtn{display:block;width:100%;background:linear-gradient(150deg,#F06292,#C2185B);color:#fff;border:2px solid #D4AF37;border-radius:10px;
         padding:.9rem;font-size:1rem;font-weight:700;cursor:pointer;margin:1.5rem 0}
       @media print{.pbtn{display:none}}
     </style></head><body>
     <div class="rh"><h1>🌸 SAR — She AI Revolution</h1><p>${title}</p></div>
     <button class="pbtn" onclick="window.print()">🖨️ প্রিন্ট / PDF সংরক্ষণ করুন</button>
     ${bodyHtml}
-    <div class="foot">SAR — women-led · women-run · women-only · © MindMax Enterprises<br>
+    <div class="foot">SAR — women-led · women-run · women-only · © MindMax Group<br>
     এটি চিকিৎসা নয়; ডাক্তারের পরামর্শ নিন।</div>
     </body></html>`);
   w.document.close();
@@ -3136,13 +3152,13 @@ function printPrescription() {
   color:var(--yellow2);margin-top:.2rem}
 
 /* ── Modal action btn ── */
-.m-btn{flex:1;padding:.7rem;border:none;border-radius:11px;
-  background:linear-gradient(135deg,var(--pink),var(--purple));
+.m-btn{flex:1;padding:.7rem;border:2px solid var(--gold);border-radius:11px;
+  background:linear-gradient(150deg,#F06292,#C2185B);
   color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:.9rem;
-  font-weight:700;cursor:pointer;transition:all .3s}
-.m-btn:hover{box-shadow:0 0 20px rgba(233,30,140,.4);transform:translateY(-1px)}
+  font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 10px -4px rgba(20,20,20,.28)}
+.m-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px -6px rgba(20,20,20,.4)}
 .m-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.m-btn.green{background:linear-gradient(135deg,var(--green),#059669)}
+.m-btn.green{background:linear-gradient(150deg,#26A65B,#157A3E)}
 .m-btn.outline{background:transparent;border:1px solid rgba(20,20,20,.15);
   color:rgba(20,20,20,.65);flex:unset;padding:.7rem 1.2rem}
 .m-btn.outline:hover{border-color:var(--pink);color:var(--pink2)}
@@ -4150,7 +4166,7 @@ function mVoice(targetId) {
       কোনো ওষুধ, সম্পূরক বা থেরাপি গ্রহণের আগে অবশ্যই
       <strong style="color:#FFD43B">আপনার নিবন্ধিত চিকিৎসকের পরামর্শ নিন</strong>।
       জরুরি অবস্থায় নিকটস্থ হাসপাতালে যোগাযোগ করুন। SAR ব্যবহারের মাধ্যমে আপনি স্বীকার করছেন যে সিদ্ধান্ত
-      আপনার নিজ দায়িত্বে নেওয়া এবং এর ফলাফলের জন্য SAR বা MindMax Enterprises দায়ী নয়।
+      আপনার নিজ দায়িত্বে নেওয়া এবং এর ফলাফলের জন্য SAR বা MindMax Group দায়ী নয়।
     </div>
     <div style="font-size:.82rem;color:#E8E8E8;
       background:rgba(20,20,20,.04);padding:1rem;border-radius:10px;border-left:4px solid #F5A623">
@@ -4164,10 +4180,10 @@ function mVoice(targetId) {
       Always <strong style="color:#FFD43B">consult your registered doctor</strong> before taking any medicine,
       supplement or therapy, or changing your health or diet. In an emergency, contact your nearest hospital.
       By using SAR you acknowledge that decisions are made at your own discretion and responsibility, and that
-      neither SAR nor MindMax Enterprises is liable for any outcome.
+      neither SAR nor MindMax Group is liable for any outcome.
     </div>
     <div style="text-align:center;font-size:.74rem;color:#FF6BB5;margin-top:1rem;font-weight:600">
-      SAR — She AI Revolution · women-led · women-run · women-only · © MindMax Enterprises
+      SAR — She AI Revolution · women-led · women-run · women-only · © MindMax Group
     </div>
   </div>
 </div>
