@@ -42,95 +42,114 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
 .sb-overlay{display:none!important}
 .topbar{display:none!important}
 
-/* ── PINK HERO (new) — non-sticky, scrolls with page, lives in the body ── */
+/* ── ROCKET-STYLE HEADER CARD (new) — non-sticky, scrolls with page ── */
 .hero{
-  background:linear-gradient(135deg,var(--bkash-pink) 0%,var(--bkash-pink-dark) 60%,#9c0c4c 100%);
-  border-radius:0 0 28px 28px;
-  padding:1.1rem 1rem 1.4rem;
+  background:linear-gradient(135deg,#7B1FA2 0%,var(--bkash-pink) 100%);
+  border-radius:0 0 26px 26px;
+  padding:1rem 1rem 1.6rem;
   position:relative;overflow:hidden;
-  box-shadow:0 14px 34px -14px rgba(226,19,110,.55);
+  box-shadow:0 14px 34px -14px rgba(123,31,162,.5);
 }
-.hero::before{content:'';position:absolute;right:-60px;top:-60px;width:220px;height:220px;
-  border-radius:50%;background:rgba(255,255,255,.08)}
-.hero::after{content:'';position:absolute;left:-40px;bottom:-70px;width:180px;height:180px;
-  border-radius:50%;background:rgba(255,255,255,.06)}
+.hero::before{content:'';position:absolute;right:-50px;top:-60px;width:200px;height:200px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
 .hero-row{
-  display:flex;align-items:center;justify-content:space-between;gap:.75rem;
+  display:flex;align-items:center;justify-content:space-between;gap:.7rem;
   max-width:1280px;margin:0 auto;position:relative;z-index:1;
 }
-.tn-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;flex-shrink:0}
-.tn-logo-icon{width:38px;height:38px;border-radius:12px;
+.tn-logo{display:flex;align-items:center;gap:.5rem;text-decoration:none;flex-shrink:0}
+.tn-logo-icon{width:30px;height:30px;border-radius:9px;
   background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem;flex-shrink:0}
-.tn-logo-text{font-family:'Hind Siliguri',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;white-space:nowrap}
-.tn-member{font-family:'Inter',sans-serif;font-size:.66rem;color:rgba(255,255,255,.7);
-  white-space:nowrap}
-.tn-member span{color:#fff;font-weight:700}
-.tn-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.tn-profile-chip{
-  display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.3);border-radius:50px;padding:.32rem .85rem .32rem .32rem;
-  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;flex-shrink:0}
+.tn-logo-text{font-family:'Hind Siliguri',sans-serif;font-size:.92rem;font-weight:800;color:#fff;white-space:nowrap}
+.tn-bell{position:relative;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);
+  color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;cursor:pointer;flex-shrink:0}
+.tn-bell-badge{position:absolute;top:-4px;right:-4px;background:#fff;color:var(--bkash-pink);
+  font-size:.58rem;font-weight:800;min-width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;border:2px solid var(--bkash-pink-dark)}
+
+.hero-profile{
+  display:flex;align-items:center;gap:.7rem;max-width:1280px;margin:1rem auto 0;
+  position:relative;z-index:1;
 }
-.tn-profile-chip:hover{background:rgba(255,255,255,.26)}
-.tn-avatar{width:28px;height:28px;border-radius:50%;
-  background:#fff;color:var(--bkash-pink);
-  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.74rem;flex-shrink:0}
-.tn-pname{font-size:.78rem;font-weight:700;color:#fff;max-width:110px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tn-logout{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:.95rem;
-  cursor:pointer;width:36px;height:36px;border-radius:50%;transition:all .2s;flex-shrink:0;
+.tn-avatar{width:54px;height:54px;border-radius:50%;flex-shrink:0;
+  background:#fff;color:var(--bkash-pink);border:2px solid rgba(255,255,255,.6);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;overflow:hidden}
+.tn-avatar img{width:100%;height:100%;object-fit:cover}
+.tn-pname{font-size:1.05rem;font-weight:800;color:#fff;line-height:1.25;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62vw}
+.tn-member{font-family:'Inter',sans-serif;font-size:.74rem;color:rgba(255,255,255,.85);
+  white-space:nowrap;margin-top:.15rem}
+.tn-member span{color:#fff;font-weight:700}
+
+.hero-balance-row{max-width:1280px;margin:1rem auto 0;position:relative;z-index:1;
+  display:flex;align-items:center;gap:.6rem}
+.tn-balance-pill{
+  flex:1;background:#fff;border-radius:50px;padding:.8rem 1.2rem;
+  display:flex;align-items:center;gap:.55rem;cursor:pointer;
+  box-shadow:0 8px 18px -8px rgba(20,20,20,.3);transition:transform .2s;
+}
+.tn-balance-pill:hover{transform:translateY(-2px)}
+.tn-balance-icon{font-size:1.2rem;color:var(--bkash-pink)}
+.tn-balance-text{font-size:1.02rem;font-weight:800;color:var(--ink)}
+.tn-logout{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:1rem;
+  cursor:pointer;width:48px;height:48px;border-radius:50%;transition:all .2s;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;}
 .tn-logout:hover{background:rgba(255,255,255,.28)}
-.hero-greet{max-width:1280px;margin:.9rem auto 0;position:relative;z-index:1}
-.hero-greet-title{font-family:'Hind Siliguri',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;line-height:1.25}
-.hero-greet-sub{font-size:.78rem;color:rgba(255,255,255,.8);margin-top:.2rem}
 
-/* ── COLOR BUTTON GRID (new) — all sidebar actions live here, in the body,
-   no sticky header, responsive grid auto-fits any screen ── */
+/* ── WHITE SERVICES PANEL (new) — Rocket-style icon-circle grid, colorful icons ── */
+.services-panel{
+  background:#fff;border-radius:24px 24px 0 0;margin-top:-1rem;position:relative;z-index:2;
+  padding:1.3rem 1rem 1.4rem;max-width:1280px;margin-inline:auto;
+  box-shadow:0 -8px 24px -16px rgba(20,20,20,.12);
+}
+.services-title{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:.9rem;padding:0 .25rem}
 .tn-buttons{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));
-  gap:.6rem;max-width:1280px;margin:1.1rem auto 0;padding:0 1rem;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem .5rem;
 }
 .tn-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;
-  padding:.85rem .5rem;border-radius:16px;border:none;
-  color:#fff;font-family:'Hind Siliguri',sans-serif;
-  font-size:.74rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;
-  transition:transform .2s,box-shadow .2s;white-space:nowrap;position:relative;
-  box-shadow:0 6px 16px -6px rgba(20,20,20,.22);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:.4rem;
+  padding:0;border:none;background:none;
+  color:var(--ink);font-family:'Hind Siliguri',sans-serif;
+  font-size:.7rem;font-weight:600;cursor:pointer;text-decoration:none;text-align:center;
+  transition:transform .15s;white-space:normal;position:relative;line-height:1.25;
 }
-.tn-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 22px -8px rgba(20,20,20,.32)}
-.tn-btn:active{transform:translateY(-1px) scale(.98)}
-.tn-btn .tn-btn-icon{font-size:1.45rem;line-height:1}
+.tn-btn:hover{transform:translateY(-2px)}
+.tn-btn:active{transform:translateY(0) scale(.96)}
+.tn-btn .tn-btn-icon{
+  font-size:1.5rem;line-height:1;width:54px;height:54px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 6px 14px -6px rgba(20,20,20,.28);
+}
 .tn-btn-badge{
-  position:absolute;top:6px;right:8px;
-  background:#fff;color:var(--bkash-pink);font-size:.62rem;font-weight:800;
-  border-radius:50px;padding:.05rem .4rem;line-height:1.4;
+  position:absolute;top:-4px;right:14px;
+  background:var(--bkash-pink);color:#fff;font-size:.58rem;font-weight:800;
+  border-radius:50px;padding:.05rem .38rem;line-height:1.4;border:2px solid #fff;
 }
-/* 4-color rotation: pink / green / blue / orange — jaw-dropping palette */
-.tn-c1{background:linear-gradient(150deg,#E2136E,#A80E51)}
-.tn-c2{background:linear-gradient(150deg,#00A651,#00773A)}
-.tn-c3{background:linear-gradient(150deg,#0E76E0,#0B58A8)}
-.tn-c4{background:linear-gradient(150deg,#F97316,#C2570A)}
-.tn-btn.tn-active,.tn-btn.sb-item.active{
-  outline:3px solid rgba(20,20,20,.85);outline-offset:-3px;
-  box-shadow:0 10px 24px -6px rgba(20,20,20,.4);
+/* 4-color rotation on the icon circle only — pink / green / purple / blue */
+.tn-c1 .tn-btn-icon{background:linear-gradient(150deg,#FCE4EC,#F8BBD0);color:#C2185B}
+.tn-c2 .tn-btn-icon{background:linear-gradient(150deg,#E0F7E9,#A5E8C2);color:#00773A}
+.tn-c3 .tn-btn-icon{background:linear-gradient(150deg,#F1E3FA,#D9B8F2);color:#7B1FA2}
+.tn-c4 .tn-btn-icon{background:linear-gradient(150deg,#E1F0FE,#B6DCFB);color:#0B58A8}
+.tn-c5 .tn-btn-icon{background:linear-gradient(150deg,#FFEAD9,#FFCBA3);color:#C2570A}
+.tn-btn.tn-active .tn-btn-icon,.tn-btn.sb-item.active .tn-btn-icon{
+  outline:2.5px solid var(--bkash-pink);outline-offset:2px;
 }
 .tn-divider{display:none}
 
-@media(min-width:640px){
-  .tn-buttons{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:.7rem}
+@media(min-width:480px){
+  .tn-buttons{grid-template-columns:repeat(5,1fr)}
+}
+@media(min-width:768px){
+  .tn-buttons{grid-template-columns:repeat(6,1fr);gap:1.3rem .75rem}
+  .tn-btn .tn-btn-icon{width:60px;height:60px;font-size:1.7rem}
+  .tn-btn{font-size:.76rem}
 }
 @media(min-width:1024px){
-  .tn-buttons{grid-template-columns:repeat(8,1fr);gap:.85rem;padding:0 2rem}
-  .hero{padding:1.4rem 2rem 1.7rem}
+  .tn-buttons{grid-template-columns:repeat(8,1fr);gap:1.4rem .9rem}
+  .hero{padding:1.3rem 2rem 1.9rem}
+  .services-panel{padding:1.5rem 2rem 1.6rem}
   .main{padding:1.25rem 2rem 4rem}
-}
-@media(max-width:420px){
-  .tn-buttons{grid-template-columns:repeat(3,1fr)}
-  .tn-btn{padding:.7rem .4rem;font-size:.68rem}
-  .tn-btn .tn-btn-icon{font-size:1.25rem}
 }
 .sb-brand{padding:1.5rem 1.4rem 1rem;border-bottom:1px solid var(--border)}
 .sb-logo{display:flex;align-items:center;gap:.7rem;text-decoration:none;margin-bottom:.6rem}
@@ -871,49 +890,56 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
     </div>
   </aside>
 
-  <!-- ═══ HERO (new) — non-sticky, scrolls with page, pink background block ═══ -->
+  <!-- ═══ HEADER CARD (new) — Rocket-app style, non-sticky, scrolls with page ═══ -->
   <div class="hero">
     <div class="hero-row">
       <a href="index.html" class="tn-logo">
         <div class="tn-logo-icon">S</div>
         <span class="tn-logo-text">SAR</span>
       </a>
-      <div class="tn-member">সদস্য আইডি: <span id="sbMemberId2">লোড...</span></div>
-      <div class="tn-right">
-        <div class="tn-profile-chip" onclick="openModal('profile')">
-          <div class="tn-avatar" id="sbAvatar2">?</div>
-          <span class="tn-pname" id="sbName2">লোড হচ্ছে</span>
-        </div>
-        <button class="tn-logout" onclick="logout()" title="লগআউট">⏻</button>
+      <button class="tn-bell" title="নোটিফিকেশন">🔔<span class="tn-bell-badge">৩</span></button>
+    </div>
+    <div class="hero-profile" onclick="openModal('profile')" style="cursor:pointer">
+      <div class="tn-avatar" id="sbAvatar2">?</div>
+      <div>
+        <div class="tn-pname" id="sbName2">লোড হচ্ছে</div>
+        <div class="tn-member">সদস্য আইডি: <span id="sbMemberId2">লোড...</span></div>
       </div>
     </div>
-    <div class="hero-greet">
-      <div class="hero-greet-title">স্বাগতম 🌸</div>
-      <div class="hero-greet-sub">আপনার সব সেবা এক জায়গায় — নিচে থেকে বেছে নিন</div>
+    <div class="hero-balance-row">
+      <div class="tn-balance-pill" onclick="showPanel('analysis')">
+        <span class="tn-balance-icon">💊</span>
+        <span class="tn-balance-text">স্বাস্থ্য স্কোর দেখুন</span>
+      </div>
+      <button class="tn-logout" onclick="logout()" title="লগআউট">⏻</button>
     </div>
   </div>
 
-  <!-- ═══ COLOR ACTION GRID (new) — every sidebar link/action as a button in the body ═══ -->
-  <nav class="tn-buttons">
-    <button class="tn-btn tn-c1 sb-item active" onclick="showPanel('dashboard')">
-      <span class="tn-btn-icon">🏠</span>ড্যাশবোর্ড</button>
-    <a href="meal-score.html" class="tn-btn tn-c2"><span class="tn-btn-icon">🥗</span>আজকের মেনু</a>
-    <a href="order.html" class="tn-btn tn-c3"><span class="tn-btn-icon">🛒</span>অর্ডার করুন<span class="tn-btn-badge" id="cartBadge2" style="display:none">0</span></a>
-    <a href="track.html" class="tn-btn tn-c4"><span class="tn-btn-icon">📍</span>ট্র্যাক</a>
-    <button class="tn-btn tn-c2 sb-item" onclick="showPanel('analysis')">
-      <span class="tn-btn-icon">🔬</span>AI বিশ্লেষণ</button>
-    <a href="metrics.html" class="tn-btn tn-c3"><span class="tn-btn-icon">📊</span>মেট্রিক্স</a>
-    <a href="receipt.html" class="tn-btn tn-c4"><span class="tn-btn-icon">🧾</span>রিসিট</a>
-    <button class="tn-btn tn-c1" onclick="openModal('daily-input')"><span class="tn-btn-icon">📝</span>আজকের অবস্থা</button>
-    <button class="tn-btn tn-c2" onclick="openModal('ai-report')"><span class="tn-btn-icon">📋</span>AI রিপোর্ট</button>
-    <a href="doctor.html" class="tn-btn tn-c3"><span class="tn-btn-icon">👩‍⚕️</span>ডাক্তার</a>
-    <button class="tn-btn tn-c4" onclick="openModal('write-sar')"><span class="tn-btn-icon">✍️</span>SAR-কে লিখুন</button>
-    <a href="payment.html" class="tn-btn tn-c1"><span class="tn-btn-icon">💳</span>পেমেন্ট</a>
-    <a href="blockchain.html" target="_blank" class="tn-btn tn-c2"><span class="tn-btn-icon">⛓️</span>Blockchain</a>
-    <button class="tn-btn tn-c3" onclick="openModal('profile')"><span class="tn-btn-icon">👤</span>প্রোফাইল</button>
-    <button class="tn-btn tn-c4" onclick="openModal('change-password')"><span class="tn-btn-icon">🔑</span>পাসওয়ার্ড</button>
-    <button class="tn-btn tn-c1" onclick="logout()"><span class="tn-btn-icon">⏻</span>লগআউট</button>
-  </nav>
+  <!-- ═══ SERVICES PANEL (new) — white rounded panel, colorful icon-circle grid,
+       every sidebar link/action lives here as a button in the main body ═══ -->
+  <div class="services-panel">
+    <div class="services-title">সেবাসমূহ</div>
+    <nav class="tn-buttons">
+      <button class="tn-btn tn-c1 sb-item active" onclick="showPanel('dashboard')">
+        <span class="tn-btn-icon">🏠</span>ড্যাশবোর্ড</button>
+      <a href="meal-score.html" class="tn-btn tn-c2"><span class="tn-btn-icon">🥗</span>আজকের মেনু</a>
+      <a href="order.html" class="tn-btn tn-c3"><span class="tn-btn-icon">🛒</span><span class="tn-btn-badge" id="cartBadge2" style="display:none">0</span>অর্ডার করুন</a>
+      <a href="track.html" class="tn-btn tn-c4"><span class="tn-btn-icon">📍</span>ট্র্যাক</a>
+      <button class="tn-btn tn-c5 sb-item" onclick="showPanel('analysis')">
+        <span class="tn-btn-icon">🔬</span>AI বিশ্লেষণ</button>
+      <a href="metrics.html" class="tn-btn tn-c1"><span class="tn-btn-icon">📊</span>মেট্রিক্স</a>
+      <a href="receipt.html" class="tn-btn tn-c2"><span class="tn-btn-icon">🧾</span>রিসিট</a>
+      <button class="tn-btn tn-c3" onclick="openModal('daily-input')"><span class="tn-btn-icon">📝</span>আজকের অবস্থা</button>
+      <button class="tn-btn tn-c4" onclick="openModal('ai-report')"><span class="tn-btn-icon">📋</span>AI রিপোর্ট</button>
+      <a href="doctor.html" class="tn-btn tn-c5"><span class="tn-btn-icon">👩‍⚕️</span>ডাক্তার</a>
+      <button class="tn-btn tn-c1" onclick="openModal('write-sar')"><span class="tn-btn-icon">✍️</span>SAR-কে লিখুন</button>
+      <a href="payment.html" class="tn-btn tn-c2"><span class="tn-btn-icon">💳</span>পেমেন্ট</a>
+      <a href="blockchain.html" target="_blank" class="tn-btn tn-c3"><span class="tn-btn-icon">⛓️</span>Blockchain</a>
+      <button class="tn-btn tn-c4" onclick="openModal('profile')"><span class="tn-btn-icon">👤</span>প্রোফাইল</button>
+      <button class="tn-btn tn-c5" onclick="openModal('change-password')"><span class="tn-btn-icon">🔑</span>পাসওয়ার্ড</button>
+      <button class="tn-btn tn-c1" onclick="logout()"><span class="tn-btn-icon">⏻</span>লগআউট</button>
+    </nav>
+  </div>
 
   <!-- ═══ MAIN CONTENT ═══ -->
   <main class="main" id="mainContent">
