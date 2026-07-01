@@ -43,7 +43,7 @@ async function processOne(cid) {
   if (!cust) return { id:cid, status:'skip', reason:'customer not found' };
 
   const analysis = await sbGetOne(
-    `/rest/v1/ai_analysis?customer_id=eq.${cid}&score_date=eq.${today()}&analysis_type=eq.daily_report&select=*`
+    `/rest/v1/ai_analysis?customer_id=eq.${cid}&analysis_date=eq.${today()}&analysis_type=eq.daily_report&select=*`
   );
   if (!analysis) {
     // analyze-customer hasn't run yet (or failed) for this customer today — nothing to send
