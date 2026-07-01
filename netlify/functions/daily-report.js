@@ -53,33 +53,42 @@ async function processOne(cid) {
   const reportUrl = `${SITE_URL}/report.html?id=${analysis.id}`;
   const catBn = CAT_BN[analysis.category] || analysis.category;
 
-  await Promise.all([
+  const [smsOk, emailOk] = await Promise.all([
     sendSms(cust.phone, cust.full_name, analysis.health_score, catBn, reportUrl),
     sendEmail(cust.email, cust.full_name, analysis.analysis_bn, reportUrl),
   ]);
 
+  // record whether SMS/email actually went out, so this doesn't get resent by mistake
+  await sbPatch(`/rest/v1/ai_analysis?id=eq.${analysis.id}`, { sms_sent: smsOk, email_sent: emailOk });
+
   return {
     id:cid, status:'ok', score:analysis.health_score, kcal:analysis.target_kcal,
     conditions:analysis.trigger_conditions, report_id:analysis.id,
+    sms_sent:smsOk, email_sent:emailOk,
   };
 }
 
 async function sendSms(phone, name, score, catBn, url) {
-  if (!phone) return;
+  if (!phone) return false;
   const msg=`🌸 SAR ${today()} | ${name} | ${catBn} | স্কোর ${score}/100 | রিপোর্ট: ${url}`;
-  try { await fetch(`${SITE_URL}/.netlify/functions/send-sms`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,message:msg})}); } catch(e){}
+  try {
+    const r = await fetch(`${SITE_URL}/.netlify/functions/send-sms`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,message:msg})});
+    return r.ok;
+  } catch(e){ return false; }
 }
 
 async function sendEmail(email, name, html, url) {
-  if (!email||!RESEND) return;
+  if (!email||!RESEND) return false;
   try {
-    await fetch('https://api.resend.com/emails',{method:'POST',
+    const r = await fetch('https://api.resend.com/emails',{method:'POST',
       headers:{'Content-Type':'application/json',Authorization:`Bearer ${RESEND}`},
       body:JSON.stringify({from:'SAR Health <report@sheairestaurant.com>',to:[email],
         subject:`🌸 SAR দৈনিক রিপোর্ট — ${today()}`,html})});
-  } catch(e){}
+    return r.ok;
+  } catch(e){ return false; }
 }
 
 async function sbGet(p){const r=await fetch(`${SUPA_URL}${p}`,{headers:SB});return r.json();}
 async function sbGetOne(p){const d=await sbGet(p);return Array.isArray(d)?d[0]:null;}
+async function sbPatch(p,b){await fetch(`${SUPA_URL}${p}`,{method:'PATCH',headers:{...SB,Prefer:'return=minimal'},body:JSON.stringify(b)});}
 function today(){return new Date().toISOString().split('T')[0];}
