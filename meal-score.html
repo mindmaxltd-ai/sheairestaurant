@@ -576,6 +576,9 @@ let aiMedicinal=null;
 // same ai_analysis row. Used by card() to replace the old 4-item local
 // formula in "Daily Requirement Coverage" with real data.
 let aiNutritionList=null;
+// Today's 5 overall benefits (meal/ingredients/chutney/powder/topping),
+// read from ai_analysis.rule_output_json.benefits — same source report.html uses.
+let aiBenefits=null;
 
 // seasonal fruit course options (disease-aware); yogurt allowed
 const SEASONAL_FRUITS={
@@ -963,6 +966,8 @@ async function runAnalysis(silent){
         })),
       ];
       aiNutritionList=combined.length>=5?combined:null;
+      // ── ৫টি সামগ্রিক উপকার — report.html-এ যেমন দেখায়, ঠিক একই সোর্স ──
+      aiBenefits=(ruleOut.benefits&&typeof ruleOut.benefits==='object')?ruleOut.benefits:null;
       const savedCat=normalizeCat(saved.category)||activeCat;
       if(savedCat&&CAT_INFO[savedCat]) activeCat=savedCat;
       // আজকের কিনা যাচাই — তারিখ অনুযায়ী source লেখা
@@ -1196,8 +1201,12 @@ function card(item,meal){
   const fatKcal=fat*9;
   const carb=Math.max(0,Math.round((kcal-protKcal-fatKcal)/4)); // বাকিটা সম্পূর্ণ কার্ব
   const fib=Math.max(6,Math.round(cnt*3.2));
+  // এই মিলের আজকের দৈনিক লক্ষ্যের কতটুকু ভাগ (breakfast/lunch/dinner split, ক্যাটাগরি
+  // অনুযায়ী ভিন্ন) ও কতগুলো কোর্স বাছা হয়েছে তার উপর ভিত্তি করে dynamic % — flat ১০০% না।
+  const mealShare=item._share||({breakfast:.3,lunch:.4,dinner:.3}[meal.key])||.33;
+  const courseRatio=Math.min(1,cnt/MAX_COURSES);
   const dr=(aiNutritionList&&aiNutritionList.length)
-    ? aiNutritionList.map(n=>[n.name+(n.amount?' ('+n.amount+')':''),n.pct])
+    ? aiNutritionList.map(n=>[n.name+(n.amount?' ('+n.amount+')':''),Math.max(1,Math.min(99,Math.round(n.pct*mealShare*courseRatio)))])
     : [['প্রোটিন',Math.min(99,Math.round(prot/0.6))],['আয়রন',Math.min(99,22+cnt*4)],['ফাইবার',Math.min(99,Math.round(fib/0.25))],['ভিটামিন C',Math.min(99,30+cnt*5)]];
   const db=MEAL_DB[item.cat]||MEAL_DB.DM;
   const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
@@ -1246,6 +1255,15 @@ function card(item,meal){
         dr.map(d=>'<div class="dr-line"><span class="dl">'+d[0]+'</span><span class="dr-bar"><i style="width:'+d[1]+'%"></i></span><span class="dp num">'+bn(d[1])+'%</span></div>').join('')+
       '</div></div>'+
       '<div><div class="panel-h">নারীদের উপকারিতা ('+bn(benList.length)+'টি)</div><div class="benefits">'+benList.map(b=>'<span class="bchip">✓ '+b+'</span>').join('')+'</div></div>'+
+      (aiBenefits?(
+      '<div><div class="panel-h">💚 ৫টি সামগ্রিক উপকার</div><div class="benefits" style="flex-direction:column;align-items:flex-start;gap:.3rem">'+
+        (aiBenefits.meal_overall?'<span class="bchip" style="white-space:normal;text-align:left">🍱 <b>মিল:</b> '+aiBenefits.meal_overall+'</span>':'')+
+        (aiBenefits.ingredients_bn?'<span class="bchip" style="white-space:normal;text-align:left">🌿 <b>উপাদান:</b> '+aiBenefits.ingredients_bn+'</span>':'')+
+        (aiBenefits.chutney_bn?'<span class="bchip" style="white-space:normal;text-align:left">🫙 <b>চাটনি:</b> '+aiBenefits.chutney_bn+'</span>':'')+
+        (aiBenefits.disease_powder_bn?'<span class="bchip" style="white-space:normal;text-align:left">💊 <b>পাউডার:</b> '+aiBenefits.disease_powder_bn+'</span>':'')+
+        (aiBenefits.topping_bn?'<span class="bchip" style="white-space:normal;text-align:left">✨ <b>টপিং:</b> '+aiBenefits.topping_bn+'</span>':'')+
+      '</div></div>'
+      ):'')+
       '<div><div class="panel-h">Medicinal Layer</div><div class="med">'+
         '<div class="med-row"><span class="ml">Disease Powders</span>'+medic.disease.map(p=>'<span class="pw dis">'+p+'</span>').join('')+'</div>'+
         '<div class="med-row"><span class="ml">Condition Powders</span>'+medic.condition.map(p=>'<span class="pw con">'+p+'</span>').join('')+'</div>'+
