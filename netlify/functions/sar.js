@@ -180,23 +180,23 @@ exports.handler = async (event) => {
       // কোনোদিন update না হলে আগের সর্বশেষ রিপোর্ট দেখায়।
       case 'latestScore': {
         const cid = encodeURIComponent(p.customer_id || '');
-        // analysis_type=meal_score আগে খুঁজি; না পেলে যেকোনো type
-        let url = `${SUPABASE_URL}/rest/v1/ai_analysis`
-          + `?customer_id=eq.${cid}`
-          + `&analysis_type=eq.meal_score`
-          + `&select=*&order=created_at.desc&limit=1`;
-        let r = await fetch(url, { headers: SB });
-        let d = await r.json();
-        let row = (Array.isArray(d) && d[0]) || null;
-        if (!row) {
-          // meal_score type না থাকলে — সর্বশেষ যেকোনো analysis
-          url = `${SUPABASE_URL}/rest/v1/ai_analysis`
+        // ── প্রায়োরিটি অর্ডার ──
+        // 1) analysis_type=daily_report  → বর্তমান পাইপলাইন (analyze-batch-submit/collect, cron)
+        // 2) analysis_type=meal_score    → পুরনো/legacy সেভ (সরাসরি meal-score.html থেকে)
+        // 3) যেকোনো type                → কিছুই না পেলে শেষ ভরসা
+        // প্রতিটা ধাপেই created_at.desc — যেটাই টাইপ হোক, সবচেয়ে নতুনটা আগে।
+        const tryType = async (typeFilter) => {
+          const url = `${SUPABASE_URL}/rest/v1/ai_analysis`
             + `?customer_id=eq.${cid}`
+            + (typeFilter ? `&analysis_type=eq.${typeFilter}` : '')
             + `&select=*&order=created_at.desc&limit=1`;
-          r = await fetch(url, { headers: SB });
-          d = await r.json();
-          row = (Array.isArray(d) && d[0]) || null;
-        }
+          const r = await fetch(url, { headers: SB });
+          const d = await r.json();
+          return (Array.isArray(d) && d[0]) || null;
+        };
+        let row = await tryType('daily_report');
+        if (!row) row = await tryType('meal_score');
+        if (!row) row = await tryType(null);
         return reply(200, { found: !!row, analysis: row });
       }
 
