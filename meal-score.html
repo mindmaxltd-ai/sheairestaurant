@@ -213,7 +213,11 @@ img{max-width:100%;display:block}
 .course{display:flex;align-items:center;gap:.6rem;cursor:pointer;padding:.5rem .6rem;border:1px solid var(--line);border-radius:13px;font-size:.86rem;transition:all .12s;user-select:none}
 .course:hover{border-color:var(--pink)}
 .course.on{background:var(--pink-soft);border-color:var(--pink)}
-.course .box{width:20px;height:20px;border-radius:7px;border:2px solid #f0c4dc;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fff}
+.course{transition:all .18s cubic-bezier(.34,1.56,.64,1)}
+.course:active{transform:scale(.985)}
+.course .box{width:20px;height:20px;border-radius:7px;border:2px solid #f0c4dc;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:#fff;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+.course.on .box{animation:boxPop .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes boxPop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 .course.on .box{background:var(--pink);border-color:var(--pink)}
 .course .ctxt{flex:1;line-height:1.3}
 .course .opt{font-size:.66rem;color:var(--green-d);font-weight:700}
@@ -227,9 +231,11 @@ img{max-width:100%;display:block}
 .mc-price .pq{font-size:.66rem;color:var(--ink-2)}
 .mc-btns{display:flex;gap:.5rem;align-items:center}
 .cart-add{border:1.5px solid var(--pink);background:#fff;color:var(--pink-d);cursor:pointer;font-family:inherit;font-weight:800;font-size:.86rem;padding:.6rem 1rem;border-radius:999px;transition:all .15s;white-space:nowrap}
+.cart-add:active{transform:scale(.94)}
 .cart-add:hover{background:var(--pink);color:#fff}
 .cart-add.added{background:var(--pink);border-color:var(--pink);color:#fff}
 .order-btn{border:1.5px solid var(--plum);cursor:pointer;font-family:inherit;font-weight:800;font-size:.9rem;background:var(--plum);color:#fff;padding:.6rem 1.2rem;border-radius:999px;transition:all .2s;white-space:nowrap}
+.order-btn:active{transform:scale(.94)}
 .order-btn:hover{background:var(--pink);border-color:var(--pink);transform:translateY(-1px)}
 
 /* drawer */
@@ -900,27 +906,27 @@ const PORTION_G={main:70,leafy:30,prot:90,steam:60,seed:8,fruit:100,chutney:20,p
 
 const COURSE_POOLS={
   DM:{ main:['Bitter Gourd','Bottle Gourd','Pumpkin','Ash Gourd','Ridge Gourd','Snake Gourd','Pointed Gourd'],
-       prot:['Chickpea Sprout','Green Gram Sprout','Boneless Fish','Indigenous Egg','Greek Yogurt (unsweetened)','Black Chickpea','Lentil Sprout'],
+       prot:['Chickpea Sprout','Green Gram Sprout','Rohu Fish','Indigenous Egg','Greek Yogurt (unsweetened)','Tilapia','Lentil Sprout'],
        steam:['Broccoli','Cauliflower','Green Beans','Okra','Cabbage','Capsicum','Turnip'],
        leafy:['Spinach','Mustard Greens','Fenugreek Leaves','Moringa Leaves','Amaranth Leaves'],
        seed:['Chia Seed','Flax Seed','Pumpkin Seed','Sunflower Seed'] },
   OB:{ main:['Ash Gourd','Bottle Gourd','Cucumber','Zucchini','Ridge Gourd','Chayote','Pumpkin'],
-       prot:['Green Gram Sprout','Indigenous Egg','Greek Yogurt (unsweetened)','Boneless Indigenous Chicken','Mung Bean','Soybean','Lentil Sprout'],
+       prot:['Green Gram Sprout','Indigenous Egg','Tilapia','Boneless Indigenous Chicken','Mung Bean','Soybean','Lentil Sprout'],
        steam:['Broccoli','Cauliflower','Cabbage','Green Beans','Capsicum','Okra','Carrot'],
        leafy:['Mustard Greens','Moringa Leaves','Spinach','Water Spinach','Malabar Spinach'],
        seed:['Pumpkin Seed','Flax Seed','Sunflower Seed','Watermelon Seed'] },
   FL:{ main:['Ridge Gourd','Bottle Gourd','Snake Gourd','Pointed Gourd','Ash Gourd','Bitter Gourd','Radish'],
-       prot:['Lentil Sprout','Boneless Fish','Green Gram Sprout','Red Lentil','Mung Bean','Chickpea Sprout','Indigenous Egg'],
+       prot:['Lentil Sprout','Rohu Fish','Green Gram Sprout','Red Lentil','Mung Bean','Chickpea Sprout','Indigenous Egg'],
        steam:['Beetroot','Radish','Carrot','Broccoli','Cauliflower','Green Papaya','Turnip'],
        leafy:['Water Spinach','Coriander Leaves','Spinach','Amaranth Leaves','Mint Leaves'],
        seed:['Flax Seed','Sunflower Seed','Pumpkin Seed','Basil Seed'] },
   IB:{ main:['Snake Gourd','Bottle Gourd','Pointed Gourd','Ridge Gourd','Green Papaya','Carrot','Ash Gourd'],
-       prot:['Greek Yogurt (unsweetened)','Green Gram Sprout','Boneless Indigenous Chicken','Mung Bean','Lentil Sprout','Indigenous Egg','Boneless Fish'],
+       prot:['Greek Yogurt (unsweetened)','Green Gram Sprout','Boneless Indigenous Chicken','Mung Bean','Lentil Sprout','Indigenous Egg','Tilapia'],
        steam:['Carrot','Green Papaya','Raw Banana','Sweet Potato','Turnip','Green Beans','Drumstick'],
        leafy:['Mint Leaves','Curry Leaves','Coriander Leaves','Spinach','Malabar Spinach'],
        seed:['Flax Seed','Basil Seed','Sunflower Seed','Pumpkin Seed'] },
   PR:{ main:['Pumpkin','Bottle Gourd','Drumstick','Sweet Potato','Green Papaya','Carrot','Beetroot'],
-       prot:['Chickpea Sprout','Indigenous Egg','Greek Yogurt (unsweetened)','Boneless Fish','Almond','Lentil Sprout','Mung Bean'],
+       prot:['Chickpea Sprout','Indigenous Egg','Hilsa Fish','Greek Yogurt (unsweetened)','Rohu Fish','Almond','Lentil Sprout','Tilapia','Mung Bean'],
        steam:['Beetroot','Carrot','Broccoli','Green Beans','Drumstick','Sweet Potato','Capsicum'],
        leafy:['Moringa Leaves','Red Spinach','Spinach','Amaranth Leaves','Fenugreek Leaves'],
        seed:['Sesame Seed','Almond','Sunflower Seed','Watermelon Seed'] },
@@ -1584,41 +1590,75 @@ function coursesFor(item,di,mealKey){
 //    প্রোটিন/ফ্যাট/কার্ব/মাইক্রো-নিউট্রিয়েন্ট — সবকিছু একই অনুপাতে স্কেল হয়,
 //    তাই আসল ইনগ্রেডিয়েন্টের আপেক্ষিক composition (কোনটায় কতটা প্রোটিন,
 //    কোনটায় কতটা আয়রন) অক্ষুণ্ন থাকে, শুধু মোট পরিমাণ AI-বাজেটে মেলানো হয়।
-function computeRealNutritionLive(courses,sel,medic,targetKcal){
-  const totals=new Array(NUTRIENT_FIELDS.length).fill(0);
-  const grams={}; // { 'Bitter Gourd': 52, ... } — real, scaled per-ingredient amount
-  function addIng(name,g){
+function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
+  const N=NUTRIENT_FIELDS.length;
+  const protTotals=new Array(N).fill(0), otherTotals=new Array(N).fill(0);
+  const protGrams={}, otherGrams={};
+  function addTo(totals,gramsObj,name,g){
     const row=ING_NUTRIENTS[name];
     if(!row)return;
     const f=g/100;
     for(let i=0;i<totals.length;i++) totals[i]+=(row[i]||0)*f;
-    grams[name]=(grams[name]||0)+g;
+    gramsObj[name]=(gramsObj[name]||0)+g;
   }
   courses.forEach((c,ci)=>{
     if(sel.indexOf(ci)===-1)return;
-    if(ci===3){ addIng('__chutney_generic__',PORTION_G.chutney); return; }
     const items=c.items||[];
+    if(ci===1){
+      // প্রোটিন কোর্স — আলাদাভাবে ট্র্যাক করা হয়, যাতে এটাকে AI-এর protein
+      // টার্গেটে নিখুঁতভাবে স্কেল করা যায় (২টা প্রোটিন আইটেম 90g + বীজ টপিং 8g)
+      items.forEach((name,idx)=>addTo(protTotals,protGrams,name, idx<items.length-1 ? PORTION_G.prot : PORTION_G.seed));
+      return;
+    }
+    if(ci===3){ addTo(otherTotals,otherGrams,'__chutney_generic__',PORTION_G.chutney); return; }
     if(ci===0){
-      // মেইন কোর্স = ২টা সবজি (main, 70g) + শেষেরটা leafy (30g) — coursesFor()-এর গঠন অনুযায়ী
-      items.forEach((name,idx)=>addIng(name, idx<items.length-1 ? PORTION_G.main : PORTION_G.leafy));
-    }else if(ci===1){
-      // প্রোটিন কোর্স = ২টা প্রোটিন আইটেম (90g) + শেষেরটা বীজ টপিং (8g) — 90g বীজ না!
-      items.forEach((name,idx)=>addIng(name, idx<items.length-1 ? PORTION_G.prot : PORTION_G.seed));
+      items.forEach((name,idx)=>addTo(otherTotals,otherGrams,name, idx<items.length-1 ? PORTION_G.main : PORTION_G.leafy));
     }else if(ci===2){
-      items.forEach(name=>addIng(name,PORTION_G.steam));
+      items.forEach(name=>addTo(otherTotals,otherGrams,name,PORTION_G.steam));
     }else if(ci===4){
-      items.forEach(name=>addIng(name,PORTION_G.fruit));
+      items.forEach(name=>addTo(otherTotals,otherGrams,name,PORTION_G.fruit));
     }
   });
-  (medic&&medic.disease||[]).forEach(n=>addIng(n,PORTION_G.powder));
-  (medic&&medic.condition||[]).forEach(n=>addIng(n,PORTION_G.powder));
+  (medic&&medic.disease||[]).forEach(n=>addTo(otherTotals,otherGrams,n,PORTION_G.powder));
+  (medic&&medic.condition||[]).forEach(n=>addTo(otherTotals,otherGrams,n,PORTION_G.powder));
 
-  // ── AI-এর ক্যালরি বাজেটে স্কেল করা — nutrient totals ও প্রতিটা ইনগ্রেডিয়েন্টের
-  //    গ্রাম-পরিমাণ, দুটোই একই scale factor দিয়ে সামঞ্জস্যপূর্ণভাবে বদলায় ──
-  const rawKcal=totals[0];
-  const scale=(targetKcal&&rawKcal>0)?(targetKcal/rawKcal):1;
-  for(let i=0;i<totals.length;i++) totals[i]*=scale;
-  Object.keys(grams).forEach(name=>{ grams[name]=Math.max(1,Math.round(grams[name]*scale)); });
+  // ── AI-এর kcal ও protein টার্গেট — দুটোই একসাথে গাণিতিকভাবে সঠিকভাবে মেলানো ──
+  // শুধু protein-কোর্স স্কেল করলেই যথেষ্ট না — leafy/medicinal আইটেমেও (যেমন
+  // Moringa Leaves/Powder) যথেষ্ট প্রোটিন থাকে। তাই ২টা unknown (protScale,
+  // otherScale) আর ২টা সমীকরণ (protein মেলা + kcal মেলা) — standard 2×2
+  // linear system, Cramer's rule দিয়ে সমাধান — উভয় লক্ষ্যই নিখুঁতভাবে মেলে।
+  const a11=protTotals[1], a12=otherTotals[1];   // protein_g contribution
+  const a21=protTotals[0], a22=otherTotals[0];   // kcal contribution
+  const det=a11*a22-a12*a21;
+  let protScale=1, otherScale=1;
+  if(Math.abs(det)>1e-6 && targetProtein!=null && targetKcal!=null){
+    protScale=(targetProtein*a22-a12*targetKcal)/det;
+    otherScale=(a11*targetKcal-targetProtein*a21)/det;
+    // বাস্তবসম্মত সীমার বাইরে গেলে (ইনগ্রেডিয়েন্ট মিক্স আসলে দুটো লক্ষ্য একসাথে
+    // মেলাতে না পারলে) — নিরাপদ ফলব্যাক: শুধু kcal-এ স্কেল করা
+    if(protScale<0.15||protScale>6||otherScale<0.15||otherScale>6){
+      // দুটো লক্ষ্য একসাথে মেলানো গাণিতিকভাবেই সম্ভব না (যেমন Moringa Leaves/
+      // Powder-এর মতো আইটেম ক্যালরির তুলনায় এতটাই প্রোটিন-ঘন যে negative
+      // scale লাগত) — তখন kcal দিয়ে scale করি, কিন্তু protein ১.৪× টার্গেট
+      // ছাড়ালে সেটা কেটে দিই (kcal সামান্য কম হতে পারে এই একটা edge case-এ,
+      // কিন্তু প্রোটিন কখনো বিপজ্জনকভাবে বেশি দেখাবে না)।
+      protScale=(targetKcal&&(a21+a22)>0)?targetKcal/(a21+a22):1;
+      otherScale=protScale;
+      const estProt=a11*protScale+a12*otherScale;
+      if(targetProtein&&estProt>targetProtein*1.4){
+        const cap=(targetProtein*1.4)/estProt;
+        protScale*=cap; otherScale*=cap;
+      }
+    }
+  }else if(targetKcal!=null&&(a21+a22)>0){
+    protScale=otherScale=targetKcal/(a21+a22);
+  }
+  for(let i=0;i<N;i++){ protTotals[i]*=protScale; otherTotals[i]*=otherScale; }
+  Object.keys(protGrams).forEach(n=>{ protGrams[n]=Math.max(1,Math.round(protGrams[n]*protScale)); });
+  Object.keys(otherGrams).forEach(n=>{ otherGrams[n]=Math.max(1,Math.round(otherGrams[n]*otherScale)); });
+
+  const totals=protTotals.map((v,i)=>v+otherTotals[i]);
+  const grams=Object.assign({},otherGrams,protGrams);
 
   const out={};
   NUTRIENT_FIELDS.forEach((key,i)=>{
@@ -1678,7 +1718,8 @@ function card(item,meal){
   // এই কার্ডে যতগুলো কোর্স বাছা হয়েছে, AI-এর এই বেলার পূর্ণ (৫ কোর্স) বাজেটের
   // ততটুকু ভাগ — যেমন daily target-কে meal-এ ভাগ করার পুরনো convention-ই (÷৫)।
   const targetKcalForSelection=Math.round((item._mealKcal||mealKcalTarget||450)*(cnt/MAX_COURSES));
-  const real=computeRealNutritionLive(courses,sel,medic,targetKcalForSelection);
+  const targetProteinForSelection=Math.round((item._mealProt||mealProtTarget||20)*(cnt/MAX_COURSES));
+  const real=computeRealNutritionLive(courses,sel,medic,targetKcalForSelection,targetProteinForSelection);
   //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
   //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
   //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
@@ -1700,10 +1741,14 @@ function card(item,meal){
   const cHtml=courses.map((c,ci)=>{
     const on=sel.indexOf(ci)>-1;
     const atMin=cnt<=minC&&on&&c.req;
+    // এই কোর্সের প্রতিটা ইনগ্রেডিয়েন্টের real, meal-requirement-scaled গ্রাম পরিমাণ
+    const subWithAmt=(c.items&&c.items.length)
+      ? c.items.map(n=>n+(real.grams&&real.grams[n]?' ('+real.grams[n]+'g)':'')).join(', ')
+      : c.sub;
     return '<div class="course '+(on?'on':'')+' '+(atMin?'locked':'')+'" onclick="toggleCourse(\''+uid+'\','+ci+')">'+
       '<span class="box">'+(on?'✓':'')+'</span>'+
       '<span class="ctxt">'+(ci+1)+'. '+c.n+' '+(c.req?'<span class="req">(আবশ্যক)</span>':'<span class="opt">(ঐচ্ছিক)</span>')+
-        (c.sub?'<br><span style="font-size:.72rem;color:var(--ink-2)">'+c.sub+'</span>':'')+'</span>'+
+        (subWithAmt?'<br><span style="font-size:.72rem;color:var(--ink-2)">'+subWithAmt+'</span>':'')+'</span>'+
       '<span class="cprice num">৳'+bn(PRICE_PER_COURSE)+'</span></div>';
   }).join('');
   const isRec=analysis&&analysis.cat===item.cat;
