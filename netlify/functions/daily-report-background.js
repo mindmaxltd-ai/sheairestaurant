@@ -142,27 +142,38 @@ async function sendSms(phone, name, score, catBn, url) {
   if (!phone) return false;
   const msg = `🌸 SAR ${today()} | ${name} | ${catBn} | স্কোর ${score}/100 | রিপোর্ট: ${url}`;
   try {
+    // send-sms.js expects {to, msg} — NOT {phone, message}. It also always
+    // replies HTTP 200 even on logical failure, so we must check body.sent,
+    // not just r.ok.
     const r = await fetch(`${SITE_URL}/.netlify/functions/send-sms`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, message: msg }),
+      body: JSON.stringify({ to: phone, msg }),
     });
-    return r.ok;
-  } catch { return false; }
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok || data.sent !== true) {
+      console.error('SMS not actually sent:', JSON.stringify(data));
+      return false;
+    }
+    return true;
+  } catch (e) { console.error('SMS request failed:', e.message); return false; }
 }
 
 async function sendEmail(email, name, html, url) {
-  if (!email || !RESEND) return false;
+  if (!email) return false;
   try {
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND}` },
-      body: JSON.stringify({
-        from: 'SAR Health <report@sheairestaurant.com>', to: [email],
-        subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html,
-      }),
+    // Route through send-email.js (already configured with the right
+    // RESEND_KEY/RESEND_API_KEY + FROM address) instead of calling Resend directly.
+    const r = await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: email, subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html }),
     });
-    return r.ok;
-  } catch { return false; }
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok || data.sent !== true) {
+      console.error('Email not actually sent:', JSON.stringify(data));
+      return false;
+    }
+    return true;
+  } catch (e) { console.error('Email request failed:', e.message); return false; }
 }
 
 async function sbGet(p) { const r = await fetch(`${SUPA_URL}${p}`, { headers: SB }); return r.json(); }
