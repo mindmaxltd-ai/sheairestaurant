@@ -1639,6 +1639,18 @@ function card(item,meal){
   //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
   //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
   //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
+  const db=MEAL_DB[item.cat]||MEAL_DB.DM;
+  const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
+  while(benList.length<3) benList.push(db.benefits[benList.length]||'সুষম পুষ্টি');
+  const dis=db.disease;
+  // medicinal layer — AI/condition driven per day & meal (topping now AI-linked too)
+  const medic=medicinalFor(item.cat,di,meal.key);
+  // ── LIVE real নিউট্রিশন — নির্বাচিত কোর্সের real ingredient থেকে ফরওয়ার্ড-গণনা।
+  //    কোর্স যোগ/বাদ দিলে এই সংখ্যাগুলো সত্যিই বদলাবে — এটাই "AI meal"।
+  const real=computeRealNutritionLive(courses,sel,medic);
+  //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
+  //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
+  //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
   const NRV={energy:8400,protein:50,fat:70,satfat:20,carb:260,sugars:90,sodium:2400}; // EU NRV, per serving-adult reference
   const energy=Math.round(real.kcal*4.184);
   const satFat=Math.round(real.fat*0.34*10)/10;
@@ -1652,15 +1664,6 @@ function card(item,meal){
     ['— sugars',pctOf(real.sugar_g,NRV.sugars)],
     ['Sodium',pctOf(real.sodium,NRV.sodium)],
   ];
-  const db=MEAL_DB[item.cat]||MEAL_DB.DM;
-  const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
-  while(benList.length<3) benList.push(db.benefits[benList.length]||'সুষম পুষ্টি');
-  const dis=db.disease;
-  // medicinal layer — AI/condition driven per day & meal (topping now AI-linked too)
-  const medic=medicinalFor(item.cat,di,meal.key);
-  // ── LIVE real নিউট্রিশন — নির্বাচিত কোর্সের real ingredient থেকে ফরওয়ার্ড-গণনা।
-  //    কোর্স যোগ/বাদ দিলে এই সংখ্যাগুলো সত্যিই বদলাবে — এটাই "AI meal"।
-  const real=computeRealNutritionLive(courses,sel,medic);
   // today's actual ingredients = union of the required courses' items (unique)
   const allIngs=[].concat(...courses.slice(0,3).map(c=>c.items||[])).filter((v,i,a)=>v&&a.indexOf(v)===i);
   const cHtml=courses.map((c,ci)=>{
