@@ -10,29 +10,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Space+Mono&display=swap');
 
 :root{
-  /* SAR women-only system — pink-rose + orange on warm ivory (menu(3) appearance) */
-  --pink:#E91E8C;--pink-d:#B51267;--pink-soft:#FDE9F4;--rose:#FF7EB8;
-  --orange:#F97316;--orange-d:#C2410C;--orange-soft:#FFF0E6;
-  --gold:#C9A24B;--gold-d:#9C7A2E;--gold-soft:#F8EFD8;
-  --green:#2E8B62;--green-d:#1E6748;--green-soft:#DFF0E8;
-  --plum:#38283B;
-  --ink:#241D24;--ink-2:#756B75;--muted:#756B75;
-  --cream:#FCFAF6;--milk:#FFFDF9;--card:#FFFFFF;--line:#E9DED3;--line-2:#DACABA;--line2:#DACABA;
-  --shadow:0 14px 45px rgba(71,42,60,.10),0 2px 9px rgba(71,42,60,.05);
-  --shadow-lg:0 26px 80px rgba(233,30,140,.18),0 10px 28px rgba(71,42,60,.10);
-  --grad:linear-gradient(125deg,#B51267 0%,#E91E8C 32%,#FF7EB8 55%,#F97316 82%,#FDBA74 120%);
-  --grad-soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF0E6 120%);
-  --soft:linear-gradient(135deg,#FFF7FC 0%,#FDE9F4 52%,#FFF0E6 120%);
-  --gold-line:linear-gradient(90deg,transparent,#E91E8C,transparent);
+  /* SAR women-only system — Sakara-inspired editorial olive + dusty rose + sage on warm ivory */
+  --pink:#C97B8C;--pink-d:#A85A6D;--pink-soft:#FBEEF0;--rose:#E8B4BC;
+  --orange:#6B7A4F;--orange-d:#4F5A3A;--orange-soft:#EEF0E4;
+  --gold:#B99A56;--gold-d:#8C7238;--gold-soft:#F3EAD3;
+  --green:#3F6B4A;--green-d:#2E4A34;--green-soft:#E1EAE2;
+  --plum:#33362C;
+  --ink:#2B2A24;--ink-2:#75705F;--muted:#75705F;
+  --cream:#FAF7F0;--milk:#FFFEFA;--card:#FFFFFF;--line:#E3DDCB;--line-2:#D6CCAF;--line2:#D6CCAF;
+  --shadow:0 14px 45px rgba(51,54,44,.10),0 2px 9px rgba(51,54,44,.05);
+  --shadow-lg:0 26px 80px rgba(107,122,79,.18),0 10px 28px rgba(51,54,44,.10);
+  --grad:linear-gradient(125deg,#6B7A4F 0%,#8A9A5B 30%,#C97B8C 65%,#D89AAA 100%);
+  --grad-soft:linear-gradient(135deg,#F7F8F2 0%,#FBEEF0 52%,#EEF0E4 120%);
+  --soft:linear-gradient(135deg,#F7F8F2 0%,#FBEEF0 52%,#EEF0E4 120%);
+  --gold-line:linear-gradient(90deg,transparent,#8A9A5B,transparent);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(920px 560px at 85% -8%,rgba(233,30,140,.18),transparent 58%),
-  radial-gradient(760px 500px at -5% 12%,rgba(249,115,22,.16),transparent 58%),
-  radial-gradient(700px 520px at 55% 108%,rgba(255,126,184,.12),transparent 58%)}
-body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.28;background-image:linear-gradient(rgba(233,30,140,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(233,30,140,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
+  radial-gradient(920px 560px at 85% -8%,rgba(107,122,79,.16),transparent 58%),
+  radial-gradient(760px 500px at -5% 12%,rgba(201,123,140,.14),transparent 58%),
+  radial-gradient(700px 520px at 55% 108%,rgba(138,154,91,.12),transparent 58%)}
+body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.24;background-image:linear-gradient(rgba(107,122,79,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(107,122,79,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
 img{max-width:100%;display:block}
 .num{font-family:'Space Mono',monospace}
 .serif{font-family:'Playfair Display',serif}
@@ -298,7 +298,7 @@ img{max-width:100%;display:block}
       <div class="ring">
         <svg width="128" height="128" viewBox="0 0 128 128">
           <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#E91E8C"/><stop offset="55%" stop-color="#FF7EB8"/><stop offset="100%" stop-color="#F97316"/>
+            <stop offset="0%" stop-color="#6B7A4F"/><stop offset="55%" stop-color="#C97B8C"/><stop offset="100%" stop-color="#8A9A5B"/>
           </linearGradient></defs>
           <circle cx="64" cy="64" r="54" fill="none" stroke="#FDE9F4" stroke-width="12"/>
           <circle id="ringArc" cx="64" cy="64" r="54" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="339"/>
@@ -1041,8 +1041,8 @@ const bn=n=>(n==null?0:n).toLocaleString('bn-BD');
 // ════════════════════════════════════════════════════
 function svgMealImage(title,index){
   const palettes=[
-    ['#E91E8C','#F97316','#FFE4F2'],['#B51267','#FF7EB8','#FFF0E6'],['#F97316','#FDBA74','#FDE9F4'],
-    ['#2E8B62','#E91E8C','#FFF7FC'],['#C9A24B','#F97316','#FDE9F4'],['#7C2D6B','#FF7EB8','#FFF0E6']
+    ['#6B7A4F','#8A9A5B','#F3EDE0'],['#4F5A3A','#C97B8C','#F7F2E8'],['#8A9A5B','#D6B989','#FBEEF0'],
+    ['#3F6B4A','#6B7A4F','#F7F8F2'],['#B99A56','#8A9A5B','#FBEEF0'],['#5C4A57','#C97B8C','#F3EDE0']
   ];
   const p=palettes[index%palettes.length];
   const safe=String(title||'SAR Meal').replace(/[&<>]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[s]));
@@ -1052,9 +1052,9 @@ function svgMealImage(title,index){
     '<rect width="900" height="620" rx="38" fill="url(#g)"/>'+
     '<circle cx="720" cy="95" r="170" fill="#fff" opacity=".20"/><circle cx="120" cy="520" r="190" fill="#fff" opacity=".16"/>'+
     '<g filter="url(#s)"><ellipse cx="450" cy="345" rx="265" ry="118" fill="#fff" opacity=".95"/><ellipse cx="450" cy="318" rx="230" ry="88" fill="#FFF7ED"/>'+
-    '<circle cx="350" cy="290" r="54" fill="#2E8B62"/><circle cx="435" cy="278" r="48" fill="#F97316"/><circle cx="515" cy="295" r="58" fill="#E91E8C"/>'+
-    '<circle cx="590" cy="326" r="37" fill="#C9A24B"/><circle cx="300" cy="348" r="35" fill="#FF7EB8"/><path d="M240 385c95 64 330 73 455-2" fill="none" stroke="#38283B" stroke-width="18" stroke-linecap="round" opacity=".18"/></g>'+
-    '<rect x="72" y="68" width="305" height="62" rx="31" fill="#fff" opacity=".88"/><text x="96" y="107" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#B51267">SAR WOMEN MEAL</text>'+
+    '<circle cx="350" cy="290" r="54" fill="#3F6B4A"/><circle cx="435" cy="278" r="48" fill="#8A9A5B"/><circle cx="515" cy="295" r="58" fill="#C97B8C"/>'+
+    '<circle cx="590" cy="326" r="37" fill="#B99A56"/><circle cx="300" cy="348" r="35" fill="#D89AAA"/><path d="M240 385c95 64 330 73 455-2" fill="none" stroke="#33362C" stroke-width="18" stroke-linecap="round" opacity=".18"/></g>'+
+    '<rect x="72" y="68" width="305" height="62" rx="31" fill="#fff" opacity=".88"/><text x="96" y="107" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#4F5A3A">SAR WOMEN MEAL</text>'+
     '<text x="72" y="558" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#fff">'+safe+'</text>'+
   '</svg>';
   return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
@@ -1576,23 +1576,50 @@ function coursesFor(item,di,mealKey){
 //    দিলে এই সংখ্যাগুলো সত্যিই বদলাবে — AI দৈনিক টার্গেট থেকে ভাগ করা না।
 //    (sar.js-এ order বসানোর সময়ও ঠিক এই একই ডেটাবেস দিয়ে আবার গণনা হয়,
 //    সেটাই চূড়ান্ত/সংরক্ষিত মান — এখানে যা দেখছেন তা browsing-time preview)
-function computeRealNutritionLive(courses,sel,medic){
+// ── LIVE real nutrition — এই কার্ডে ঠিক যেই কোর্সগুলো এখন নির্বাচিত (sel),
+//    তাদের real ingredient তালিকা থেকে ফরওয়ার্ড-গণনা, তারপর AI-এর এই বেলার
+//    ক্যালরি বরাদ্দে (targetKcal) স্কেল করা — যাতে ৩ বেলা মিলে AI-এর দৈনিক
+//    লক্ষ্যের কাছাকাছি থাকে, প্রতিটা আলাদা মিল কার্ড fixed portion দিয়ে
+//    independently হিসাব হয়ে দৈনিক লক্ষ্য ছাড়িয়ে না যায়।
+//    প্রোটিন/ফ্যাট/কার্ব/মাইক্রো-নিউট্রিয়েন্ট — সবকিছু একই অনুপাতে স্কেল হয়,
+//    তাই আসল ইনগ্রেডিয়েন্টের আপেক্ষিক composition (কোনটায় কতটা প্রোটিন,
+//    কোনটায় কতটা আয়রন) অক্ষুণ্ন থাকে, শুধু মোট পরিমাণ AI-বাজেটে মেলানো হয়।
+function computeRealNutritionLive(courses,sel,medic,targetKcal){
   const totals=new Array(NUTRIENT_FIELDS.length).fill(0);
-  function addIng(name,grams){
+  const grams={}; // { 'Bitter Gourd': 52, ... } — real, scaled per-ingredient amount
+  function addIng(name,g){
     const row=ING_NUTRIENTS[name];
     if(!row)return;
-    const f=grams/100;
+    const f=g/100;
     for(let i=0;i<totals.length;i++) totals[i]+=(row[i]||0)*f;
+    grams[name]=(grams[name]||0)+g;
   }
   courses.forEach((c,ci)=>{
     if(sel.indexOf(ci)===-1)return;
     if(ci===3){ addIng('__chutney_generic__',PORTION_G.chutney); return; }
-    let role='steam';
-    if(ci===0)role='main'; else if(ci===1)role='prot'; else if(ci===4)role='fruit';
-    (c.items||[]).forEach(name=>addIng(name,PORTION_G[role]||50));
+    const items=c.items||[];
+    if(ci===0){
+      // মেইন কোর্স = ২টা সবজি (main, 70g) + শেষেরটা leafy (30g) — coursesFor()-এর গঠন অনুযায়ী
+      items.forEach((name,idx)=>addIng(name, idx<items.length-1 ? PORTION_G.main : PORTION_G.leafy));
+    }else if(ci===1){
+      // প্রোটিন কোর্স = ২টা প্রোটিন আইটেম (90g) + শেষেরটা বীজ টপিং (8g) — 90g বীজ না!
+      items.forEach((name,idx)=>addIng(name, idx<items.length-1 ? PORTION_G.prot : PORTION_G.seed));
+    }else if(ci===2){
+      items.forEach(name=>addIng(name,PORTION_G.steam));
+    }else if(ci===4){
+      items.forEach(name=>addIng(name,PORTION_G.fruit));
+    }
   });
   (medic&&medic.disease||[]).forEach(n=>addIng(n,PORTION_G.powder));
   (medic&&medic.condition||[]).forEach(n=>addIng(n,PORTION_G.powder));
+
+  // ── AI-এর ক্যালরি বাজেটে স্কেল করা — nutrient totals ও প্রতিটা ইনগ্রেডিয়েন্টের
+  //    গ্রাম-পরিমাণ, দুটোই একই scale factor দিয়ে সামঞ্জস্যপূর্ণভাবে বদলায় ──
+  const rawKcal=totals[0];
+  const scale=(targetKcal&&rawKcal>0)?(targetKcal/rawKcal):1;
+  for(let i=0;i<totals.length;i++) totals[i]*=scale;
+  Object.keys(grams).forEach(name=>{ grams[name]=Math.max(1,Math.round(grams[name]*scale)); });
+
   const out={};
   NUTRIENT_FIELDS.forEach((key,i)=>{
     const decimals=['kcal','sodium_mg','potassium_mg','magnesium_mg','folate_mcg','calcium_mg','vitaminD_iu','iodine_mcg','dha_mg'].indexOf(key)>-1?0:1;
@@ -1601,6 +1628,7 @@ function computeRealNutritionLive(courses,sel,medic){
   out.protein=out.protein_g; out.fat=out.fat_g; out.carb=out.carb_g; out.fiber=out.fiber_g;
   out.sodium=out.sodium_mg; out.folate=out.folate_mcg; out.iron=out.iron_mg;
   out.calcium=out.calcium_mg; out.vitD=out.vitaminD_iu; out.iodine=out.iodine_mcg; out.dha=out.dha_mg;
+  out.grams=grams; // { ইনগ্রেডিয়েন্টের নাম: প্রকৃত গ্রাম } — রান্নাঘরের জন্য
   return out;
 }
 function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
@@ -1647,7 +1675,10 @@ function card(item,meal){
   const medic=medicinalFor(item.cat,di,meal.key);
   // ── LIVE real নিউট্রিশন — নির্বাচিত কোর্সের real ingredient থেকে ফরওয়ার্ড-গণনা।
   //    কোর্স যোগ/বাদ দিলে এই সংখ্যাগুলো সত্যিই বদলাবে — এটাই "AI meal"।
-  const real=computeRealNutritionLive(courses,sel,medic);
+  // এই কার্ডে যতগুলো কোর্স বাছা হয়েছে, AI-এর এই বেলার পূর্ণ (৫ কোর্স) বাজেটের
+  // ততটুকু ভাগ — যেমন daily target-কে meal-এ ভাগ করার পুরনো convention-ই (÷৫)।
+  const targetKcalForSelection=Math.round((item._mealKcal||mealKcalTarget||450)*(cnt/MAX_COURSES));
+  const real=computeRealNutritionLive(courses,sel,medic,targetKcalForSelection);
   //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
   //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
   //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
@@ -1726,7 +1757,10 @@ function card(item,meal){
         '<div class="med-row"><span class="ml">Topping</span><span class="pw top">'+medic.topping+'</span></div>'+
         '<div class="med-row"><span class="ml">AI Chutney</span><span class="pw chu">'+medic.chutney+'</span></div>'+
       '</div></div>'+
-      '<div class="info-box"><b>Ingredients</b><br>'+(item.ename||item.name)+': '+allIngs.join(', ')+', পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা। সব উপাদান বাংলাদেশে পাওয়া যায়। <span style="color:var(--ink-2);font-size:.72rem">(সঠিক পরিমাণ রান্নাঘরের রেসিপিতে — আপনার ব্যক্তিগত ক্যালরি অনুযায়ী)</span></div>'+
+      '<div class="info-box"><b>Ingredients</b><br>'+(item.ename||item.name)+': '+
+        allIngs.map(i=>i+(real.grams&&real.grams[i]?' ('+real.grams[i]+'g)':'')).join(', ')+
+        ', পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা। সব উপাদান বাংলাদেশে পাওয়া যায়। '+
+        '<span style="color:var(--ink-2);font-size:.72rem">(bracket-এর পরিমাণ আপনার আজকের ক্যালরি লক্ষ্য অনুযায়ী গণনা করা — মশলা/পেঁয়াজ-রসুনের সঠিক পরিমাণ রান্নাঘরের রেসিপিতে)</span></div>'+
       '<div class="info-box"><b>Allergen</b><br>'+allergenInfoHTML(allIngs.concat(medic.disease,medic.condition))+'</div>'+
       '<div><div class="panel-h">Product Claims</div><div class="claim-list">'+claimsHTML()+'</div></div>'+
       '<div class="bchain"><span class="bl">⛓ Blockchain Verified Ingredients</span>'+
@@ -1855,7 +1889,7 @@ function hideLoader(){document.getElementById('loader').classList.remove('show')
 <!-- ═══ SAR DISCLAIMER — full width, high contrast ═══ -->
 <div style="
   width:100%;margin:2.2rem 0 0;padding:1.5rem 1.6rem;
-  background:#1a0f1c;border-top:2px solid #E91E8C;
+  background:#22261b;border-top:2px solid #8A9A5B;
   line-height:1.75;font-family:'Segoe UI',system-ui,sans-serif;box-sizing:border-box">
   <div style="max-width:1100px;margin:0 auto">
     <div style="text-align:center;font-weight:800;font-size:1rem;color:#FFD43B;
@@ -1864,7 +1898,7 @@ function hideLoader(){document.getElementById('loader').classList.remove('show')
       <br><span style="font-size:.82rem;color:#FF6BB5">IMPORTANT LEGAL &amp; HEALTH DISCLAIMER</span>
     </div>
     <div style="font-size:.86rem;color:#FFFFFF;margin-bottom:1rem;
-      background:rgba(255,255,255,.04);padding:1rem;border-radius:10px;border-left:4px solid #E91E8C">
+      background:rgba(255,255,255,.04);padding:1rem;border-radius:10px;border-left:4px solid #8A9A5B">
       <strong style="color:#FFD43B;display:block;margin-bottom:.4rem">🇧🇩 বাংলা</strong>
       SAR (She AI Revolution) একটি নারী-পরিচালিত স্বাস্থ্য সচেতনতা, সুস্থতা ও নারী-ক্ষমতায়ন প্ল্যাটফর্ম।
       এটি <strong style="color:#FFD43B">কোনো হাসপাতাল, ক্লিনিক, ডায়াগনস্টিক কেন্দ্র বা চিকিৎসা প্রতিষ্ঠান নয়</strong>
