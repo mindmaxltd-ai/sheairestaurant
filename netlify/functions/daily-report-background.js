@@ -34,11 +34,19 @@ const SB = { apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type'
 // Only needed to turn a category code into a Bangla label for the SMS text.
 const CAT_BN = { DM:'ডায়াবেটিস', OB:'স্থূলতা', FL:'ফ্যাটি লিভার', IB:'IBS/গ্যাস্ট্রিক', PR:'গর্ভাবস্থা' };
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+
   // Background functions: Netlify doesn't deliver this return value anywhere
   // useful (the caller already got a 202 and moved on) — we still return
   // a normal response so local testing / logs behave sensibly.
-  if (!SUPA_KEY) { console.error('Missing SUPABASE_SERVICE_KEY'); return { statusCode: 500 }; }
+  if (!SUPA_KEY) { console.error('Missing SUPABASE_SERVICE_KEY'); return { statusCode: 500, headers: CORS }; }
 
   let body = {};
   try { body = JSON.parse(event.body || '{}'); } catch {}
@@ -47,13 +55,13 @@ exports.handler = async (event) => {
     if (body.action === 'run' && body.customer_id) {
       const result = await processOne(body.customer_id);
       console.log('single result:', JSON.stringify(result));
-      return { statusCode: 200 };
+      return { statusCode: 200, headers: CORS };
     }
 
     const custs = await sbGet(
       `/rest/v1/customers?is_active=eq.true&admin_approved=eq.true&select=id,full_name,phone,email,sar_category&order=id.asc&limit=${PAGE_SIZE}`
     );
-    if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500 }; }
+    if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500, headers: CORS }; }
 
     // bulk-fetch today's ai_analysis rows for everyone in this page, chunked
     const analysisMap = await fetchAnalysisForIds(custs.map(c => c.id));
@@ -72,10 +80,10 @@ exports.handler = async (event) => {
     });
 
     console.log(`daily-report done — total:${custs.length} sent:${sent} skipped:${skipped} failed:${failed} date:${today()}`);
-    return { statusCode: 200 };
+    return { statusCode: 200, headers: CORS };
   } catch (e) {
     console.error('daily-report fatal error:', e.message);
-    return { statusCode: 500 };
+    return { statusCode: 500, headers: CORS };
   }
 };
 
