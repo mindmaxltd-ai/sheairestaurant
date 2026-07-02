@@ -963,6 +963,63 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
   padding:.15rem .55rem;border-radius:50px;position:relative;z-index:1;
 }
 
+
+/* ══════════════════════════════════════════════════════════════
+   NEW — gorgeous per-card colour palette for the plain white
+   dashboard cards (blue / red / pink / green / purple / yellow).
+   Purely additive classes appended to existing class="dcard ...".
+   Does not touch the report-glow-card or sar-report-header (kept
+   exactly as before), nor any button/tn-c*/qa-btn colours.
+   ══════════════════════════════════════════════════════════════ */
+.dcard.card-blue,.dcard.card-red,.dcard.card-pink,
+.dcard.card-green,.dcard.card-purple,.dcard.card-yellow{position:relative}
+.dcard.card-blue::before,.dcard.card-red::before,.dcard.card-pink::before,
+.dcard.card-green::before,.dcard.card-purple::before,.dcard.card-yellow::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;z-index:2;
+}
+
+.dcard.card-blue{background:linear-gradient(165deg,rgba(59,156,232,.11),rgba(255,255,255,.98) 55%);
+  border-color:rgba(59,156,232,.28);box-shadow:0 12px 26px -16px rgba(21,101,192,.45)}
+.dcard.card-blue::before{background:linear-gradient(90deg,#3B9CE8,#1565C0)}
+.dcard.card-blue .dcard-header{background:linear-gradient(120deg,rgba(59,156,232,.14),rgba(38,198,218,.06))}
+.dcard.card-blue .dcard-title{color:#1565C0}
+.dcard.card-blue .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(59,156,232,.55))}
+
+.dcard.card-red{background:linear-gradient(165deg,rgba(239,68,68,.11),rgba(255,255,255,.98) 55%);
+  border-color:rgba(239,68,68,.28);box-shadow:0 12px 26px -16px rgba(190,30,30,.4)}
+.dcard.card-red::before{background:linear-gradient(90deg,#F87171,#B91C1C)}
+.dcard.card-red .dcard-header{background:linear-gradient(120deg,rgba(239,68,68,.14),rgba(251,113,133,.06))}
+.dcard.card-red .dcard-title{color:#B91C1C}
+.dcard.card-red .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(239,68,68,.55))}
+
+.dcard.card-pink{background:linear-gradient(165deg,rgba(240,98,146,.12),rgba(255,255,255,.98) 55%);
+  border-color:rgba(240,98,146,.3);box-shadow:0 12px 26px -16px rgba(194,24,91,.4)}
+.dcard.card-pink::before{background:linear-gradient(90deg,#F06292,#C2185B)}
+.dcard.card-pink .dcard-header{background:linear-gradient(120deg,rgba(240,98,146,.16),rgba(255,141,193,.06))}
+.dcard.card-pink .dcard-title{color:#C2185B}
+.dcard.card-pink .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(240,98,146,.55))}
+
+.dcard.card-green{background:linear-gradient(165deg,rgba(38,166,91,.12),rgba(255,255,255,.98) 55%);
+  border-color:rgba(38,166,91,.3);box-shadow:0 12px 26px -16px rgba(21,122,62,.4)}
+.dcard.card-green::before{background:linear-gradient(90deg,#26A65B,#157A3E)}
+.dcard.card-green .dcard-header{background:linear-gradient(120deg,rgba(38,166,91,.15),rgba(46,204,113,.06))}
+.dcard.card-green .dcard-title{color:#157A3E}
+.dcard.card-green .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(38,166,91,.55))}
+
+.dcard.card-purple{background:linear-gradient(165deg,rgba(156,95,224,.12),rgba(255,255,255,.98) 55%);
+  border-color:rgba(156,95,224,.3);box-shadow:0 12px 26px -16px rgba(106,45,168,.4)}
+.dcard.card-purple::before{background:linear-gradient(90deg,#9C5FE0,#6A2DA8)}
+.dcard.card-purple .dcard-header{background:linear-gradient(120deg,rgba(156,95,224,.16),rgba(196,148,255,.06))}
+.dcard.card-purple .dcard-title{color:#6A2DA8}
+.dcard.card-purple .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(156,95,224,.55))}
+
+.dcard.card-yellow{background:linear-gradient(165deg,rgba(244,196,48,.16),rgba(255,255,255,.98) 55%);
+  border-color:rgba(244,196,48,.34);box-shadow:0 12px 26px -16px rgba(169,126,0,.35)}
+.dcard.card-yellow::before{background:linear-gradient(90deg,#F4C430,#C99A0E)}
+.dcard.card-yellow .dcard-header{background:linear-gradient(120deg,rgba(244,196,48,.22),rgba(251,191,36,.08))}
+.dcard.card-yellow .dcard-title{color:#A37E00}
+.dcard.card-yellow .dcard-title-icon{filter:drop-shadow(0 0 6px rgba(244,196,48,.55))}
+
 </style>
 </head>
 <body>
@@ -1137,7 +1194,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- DAILY MENU -->
-          <div class="dcard menu-card" id="dailyMenuSection">
+          <div class="dcard menu-card card-green" id="dailyMenuSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🥗</span>আজকের থেরাপিউটিক মেনু</span>
               <a href="meal-score.html" class="dcard-action">সব দেখুন →</a>
@@ -1148,7 +1205,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- RECENT ORDERS -->
-          <div class="dcard" id="ordersSection">
+          <div class="dcard card-blue" id="ordersSection">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🛒</span>সাম্প্রতিক অর্ডার</span>
               <a href="order.html" class="dcard-action">নতুন অর্ডার →</a>
@@ -1164,7 +1221,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
         <div class="dash-col-right">
 
           <!-- QUICK ACTIONS -->
-          <div class="dcard">
+          <div class="dcard card-yellow">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">⚡</span>দ্রুত কাজ</span>
             </div>
@@ -1208,7 +1265,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- KEY HEALTH METRICS -->
-          <div class="dcard">
+          <div class="dcard card-red">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">🩺</span>মূল স্বাস্থ্য মেট্রিক্স</span>
               <a href="metrics.html" class="dcard-action">আপডেট →</a>
@@ -1226,7 +1283,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- LOYALTY -->
-          <div class="dcard loyalty-card">
+          <div class="dcard loyalty-card card-purple">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">⭐</span>লয়্যালটি প্রোগ্রাম</span>
             </div>
@@ -1236,7 +1293,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- MEMBERSHIP -->
-          <div class="dcard mem-card">
+          <div class="dcard mem-card card-pink">
             <div class="dcard-header">
               <span class="dcard-title"><span class="dcard-title-icon">💎</span>সদস্যতার অবস্থা</span>
               <a href="payment.html" class="dcard-action">পরিচালনা →</a>
@@ -1247,7 +1304,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- SAR NOTES (collapsible, closed by default) -->
-          <div class="dcard">
+          <div class="dcard card-green">
             <div class="dcard-header" onclick="toggleCollapse('sarNotesBody','sarNotesChevron')" style="cursor:pointer">
               <span class="dcard-title"><span class="dcard-title-icon">📝</span>SAR টিমের নোট</span>
               <span id="sarNotesChevron" style="transition:transform .25s;color:rgba(20,20,20,.4)">▾</span>
@@ -1260,7 +1317,7 @@ body{background:var(--dark);color:var(--ink);font-family:'Hind Siliguri','Inter'
           </div>
 
           <!-- MOTIVATIONAL -->
-          <div class="dcard moti-card">
+          <div class="dcard moti-card card-purple">
             <span class="moti-icon">🌸</span>
             <div class="moti-text" id="motiText">"আপনার শরীর আপনার মন্দির। সঠিক খাদ্য দিয়ে তাকে সম্মান করুন।"</div>
             <div class="moti-source">— SAR AI • আজকের অনুপ্রেরণা</div>
