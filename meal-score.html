@@ -571,11 +571,14 @@ let aiDaily=null;
 // (set inside runAnalysis()). Used by medicinalFor() as the primary AI source
 // whenever aiDaily's weekly per-meal structure isn't present.
 let aiMedicinal=null;
-// Today's full nutrition list (≥10 items: 5 macros with real DV% + micro-
-// nutrients like folate/iron/calcium/DHA/vitamin-D/iodine), read from the
-// same ai_analysis row. Used by card() to replace the old 4-item local
-// formula in "Daily Requirement Coverage" with real data.
-let aiNutritionList=null;
+// আজকের ৫টা ম্যাক্রো (কার্ট/প্রোটিন/ফাইবার/কার্ব/ফ্যাট) — রুল ইঞ্জিনের সত্যিকারের
+// গণনা করা %, ai_analysis.nutrition_dv_json থেকে। এটাই একমাত্র জায়গা যেখানে সত্যিই
+// একটা % সংরক্ষিত আছে — তাই এটাই একমাত্র bar-চার্টে % হিসেবে দেখানো হয়।
+let aiDvList=null;
+// আজকের ৭টা মাইক্রো-নিউট্রিয়েন্ট টার্গেট (ফোলেট/আয়রন/ক্যালসিয়াম/DHA/ভিটামিন-D/আয়োডিন) —
+// ai_analysis.rule_output_json.nutrients থেকে। এখানে কোনো % নেই (রুল ইঞ্জিন রাখেই না),
+// তাই কোনো bar/percentage বানানো হয় না — শুধু target amount + কারণ, দিনে একবার দেখানো হয়।
+let aiMicroList=null;
 // Today's 5 overall benefits (meal/ingredients/chutney/powder/topping),
 // read from ai_analysis.rule_output_json.benefits — same source report.html uses.
 let aiBenefits=null;
@@ -942,30 +945,27 @@ async function runAnalysis(silent){
         chutney:(ruleOut.chutney&&ruleOut.chutney.name)||saved.chutney_selected||'',
         topping:(ruleOut.topping&&ruleOut.topping.name)||saved.topping_selected||'',
       }:null;
-      // ── আজকের সম্পূর্ণ পুষ্টি তালিকা (কমপক্ষে ১০টা), ঠিক report.html যেভাবে দেখায় ──
-      // উৎস: ai_analysis.nutrition_dv_json (৫টা ম্যাক্রো, রুল ইঞ্জিনের নিজস্ব pct%)
-      //     + ai_analysis.rule_output_json.nutrients (৭টা মাইক্রো — ফোলেট/আয়রন/ক্যালসিয়াম/
-      //       DHA/ভিটামিন-D/আয়োডিন ইত্যাদি, ক্যাটাগরি অনুযায়ী বদলায়)।
-      // মাইক্রো নিউট্রিয়েন্টের জন্য pct নেই (রুল ইঞ্জিন শুধু target amount + benefit রাখে) —
-      // তাই bar ১০০%-এ পূর্ণ দেখানো হয় ("আজকের SAR মিল এই লক্ষ্য সম্পূর্ণ কভার করে"), নাম্বার
-      // fabricate করা হয় না, শুধু আসল target amount ও benefit টেক্সট দেখানো হয়।
+      // ── সততার নীতি ──
+      // ai_analysis.nutrition_dv_json (৫টা ম্যাক্রো) — রুল ইঞ্জিন সত্যিই এদের জন্য একটা
+      // % হিসাব করে রাখে (target ÷ স্ট্যান্ডার্ড baseline), তাই এটা প্রকৃত সংখ্যা — দেখানো হয়,
+      // "এই বেলার প্রত্যাশিত ভাগ" হিসেবে (পুরো দিনের লক্ষ্যের ভাগ, নির্দিষ্ট ইনগ্রেডিয়েন্ট
+      // পরিমাপ না — এটাই সত্যি, তাই এভাবেই লেবেল করা হচ্ছে, ভুল claim না)।
+      // ai_analysis.rule_output_json.nutrients (৭টা মাইক্রো: ফোলেট/আয়রন/ক্যালসিয়াম/DHA/
+      // ভিটামিন-D/আয়োডিন) — রুল ইঞ্জিন এদের জন্য কোনো % রাখে না, শুধু দৈনিক target amount।
+      // তাই এখানে কোনো % বানানো হয় না — শুধু target amount + কারণ (benefit) দেখানো হয়,
+      // এক জায়গায় (দিনে একবার), প্রতি মিল কার্ডে বারবার নকল % হিসেবে না।
       const dvList=(function(){
         let dv=saved.nutrition_dv_json; if(typeof dv==='string'){try{dv=JSON.parse(dv);}catch(e){dv=null;}}
         if(!dv||!dv.length) dv=ruleOut.dv;
         return Array.isArray(dv)?dv:[];
       })();
+      aiDvList=dvList.length?dvList.map(d=>({name:d.name,pct:Math.min(150,Math.max(0,d.pct||0)),note:d.note||''})):null;
       const nutList=Array.isArray(ruleOut.nutrients)?ruleOut.nutrients:[];
-      const combined=[
-        ...dvList.map(d=>({name:d.name,pct:Math.min(100,d.pct||0),note:d.note||'',full:false})),
-        ...nutList.map(n=>({
-          name:n.name,
-          pct:100,
-          note:n.benefit||'',
-          amount:n.target_g?n.target_g+'g':n.target_mg?n.target_mg+'mg':n.target_mcg?n.target_mcg+'mcg':n.target_iu?n.target_iu+' IU':'',
-          full:true,
-        })),
-      ];
-      aiNutritionList=combined.length>=5?combined:null;
+      aiMicroList=nutList.length?nutList.map(n=>({
+        name:n.name,
+        note:n.benefit||'',
+        amount:n.target_g?n.target_g+'g':n.target_mg?n.target_mg+'mg':n.target_mcg?n.target_mcg+'mcg':n.target_iu?n.target_iu+' IU':'',
+      })):null;
       // ── ৫টি সামগ্রিক উপকার — report.html-এ যেমন দেখায়, ঠিক একই সোর্স ──
       aiBenefits=(ruleOut.benefits&&typeof ruleOut.benefits==='object')?ruleOut.benefits:null;
       const savedCat=normalizeCat(saved.category)||activeCat;
@@ -1201,13 +1201,26 @@ function card(item,meal){
   const fatKcal=fat*9;
   const carb=Math.max(0,Math.round((kcal-protKcal-fatKcal)/4)); // বাকিটা সম্পূর্ণ কার্ব
   const fib=Math.max(6,Math.round(cnt*3.2));
-  // এই মিলের আজকের দৈনিক লক্ষ্যের কতটুকু ভাগ (breakfast/lunch/dinner split, ক্যাটাগরি
-  // অনুযায়ী ভিন্ন) ও কতগুলো কোর্স বাছা হয়েছে তার উপর ভিত্তি করে dynamic % — flat ১০০% না।
+  // ── সততার নীতি: শুধু যা সত্যিই যাচাইযোগ্য তা-ই দেখানো হয় ──
+  // ১) এই নির্দিষ্ট থালার real kcal/protein/fiber (menu_items ডাটাবেস থেকে, item তৈরির
+  //    সময় থেকেই সংরক্ষিত) — শুধু তখনই যোগ হয় যখন ডাটাবেসে সত্যিই মান আছে (0 হলে বাদ,
+  //    কারণ সেটা fallback/generic entry, কল্পিত সংখ্যা বসানো হয় না)
+  // ২) আজকের সামগ্রিক লক্ষ্যের এই বেলার (breakfast/lunch/dinner) প্রত্যাশিত ভাগ —
+  //    রুল ইঞ্জিনের real দৈনিক % থেকে, স্পষ্টভাবে "এই বেলার ভাগ" লেবেল করা, কোনো
+  //    নির্দিষ্ট ইনগ্রেডিয়েন্ট পরিমাপ বলে দাবি করা হয় না
   const mealShare=item._share||({breakfast:.3,lunch:.4,dinner:.3}[meal.key])||.33;
-  const courseRatio=Math.min(1,cnt/MAX_COURSES);
-  const dr=(aiNutritionList&&aiNutritionList.length)
-    ? aiNutritionList.map(n=>[n.name+(n.amount?' ('+n.amount+')':''),Math.max(1,Math.min(99,Math.round(n.pct*mealShare*courseRatio)))])
-    : [['প্রোটিন',Math.min(99,Math.round(prot/0.6))],['আয়রন',Math.min(99,22+cnt*4)],['ফাইবার',Math.min(99,Math.round(fib/0.25))],['ভিটামিন C',Math.min(99,30+cnt*5)]];
+  const dr=[];
+  if(item.kcal>0)    dr.push(['ক্যালরি (এই থালা)',Math.min(150,Math.round(item.kcal/2000*100))]);
+  if(item.protein>0) dr.push(['প্রোটিন (এই থালা)',Math.min(150,Math.round(item.protein/50*100))]);
+  if(item.fiber>0)   dr.push(['ফাইবার (এই থালা)',Math.min(150,Math.round(item.fiber/25*100))]);
+  if(aiDvList&&aiDvList.length){
+    aiDvList.forEach(d=>dr.push([d.name+' (এই বেলার ভাগ)',Math.max(1,Math.min(99,Math.round((d.pct||0)*mealShare)))]));
+  }
+  if(!dr.length){
+    // এই থালার real ডেটা এখনো ডাটাবেসে নেই এবং AI বিশ্লেষণও নেই — তখনই শুধু, স্পষ্ট
+    // "আনুমানিক" লেবেল সহ, কোর্স-সংখ্যাভিত্তিক সাধারণ এস্টিমেট (আগের মতোই, কিন্তু সৎভাবে লেবেল করা)
+    dr.push(['প্রোটিন (আনুমানিক)',Math.min(99,Math.round(prot/0.6))],['ফাইবার (আনুমানিক)',Math.min(99,Math.round(fib/0.25))]);
+  }
   const db=MEAL_DB[item.cat]||MEAL_DB.DM;
   const benList=(item.benefits?item.benefits.split(/[•,·]/):db.benefits).map(b=>b.trim()).filter(Boolean);
   while(benList.length<3) benList.push(db.benefits[benList.length]||'সুষম পুষ্টি');
@@ -1262,6 +1275,13 @@ function card(item,meal){
         (aiBenefits.chutney_bn?'<span class="bchip" style="white-space:normal;text-align:left">🫙 <b>চাটনি:</b> '+aiBenefits.chutney_bn+'</span>':'')+
         (aiBenefits.disease_powder_bn?'<span class="bchip" style="white-space:normal;text-align:left">💊 <b>পাউডার:</b> '+aiBenefits.disease_powder_bn+'</span>':'')+
         (aiBenefits.topping_bn?'<span class="bchip" style="white-space:normal;text-align:left">✨ <b>টপিং:</b> '+aiBenefits.topping_bn+'</span>':'')+
+      '</div></div>'
+      ):'')+
+      (aiMicroList&&aiMicroList.length?(
+      '<div><div class="panel-h">💊 আজকের ব্যক্তিগত পুষ্টি লক্ষ্য ('+bn(aiMicroList.length)+'টি)</div>'+
+      '<div style="font-size:.68rem;color:var(--ink-2);margin:-4px 0 8px">আপনার স্বাস্থ্য প্রোফাইল অনুযায়ী SAR AI-এর নির্ধারিত দৈনিক লক্ষ্য — এই নির্দিষ্ট থালার measured উপাদান না, তাই কোনো % দেখানো হচ্ছে না</div>'+
+      '<div class="benefits" style="flex-direction:column;align-items:flex-start;gap:.3rem">'+
+        aiMicroList.map(n=>'<span class="bchip" style="white-space:normal;text-align:left">🔹 <b>'+n.name+(n.amount?' ('+n.amount+')':'')+':</b> '+n.note+'</span>').join('')+
       '</div></div>'
       ):'')+
       '<div><div class="panel-h">Medicinal Layer</div><div class="med">'+
