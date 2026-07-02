@@ -23,6 +23,7 @@ const SB = {
 };
 
 const K = require('./kitchen-lib');
+const { computeRealNutritionFromOrder, sumRealNutrition } = require('./ingredient_db');
 
 const reply = (status, body) => ({
   statusCode: status,
@@ -202,12 +203,27 @@ exports.handler = async (event) => {
 
       // ── 4. place order → orders (+ order_items) ─────────────
       case 'placeOrder': {
+        // ── আসল, ইনগ্রেডিয়েন্ট-ভিত্তিক পুষ্টি — checkout-এ যা সত্যিই নির্বাচিত হয়েছে
+        // তা থেকে ফরওয়ার্ড-গণনা করা (ingredient_db.js), AI দৈনিক টার্গেট থেকে ভাগ করা
+        // অনুমান না। meal-score.html-এর buildCartItem() ইতিমধ্যেই courseDetail/
+        // diseasePowders/conditionPowders পাঠায় — এখানে শুধু ব্যবহার করা হচ্ছে,
+        // meal-score.html-এ কোনো পরিবর্তনের দরকার নেই।
+        const itemsWithRealNutrition = (Array.isArray(p.items) ? p.items : []).map(it => {
+          let real = null;
+          try {
+            real = computeRealNutritionFromOrder(it.courseDetail, it.diseasePowders, it.conditionPowders);
+          } catch (e) { real = null; } // ইনগ্রেডিয়েন্ট ডেটাবেসে কোনো নাম না মিললেও অর্ডার ব্যর্থ হবে না
+          return Object.assign({}, it, { real_nutrition: real });
+        });
+        const orderRealNutritionTotal = sumRealNutrition(itemsWithRealNutrition.map(it => it.real_nutrition));
+
         // 4a. header row into orders
         const orderRow = {
           customer_id:   p.customer_id,
           order_type:    'delivery',
           status:        'pending',
-          items_json:    p.items,        // JSONB NOT NULL — full meal+course detail
+          items_json:    itemsWithRealNutrition, // JSONB NOT NULL — এখন real_nutrition সহ প্রতিটা আইটেমে
+          real_nutrition_json: orderRealNutritionTotal, // পুরো অর্ডারের সমষ্টি — সততার সাথে গণনাকৃত
           subtotal:      p.subtotal,
           tax:           p.vat,          // 5% VAT lands in tax column
           total_amount:  p.total,
@@ -224,16 +240,17 @@ exports.handler = async (event) => {
         const order = Array.isArray(od) ? od[0] : od;
 
         // 4b. one order_items row per meal
-        if (order && order.id && Array.isArray(p.items)) {
-          const lines = p.items.map(it => ({
+        if (order && order.id && Array.isArray(itemsWithRealNutrition)) {
+          const lines = itemsWithRealNutrition.map(it => ({
             order_id:      order.id,
             menu_item_id:  it.menu_item_id || null,
             menu_name_bn:  it.name,
             quantity:      1,
             unit_price:    it.price,           // courses × ৳85
             special_note:  (it.courses || []).join(' · '),
-            nutrition_json:{ kcal: it.kcal, protein: it.protein,
-                             courses: it.courseCount, meal: it.meal, day: it.day },
+            nutrition_json:{ kcal: it.kcal, protein: it.protein,       // আগের মতোই (client estimate) — অপরিবর্তিত
+                             courses: it.courseCount, meal: it.meal, day: it.day,
+                             real: it.real_nutrition },                // নতুন — আসল ইনগ্রেডিয়েন্ট-ভিত্তিক হিসাব
           }));
           await fetch(`${SUPABASE_URL}/rest/v1/order_items`, {
             method: 'POST', headers: { ...SB, Prefer: 'return=minimal' },
