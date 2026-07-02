@@ -1590,58 +1590,53 @@ function coursesFor(item,di,mealKey){
 //    প্রোটিন/ফ্যাট/কার্ব/মাইক্রো-নিউট্রিয়েন্ট — সবকিছু একই অনুপাতে স্কেল হয়,
 //    তাই আসল ইনগ্রেডিয়েন্টের আপেক্ষিক composition (কোনটায় কতটা প্রোটিন,
 //    কোনটায় কতটা আয়রন) অক্ষুণ্ন থাকে, শুধু মোট পরিমাণ AI-বাজেটে মেলানো হয়।
+// বাস্তব, একবেলার-খাবার-সম্মত সর্বোচ্চ/সর্বনিম্ন পরিমাণ (গ্রাম) — প্রতিটা
+// ইনগ্রেডিয়েন্ট, ভূমিকা অনুযায়ী, যত বড় ক্যালরি ঘাটতিই থাকুক না কেন এই
+// সীমা কখনো ছাড়ানো হয় না। বাস্তব পরিমাণ AI-এর সংখ্যা মেলানোর চেয়ে জরুরি —
+// ৫০০ গ্রাম ফল বা ৩০০ গ্রাম বাঁধাকপি কোনো মানুষের এক বেলার খাবার না।
+const PORTION_MIN={main:30,leafy:12,prot:45,seed:5,steam:35,fruit:60,chutney:12,powder:1};
+const PORTION_MAX={main:110,leafy:45,prot:150,seed:15,steam:110,fruit:150,chutney:28,powder:5};
+
 function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
   const N=NUTRIENT_FIELDS.length;
-  const protTotals=new Array(N).fill(0), otherTotals=new Array(N).fill(0);
-  const protGrams={}, otherGrams={};
-  function addTo(totals,gramsObj,name,g){
-    const row=ING_NUTRIENTS[name];
-    if(!row)return;
-    const f=g/100;
-    for(let i=0;i<totals.length;i++) totals[i]+=(row[i]||0)*f;
-    gramsObj[name]=(gramsObj[name]||0)+g;
-  }
+  // প্রথমে প্রতিটা ইনগ্রেডিয়েন্টের role ও baseline গ্রাম ট্র্যাক করি (এখনই যোগ করি না)
+  const entries=[]; // [{name, role, base, group:'prot'|'other'}]
+  function track(group,role,name,base){ entries.push({group,role,name,base}); }
+
   courses.forEach((c,ci)=>{
     if(sel.indexOf(ci)===-1)return;
     const items=c.items||[];
     if(ci===1){
-      // প্রোটিন কোর্স — আলাদাভাবে ট্র্যাক করা হয়, যাতে এটাকে AI-এর protein
-      // টার্গেটে নিখুঁতভাবে স্কেল করা যায় (২টা প্রোটিন আইটেম 90g + বীজ টপিং 8g)
-      items.forEach((name,idx)=>addTo(protTotals,protGrams,name, idx<items.length-1 ? PORTION_G.prot : PORTION_G.seed));
+      items.forEach((name,idx)=>track('prot', idx<items.length-1?'prot':'seed', name, idx<items.length-1?PORTION_G.prot:PORTION_G.seed));
       return;
     }
-    if(ci===3){ addTo(otherTotals,otherGrams,'__chutney_generic__',PORTION_G.chutney); return; }
+    if(ci===3){ track('other','chutney','__chutney_generic__',PORTION_G.chutney); return; }
     if(ci===0){
-      items.forEach((name,idx)=>addTo(otherTotals,otherGrams,name, idx<items.length-1 ? PORTION_G.main : PORTION_G.leafy));
+      items.forEach((name,idx)=>track('other', idx<items.length-1?'main':'leafy', name, idx<items.length-1?PORTION_G.main:PORTION_G.leafy));
     }else if(ci===2){
-      items.forEach(name=>addTo(otherTotals,otherGrams,name,PORTION_G.steam));
+      items.forEach(name=>track('other','steam',name,PORTION_G.steam));
     }else if(ci===4){
-      items.forEach(name=>addTo(otherTotals,otherGrams,name,PORTION_G.fruit));
+      items.forEach(name=>track('other','fruit',name,PORTION_G.fruit));
     }
   });
-  (medic&&medic.disease||[]).forEach(n=>addTo(otherTotals,otherGrams,n,PORTION_G.powder));
-  (medic&&medic.condition||[]).forEach(n=>addTo(otherTotals,otherGrams,n,PORTION_G.powder));
+  (medic&&medic.disease||[]).forEach(n=>track('other','powder',n,PORTION_G.powder));
+  (medic&&medic.condition||[]).forEach(n=>track('other','powder',n,PORTION_G.powder));
+
+  function sumBy(group,field){
+    return entries.filter(e=>e.group===group).reduce((s,e)=>{
+      const row=ING_NUTRIENTS[e.name]; return s+(row?(row[field]||0)*e.base/100:0);
+    },0);
+  }
+  const a11=sumBy('prot',1), a12=sumBy('other',1);   // protein_g
+  const a21=sumBy('prot',0), a22=sumBy('other',0);   // kcal
 
   // ── AI-এর kcal ও protein টার্গেট — দুটোই একসাথে গাণিতিকভাবে সঠিকভাবে মেলানো ──
-  // শুধু protein-কোর্স স্কেল করলেই যথেষ্ট না — leafy/medicinal আইটেমেও (যেমন
-  // Moringa Leaves/Powder) যথেষ্ট প্রোটিন থাকে। তাই ২টা unknown (protScale,
-  // otherScale) আর ২টা সমীকরণ (protein মেলা + kcal মেলা) — standard 2×2
-  // linear system, Cramer's rule দিয়ে সমাধান — উভয় লক্ষ্যই নিখুঁতভাবে মেলে।
-  const a11=protTotals[1], a12=otherTotals[1];   // protein_g contribution
-  const a21=protTotals[0], a22=otherTotals[0];   // kcal contribution
   const det=a11*a22-a12*a21;
   let protScale=1, otherScale=1;
   if(Math.abs(det)>1e-6 && targetProtein!=null && targetKcal!=null){
     protScale=(targetProtein*a22-a12*targetKcal)/det;
     otherScale=(a11*targetKcal-targetProtein*a21)/det;
-    // বাস্তবসম্মত সীমার বাইরে গেলে (ইনগ্রেডিয়েন্ট মিক্স আসলে দুটো লক্ষ্য একসাথে
-    // মেলাতে না পারলে) — নিরাপদ ফলব্যাক: শুধু kcal-এ স্কেল করা
     if(protScale<0.15||protScale>6||otherScale<0.15||otherScale>6){
-      // দুটো লক্ষ্য একসাথে মেলানো গাণিতিকভাবেই সম্ভব না (যেমন Moringa Leaves/
-      // Powder-এর মতো আইটেম ক্যালরির তুলনায় এতটাই প্রোটিন-ঘন যে negative
-      // scale লাগত) — তখন kcal দিয়ে scale করি, কিন্তু protein ১.৪× টার্গেট
-      // ছাড়ালে সেটা কেটে দিই (kcal সামান্য কম হতে পারে এই একটা edge case-এ,
-      // কিন্তু প্রোটিন কখনো বিপজ্জনকভাবে বেশি দেখাবে না)।
       protScale=(targetKcal&&(a21+a22)>0)?targetKcal/(a21+a22):1;
       otherScale=protScale;
       const estProt=a11*protScale+a12*otherScale;
@@ -1653,12 +1648,27 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
   }else if(targetKcal!=null&&(a21+a22)>0){
     protScale=otherScale=targetKcal/(a21+a22);
   }
-  for(let i=0;i<N;i++){ protTotals[i]*=protScale; otherTotals[i]*=otherScale; }
-  Object.keys(protGrams).forEach(n=>{ protGrams[n]=Math.max(1,Math.round(protGrams[n]*protScale)); });
-  Object.keys(otherGrams).forEach(n=>{ otherGrams[n]=Math.max(1,Math.round(otherGrams[n]*otherScale)); });
 
-  const totals=protTotals.map((v,i)=>v+otherTotals[i]);
-  const grams=Object.assign({},otherGrams,protGrams);
+  // ── সবচেয়ে গুরুত্বপূর্ণ ধাপ: প্রতিটা ইনগ্রেডিয়েন্টের scale-করা গ্রাম এখন
+  //    বাস্তব মানুষের-খাবার সীমায় (PORTION_MIN/MAX) clamp করা হয় — কোনো
+  //    অবস্থাতেই এই সীমা ছাড়ানো হয় না, টার্গেট নাম্বার না মিললেও। ──
+  const grams={};
+  entries.forEach(e=>{
+    const scale=e.group==='prot'?protScale:otherScale;
+    const raw=e.base*scale;
+    const clamped=Math.round(Math.max(PORTION_MIN[e.role]||10, Math.min(PORTION_MAX[e.role]||130, raw)));
+    grams[e.name]=(grams[e.name]||0)+clamped;
+  });
+
+  // ── এখন totals পুনরায় গণনা হয় সত্যিকারের (clamp করা) গ্রাম থেকে — তাই
+  //    দেখানো kcal/protein সবসময় প্রদর্শিত ইনগ্রেডিয়েন্ট-পরিমাণের সাথে মেলে,
+  //    এমনকি clamp-এর কারণে AI-টার্গেট থেকে কিছুটা সরে গেলেও ──
+  const totals=new Array(N).fill(0);
+  Object.keys(grams).forEach(name=>{
+    const row=ING_NUTRIENTS[name]; if(!row)return;
+    const f=grams[name]/100;
+    for(let i=0;i<N;i++) totals[i]+=(row[i]||0)*f;
+  });
 
   const out={};
   NUTRIENT_FIELDS.forEach((key,i)=>{
@@ -1668,7 +1678,7 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
   out.protein=out.protein_g; out.fat=out.fat_g; out.carb=out.carb_g; out.fiber=out.fiber_g;
   out.sodium=out.sodium_mg; out.folate=out.folate_mcg; out.iron=out.iron_mg;
   out.calcium=out.calcium_mg; out.vitD=out.vitaminD_iu; out.iodine=out.iodine_mcg; out.dha=out.dha_mg;
-  out.grams=grams; // { ইনগ্রেডিয়েন্টের নাম: প্রকৃত গ্রাম } — রান্নাঘরের জন্য
+  out.grams=grams; // { ইনগ্রেডিয়েন্টের নাম: বাস্তবসম্মত, clamp করা গ্রাম } — রান্নাঘরের জন্য
   return out;
 }
 function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
