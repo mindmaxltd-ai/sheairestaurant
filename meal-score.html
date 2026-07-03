@@ -38,7 +38,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-2;background:
 body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.10;background-image:linear-gradient(rgba(244,251,246,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(244,251,246,.05) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
 img{max-width:100%;display:block}
 .num{font-family:'Space Mono',monospace}
-.serif{font-family:'Playfair Display',serif}
+.serif{font-family:'Playfair Display','SolaimanLipi',serif}
 
 .topbar{height:3px;background:var(--grad);background-size:240% 100%;animation:slide 8s linear infinite}
 @keyframes slide{to{background-position:240% 0}}
@@ -61,8 +61,8 @@ img{max-width:100%;display:block}
 .eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--line);color:var(--pink-d);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.45rem 1rem;border-radius:30px;margin-bottom:1.3rem;box-shadow:var(--shadow)}
 .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.85)}}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.3rem,6vw,4rem);font-weight:600;line-height:1.06;letter-spacing:-.015em;max-width:18ch;color:var(--onbg-title)}
-.hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero h1{font-family:'Playfair Display','SolaimanLipi',serif;font-size:clamp(2.3rem,6vw,4rem);font-weight:600;line-height:1.06;letter-spacing:-.015em;max-width:18ch;color:var(--onbg-title)}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero-sub{margin-top:1.1rem;font-size:1.08rem;color:var(--onbg-2);max-width:54ch;line-height:1.7}
 
 .score-card{max-width:1180px;margin:1.9rem auto 0;padding:0 1.25rem}
@@ -105,8 +105,8 @@ img{max-width:100%;display:block}
 .mixbox input{width:18px;height:18px;accent-color:var(--pink-d);cursor:pointer}
 
 .sec-head{max-width:1180px;margin:2rem auto .2rem;padding:0 1.25rem}
-.sec-head h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:-.01em;color:var(--onbg-title)}
-.sec-head h2 .serif{font-style:italic}
+.sec-head h2{font-family:'Playfair Display','SolaimanLipi',serif;font-size:2rem;font-weight:700;letter-spacing:-.01em;color:var(--onbg-title)}
+.sec-head h2 .serif{font-style:normal}
 .sec-head p{color:var(--onbg-2);font-size:.95rem;margin-top:.2rem}
 
 .daybar{max-width:1180px;margin:1rem auto 0;padding:0 1.25rem;display:flex;gap:.5rem;overflow-x:auto;scrollbar-width:none}
@@ -146,7 +146,7 @@ img{max-width:100%;display:block}
 .pill.dark{background:linear-gradient(135deg,rgba(233,30,140,.9),rgba(249,115,22,.86));color:#fff}
 .mc-head{padding:1.1rem 1.08rem .85rem;background:var(--soft);position:relative;border-bottom:1px solid var(--line)}
 .mc-no{font-size:.66rem;font-weight:800;color:var(--pink-d);letter-spacing:.13em;text-transform:uppercase}
-.mc-name{font-family:'Playfair Display',serif;font-weight:700;font-size:1.38rem;line-height:1.15;margin-top:.25rem;color:var(--plum);letter-spacing:-.01em}
+.mc-name{font-family:'Playfair Display','SolaimanLipi',serif;font-weight:700;font-size:1.38rem;line-height:1.15;margin-top:.25rem;color:var(--plum);letter-spacing:-.01em}
 .mc-name sup{font-size:.58rem;color:var(--pink-d)}
 .mc-en{font-size:.84rem;color:var(--muted);font-weight:700;margin-top:.15rem}
 .mc-rec{position:absolute;top:.9rem;right:.9rem;background:var(--plum);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:.3rem .7rem;border-radius:20px;box-shadow:var(--shadow);text-transform:uppercase;z-index:3}
@@ -1573,7 +1573,7 @@ function coursesFor(item,di,mealKey){
   const fruitPick= fruits[(seed)%fruits.length];
   // স্বাস্থ্যকর ফ্যাট লিভার — ক্যালরি-ঘন, প্রায়-শূন্য প্রোটিন, তেল/চিনি ছাড়াই
   // (নারকেল/জলপাই), calorie target মেলাতে সাহায্য করে প্রোটিন না বাড়িয়ে।
-  const FAT_POOL=['Coconut (fresh)','Olive'];
+  const FAT_POOL=['Coconut (fresh)','Olive','Walnut','Pistachio'];
   const fatPick=FAT_POOL[(seed)%FAT_POOL.length];
 
   return [
@@ -1639,7 +1639,8 @@ function waterFill(items,ratioField,target){
   return grams.map((g,i)=>Math.max(items[i].min,Math.min(items[i].max,g)));
 }
 
-function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
+function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein,priorityMode){
+  priorityMode=priorityMode||'kcal';
   const N=NUTRIENT_FIELDS.length;
   const entries=[]; // [{name, role, group}]
   function track(group,role,name){ entries.push({group,role,name}); }
@@ -1723,11 +1724,13 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
   let t2=fStats.kcalPerUnit>0?Math.max(0,Math.min(fStats.totalHeadroom,kcalGapForFat/fStats.kcalPerUnit)):0;
   let fatLeverKcalNow=fStats.minKcal+t2*fStats.kcalPerUnit;
 
-  // ধাপ ৩: ফ্যাট-লিভার সর্বোচ্চ সীমায় পৌঁছেও যদি kcal কম থেকে যায় — তখনই
-  //    (এবং শুধুমাত্র তখনই) protein-কোর্স ৯৯% সীমা ছাড়িয়ে kcal ফাঁক পূরণ করে,
-  //    কারণ calorie=১০০% অগ্রাধিকার, protein-এর সীমা তখন শিথিল হয়।
+  // ধাপ ৩: শুধু calorie-priority দিনে (মোড='kcal') — ফ্যাট-লিভার সর্বোচ্চ সীমায়
+  //    পৌঁছেও kcal কম থাকলে, তখনই protein-কোর্স ৯৯% সীমা ছাড়িয়ে পূরণ করে।
+  //    protein-priority দিনে (মোড='protein') এই ধাপ স্কিপ হয় — protein ৯৯%-এই
+  //    থামে, kcal কম থেকে যেতে পারে কিন্তু কখনো target ছাড়ায় না — এভাবে
+  //    সপ্তাহের মোট ক্যালরি কখনোই AI-এর সাপ্তাহিক বাজেট ছাড়ায় না।
   const kcalStillShort=(targetKcal||0)-(bgKcal+protLeverKcalNow+fatLeverKcalNow);
-  if(kcalStillShort>10&&pStats.kcalPerUnit>0){
+  if(priorityMode==='kcal'&&kcalStillShort>10&&pStats.kcalPerUnit>0){
     const extraT1=kcalStillShort/pStats.kcalPerUnit;
     t1=Math.max(0,Math.min(pStats.totalHeadroom,t1+extraT1));
   }
@@ -1828,7 +1831,12 @@ function card(item,meal){
   // ততটুকু ভাগ — যেমন daily target-কে meal-এ ভাগ করার পুরনো convention-ই (÷৫)।
   const targetKcalForSelection=Math.round((item._mealKcal||mealKcalTarget||450)*(cnt/MAX_COURSES));
   const targetProteinForSelection=Math.round((item._mealProt||mealProtTarget||20)*(cnt/MAX_COURSES));
-  const real=computeRealNutritionLive(courses,sel,medic,targetKcalForSelection,targetProteinForSelection);
+  // সপ্তাহজুড়ে বৈচিত্র্য: জোড় দিনে calorie=১০০% অগ্রাধিকার (protein কমবেশি
+  // হতে পারে), বিজোড় দিনে protein=১০০% অগ্রাধিকার (calorie কম হতে পারে,
+  // কখনো বেশি না) — পুরো সপ্তাহ মিলিয়ে AI-এর সাপ্তাহিক লক্ষ্যের কাছাকাছি,
+  // প্রতিদিন একই রকম না।
+  const priorityMode=(di%2===0)?'kcal':'protein';
+  const real=computeRealNutritionLive(courses,sel,medic,targetKcalForSelection,targetProteinForSelection,priorityMode);
   //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
   //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
   //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
