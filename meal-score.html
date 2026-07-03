@@ -929,7 +929,13 @@ const COURSE_POOLS={
        leafy:['Mint Leaves','Curry Leaves','Coriander Leaves','Spinach','Malabar Spinach'],
        seed:['Flax Seed','Basil Seed','Sunflower Seed','Pumpkin Seed'] },
   PR:{ main:['Pumpkin','Bottle Gourd','Drumstick','Sweet Potato','Green Papaya','Carrot','Beetroot'],
-       prot:['Chickpea Sprout','Indigenous Egg','Hilsa Fish','Greek Yogurt (unsweetened)','Rohu Fish','Almond','Lentil Sprout','Tilapia','Mung Bean'],
+       prot:['Chickpea Sprout','Indigenous Egg','Hilsa Fish','Greek Yogurt (unsweetened)','Rohu Fish','Almond','Lentil Sprout','Tilapia','Mung Bean','Boneless Indigenous Chicken'],
+       // DHA/ভিটামিন-D/আয়োডিন — এই ৩টা পুষ্টি উপাদান আমাদের ডেটাবেসে মূলত
+       // মাছ, ডিম ও (কম পরিমাণে) দেশি মুরগিতে আছে (উদ্ভিজ্জ উৎসে জৈবিকভাবেই
+       // এগুলো থাকে না)। AI-এর টার্গেটে DHA/ভিটামিন-D স্পষ্ট থাকায়, প্রতিদিন
+       // এই sub-pool থেকে অন্তত ১টা আইটেম গ্যারান্টিযুক্তভাবে নির্বাচিত হবে —
+       // rotation-এর ভাগ্যের উপর ছেড়ে দেওয়া হবে না।
+       protGuaranteed:['Hilsa Fish','Rohu Fish','Tilapia','Indigenous Egg','Boneless Indigenous Chicken'],
        steam:['Beetroot','Carrot','Broccoli','Green Beans','Drumstick','Sweet Potato','Capsicum'],
        leafy:['Moringa Leaves','Red Spinach','Spinach','Amaranth Leaves','Fenugreek Leaves'],
        seed:['Sesame Seed','Almond','Sunflower Seed','Watermelon Seed'] },
@@ -1567,7 +1573,21 @@ function coursesFor(item,di,mealKey){
   // AI daily override if provided for this day+meal
   const ai=aiDaily&&aiDaily[di]&&aiDaily[di][mealKey];
   const mainIngs = (ai&&ai.main)||rotPick(pools.main,seed,0,2).concat(rotPick(pools.leafy,seed,0,1));
-  const protIngs = (ai&&ai.prot)||rotPick(pools.prot,seed,0,2);
+  // ── প্রোটিন নির্বাচন — যদি এই ক্যাটাগরির কোনো "গ্যারান্টিযুক্ত" উৎস থাকে
+  //    (যেমন PR-এর জন্য DHA/ভিটামিন-D উৎস মাছ/ডিম), তাহলে প্রতিদিন অন্তত
+  //    ১টা সেখান থেকেই আসবে — বাকি ১টা সাধারণ pool থেকে ঘোরে। এভাবে AI-এর
+  //    টার্গেট করা critical নিউট্রিয়েন্ট কখনো "ভাগ্যক্রমে বাদ" পড়বে না।
+  let protIngs;
+  if(ai&&ai.prot){
+    protIngs=ai.prot;
+  }else if(pools.protGuaranteed&&pools.protGuaranteed.length){
+    const guaranteed=rotPick(pools.protGuaranteed,seed,0,1);
+    const restPool=pools.prot.filter(x=>pools.protGuaranteed.indexOf(x)===-1);
+    const rest=rotPick(restPool,seed,0,1);
+    protIngs=guaranteed.concat(rest);
+  }else{
+    protIngs=rotPick(pools.prot,seed,0,2);
+  }
   const steamIngs= (ai&&ai.steam)||rotPick(pools.steam,seed,0,2);
   const seedTop  = rotPick(pools.seed,seed,0,1)[0]||'Pumpkin Seed';
   const fruitPick= fruits[(seed)%fruits.length];
