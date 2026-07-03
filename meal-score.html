@@ -1107,6 +1107,11 @@ function nutritionTableHTML(kcal,prot,fat,carb,serving){
 // শুধু এই কাস্টমারের জন্য AI যা যা সাজেস্ট করেছে (৫-৭টা, ক্যাটাগরি অনুযায়ী
 // ভিন্ন) ঠিক ততগুলোই দেখানো হয় — বাড়তি বানানো হয় না, কম থাকলে কমই দেখাবে।
 const MICRO_NRV={folate:400,iron:14,calcium:800,dha:250,vitD:600,iodine:150}; // mcg/mg/IU reference
+function parseAiAmount(str){
+  if(!str)return 0;
+  const m=String(str).match(/[\d.]+/);
+  return m?parseFloat(m[0]):0;
+}
 function microRowsFromAiList(list,real){
   if(!list||!list.length)return [];
   const map=[
@@ -1121,7 +1126,10 @@ function microRowsFromAiList(list,real){
   list.forEach(n=>{
     const m=map.find(x=>x.re.test(n.name||''));
     // মান শূন্য (বা প্রায় শূন্য) হলে সেই সারিটাই বাদ — কল্পিত সংখ্যা না
-    if(m&&real[m.key]!=null&&real[m.key]>0.05) rows.push([m.label,real[m.key],m.unit,m.key,(real.topSource&&real.topSource[m.key])||'']);
+    if(m&&real[m.key]!=null&&real[m.key]>0.05){
+      const dailyTarget=parseAiAmount(n.amount)||MICRO_NRV[m.key]||0; // AI-এর নিজস্ব টার্গেট আগে, না থাকলে standard NRV
+      rows.push([m.label,real[m.key],m.unit,m.key,(real.topSource&&real.topSource[m.key])||'',dailyTarget]);
+    }
   });
   return rows;
 }
@@ -1499,9 +1507,7 @@ function localEngine(cat){
   let target=1650; if(bmi>=30)target=1350;else if(bmi>=25)target=1450;else if(bmi<18.5)target=1750;
   target=Math.round(target*actF/10)*10;
   let protein=60; if(cat==='PR')protein=75;else if(cat==='OB')protein=80;else if(cat==='FL')protein=65;
-  let split={breakfast:.3,lunch:.4,dinner:.3};
-  if(cat==='OB')split={breakfast:.32,lunch:.42,dinner:.26};
-  if(cat==='PR')split={breakfast:.33,lunch:.37,dinner:.3};
+  let split={breakfast:.33,lunch:.40,dinner:.27};
   let score=72; if(bmi>=18.5&&bmi<25)score+=10; score+=Math.round((mood-5)*1.5); score+=actF>1?6:(actF<1?-4:0);
   score=Math.max(55,Math.min(98,score));
   const moodNote=mood>=7?'চাঙা 😊':(mood>=4?'মাঝারি 😐':'ক্লান্ত 😔');
@@ -1509,7 +1515,7 @@ function localEngine(cat){
     focus:CAT_INFO[cat].focus,note:'আপনার BMI '+bmi.toFixed(1)+', মুড '+moodNote+' ও আবহাওয়া অনুযায়ী '+CAT_INFO[cat].bn+' প্ল্যান সমন্বয় করা হয়েছে।',source:'SAR ইঞ্জিন'};
 }
 function applyPersonalization(a){
-  const split=a.split||{breakfast:.3,lunch:.4,dinner:.3};
+  const split=a.split||{breakfast:.33,lunch:.40,dinner:.27};
   const dailyTarget=+a.target||1500;
   const dailyProtein=+a.protein||60;
   // store a per-customer kcal factor so course kcal scales to her target
@@ -1722,15 +1728,18 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein,pri
   (medic&&medic.disease||[]).forEach(n=>track('background','powder',n));
   (medic&&medic.condition||[]).forEach(n=>track('background','powder',n));
 
-  function withRatios(list){
+  function withRatios(list,maxScale){
+    maxScale=maxScale||1;
     return list.map(e=>{
       const row=ING_NUTRIENTS[e.name]||[0,0];
-      return {name:e.name, role:e.role, min:PORTION_MIN[e.role]||10, max:PORTION_MAX[e.role]||130,
+      const trueMax=(PORTION_MAX[e.role]||130);
+      return {name:e.name, role:e.role, min:PORTION_MIN[e.role]||10, max:Math.round(trueMax*maxScale),
         kcal:(row[0]||0)/100, prot:(row[1]||0)/100}; // per-GRAM
     });
   }
-  const protLever=withRatios(entries.filter(e=>e.group==='protLever'));
-  const fatLever=withRatios(entries.filter(e=>e.group==='fatLever'));
+  function runPass(maxScale){
+  const protLever=withRatios(entries.filter(e=>e.group==='protLever'),maxScale);
+  const fatLever=withRatios(entries.filter(e=>e.group==='fatLever'),maxScale);
   const background=withRatios(entries.filter(e=>e.group==='background'));
 
   // ── GOLDEN RULE v2 — EXACT 2×2 সমাধান, শুধু দুটো "বিশুদ্ধ" lever দিয়ে ──
@@ -1854,6 +1863,18 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein,pri
   out.grams=grams; // { ইনগ্রেডিয়েন্টের নাম: বাস্তবসম্মত গ্রাম } — রান্নাঘরের জন্য
   out.metTarget=Math.abs(out.kcal-(targetKcal||out.kcal))<Math.max(30,(targetKcal||0)*0.05);
   return out;
+  } // ── end runPass ──
+
+  // ── ধাপ ৪ (এক্সপ্যানশন): স্বাভাবিক বাস্তবসম্মত সীমাতেও AI-এর টার্গেট না
+  //    মিললে (৯০%-এর কম), সীমা সাময়িকভাবে বাড়িয়ে (এখনো একটা স্বাস্থ্যকর
+  //    উচ্চ সীমার মধ্যে) আবার চেষ্টা করা হয় — "প্রয়োজনে আরও ইনগ্রেডিয়েন্ট
+  //    যোগ করুন" নীতি অনুযায়ী। কার্ডে স্পষ্টভাবে দেখানো হয় কখন এটা ঘটে।
+  let out=runPass(1);
+  if(targetKcal&&out.kcal<targetKcal*0.9){
+    const escalated=runPass(1.6);
+    if(escalated.kcal>out.kcal){ escalated.escalated=true; out=escalated; }
+  }
+  return out;
 }
 function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
 function mealNo(meal,di){const idx={breakfast:1,lunch:2,dinner:3}[meal];return (di*3+idx);}
@@ -1925,28 +1946,32 @@ function card(item,meal){
   //    নেই) courseFrac বেড়ে reference-ও বেড়ে যেত, ফলে real ভিটামিন-D অপরিবর্তিত
   //    থাকলেও % কমে যেত। এখন reference স্থির (শুধু এই বেলার ভাগ অনুযায়ী),
   //    তাই কোর্স যোগ/বাদ দিলে শুধু real.* (আসল ডেলিভারি) বদলাবে, target না।
-  const mealShare=item._share||({breakfast:.3,lunch:.4,dinner:.3}[meal.key])||.33;
+  // ── সংশোধন: "Daily Requirement Coverage" মানেই পুরো দিনের চাহিদার ভাগ —
+  //    তাই একবেলার reference কখনোই এই বেলার নিজস্ব sub-target হতে পারে না,
+  //    সবসময় AI-এর নির্ধারিত সম্পূর্ণ দৈনিক লক্ষ্যের বিপরীতে % গণনা হবে।
+  //    breakfast+lunch+dinner মিলিয়ে স্বাভাবিকভাবেই ~১০০% (বা কম) হবে,
+  //    একবেলা কখনো একাই ১০০% দেখাবে না — এটাই বৈজ্ঞানিকভাবে সঠিক।
+  const dailyKcalTarget=window._dailyTarget||mealKcalTarget||2000;
+  const dailyProteinTarget=window._dailyProtein||mealProtTarget||60;
   const NRV={fat:70,satfat:20,carb:260,sugars:90,sodium:2400};
   const energy=Math.round(real.kcal*4.184);
   const satFat=Math.round(real.fat*0.34*10)/10;
-  const pctOf=(v,ref)=>ref>0?Math.max(1,Math.min(150,Math.round(v/ref*100))):0;
+  const pctOf=(v,ref)=>ref>0?Math.max(0,Math.min(150,Math.round(v/ref*100))):0;
   const dr=[
-    ['Energy',pctOf(real.kcal,targetKcalForSelection)],
-    ['Protein',pctOf(real.protein,targetProteinForSelection)],
-    ['Fat, total',pctOf(real.fat,NRV.fat*mealShare)],
-    ['— saturated (est.)',pctOf(satFat,NRV.satfat*mealShare)],
-    ['Carbohydrate',pctOf(real.carb,NRV.carb*mealShare)],
-    ['— sugars',pctOf(real.sugar_g,NRV.sugars*mealShare)],
-    ['Sodium',pctOf(real.sodium,NRV.sodium*mealShare)],
+    ['Energy',pctOf(real.kcal,dailyKcalTarget)],
+    ['Protein',pctOf(real.protein,dailyProteinTarget)],
+    ['Fat, total',pctOf(real.fat,NRV.fat)],
+    ['— saturated (est.)',pctOf(satFat,NRV.satfat)],
+    ['Carbohydrate',pctOf(real.carb,NRV.carb)],
+    ['— sugars',pctOf(real.sugar_g,NRV.sugars)],
+    ['Sodium',pctOf(real.sodium,NRV.sodium)],
   ];
-  // ── উপরের Nutritional Information প্যানেলে যে micronutrient-গুলো দেখানো
-  //    হচ্ছে (AI-নির্ধারিত, শূন্য বাদ), এখানেও ঠিক সেই একই তালিকা — একই সোর্স,
-  //    দুটো প্যানেল সবসময় একমত থাকে। %DV আন্তর্জাতিক reference (MICRO_NRV)
-  //    থেকে এই বেলার স্থির ভাগে স্কেল করা (courseFrac ছাড়াই, একই কারণে)।
+  // ── micronutrient-এর জন্য AI-এর নিজস্ব দৈনিক টার্গেট ব্যবহার করা হয় (যেমন
+  //    ফোলেট ৬০০mcg) — generic standard-এর চেয়ে বেশি সঠিক, কারণ এটাই এই
+  //    নির্দিষ্ট কাস্টমারের জন্য ব্যক্তিগতকৃত সংখ্যা।
   const microRowsForDr=microRowsFromAiList(aiMicroList,real);
   microRowsForDr.forEach(m=>{
-    const ref=(MICRO_NRV[m[3]]||0)*mealShare;
-    dr.push([m[0],pctOf(m[1],ref)]);
+    dr.push([m[0],pctOf(m[1],m[5])]);
   });
   // today's actual ingredients = union of the required courses' items (unique)
   const allIngs=[].concat(...courses.slice(0,3).map(c=>c.items||[])).filter((v,i,a)=>v&&a.indexOf(v)===i);
@@ -1987,7 +2012,8 @@ function card(item,meal){
           '<div class="n-pill fat"><div class="nv num">'+bn(real.fat)+'g</div><div class="nk">ফ্যাট</div></div>'+
           '<div class="n-pill carb"><div class="nv num">'+bn(real.carb)+'g</div><div class="nk">নেট কার্ব</div></div>'+
           '<div class="n-pill fiber"><div class="nv num">'+bn(real.fiber)+'g</div><div class="nk">ফাইবার</div></div>'+
-        '</div>'+(item._tweak?'<div class="tweak">🤖 '+item._tweak+' · কোর্স বাড়ালে kcal বাড়বে</div>':'')+'</div>'+
+        '</div>'+(item._tweak?'<div class="tweak">🤖 '+item._tweak+' · কোর্স বাড়ালে kcal বাড়বে</div>':'')+
+        (real.escalated?'<div class="tweak">📈 আপনার AI-নির্ধারিত লক্ষ্য পূরণে স্বাভাবিক পরিমাণের চেয়ে বেশি ইনগ্রেডিয়েন্ট ব্যবহার হয়েছে</div>':'')+'</div>'+
       nutritionTableHTMLReal(real,320,aiMicroList)+
       '<div><div class="panel-h">Daily Requirement Coverage</div><div class="drc">'+
         dr.map(d=>'<div class="dr-line"><span class="dl">'+d[0]+'</span><span class="dr-bar"><i style="width:'+d[1]+'%"></i></span><span class="dp num">'+bn(d[1])+'%</span></div>').join('')+
