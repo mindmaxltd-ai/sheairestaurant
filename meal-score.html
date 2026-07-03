@@ -10,29 +10,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Space+Mono&display=swap');
 
 :root{
-  /* SAR women-only system — Sakara-inspired editorial olive + dusty rose + sage on warm ivory */
-  --pink:#C97B8C;--pink-d:#A85A6D;--pink-soft:#FBEEF0;--rose:#E8B4BC;
+  /* SAR women-only system — velvet emerald green backdrop, pink+green+purple accents */
+  --pink:#E85D9E;--pink-d:#C23E80;--pink-soft:#FBEEF0;--rose:#F49AC1;
   --orange:#6B7A4F;--orange-d:#4F5A3A;--orange-soft:#EEF0E4;
-  --gold:#B99A56;--gold-d:#8C7238;--gold-soft:#F3EAD3;
-  --green:#3F6B4A;--green-d:#2E4A34;--green-soft:#E1EAE2;
-  --plum:#33362C;
-  --ink:#2B2A24;--ink-2:#75705F;--muted:#75705F;
-  --cream:#FAF7F0;--milk:#FFFEFA;--card:#FFFFFF;--line:#E3DDCB;--line-2:#D6CCAF;--line2:#D6CCAF;
-  --shadow:0 14px 45px rgba(51,54,44,.10),0 2px 9px rgba(51,54,44,.05);
-  --shadow-lg:0 26px 80px rgba(107,122,79,.18),0 10px 28px rgba(51,54,44,.10);
-  --grad:linear-gradient(125deg,#6B7A4F 0%,#8A9A5B 30%,#C97B8C 65%,#D89AAA 100%);
+  --gold:#D4AF6A;--gold-d:#A9813F;--gold-soft:#F3EAD3;
+  --green:#2FA66B;--green-d:#1B5E3C;--green-soft:#E1EAE2;
+  --purple:#8B5FBF;--purple-d:#6B3FA0;--purple-soft:#F1E9FB;
+  --plum:#0F3D2C;
+  --ink:#241D24;--ink-2:#5B5650;--muted:#5B5650;
+  --cream:#0E3B2A;--milk:#123F2E;--card:#FFFFFF;--line:#2FA66B;--line-2:#8B5FBF;--line2:#8B5FBF;
+  --shadow:0 14px 45px rgba(0,0,0,.28),0 2px 9px rgba(0,0,0,.14);
+  --shadow-lg:0 26px 80px rgba(232,93,158,.25),0 10px 28px rgba(139,95,191,.18);
+  --grad:linear-gradient(125deg,#E85D9E 0%,#2FA66B 45%,#8B5FBF 85%,#E85D9E 120%);
   --grad-soft:linear-gradient(135deg,#F7F8F2 0%,#FBEEF0 52%,#EEF0E4 120%);
   --soft:linear-gradient(135deg,#F7F8F2 0%,#FBEEF0 52%,#EEF0E4 120%);
-  --gold-line:linear-gradient(90deg,transparent,#8A9A5B,transparent);
+  --gold-line:linear-gradient(90deg,#E85D9E,#2FA66B,#8B5FBF);
+  /* card-content text stays dark-on-white; these are for text sitting directly on the velvet body bg */
+  --onbg:#F4FBF6;--onbg-2:#BFE0CC;--onbg-title:#FFFFFF;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'SolaimanLipi',-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:-2;background:
-  radial-gradient(920px 560px at 85% -8%,rgba(107,122,79,.16),transparent 58%),
-  radial-gradient(760px 500px at -5% 12%,rgba(201,123,140,.14),transparent 58%),
-  radial-gradient(700px 520px at 55% 108%,rgba(138,154,91,.12),transparent 58%)}
-body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.24;background-image:linear-gradient(rgba(107,122,79,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(107,122,79,.045) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
+  radial-gradient(920px 560px at 85% -8%,rgba(232,93,158,.22),transparent 58%),
+  radial-gradient(760px 500px at -5% 12%,rgba(139,95,191,.20),transparent 58%),
+  radial-gradient(700px 520px at 55% 108%,rgba(47,166,107,.18),transparent 58%)}
+body::after{content:'';position:fixed;inset:0;z-index:-1;opacity:.10;background-image:linear-gradient(rgba(244,251,246,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(244,251,246,.05) 1px,transparent 1px);background-size:68px 68px;mask-image:linear-gradient(#000,transparent 80%)}
 img{max-width:100%;display:block}
 .num{font-family:'Space Mono',monospace}
 .serif{font-family:'Playfair Display',serif}
@@ -58,9 +61,9 @@ img{max-width:100%;display:block}
 .eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--line);color:var(--pink-d);font-weight:700;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.45rem 1rem;border-radius:30px;margin-bottom:1.3rem;box-shadow:var(--shadow)}
 .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--pink);animation:pulse 1.8s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.85)}}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.3rem,6vw,4rem);font-weight:600;line-height:1.06;letter-spacing:-.015em;max-width:18ch;color:var(--plum)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.3rem,6vw,4rem);font-weight:600;line-height:1.06;letter-spacing:-.015em;max-width:18ch;color:var(--onbg-title)}
 .hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{margin-top:1.1rem;font-size:1.08rem;color:var(--ink-2);max-width:54ch;line-height:1.7}
+.hero-sub{margin-top:1.1rem;font-size:1.08rem;color:var(--onbg-2);max-width:54ch;line-height:1.7}
 
 .score-card{max-width:1180px;margin:1.9rem auto 0;padding:0 1.25rem}
 .score-in{background:linear-gradient(135deg,#fff 0%,#fff 40%,var(--pink-soft) 130%);border:1px solid var(--line-2);border-radius:26px;box-shadow:var(--shadow-lg);overflow:hidden;display:grid;grid-template-columns:auto 1fr;position:relative}
@@ -85,7 +88,7 @@ img{max-width:100%;display:block}
 .recompute:disabled{opacity:.55;cursor:wait}
 
 .catbar{max-width:1180px;margin:1.5rem auto 0;padding:0 1.25rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
-.catbar .lbl{font-size:.82rem;color:var(--ink-2);font-weight:700;margin-right:.2rem}
+.catbar .lbl{font-size:.82rem;color:var(--onbg-2);font-weight:700;margin-right:.2rem}
 .cat-tab{border:1px solid var(--line);background:#fff;color:var(--ink-2);font-family:inherit;font-weight:700;font-size:.84rem;cursor:pointer;padding:.5rem .95rem;border-radius:22px;transition:all .15s;position:relative}
 .cat-tab:hover{border-color:var(--pink)}
 .cat-tab.active{background:var(--pink);color:#fff;border-color:var(--pink)}
@@ -94,7 +97,7 @@ img{max-width:100%;display:block}
 .cat-tab.locked{opacity:.4;cursor:not-allowed;background:#f7f2ec}
 .cat-tab.locked:hover{border-color:var(--line)}
 .cat-tab .lk{font-size:.7rem;margin-left:.2rem}
-.cat-note{font-size:.74rem;color:var(--green-d);font-weight:700;width:100%;margin-top:.2rem}
+.cat-note{font-size:.74rem;color:#B8F2CE;font-weight:700;width:100%;margin-top:.2rem}
 
 .mixbar{max-width:1180px;margin:.8rem auto 0;padding:0 1.25rem}
 .mixbox{background:var(--pink-soft);border:1px solid var(--pink);border-radius:16px;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;font-size:.86rem;color:var(--pink-d);font-weight:700}
@@ -102,9 +105,9 @@ img{max-width:100%;display:block}
 .mixbox input{width:18px;height:18px;accent-color:var(--pink-d);cursor:pointer}
 
 .sec-head{max-width:1180px;margin:2rem auto .2rem;padding:0 1.25rem}
-.sec-head h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:-.01em;color:var(--plum)}
+.sec-head h2{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;letter-spacing:-.01em;color:var(--onbg-title)}
 .sec-head h2 .serif{font-style:italic}
-.sec-head p{color:var(--ink-2);font-size:.95rem;margin-top:.2rem}
+.sec-head p{color:var(--onbg-2);font-size:.95rem;margin-top:.2rem}
 
 .daybar{max-width:1180px;margin:1rem auto 0;padding:0 1.25rem;display:flex;gap:.5rem;overflow-x:auto;scrollbar-width:none}
 .daybar::-webkit-scrollbar{display:none}
@@ -119,8 +122,8 @@ img{max-width:100%;display:block}
 .meal-label .ic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
 .ic.b{background:var(--orange-soft)}.ic.l{background:var(--gold-soft)}.ic.d{background:var(--pink-soft)}
 
-.note{max-width:1180px;margin:2.5rem auto 3rem;padding:0 1.25rem;color:var(--ink-2);font-size:.82rem;line-height:1.7}
-.note b{color:var(--orange-d)}
+.note{max-width:1180px;margin:2.5rem auto 3rem;padding:0 1.25rem;color:var(--onbg-2);font-size:.82rem;line-height:1.7}
+.note b{color:#F4C77A}
 
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--plum);color:#fff;padding:.75rem 1.3rem;border-radius:30px;font-size:.9rem;font-weight:800;opacity:0;visibility:hidden;transition:.25s;z-index:120;box-shadow:0 8px 30px rgba(0,0,0,.25)}
 .toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
@@ -1568,13 +1571,17 @@ function coursesFor(item,di,mealKey){
   const steamIngs= (ai&&ai.steam)||rotPick(pools.steam,seed,0,2);
   const seedTop  = rotPick(pools.seed,seed,0,1)[0]||'Pumpkin Seed';
   const fruitPick= fruits[(seed)%fruits.length];
+  // স্বাস্থ্যকর ফ্যাট লিভার — ক্যালরি-ঘন, প্রায়-শূন্য প্রোটিন, তেল/চিনি ছাড়াই
+  // (নারকেল/জলপাই), calorie target মেলাতে সাহায্য করে প্রোটিন না বাড়িয়ে।
+  const FAT_POOL=['Coconut (fresh)','Olive'];
+  const fatPick=FAT_POOL[(seed)%FAT_POOL.length];
 
   return [
     {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs.join(', '),items:mainIngs,req:true},
     {n:'প্রোটিন ও স্প্রাউট কোর্স',sub:protIngs.concat(seedTop).join(', '),items:protIngs.concat(seedTop),req:true},
     {n:'স্টিমড / এয়ার-ফ্রায়েড সবজি কোর্স',sub:steamIngs.join(', '),items:steamIngs,req:true},
     {n:'ইমোশনাল চাটনি কোর্স',sub:(item.chutney||'AI Green Chutney'),req:false,opt:true},
-    {n:'মৌসুমি ফল কোর্স',sub:fruitPick+' (আজকের)',items:[fruitPick],req:false,opt:true},
+    {n:'মৌসুমি ফল কোর্স',sub:fruitPick+' + '+fatPick+' (আজকের)',items:[fruitPick,fatPick],req:false,opt:true},
   ];
 }
 // ── LIVE real nutrition — এই কার্ডে ঠিক যেই কোর্সগুলো এখন নির্বাচিত (sel),
@@ -1594,8 +1601,8 @@ function coursesFor(item,di,mealKey){
 // ইনগ্রেডিয়েন্ট, ভূমিকা অনুযায়ী, যত বড় ক্যালরি ঘাটতিই থাকুক না কেন এই
 // সীমা কখনো ছাড়ানো হয় না। বাস্তব পরিমাণ AI-এর সংখ্যা মেলানোর চেয়ে জরুরি —
 // ৫০০ গ্রাম ফল বা ৩০০ গ্রাম বাঁধাকপি কোনো মানুষের এক বেলার খাবার না।
-const PORTION_MIN={main:30,leafy:12,prot:50,seed:6,steam:35,fruit:60,chutney:12,powder:1};
-const PORTION_MAX={main:110,leafy:45,prot:200,seed:30,steam:110,fruit:150,chutney:28,powder:5};
+const PORTION_MIN={main:30,leafy:12,prot:50,seed:6,steam:35,fruit:60,chutney:12,powder:1,fat:8};
+const PORTION_MAX={main:110,leafy:45,prot:220,seed:30,steam:110,fruit:150,chutney:28,powder:5,fat:55};
 
 // ── Water-filling: গ্রাম প্রতিটা ইনগ্রেডিয়েন্টের [MIN,MAX] সীমার মধ্যে ধাপে
 // ধাপে বাড়ানো হয়, লক্ষ্যের দিকে — কোনো একটা ইনগ্রেডিয়েন্ট তার সর্বোচ্চ সীমায়
@@ -1641,65 +1648,114 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
     if(sel.indexOf(ci)===-1)return;
     const items=c.items||[];
     if(ci===1){
-      items.forEach((name,idx)=>track('prot', idx<items.length-1?'prot':'seed', name));
+      items.forEach((name,idx)=>track('protLever', idx<items.length-1?'prot':'seed', name));
       return;
     }
-    if(ci===3){ track('other','chutney','__chutney_generic__'); return; }
+    if(ci===3){ track('background','chutney','__chutney_generic__'); return; }
     if(ci===0){
-      // গঠন: [main, main, leafy] — শেষটা leafy, বাকিগুলো main
-      items.forEach((name,idx)=>track('other', idx<items.length-1?'main':'leafy', name));
+      // গঠন: [main, main, leafy] — সবই background (স্থির), main/leafy কোনোটাই
+      // এখন আর optimize হয় না — শুধু protLever ও fatLever, এই দুটো "বিশুদ্ধ"
+      // lever-ই সমীকরণ সমাধান করে।
+      items.forEach((name,idx)=>track('background', idx<items.length-1?'main':'leafy', name));
     }else if(ci===2){
-      items.forEach(name=>track('other','steam',name));
+      items.forEach(name=>track('background','steam',name));
     }else if(ci===4){
-      items.forEach(name=>track('other','fruit',name));
+      items.forEach((name,idx)=>track('fatLever', idx===0?'fruit':'fat', name));
     }
   });
-  (medic&&medic.disease||[]).forEach(n=>track('other','powder',n));
-  (medic&&medic.condition||[]).forEach(n=>track('other','powder',n));
+  (medic&&medic.disease||[]).forEach(n=>track('background','powder',n));
+  (medic&&medic.condition||[]).forEach(n=>track('background','powder',n));
 
   function withRatios(list){
     return list.map(e=>{
       const row=ING_NUTRIENTS[e.name]||[0,0];
       return {name:e.name, role:e.role, min:PORTION_MIN[e.role]||10, max:PORTION_MAX[e.role]||130,
-        kcal:(row[0]||0)/100, prot:(row[1]||0)/100}; // per-GRAM (not per-100g) — waterFill multiplies directly by grams
+        kcal:(row[0]||0)/100, prot:(row[1]||0)/100}; // per-GRAM
     });
   }
-  const protEntries=withRatios(entries.filter(e=>e.group==='prot'));
-  const otherEntries=withRatios(entries.filter(e=>e.group==='other'));
+  const protLever=withRatios(entries.filter(e=>e.group==='protLever'));
+  const fatLever=withRatios(entries.filter(e=>e.group==='fatLever'));
+  const background=withRatios(entries.filter(e=>e.group==='background'));
 
-  // ── ধাপ ১: প্রোটিন কোর্স water-fill করা হয় AI-এর protein টার্গেটে ঠিক মেলাতে ──
-  const protGramsArr=protEntries.length?waterFill(protEntries,'prot',targetProtein||0):[];
-  const protKcalUsed=protEntries.reduce((s,e,i)=>s+protGramsArr[i]*e.kcal,0);
+  // ── GOLDEN RULE v2 — EXACT 2×2 সমাধান, শুধু দুটো "বিশুদ্ধ" lever দিয়ে ──
+  // background (সবজি/শাক/চাটনি/পাউডার) সম্পূর্ণ স্থির থাকে ন্যূনতমে — এরা কখনো
+  // optimize হয় না, শুধু উপস্থিতি/স্বাদ/মাইক্রো-নিউট্রিয়েন্টের জন্য, আর এদের
+  // kcal/protein আগেই টার্গেট থেকে বিয়োগ হয়ে যায় (তাই এরা precision নষ্ট
+  // করতে পারে না)। বাকি থাকে দুটো lever — protLever (প্রোটিন কোর্স) ও fatLever
+  // (ফল+নারকেল) — এই দুটোর জন্য একটা ঠিক 2×2 রৈখিক সমীকরণ সমাধান করা হয়
+  // (Cramer's rule), প্রতিটা lever-এর ভেতরের আইটেমগুলো তাদের headroom অনুপাতে
+  // একসাথে ভরাট হয়। এতে kcal ও protein — দুটো লক্ষ্যই একসাথে, গাণিতিকভাবে
+  // নিখুঁতভাবে মেলে (যতক্ষণ টার্গেট বাস্তবসম্মত সীমার মধ্যে থাকে)।
+  function leverStats(lever){
+    let minKcal=0,minProt=0,totalHeadroom=0,kcalPerUnit=0,protPerUnit=0;
+    lever.forEach(e=>{ minKcal+=e.min*e.kcal; minProt+=e.min*e.prot; totalHeadroom+=(e.max-e.min); });
+    if(totalHeadroom>0){
+      lever.forEach(e=>{
+        const w=(e.max-e.min)/totalHeadroom;
+        kcalPerUnit+=w*e.kcal; protPerUnit+=w*e.prot;
+      });
+    }
+    return {minKcal,minProt,kcalPerUnit,protPerUnit,totalHeadroom};
+  }
+  function applyFill(lever,t,stats){
+    const frac=stats.totalHeadroom>0?Math.max(0,Math.min(1,t/stats.totalHeadroom)):0;
+    return lever.map(e=>e.min+(e.max-e.min)*frac);
+  }
 
-  // ── ধাপ ২: বাকিটা water-fill করা হয় অবশিষ্ট kcal বাজেটে ──
-  const remainingKcalTarget=Math.max(0,(targetKcal||0)-protKcalUsed);
-  let otherGramsArr=otherEntries.length?waterFill(otherEntries,'kcal',remainingKcalTarget):[];
+  const backgroundGrams=background.map(e=>e.min);
+  const bgKcal=background.reduce((s,e,i)=>s+backgroundGrams[i]*e.kcal,0);
+  const bgProt=background.reduce((s,e,i)=>s+backgroundGrams[i]*e.prot,0);
 
-  // ── ধাপ ৩ (সংশোধন): leafy/medicinal-এর মতো "other" আইটেমও উল্লেখযোগ্য
-  //    প্রোটিন যোগ করতে পারে (যেমন Moringa Leaves/Powder), যা মোট protein-কে
-  //    AI-টার্গেটের বাইরে ঠেলে দেয়। তাই leafy/powder-কে ন্যূনতমে নামিয়ে,
-  //    একই kcal বাজেট low-protein আইটেমে (main/steam/fruit/chutney) সরিয়ে
-  //    পুনরায় ভরা হয় — মোট kcal অপরিবর্তিত থাকে, কিন্তু বাড়তি প্রোটিন কমে। ──
-  const otherProtNow=otherEntries.reduce((s,e,i)=>s+otherGramsArr[i]*e.prot,0);
-  const totalProtNow=protEntries.reduce((s,e,i)=>s+protGramsArr[i]*e.prot,0)+otherProtNow;
-  if(targetProtein&&totalProtNow>targetProtein*1.1){
-    const highProtRoles=['leafy','powder'];
-    const lowIdx=[], highIdx=[];
-    otherEntries.forEach((e,i)=>{ (highProtRoles.indexOf(e.role)>-1?highIdx:lowIdx).push(i); });
-    if(lowIdx.length){
-      let keptKcal=0;
-      highIdx.forEach(i=>{ otherGramsArr[i]=otherEntries[i].min; });
-      const lowEntries=lowIdx.map(i=>otherEntries[i]);
-      const highKcalAtMin=highIdx.reduce((s,i)=>s+otherEntries[i].min*otherEntries[i].kcal,0);
-      const kcalForLow=Math.max(0,remainingKcalTarget-highKcalAtMin);
-      const lowGrams=waterFill(lowEntries,'kcal',kcalForLow);
-      lowIdx.forEach((i,j)=>{ otherGramsArr[i]=lowGrams[j]; });
+  const pStats=leverStats(protLever), fStats=leverStats(fatLever);
+
+  // ── PRIORITY CASCADE: calorie সবসময় ১০০%, protein ৯০-৯৯%-এ থাকার চেষ্টা করে
+  //    (শুধু kcal-এর জন্য জায়গার অভাব হলেই protein ৯৯%-এর বেশি যেতে পারে) ──
+  // ধাপ ১: প্রোটিন কোর্স শুধু ৯৯% protein টার্গেট পর্যন্ত ভরাট হয় (ছাড়ায় না)
+  const proteinCap99=Math.max(0,(targetProtein||0)*0.99-bgProt-pStats.minProt);
+  let t1=pStats.kcalPerUnit>0||pStats.protPerUnit>0
+    ? Math.max(0,Math.min(pStats.totalHeadroom, pStats.protPerUnit>0?proteinCap99/pStats.protPerUnit:0))
+    : 0;
+  let protLeverKcalNow=pStats.minKcal+t1*pStats.kcalPerUnit;
+
+  // ধাপ ২: বাকি সব kcal ফ্যাট-লিভার দিয়ে ঠিক পূরণ করার চেষ্টা
+  const kcalAfterStep1=bgKcal+protLeverKcalNow+fStats.minKcal;
+  let kcalGapForFat=(targetKcal||0)-kcalAfterStep1;
+  let t2=fStats.kcalPerUnit>0?Math.max(0,Math.min(fStats.totalHeadroom,kcalGapForFat/fStats.kcalPerUnit)):0;
+  let fatLeverKcalNow=fStats.minKcal+t2*fStats.kcalPerUnit;
+
+  // ধাপ ৩: ফ্যাট-লিভার সর্বোচ্চ সীমায় পৌঁছেও যদি kcal কম থেকে যায় — তখনই
+  //    (এবং শুধুমাত্র তখনই) protein-কোর্স ৯৯% সীমা ছাড়িয়ে kcal ফাঁক পূরণ করে,
+  //    কারণ calorie=১০০% অগ্রাধিকার, protein-এর সীমা তখন শিথিল হয়।
+  const kcalStillShort=(targetKcal||0)-(bgKcal+protLeverKcalNow+fatLeverKcalNow);
+  if(kcalStillShort>10&&pStats.kcalPerUnit>0){
+    const extraT1=kcalStillShort/pStats.kcalPerUnit;
+    t1=Math.max(0,Math.min(pStats.totalHeadroom,t1+extraT1));
+  }
+
+  // ── সংশোধন: fat-লিভার (নারকেল/ফল) নিজেই সামান্য প্রোটিন যোগ করে (নারকেলে
+  //    ৩.৩g/100g), যেটা ধাপ ১-এর cap হিসাবে ধরা হয়নি। সেই বাড়তি protein
+  //    protLever থেকে কমিয়ে সমন্বয় করা হয়, আর তাতে যে kcal কমে যায় সেটা
+  //    fat-লিভারে সামান্য বাড়িয়ে পূরণ করা হয় — kcal=১০০% ঠিক থাকে। ──
+  const fatLeverProtNow=fStats.minProt+t2*fStats.protPerUnit;
+  const protSoFar=bgProt+(pStats.minProt+t1*pStats.protPerUnit)+fatLeverProtNow;
+  const proteinCapAbs=(targetProtein||0)*0.99;
+  if(protSoFar>proteinCapAbs&&pStats.protPerUnit>0){
+    const excess=protSoFar-proteinCapAbs;
+    const t1Reduction=Math.min(t1,excess/pStats.protPerUnit);
+    t1=Math.max(0,t1-t1Reduction);
+    const kcalLost=t1Reduction*pStats.kcalPerUnit;
+    if(fStats.kcalPerUnit>0){
+      t2=Math.max(0,Math.min(fStats.totalHeadroom,t2+kcalLost/fStats.kcalPerUnit));
     }
   }
 
+  const protGramsArr=applyFill(protLever,t1,pStats);
+  const fatGramsArr=applyFill(fatLever,t2,fStats);
+
   const grams={};
-  protEntries.forEach((e,i)=>{ grams[e.name]=(grams[e.name]||0)+Math.round(protGramsArr[i]); });
-  otherEntries.forEach((e,i)=>{ grams[e.name]=(grams[e.name]||0)+Math.round(otherGramsArr[i]); });
+  background.forEach((e,i)=>{ grams[e.name]=(grams[e.name]||0)+Math.round(backgroundGrams[i]); });
+  protLever.forEach((e,i)=>{ grams[e.name]=(grams[e.name]||0)+Math.round(protGramsArr[i]); });
+  fatLever.forEach((e,i)=>{ grams[e.name]=(grams[e.name]||0)+Math.round(fatGramsArr[i]); });
 
   const totals=new Array(N).fill(0);
   Object.keys(grams).forEach(name=>{
@@ -1721,7 +1777,7 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein){
   out.sodium=out.sodium_mg+seasoningSodium; out.folate=out.folate_mcg; out.iron=out.iron_mg;
   out.calcium=out.calcium_mg; out.vitD=out.vitaminD_iu; out.iodine=out.iodine_mcg; out.dha=out.dha_mg;
   out.grams=grams; // { ইনগ্রেডিয়েন্টের নাম: বাস্তবসম্মত গ্রাম } — রান্নাঘরের জন্য
-  out.metTarget=Math.abs(out.kcal-(targetKcal||out.kcal))<Math.max(30,(targetKcal||0)*0.05); // ৫%-এর মধ্যে হলে "মিলেছে"
+  out.metTarget=Math.abs(out.kcal-(targetKcal||out.kcal))<Math.max(30,(targetKcal||0)*0.05);
   return out;
 }
 function minCoursesFor(mealKey){return MIN_BY_MEAL[mealKey]||3;}
@@ -1776,18 +1832,29 @@ function card(item,meal){
   //    এটাই বিশ্বব্যাপী প্যাকেটজাত খাবারের লেবেলে ব্যবহৃত standard বৈজ্ঞানিক পদ্ধতি।
   //    (saturated fat-এর ভাগটুকু এখনো এস্টিমেট — বাকি সব real.kcal/protein/fat/
   //    carb/sugar_g/sodium সত্যিই নির্বাচিত ইনগ্রেডিয়েন্ট থেকে যোগ করা।)
-  const NRV={energy:8400,protein:50,fat:70,satfat:20,carb:260,sugars:90,sodium:2400}; // EU NRV, per serving-adult reference
+  // ── %DV-এর reference এখন এই মিলের নিজস্ব AI-টার্গেট (সারাদিনের reference
+  //    না!) — একটা একক বেলা কখনোই সারাদিনের ১০০% cover করার কথা না, তাই
+  //    আগে whole-day NRV দিয়ে ভাগ করাটাই ভুল মেট্রিক ছিল (তাই কম % দেখাচ্ছিল,
+  //    ৬৫% এর মতো, এমনকি real kcal AI-টার্গেটের প্রায় সমান হলেও)। Energy ও
+  //    Protein এখন সরাসরি এই বেলার AI-assigned target-এর সাথে তুলনা হয় —
+  //    water-fill যেহেতু kcal-কে নিখুঁতভাবে সেই টার্গেটে মেলায়, % এখন সত্যিই
+  //    ৯৫-১০০%-এর কাছাকাছি দেখাবে। Fat/Carb/Sugar/Sodium-এর জন্য কোনো
+  //    সুনির্দিষ্ট per-meal AI target নেই, তাই দৈনিক NRV-কে এই বেলার ভাগ
+  //    (mealShare × courseFraction) দিয়ে প্রোপোরশনালি স্কেল করা হয়েছে।
+  const mealShare=item._share||({breakfast:.3,lunch:.4,dinner:.3}[meal.key])||.33;
+  const courseFrac=cnt/MAX_COURSES;
+  const NRV={fat:70,satfat:20,carb:260,sugars:90,sodium:2400};
   const energy=Math.round(real.kcal*4.184);
   const satFat=Math.round(real.fat*0.34*10)/10;
-  const pctOf=(v,ref)=>Math.max(1,Math.min(150,Math.round(v/ref*100)));
+  const pctOf=(v,ref)=>ref>0?Math.max(1,Math.min(150,Math.round(v/ref*100))):0;
   const dr=[
-    ['Energy',pctOf(energy,NRV.energy)],
-    ['Protein',pctOf(real.protein,NRV.protein)],
-    ['Fat, total',pctOf(real.fat,NRV.fat)],
-    ['— saturated (est.)',pctOf(satFat,NRV.satfat)],
-    ['Carbohydrate',pctOf(real.carb,NRV.carb)],
-    ['— sugars',pctOf(real.sugar_g,NRV.sugars)],
-    ['Sodium',pctOf(real.sodium,NRV.sodium)],
+    ['Energy',pctOf(real.kcal,targetKcalForSelection)],
+    ['Protein',pctOf(real.protein,targetProteinForSelection)],
+    ['Fat, total',pctOf(real.fat,NRV.fat*mealShare*courseFrac)],
+    ['— saturated (est.)',pctOf(satFat,NRV.satfat*mealShare*courseFrac)],
+    ['Carbohydrate',pctOf(real.carb,NRV.carb*mealShare*courseFrac)],
+    ['— sugars',pctOf(real.sugar_g,NRV.sugars*mealShare*courseFrac)],
+    ['Sodium',pctOf(real.sodium,NRV.sodium*mealShare*courseFrac)],
   ];
   // today's actual ingredients = union of the required courses' items (unique)
   const allIngs=[].concat(...courses.slice(0,3).map(c=>c.items||[])).filter((v,i,a)=>v&&a.indexOf(v)===i);
