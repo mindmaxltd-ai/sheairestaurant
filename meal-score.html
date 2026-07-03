@@ -1121,7 +1121,7 @@ function microRowsFromAiList(list,real){
   list.forEach(n=>{
     const m=map.find(x=>x.re.test(n.name||''));
     // মান শূন্য (বা প্রায় শূন্য) হলে সেই সারিটাই বাদ — কল্পিত সংখ্যা না
-    if(m&&real[m.key]!=null&&real[m.key]>0.05) rows.push([m.label,real[m.key],m.unit,m.key]);
+    if(m&&real[m.key]!=null&&real[m.key]>0.05) rows.push([m.label,real[m.key],m.unit,m.key,(real.topSource&&real.topSource[m.key])||'']);
   });
   return rows;
 }
@@ -1140,7 +1140,7 @@ function nutritionTableHTMLReal(real,serving,aiMicro){
     ['Sodium',real.sodium+' mg',per100(real.sodium)+' mg'],
   ];
   const microRows=microRowsFromAiList(aiMicro,real);
-  microRows.forEach(m=>rows.push([m[0],m[1]+' '+m[2],per100(m[1])+' '+m[2]]));
+  microRows.forEach(m=>rows.push([m[0]+(m[4]?' <span style="font-weight:400;color:var(--muted);font-size:.68rem">('+m[4]+')</span>':''),m[1]+' '+m[2],per100(m[1])+' '+m[2]]));
   return '<div class="nutrition-label"><div class="nl-head"><span>Nutritional Information</span><span>Serving size: '+serving+'g</span></div>'+
     '<table><thead><tr><th>AVG. QUANTITY</th><th>PER SERVING</th><th>PER 100g</th></tr></thead><tbody>'+
     rows.map((r,i)=>'<tr'+(i===7?' style="border-top:2px solid var(--green)"':'')+'><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')+
@@ -1627,11 +1627,11 @@ function coursesFor(item,di,mealKey){
   const fatPick=FAT_POOL[(seed)%FAT_POOL.length];
 
   return [
-    {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs.join(', '),items:mainIngs,req:true},
+    {n:'থেরাপিউটিক মেইন কোর্স',sub:mainIngs.join(', ')+' + '+fatPick,items:mainIngs.concat(fatPick),req:true},
     {n:'প্রোটিন ও স্প্রাউট কোর্স',sub:protIngs.concat(seedTop).join(', '),items:protIngs.concat(seedTop),req:true},
     {n:'স্টিমড / এয়ার-ফ্রায়েড সবজি কোর্স',sub:steamIngs.join(', '),items:steamIngs,req:true},
     {n:'ইমোশনাল চাটনি কোর্স',sub:(item.chutney||'AI Green Chutney'),req:false,opt:true},
-    {n:'মৌসুমি ফল কোর্স',sub:fruitPick+' + '+fatPick+' (আজকের)',items:[fruitPick,fatPick],req:false,opt:true},
+    {n:'মৌসুমি ফল কোর্স',sub:fruitPick+' (আজকের)',items:[fruitPick],req:false,opt:true},
   ];
 }
 // ── LIVE real nutrition — এই কার্ডে ঠিক যেই কোর্সগুলো এখন নির্বাচিত (sel),
@@ -1704,14 +1704,19 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein,pri
     }
     if(ci===3){ track('background','chutney','__chutney_generic__'); return; }
     if(ci===0){
-      // গঠন: [main, main, leafy] — সবই background (স্থির), main/leafy কোনোটাই
-      // এখন আর optimize হয় না — শুধু protLever ও fatLever, এই দুটো "বিশুদ্ধ"
-      // lever-ই সমীকরণ সমাধান করে।
-      items.forEach((name,idx)=>track('background', idx<items.length-1?'main':'leafy', name));
+      // গঠন: [main, main, leafy, fat] — শেষটা fat (fatLever-এর অংশ, সবসময়
+      // উপস্থিত — ঐচ্ছিক ফল কোর্সের সাথে বাঁধা না, তাই ফল টগল করলেও মাছ/
+      // প্রোটিন কোর্সের পরিমাণ অস্থির হয় না), তার আগেরটা leafy (background),
+      // বাকিগুলো main (background)।
+      items.forEach((name,idx)=>{
+        if(idx===items.length-1){ track('fatLever','fat',name); }
+        else if(idx===items.length-2){ track('background','leafy',name); }
+        else{ track('background','main',name); }
+      });
     }else if(ci===2){
       items.forEach(name=>track('background','steam',name));
     }else if(ci===4){
-      items.forEach((name,idx)=>track('fatLever', idx===0?'fruit':'fat', name));
+      items.forEach(name=>track('fatLever','fruit',name));
     }
   });
   (medic&&medic.disease||[]).forEach(n=>track('background','powder',n));
@@ -1823,6 +1828,23 @@ function computeRealNutritionLive(courses,sel,medic,targetKcal,targetProtein,pri
     out[key]=Math.round(totals[i]*Math.pow(10,decimals))/Math.pow(10,decimals);
   });
   out.protein=out.protein_g; out.fat=out.fat_g; out.carb=out.carb_g; out.fiber=out.fiber_g;
+  // ── প্রতিটা মূল নিউট্রিয়েন্টের সবচেয়ে বড় real উৎস ট্র্যাক করা — এতে যেকোনো
+  //    সংখ্যা বাড়া/কমা সবসময় নির্দিষ্ট ইনগ্রেডিয়েন্ট দিয়ে ব্যাখ্যাযোগ্য থাকে,
+  //    "কেন কমল" প্রশ্নের উত্তর সবসময় কার্ডেই স্পষ্ট থাকে — আলাদা করে
+  //    ব্যাখ্যা করতে হয় না।
+  const NUTRIENT_IDX={folate:9,iron:10,calcium:11,vitD:15,iodine:16,dha:17};
+  const topSource={};
+  Object.keys(NUTRIENT_IDX).forEach(key=>{
+    const idx=NUTRIENT_IDX[key];
+    let best=null,bestAmt=0;
+    Object.keys(grams).forEach(name=>{
+      const row=ING_NUTRIENTS[name]; if(!row)return;
+      const amt=(row[idx]||0)*grams[name]/100;
+      if(amt>bestAmt){ bestAmt=amt; best=name; }
+    });
+    if(best) topSource[key]=best;
+  });
+  out.topSource=topSource;
   // ── রান্নার লবণ (পিংক সল্ট) + পেঁয়াজ-রসুন-মসলা — real recipe-তে থাকে
   // (info-box-এ "পেঁয়াজ, রসুন, ধনে পাতা, লেবু, pink salt, ভেষজ মসলা" লেখাই
   // আছে), raw ingredient ডেটাবেসে ধরা ছিল না — স্বাস্থ্য-সচেতন বাস্তব পরিমাণ।
@@ -1896,11 +1918,14 @@ function card(item,meal){
   //    ৬৫% এর মতো, এমনকি real kcal AI-টার্গেটের প্রায় সমান হলেও)। Energy ও
   //    Protein এখন সরাসরি এই বেলার AI-assigned target-এর সাথে তুলনা হয় —
   //    water-fill যেহেতু kcal-কে নিখুঁতভাবে সেই টার্গেটে মেলায়, % এখন সত্যিই
-  //    ৯৫-১০০%-এর কাছাকাছি দেখাবে। Fat/Carb/Sugar/Sodium-এর জন্য কোনো
-  //    সুনির্দিষ্ট per-meal AI target নেই, তাই দৈনিক NRV-কে এই বেলার ভাগ
-  //    (mealShare × courseFraction) দিয়ে প্রোপোরশনালি স্কেল করা হয়েছে।
+  //    ৯৫-১০০%-এর কাছাকাছি দেখাবে। Fat/Carb/Sugar/Sodium/micronutrient-এর
+  //    জন্য কোনো সুনির্দিষ্ট per-meal AI target নেই, তাই দৈনিক NRV-কে শুধু
+  //    এই বেলার স্থির ভাগে (mealShare) স্কেল করা হয়েছে — courseFraction দিয়ে
+  //    আর না, কারণ সেটা একটা bug তৈরি করছিল: ফল যোগ করলে (যেটায় ভিটামিন-D
+  //    নেই) courseFrac বেড়ে reference-ও বেড়ে যেত, ফলে real ভিটামিন-D অপরিবর্তিত
+  //    থাকলেও % কমে যেত। এখন reference স্থির (শুধু এই বেলার ভাগ অনুযায়ী),
+  //    তাই কোর্স যোগ/বাদ দিলে শুধু real.* (আসল ডেলিভারি) বদলাবে, target না।
   const mealShare=item._share||({breakfast:.3,lunch:.4,dinner:.3}[meal.key])||.33;
-  const courseFrac=cnt/MAX_COURSES;
   const NRV={fat:70,satfat:20,carb:260,sugars:90,sodium:2400};
   const energy=Math.round(real.kcal*4.184);
   const satFat=Math.round(real.fat*0.34*10)/10;
@@ -1908,19 +1933,19 @@ function card(item,meal){
   const dr=[
     ['Energy',pctOf(real.kcal,targetKcalForSelection)],
     ['Protein',pctOf(real.protein,targetProteinForSelection)],
-    ['Fat, total',pctOf(real.fat,NRV.fat*mealShare*courseFrac)],
-    ['— saturated (est.)',pctOf(satFat,NRV.satfat*mealShare*courseFrac)],
-    ['Carbohydrate',pctOf(real.carb,NRV.carb*mealShare*courseFrac)],
-    ['— sugars',pctOf(real.sugar_g,NRV.sugars*mealShare*courseFrac)],
-    ['Sodium',pctOf(real.sodium,NRV.sodium*mealShare*courseFrac)],
+    ['Fat, total',pctOf(real.fat,NRV.fat*mealShare)],
+    ['— saturated (est.)',pctOf(satFat,NRV.satfat*mealShare)],
+    ['Carbohydrate',pctOf(real.carb,NRV.carb*mealShare)],
+    ['— sugars',pctOf(real.sugar_g,NRV.sugars*mealShare)],
+    ['Sodium',pctOf(real.sodium,NRV.sodium*mealShare)],
   ];
   // ── উপরের Nutritional Information প্যানেলে যে micronutrient-গুলো দেখানো
   //    হচ্ছে (AI-নির্ধারিত, শূন্য বাদ), এখানেও ঠিক সেই একই তালিকা — একই সোর্স,
   //    দুটো প্যানেল সবসময় একমত থাকে। %DV আন্তর্জাতিক reference (MICRO_NRV)
-  //    থেকে এই বেলার ভাগে স্কেল করা।
+  //    থেকে এই বেলার স্থির ভাগে স্কেল করা (courseFrac ছাড়াই, একই কারণে)।
   const microRowsForDr=microRowsFromAiList(aiMicroList,real);
   microRowsForDr.forEach(m=>{
-    const ref=(MICRO_NRV[m[3]]||0)*mealShare*courseFrac;
+    const ref=(MICRO_NRV[m[3]]||0)*mealShare;
     dr.push([m[0],pctOf(m[1],ref)]);
   });
   // today's actual ingredients = union of the required courses' items (unique)
