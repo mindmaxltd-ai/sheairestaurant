@@ -181,11 +181,15 @@ img{max-width:100%;display:block}
 .panel-h::before{content:'';width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--pink),var(--orange))}
 
 .nutri{display:grid;grid-template-columns:repeat(5,1fr);gap:.42rem}
-.n-pill{background:var(--panel-fill);border:1px solid var(--line);border-radius:12px;padding:.45rem .25rem;text-align:center}
-.n-pill .nv{font-family:'Space Mono',monospace;font-weight:700;font-size:.82rem}
-.n-pill .nk{font-size:.56rem;color:var(--muted)}
-.n-pill.cal{background:var(--pink-soft);border-color:transparent}
-.n-pill.cal .nv{color:var(--pink-d)}
+.n-pill{border-radius:14px;padding:.55rem .3rem;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.14);transition:transform .18s cubic-bezier(.34,1.56,.64,1)}
+.n-pill:hover{transform:translateY(-2px) scale(1.03)}
+.n-pill .nv{font-family:'Space Mono',monospace;font-weight:800;font-size:.86rem;color:#fff}
+.n-pill .nk{font-size:.58rem;color:rgba(255,255,255,.88);font-weight:700}
+.n-pill.cal{background:linear-gradient(150deg,#E85D9E,#C23E80)}
+.n-pill.protein{background:linear-gradient(150deg,#6C5CE7,#4834B0)}
+.n-pill.fat{background:linear-gradient(150deg,#F0932B,#C46B15)}
+.n-pill.carb{background:linear-gradient(150deg,#6B7A4F,#4A5636)}
+.n-pill.fiber{background:linear-gradient(150deg,#8B5FBF,#6B3FA0)}
 .tweak{font-size:.72rem;color:var(--pink-d);font-weight:700;margin-top:.4rem}
 
 .drc{display:flex;flex-direction:column;gap:.36rem}
@@ -1102,20 +1106,22 @@ function nutritionTableHTML(kcal,prot,fat,carb,serving){
 // AI-এর ব্যক্তিগত পুষ্টি-লক্ষ্য তালিকা (aiMicroList) থেকে মিলিয়ে real.* মান বসানো —
 // শুধু এই কাস্টমারের জন্য AI যা যা সাজেস্ট করেছে (৫-৭টা, ক্যাটাগরি অনুযায়ী
 // ভিন্ন) ঠিক ততগুলোই দেখানো হয় — বাড়তি বানানো হয় না, কম থাকলে কমই দেখাবে।
+const MICRO_NRV={folate:400,iron:14,calcium:800,dha:250,vitD:600,iodine:150}; // mcg/mg/IU reference
 function microRowsFromAiList(list,real){
   if(!list||!list.length)return [];
   const map=[
-    {re:/ফোলেট|folate/i,key:'folate',unit:'mcg'},
-    {re:/আয়রন|iron/i,key:'iron',unit:'mg'},
-    {re:/ক্যালসিয়াম|calcium/i,key:'calcium',unit:'mg'},
-    {re:/ডিএইচএ|dha/i,key:'dha',unit:'mg'},
-    {re:/ভিটামিন.?ডি|vitamin.?d/i,key:'vitD',unit:'IU'},
-    {re:/আয়োডিন|iodine/i,key:'iodine',unit:'mcg'},
+    {re:/ফোলেট|folate/i,key:'folate',label:'Folate',unit:'mcg'},
+    {re:/আয়রন|iron/i,key:'iron',label:'Iron',unit:'mg'},
+    {re:/ক্যালসিয়াম|calcium/i,key:'calcium',label:'Calcium',unit:'mg'},
+    {re:/ডিএইচএ|dha/i,key:'dha',label:'DHA',unit:'mg'},
+    {re:/ভিটামিন.?ডি|vitamin.?d/i,key:'vitD',label:'Vitamin D',unit:'IU'},
+    {re:/আয়োডিন|iodine/i,key:'iodine',label:'Iodine',unit:'mcg'},
   ];
   const rows=[];
   list.forEach(n=>{
     const m=map.find(x=>x.re.test(n.name||''));
-    if(m&&real[m.key]!=null) rows.push([n.name,real[m.key],m.unit]);
+    // মান শূন্য (বা প্রায় শূন্য) হলে সেই সারিটাই বাদ — কল্পিত সংখ্যা না
+    if(m&&real[m.key]!=null&&real[m.key]>0.05) rows.push([m.label,real[m.key],m.unit,m.key]);
   });
   return rows;
 }
@@ -1135,13 +1141,10 @@ function nutritionTableHTMLReal(real,serving,aiMicro){
   ];
   const microRows=microRowsFromAiList(aiMicro,real);
   microRows.forEach(m=>rows.push([m[0],m[1]+' '+m[2],per100(m[1])+' '+m[2]]));
-  const countNote=microRows.length
-    ? '৭টি সাধারণ + '+microRows.length+'টি AI-নির্ধারিত = মোট '+(7+microRows.length)+'টি'
-    : '৭টি (এই কাস্টমারের জন্য কোনো অতিরিক্ত AI-নির্ধারিত পুষ্টি লক্ষ্য পাওয়া যায়নি)';
   return '<div class="nutrition-label"><div class="nl-head"><span>Nutritional Information</span><span>Serving size: '+serving+'g</span></div>'+
     '<table><thead><tr><th>AVG. QUANTITY</th><th>PER SERVING</th><th>PER 100g</th></tr></thead><tbody>'+
     rows.map((r,i)=>'<tr'+(i===7?' style="border-top:2px solid var(--green)"':'')+'><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>').join('')+
-    '</tbody></table><div style="padding:.5rem .78rem;font-size:.68rem;color:var(--muted);border-top:1px dashed var(--line)">'+countNote+'</div></div>';
+    '</tbody></table></div>';
 }
 function allergenInfoHTML(ings){
   const txt=(ings||[]).join(' ');
@@ -1911,6 +1914,15 @@ function card(item,meal){
     ['— sugars',pctOf(real.sugar_g,NRV.sugars*mealShare*courseFrac)],
     ['Sodium',pctOf(real.sodium,NRV.sodium*mealShare*courseFrac)],
   ];
+  // ── উপরের Nutritional Information প্যানেলে যে micronutrient-গুলো দেখানো
+  //    হচ্ছে (AI-নির্ধারিত, শূন্য বাদ), এখানেও ঠিক সেই একই তালিকা — একই সোর্স,
+  //    দুটো প্যানেল সবসময় একমত থাকে। %DV আন্তর্জাতিক reference (MICRO_NRV)
+  //    থেকে এই বেলার ভাগে স্কেল করা।
+  const microRowsForDr=microRowsFromAiList(aiMicroList,real);
+  microRowsForDr.forEach(m=>{
+    const ref=(MICRO_NRV[m[3]]||0)*mealShare*courseFrac;
+    dr.push([m[0],pctOf(m[1],ref)]);
+  });
   // today's actual ingredients = union of the required courses' items (unique)
   const allIngs=[].concat(...courses.slice(0,3).map(c=>c.items||[])).filter((v,i,a)=>v&&a.indexOf(v)===i);
   const cHtml=courses.map((c,ci)=>{
@@ -1946,10 +1958,10 @@ function card(item,meal){
       '<div><div class="panel-h">Quick Nutrition Panel · নির্বাচিত কোর্স অনুযায়ী (real ingredient ভিত্তিক)</div>'+
         '<div class="nutri">'+
           '<div class="n-pill cal"><div class="nv num">'+bn(real.kcal)+'</div><div class="nk">kcal</div></div>'+
-          '<div class="n-pill"><div class="nv num">'+bn(real.protein)+'g</div><div class="nk">প্রোটিন</div></div>'+
-          '<div class="n-pill"><div class="nv num">'+bn(real.fat)+'g</div><div class="nk">ফ্যাট</div></div>'+
-          '<div class="n-pill"><div class="nv num">'+bn(real.carb)+'g</div><div class="nk">নেট কার্ব</div></div>'+
-          '<div class="n-pill"><div class="nv num">'+bn(real.fiber)+'g</div><div class="nk">ফাইবার</div></div>'+
+          '<div class="n-pill protein"><div class="nv num">'+bn(real.protein)+'g</div><div class="nk">প্রোটিন</div></div>'+
+          '<div class="n-pill fat"><div class="nv num">'+bn(real.fat)+'g</div><div class="nk">ফ্যাট</div></div>'+
+          '<div class="n-pill carb"><div class="nv num">'+bn(real.carb)+'g</div><div class="nk">নেট কার্ব</div></div>'+
+          '<div class="n-pill fiber"><div class="nv num">'+bn(real.fiber)+'g</div><div class="nk">ফাইবার</div></div>'+
         '</div>'+(item._tweak?'<div class="tweak">🤖 '+item._tweak+' · কোর্স বাড়ালে kcal বাড়বে</div>':'')+'</div>'+
       nutritionTableHTMLReal(real,320,aiMicroList)+
       '<div><div class="panel-h">Daily Requirement Coverage</div><div class="drc">'+
