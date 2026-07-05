@@ -145,6 +145,30 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   padding:5px 9px;margin:3px 0;font-size:9px;color:#33402c;line-height:1.45}
 .advice2 b{color:#2E7D32}
 
+/* ── AI daily-analysis detail block (ai_analysis table) ── */
+.aiblock{border:1px solid var(--line2);border-radius:8px;margin:5px 0;overflow:hidden;
+  background:linear-gradient(135deg,#FFFFFF,var(--paper2))}
+.aiscorebox{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:6px 10px;border-bottom:1px dashed var(--rule)}
+.aiscorebox .asnum{font-size:20px;font-weight:800;line-height:1}
+.aiscorebox .asdenom{font-size:9px;color:var(--ink2);font-weight:600}
+.aiscorebox .asright{flex:1;min-width:0}
+.aibar-wrap{background:#F3E3EC;border-radius:99px;height:6px;overflow:hidden;margin:2px 0}
+.aibar{height:100%;border-radius:99px}
+.aimeta{font-size:8px;color:var(--ink2);display:flex;flex-wrap:wrap;gap:4px}
+.aimeta span{background:#fff;border:.5px solid var(--line2);padding:0 5px;border-radius:99px}
+.ai-prob-list{list-style:none;margin:4px 8px}
+.ai-prob-list li{padding:3px 6px;border-left:2px solid #F87171;background:#fef2f2;
+  border-radius:0 5px 5px 0;margin-bottom:3px;font-size:8.5px;color:#5a3030}
+.ai-prob-list li::before{content:'⚠ ';color:#ef4444;font-size:8px}
+.aisec{padding:2px 10px 6px}
+.aisec .aish{font-size:8.5px;font-weight:800;color:var(--plum);margin:4px 0 1px;display:flex;align-items:center;gap:3px}
+.aisec .aitxt{font-size:8.5px;color:#3a2630;line-height:1.5;white-space:pre-wrap}
+.ai-menu-list{list-style:none;margin:2px 8px 6px}
+.ai-menu-list li{padding:4px 7px;background:#f0fdf4;border-radius:6px;margin-bottom:3px;
+  font-size:8.5px;color:#166534;border:.5px solid rgba(5,150,105,.15)}
+.ai-menu-list li .aiml{font-weight:700;color:var(--inkgreen);font-size:7.5px;display:block}
+
 /* persuasive engagement — red + green ink, tight */
 .persuade{border:1px dashed var(--line2);border-radius:7px;padding:6px 9px;margin:3px 0;background:var(--paper2)}
 .persuade .ph{font-size:9px;font-weight:800;color:var(--red);margin-bottom:2px;letter-spacing:.02em}
@@ -426,6 +450,32 @@ function makeQR(el, text){
 
 const bn = n => String(n).replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]);
 
+/* ── ai_analysis JSON-field helpers (same logic as report.html) ── */
+const jstr = v => {
+  if (!v) return '';
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch(e) { return v; } }
+  if (Array.isArray(v)) return v.map(x => typeof x === 'object' ? (x.name||x.title||x.item||JSON.stringify(x)) : x).join(', ');
+  if (typeof v === 'object') return Object.values(v).map(x => typeof x==='object'?JSON.stringify(x):x).join(', ');
+  return String(v);
+};
+const toArr = v => {
+  if (!v) return [];
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch(e) { return [v]; } }
+  return Array.isArray(v) ? v : [v];
+};
+function parseMenuItem(x) {
+  if (typeof x === 'object' && x !== null) {
+    const label = x.meal || x.time || x.type || '';
+    const text  = x.description || x.name || x.text || JSON.stringify(x);
+    return { label, text };
+  }
+  const s = String(x);
+  const colon = s.indexOf(':');
+  if (colon > 0 && colon < 10) return { label: s.slice(0, colon).trim(), text: s.slice(colon+1).trim() };
+  return { label: '', text: s };
+}
+const aiScoreColor = n => n >= 70 ? '#059669' : n >= 40 ? '#D97706' : '#DC2626';
+
 // ── normalize a stored item (handles both rich & db-json shapes) ──
 function norm(i){
   i = i || {};
@@ -496,6 +546,8 @@ async function load(){
 
   // AI magical message + advice + weather (the 6 AM daily analysis row)
   let magic = '', advice = '', weather = '', analysisRow = null;
+  let aiScore = 0, aiCategory = '', aiFocus = '', aiDailyKcal = '', aiDailyProtein = '';
+  let aiProblems = [], aiMenuItems = [], aiSections = [];
   const cid = cust.id || localStorage.getItem('sar_customer_id');
   if(cid){
     try{
@@ -507,6 +559,21 @@ async function load(){
         magic   = a[0].magical_message || rj.magical_message || rj.magic || '';
         advice  = a[0].health_summary_bn || a[0].general_suggestions_bn || a[0].analysis_bn || a[0].recommendations || rj.note || a[0].focus || '';
         weather = rj.weather || a[0].weather || '';
+
+        // ── additional ai_analysis fields (same row, detailed like report.html) ──
+        aiScore        = parseInt(a[0].health_score || a[0].meal_score) || 0;
+        aiCategory     = a[0].category || '';
+        aiFocus        = a[0].focus || '';
+        aiDailyKcal    = a[0].daily_kcal || '';
+        aiDailyProtein = a[0].daily_protein || '';
+        aiProblems     = toArr(a[0].problems_json).filter(Boolean);
+        aiMenuItems    = toArr(a[0].daily_menu_recommendation_json).filter(Boolean).map(parseMenuItem).filter(x => x.text);
+        aiSections     = [
+          { ic:'🥗', label:'পুষ্টি পরামর্শ',         text: a[0].nutrition_advice_bn },
+          { ic:'🌿', label:'ঘরোয়া প্রতিকার',        text: a[0].home_remedies_bn },
+          { ic:'🪷', label:'আয়ুর্বেদিক পরামর্শ',    text: a[0].ayurvedic_bn },
+          { ic:'💪', label:'অনুপ্রেরণা',             text: a[0].motivational_message_bn },
+        ].filter(s => s.text && String(s.text).trim());
       }
     }catch(e){}
   }
@@ -547,7 +614,11 @@ async function load(){
   }
   if(!magic) magic = localMagic({cust, metrics, items:norms, prevOrder, cat, weather});
 
-  render(order, norms, cust, {magic, advice, weather}, oid, {metrics, prevOrder, cat});
+  render(order, norms, cust, {magic, advice, weather,
+    score: aiScore, category: aiCategory, focus: aiFocus,
+    dailyKcal: aiDailyKcal, dailyProtein: aiDailyProtein,
+    problems: aiProblems, menuItems: aiMenuItems, sections: aiSections
+  }, oid, {metrics, prevOrder, cat});
 
   // ── store payment-receipt details in Supabase for 1 month (audit/verification) ──
   storeReceiptAudit(order, norms, cust, oid);
@@ -904,6 +975,39 @@ function render(order, items, cust, ai, oid, eng){
       </div>
 
       ${ai.advice?`<div class="advice2">🤖 <b>AI স্বাস্থ্য পরামর্শ:</b> ${ai.advice}</div>`:''}
+
+      ${(ai.score || ai.problems.length || ai.sections.length || ai.menuItems.length) ? `
+      <div class="aiblock">
+        ${ai.score ? `
+        <div class="aiscorebox">
+          <div><span class="asnum" style="color:${aiScoreColor(ai.score)}">${bn(ai.score)}</span><span class="asdenom">/100</span></div>
+          <div class="asright">
+            <div class="aibar-wrap"><div class="aibar" style="width:${Math.min(100,ai.score)}%;background:${aiScoreColor(ai.score)}"></div></div>
+            <div class="aimeta">
+              ${ai.category?`<span>বিভাগ: ${CAT_BN[ai.category]||ai.category}</span>`:''}
+              ${ai.dailyKcal?`<span>🔥 ${bn(ai.dailyKcal)} kcal</span>`:''}
+              ${ai.dailyProtein?`<span>💪 ${bn(ai.dailyProtein)}g প্রোটিন</span>`:''}
+              ${ai.focus?`<span>🎯 ${ai.focus}</span>`:''}
+            </div>
+          </div>
+        </div>` : ''}
+
+        ${ai.problems.length ? `
+        <ul class="ai-prob-list">
+          ${ai.problems.map(p => `<li>${jstr(p)}</li>`).join('')}
+        </ul>` : ''}
+
+        ${ai.sections.map(s => `
+        <div class="aisec">
+          <div class="aish">${s.ic} ${s.label}</div>
+          <div class="aitxt">${s.text}</div>
+        </div>`).join('')}
+
+        ${ai.menuItems.length ? `
+        <ul class="ai-menu-list">
+          ${ai.menuItems.map(m => `<li>${m.label?`<span class="aiml">${m.label}</span>`:''}${m.text}</li>`).join('')}
+        </ul>` : ''}
+      </div>` : ''}
 
       <div class="persuade">
         <div class="ph">💌 SAR থেকে বিশেষ বার্তা</div>
