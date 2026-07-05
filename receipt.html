@@ -107,21 +107,21 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:linear-gradient(135deg,#FFFFFF,var(--paper2))}
 .nfcol .nfh{font-size:8.5px;font-weight:800;letter-spacing:.04em;color:#fff;padding:4px 8px;
   background:linear-gradient(135deg,var(--plum),var(--purple));display:flex;align-items:center;gap:4px}
-.nftbl{width:100%;border-collapse:collapse;font-size:8.5px}
-.nftbl td{padding:2.5px 8px;border-bottom:1px solid var(--line)}
+.nftbl{width:100%;border-collapse:collapse;font-size:7.8px}
+.nftbl td{padding:1.4px 8px;border-bottom:1px solid var(--line)}
 .nftbl tr:last-child td{border-bottom:0}
 .nftbl .nn{color:var(--ink2)}
 .nftbl .nv{text-align:right;font-family:'Space Mono',monospace;color:var(--plum);font-weight:700;white-space:nowrap}
-.nftbl .nd{text-align:right;width:42px;font-family:'Space Mono',monospace;color:var(--rose);font-weight:700}
+.nftbl .nd{text-align:right;width:38px;font-family:'Space Mono',monospace;color:var(--rose);font-weight:700}
 .nftbl tr.cal td{background:rgba(233,30,140,.07);font-weight:800}
 .nftbl tr.cal .nv{color:var(--red)}
 /* colorful DRC bars */
-.drcx{padding:6px 8px;display:flex;flex-direction:column;gap:5px}
-.drx{display:flex;align-items:center;gap:6px;font-size:8.5px}
-.drx .dxl{width:62px;color:var(--ink2);white-space:nowrap}
-.drx .dxbar{flex:1;height:8px;border-radius:6px;background:#F3E3EC;overflow:hidden;position:relative}
+.drcx{padding:4px 8px;display:flex;flex-direction:column;gap:2.5px}
+.drx{display:flex;align-items:center;gap:5px;font-size:7.8px}
+.drx .dxl{width:72px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drx .dxbar{flex:1;height:6px;border-radius:6px;background:#F3E3EC;overflow:hidden;position:relative}
 .drx .dxbar i{display:block;height:100%;border-radius:6px}
-.drx .dxp{width:34px;text-align:right;font-family:'Space Mono',monospace;font-weight:700;color:var(--inkgreen)}
+.drx .dxp{width:30px;text-align:right;font-family:'Space Mono',monospace;font-weight:700;color:var(--inkgreen)}
 .dxc1{background:linear-gradient(90deg,#E91E8C,#FF6BB5)}
 .dxc2{background:linear-gradient(90deg,#6B21A8,#A855F7)}
 .dxc3{background:linear-gradient(90deg,#006A4E,#00A878)}
@@ -476,6 +476,15 @@ function parseMenuItem(x) {
 }
 const aiScoreColor = n => n >= 70 ? '#059669' : n >= 40 ? '#D97706' : '#DC2626';
 
+/* ── defensively read an AI daily-target field under several possible column names ── */
+function numField(row, keys){
+  for(const k of keys){
+    const v = row && row[k];
+    if(v != null && v !== '' && !isNaN(parseFloat(v))) return parseFloat(v);
+  }
+  return null;
+}
+
 // ── normalize a stored item (handles both rich & db-json shapes) ──
 function norm(i){
   i = i || {};
@@ -548,6 +557,7 @@ async function load(){
   let magic = '', advice = '', weather = '', analysisRow = null;
   let aiScore = 0, aiCategory = '', aiFocus = '', aiDailyKcal = '', aiDailyProtein = '';
   let aiProblems = [], aiMenuItems = [], aiSections = [];
+  let aiTargets = {};
   const cid = cust.id || localStorage.getItem('sar_customer_id');
   if(cid){
     try{
@@ -574,6 +584,24 @@ async function load(){
           { ic:'🪷', label:'আয়ুর্বেদিক পরামর্শ',    text: a[0].ayurvedic_bn },
           { ic:'💪', label:'অনুপ্রেরণা',             text: a[0].motivational_message_bn },
         ].filter(s => s.text && String(s.text).trim());
+
+        // ── daily nutrient targets from ai_analysis (used by Nutrition Info + DRC below) ──
+        aiTargets = {
+          kcal:        numField(a[0], ['daily_kcal','kcal_target']),
+          protein:     numField(a[0], ['daily_protein','protein_target']),
+          carb:        numField(a[0], ['daily_carb','daily_carbs','carb_target']),
+          fat:         numField(a[0], ['daily_fat','fat_target']),
+          fiber:       numField(a[0], ['daily_fiber','fiber_target']),
+          sugar:       numField(a[0], ['daily_sugar','sugar_target']),
+          sodium:      numField(a[0], ['daily_sodium','sodium_target']),
+          cholesterol: numField(a[0], ['daily_cholesterol','cholesterol_target']),
+          calcium:     numField(a[0], ['daily_calcium','calcium_target']),
+          iron:        numField(a[0], ['daily_iron','iron_target']),
+          potassium:   numField(a[0], ['daily_potassium','potassium_target']),
+          vitaminC:    numField(a[0], ['daily_vitamin_c','daily_vitaminc','vitamin_c_target']),
+          folate:      numField(a[0], ['daily_folate','folate_target']),
+          zinc:        numField(a[0], ['daily_zinc','zinc_target']),
+        };
       }
     }catch(e){}
   }
@@ -617,7 +645,7 @@ async function load(){
   render(order, norms, cust, {magic, advice, weather,
     score: aiScore, category: aiCategory, focus: aiFocus,
     dailyKcal: aiDailyKcal, dailyProtein: aiDailyProtein,
-    problems: aiProblems, menuItems: aiMenuItems, sections: aiSections
+    problems: aiProblems, menuItems: aiMenuItems, sections: aiSections, targets: aiTargets
   }, oid, {metrics, prevOrder, cat});
 
   // ── store payment-receipt details in Supabase for 1 month (audit/verification) ──
@@ -886,9 +914,6 @@ function render(order, items, cust, ai, oid, eng){
     </div>`;
   }).join('');
 
-  const pTotKcal = Math.min(99, Math.round(totalKcal/DAILY.kcal*100));
-  const pTotProt = Math.min(99, Math.round(totalProt/DAILY.protein*100));
-
   // invoice number (order.html saves it after creating the secure invoice)
   const invNum = (order && order.invoice_number)
     || localStorage.getItem('sar_last_invoice_num') || '';
@@ -898,25 +923,72 @@ function render(order, items, cust, ai, oid, eng){
     || (localStorage.getItem('sar_payment_verified')==='true');
 
   // ── half-page nutrition facts + colorful daily-requirement bars ──
+  // Daily targets: prefer values supplied by ai_analysis (ai.targets / ai.dailyKcal / ai.dailyProtein),
+  // fall back to sensible general/pregnancy-aware defaults when the row doesn't carry them.
+  const T = ai.targets || {};
+  const DAILY2 = {
+    kcal:        T.kcal        || parseFloat(ai.dailyKcal)    || DAILY.kcal,
+    protein:     T.protein     || parseFloat(ai.dailyProtein) || DAILY.protein,
+    carb:        T.carb        || DAILY.carb,
+    fat:         T.fat         || DAILY.fat,
+    fiber:       T.fiber       || DAILY.fiber,
+    sugar:       T.sugar       || 50,
+    sodium:      T.sodium      || 2300,
+    cholesterol: T.cholesterol || 300,
+    calcium:     T.calcium     || (ai.category==='PR' ? 1200 : 1000),
+    iron:        T.iron        || (ai.category==='PR' ? 27   : DAILY.iron),
+    potassium:   T.potassium   || 2600,
+    vitaminC:    T.vitaminC    || 75,
+    folate:      T.folate      || (ai.category==='PR' ? 600  : 400),
+    zinc:        T.zinc        || 11,
+  };
+  const usingAiTargets = !!(T.kcal || T.protein || ai.dailyKcal || ai.dailyProtein);
+
+  // micronutrients aren't tracked per line-item, so they're estimated from the order's
+  // course count / macro totals — same style as the existing DRC estimation formulas.
+  const totalSugar       = Math.round(totalCarb * 0.06);
+  const totalSodium      = Math.round(totalCourses * 180);
+  const totalCholesterol = 0; // fully plant-based, oil-free SAR menu
+  const totalCalcium     = Math.round(totalCourses * 55);
+  const totalIron        = Math.max(2, Math.round(totalCourses * 2.4));
+  const totalPotassium   = Math.round(totalCourses * 260);
+  const totalVitC        = Math.round(totalCourses * 16);
+  const totalFolate      = Math.round(totalCourses * 70);
+  const totalZinc        = Math.round(totalCourses * 1.2 * 10) / 10;
+
   const dvp = (v,d)=> d? Math.min(999, Math.round(v/d*100)) : 0;
-  const drcData = [
-    ['প্রোটিন',   Math.min(99, Math.round(totalProt/0.6)),                'dxc1'],
-    ['আয়রন',     Math.min(99, 22 + totalCourses*4),                      'dxc2'],
-    ['ফাইবার',    Math.min(99, Math.round(totalFib/0.25)),                'dxc3'],
-    ['ভিটামিন C', Math.min(99, 30 + totalCourses*5),                      'dxc4'],
+
+  const nutritionRows = [
+    ['ক্যালরি',        Math.round(totalKcal), 'kcal', DAILY2.kcal, true],
+    ['প্রোটিন',        Math.round(totalProt), 'g',    DAILY2.protein],
+    ['কার্বোহাইড্রেট', Math.round(totalCarb), 'g',    DAILY2.carb],
+    ['ফ্যাট',          Math.round(totalFat),  'g',    DAILY2.fat],
+    ['ফাইবার',         Math.round(totalFib),  'g',    DAILY2.fiber],
+    ['চিনি',           totalSugar,            'g',    DAILY2.sugar],
+    ['সোডিয়াম',       totalSodium,           'mg',   DAILY2.sodium],
+    ['কোলেস্টেরল',     totalCholesterol,      'mg',   DAILY2.cholesterol],
+    ['ক্যালসিয়াম',    totalCalcium,          'mg',   DAILY2.calcium],
+    ['আয়রন',          totalIron,             'mg',   DAILY2.iron],
+    ['পটাসিয়াম',      totalPotassium,        'mg',   DAILY2.potassium],
+    ['ভিটামিন C',      totalVitC,             'mg',   DAILY2.vitaminC],
+    ['ফোলেট',          totalFolate,           'mcg',  DAILY2.folate],
+    ['জিংক',           totalZinc,             'mg',   DAILY2.zinc],
   ];
+  const pTotKcal = Math.min(99, dvp(totalKcal, DAILY2.kcal));
+  const pTotProt = Math.min(99, dvp(totalProt, DAILY2.protein));
+
+  const drcData = nutritionRows.slice(1).map((r,i)=>[r[0], Math.min(99, dvp(r[1], r[3])), 'dxc'+((i%4)+1)]);
+
   const nutritionBlock = items.length ? `
     <div class="nfblock">
       <div class="nfcol">
         <div class="nfh">📊 Nutrition Information · পুষ্টিমান</div>
         <table class="nftbl">
-          <tr class="cal"><td class="nn">ক্যালরি</td><td class="nv">${bn(Math.round(totalKcal))} kcal</td><td class="nd">${bn(pTotKcal)}%</td></tr>
-          <tr><td class="nn">প্রোটিন</td><td class="nv">${bn(Math.round(totalProt))} g</td><td class="nd">${bn(dvp(totalProt,DAILY.protein))}%</td></tr>
-          <tr><td class="nn">কার্বোহাইড্রেট</td><td class="nv">${bn(Math.round(totalCarb))} g</td><td class="nd">${bn(dvp(totalCarb,DAILY.carb))}%</td></tr>
-          <tr><td class="nn">ফ্যাট</td><td class="nv">${bn(Math.round(totalFat))} g</td><td class="nd">${bn(dvp(totalFat,DAILY.fat))}%</td></tr>
-          <tr><td class="nn">ফাইবার</td><td class="nv">${bn(Math.round(totalFib))} g</td><td class="nd">${bn(dvp(totalFib,DAILY.fiber))}%</td></tr>
+          ${nutritionRows.map(r=>`<tr${r[4]?' class="cal"':''}><td class="nn">${r[0]}</td><td class="nv">${bn(r[1])} ${r[2]}</td><td class="nd">${bn(dvp(r[1],r[3]))}%</td></tr>`).join('')}
         </table>
-        <div class="nffoot">*২০০০ kcal দৈনিক চাহিদার শতাংশ (%DV)</div>
+        <div class="nffoot">${usingAiTargets
+          ? `*আপনার AI বিশ্লেষণ (ai_analysis) অনুযায়ী দৈনিক ${bn(Math.round(DAILY2.kcal))} kcal লক্ষ্যমাত্রার শতাংশ (%DV)`
+          : `*২০০০ kcal দৈনিক চাহিদার শতাংশ (%DV)`}</div>
       </div>
       <div class="nfcol">
         <div class="nfh">🎯 Daily Requirement Coverage</div>
@@ -925,7 +997,7 @@ function render(order, items, cust, ai, oid, eng){
             <span class="dxbar"><i class="${d[2]}" style="width:${d[1]}%"></i></span>
             <span class="dxp">${bn(d[1])}%</span></div>`).join('')}
         </div>
-        <div class="nffoot">আজকের অর্ডার থেকে পূরণ হওয়া দৈনিক চাহিদা</div>
+        <div class="nffoot">${usingAiTargets ? 'আপনার AI বিশ্লেষণ অনুযায়ী দৈনিক চাহিদা' : 'আজকের অর্ডার থেকে পূরণ হওয়া দৈনিক চাহিদা'}</div>
       </div>
     </div>` : '';
 
