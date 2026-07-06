@@ -309,6 +309,10 @@ nav{position:sticky;top:5px;z-index:100;
           <div class="ai-text" id="aiAssessText" style="color:#9A7A8A">
             আজকের অভিযোগ লিখুন এবং বিশ্লেষণ বাটনে ক্লিক করুন।
           </div>
+          <div id="aiDebugToggle" style="display:none;margin-top:.65rem">
+            <a href="javascript:void(0)" onclick="toggleAiDebug()" style="font-size:.68rem;color:var(--pink-d);text-decoration:none;font-family:'Space Mono',monospace;letter-spacing:.03em">🔍 কারিগরি বিবরণ দেখুন (Admin-এর জন্য)</a>
+            <pre id="aiDebugBox" style="display:none;margin-top:.5rem;font-size:.68rem;color:#4A3F49;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.6rem .75rem;white-space:pre-wrap;max-height:200px;overflow:auto"></pre>
+          </div>
         </div>
       </div>
 
@@ -635,6 +639,13 @@ function toggleRxPanel(){
   if(arrow) arrow.style.transform = hidden ? 'rotate(0deg)' : 'rotate(-90deg)';
 }
 
+// ── AI ব্যর্থ হলে admin debugging-এর জন্য technical detail টগল ──
+function toggleAiDebug(){
+  const box = document.getElementById('aiDebugBox');
+  if(!box) return;
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
 async function loadApprovedRx(){
   const card = document.getElementById('myRxCard');
   const box = document.getElementById('myRxBox');
@@ -723,6 +734,10 @@ async function runAIAnalysis(){
   btn.innerHTML = '<span class="spinner-inline"></span> AI বিশ্লেষণ চলছে...';
 
   document.getElementById('aiAssessText').innerHTML = '<span class="spinner-inline"></span> বিশ্লেষণ করা হচ্ছে...';
+  const dbgToggle = document.getElementById('aiDebugToggle');
+  const dbgBox = document.getElementById('aiDebugBox');
+  if(dbgToggle) dbgToggle.style.display = 'none';
+  if(dbgBox){ dbgBox.style.display = 'none'; dbgBox.textContent = ''; }
 
   const m = patient.metrics || {};
   // ── পথ A: customer_metrics-এর সব column পাঠাই (যেগুলোতে value আছে) ──
@@ -805,6 +820,7 @@ ${prevRxStr}
   try {
     // Try Claude API via Edge Function first
     let aiData = null;
+    const diag = { time: new Date().toISOString(), complaint };
 
     // ── PRIMARY: Netlify analyze function (dashboard যেটা ব্যবহার করে — কাজ করছে) ──
     try {
@@ -815,13 +831,19 @@ ${prevRxStr}
       });
       if(r.ok){
         const d = await r.json();
+        diag.netlify = { httpStatus:r.status, hasParsed:!!d.parsed, hasText:!!d.text, keys:Object.keys(d||{}) };
         if(d.parsed && (d.parsed.assessment || d.parsed.rx)) aiData = d.parsed;
         else if(d.assessment || d.rx) aiData = d;
         else if(d.text){
           aiData = robustParseAI(d.text);
+        } else {
+          diag.netlify.note = 'response ok কিন্তু assessment/rx/text কিছুই নেই — Claude call server-এ ব্যর্থ হয়েছে বা key missing';
         }
+      } else {
+        const t = await r.text().catch(()=>'');
+        diag.netlify = { httpStatus:r.status, errorBody:t.slice(0,300) };
       }
-    } catch(e){}
+    } catch(e){ diag.netlify = { fetchError:e.message }; }
 
     // Fallback: Supabase Edge Function (পুরোনো — অক্ষত)
     if(!aiData){
@@ -831,23 +853,29 @@ ${prevRxStr}
           headers:H,
           body:JSON.stringify({ customer_id:patient.id, complaint, force:true })
         });
-        const d = await r.json();
+        const d = await r.json().catch(()=>({}));
+        diag.supabaseEdge = { httpStatus:r.status, hasAnalysisBn:!!d?.analysis_bn };
         if(d?.analysis_bn){ aiData = { assessment:d.analysis_bn }; }
-      } catch(e){}
+      } catch(e){ diag.supabaseEdge = { fetchError:e.message }; }
     }
 
     // Fallback: direct Claude API (if key in localStorage)
     if(!aiData){
       const claudeKey = JSON.parse(localStorage.getItem('sar_api_keys_v1')||'{}')?.CLAUDE_API_KEY;
       if(claudeKey){
-        const cr = await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','x-api-key':atob(claudeKey),'anthropic-version':'2023-06-01'},
-          body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
-        });
-        const cd = await cr.json();
-        const raw = cd.content?.[0]?.text||'';
-        aiData = robustParseAI(raw);
+        try{
+          const cr = await fetch('https://api.anthropic.com/v1/messages',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','x-api-key':atob(claudeKey),'anthropic-version':'2023-06-01'},
+            body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+          });
+          const cd = await cr.json().catch(()=>({}));
+          diag.localKeyFallback = { httpStatus:cr.status, hasContent:!!cd?.content };
+          const raw = cd.content?.[0]?.text||'';
+          if(raw) aiData = robustParseAI(raw);
+        }catch(e){ diag.localKeyFallback = { fetchError:e.message }; }
+      } else {
+        diag.localKeyFallback = { skipped:'localStorage-এ sar_api_keys_v1.CLAUDE_API_KEY নেই' };
       }
     }
 
@@ -857,12 +885,17 @@ ${prevRxStr}
       try{
         const statusR = await fetch('/.netlify/functions/analyze', { method:'GET' });
         const statusD = await statusR.json();
+        diag.serverStatusCheck = statusD;
         keyMissing = statusD.claude_key === 'MISSING';
-      }catch(e){}
+      }catch(e){ diag.serverStatusCheck = { fetchError:e.message }; }
 
       const reasonMsg = keyMissing
         ? '⚠️ সার্ভারে (Netlify) ANTHROPIC_API_KEY কনফিগার করা নেই — অ্যাডমিনকে Netlify Environment Variables-এ কী যোগ করে redeploy করতে বলুন (Admin Panel-এর local key দিয়ে এটি সমাধান হবে না)।'
-        : 'বিস্তারিত বিশ্লেষণের জন্য Admin Panel থেকে Claude API Key সেট করুন।';
+        : '⚠️ AI বিশ্লেষণ সার্ভারে সম্পন্ন হয়নি (key আছে কিন্তু কল ব্যর্থ হয়েছে হতে পারে quota/rate-limit/network কারণে)। নিচে "কারিগরি বিবরণ" থেকে বিস্তারিত দেখুন বা Netlify function logs চেক করুন।';
+
+      console.error('SAR doctor.html — AI বিশ্লেষণ ব্যর্থ, ডায়াগনস্টিক:', diag);
+      if(dbgBox){ dbgBox.textContent = JSON.stringify(diag, null, 2); }
+      if(dbgToggle){ dbgToggle.style.display = 'block'; }
 
       aiData = {
         assessment: `রোগীর মেট্রিক্স ও অভিযোগ বিশ্লেষণ করা হয়েছে। অভিযোগ: "${complaint}"। ${reasonMsg}`,
