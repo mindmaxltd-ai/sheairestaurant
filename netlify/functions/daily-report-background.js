@@ -103,7 +103,10 @@ async function processOne(cid) {
 }
 
 async function sendForCustomer(cust, analysis) {
-  const reportUrl = `${SITE_URL}/report.html?id=${analysis.id}`;
+  // report.html নিজে location.search থেকে 'customer_id' প্যারামিটার পড়ে
+  // (analysis-এর নিজস্ব id না) — আগে ভুল প্যারামিটার নাম ও ভুল মান পাঠানো
+  // হচ্ছিল, তাই report.html কখনো কাস্টমার খুঁজে পেত না।
+  const reportUrl = `${SITE_URL}/report.html?customer_id=${cust.id}`;
   const catBn = CAT_BN[analysis.category] || analysis.category;
 
   const [smsOk, emailOk] = await Promise.all([
