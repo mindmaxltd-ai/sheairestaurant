@@ -170,14 +170,18 @@ async function sendSms(phone, name, score, catBn, url) {
 }
 
 async function sendEmail(email, name, html, url) {
-  if (!email || !RESEND) { if (!RESEND) console.error('sendEmail: RESEND_API_KEY missing'); return false; }
+  if (!email) return false;
   try {
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND}` },
+    // Resend সরাসরি কল না করে send-email.js-কে কল করা হচ্ছে — এটাই আগে থেকে
+    // টেস্ট করে কাজ করতে দেখা গেছে (নিজস্ব প্রমাণিত FROM ঠিকানা সহ), তাই
+    // এখানে থেকে আলাদা/সম্ভবত-unverified from ঠিকানা দিয়ে ডুপ্লিকেট Resend
+    // কল করার দরকার নেই।
+    const r = await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'SAR Health <report@sheairestaurant.com>', to: [email],
-        subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html,
+        to: email,
+        subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`,
+        html,
       }),
     });
     if (!r.ok) {
