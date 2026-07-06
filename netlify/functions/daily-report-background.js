@@ -152,15 +152,22 @@ async function sendSms(phone, name, score, catBn, url) {
   const msg = `🌸 SAR ${today()} | ${name} | ${catBn} | স্কোর ${score}/100 | রিপোর্ট: ${url}`;
   try {
     const r = await fetch(`${SITE_URL}/.netlify/functions/send-sms`, {
+      // send-sms.js expects {to, msg} — NOT {phone, message}. This field-name
+      // mismatch was the actual reason SMS silently failed (send-sms.js
+      // returned 400 "no recipient (to)" because it never received `to`).
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, message: msg }),
+      body: JSON.stringify({ to: phone, msg }),
     });
+    if (!r.ok) {
+      const text = await r.text().catch(() => '');
+      console.error(`sendSms failed for ${phone}: HTTP ${r.status} — ${text.slice(0, 300)}`);
+    }
     return r.ok;
-  } catch { return false; }
+  } catch (e) { console.error(`sendSms exception for ${phone}:`, e.message); return false; }
 }
 
 async function sendEmail(email, name, html, url) {
-  if (!email || !RESEND) return false;
+  if (!email || !RESEND) { if (!RESEND) console.error('sendEmail: RESEND_API_KEY missing'); return false; }
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -170,8 +177,12 @@ async function sendEmail(email, name, html, url) {
         subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html,
       }),
     });
+    if (!r.ok) {
+      const text = await r.text().catch(() => '');
+      console.error(`sendEmail failed for ${email}: HTTP ${r.status} — ${text.slice(0, 300)}`);
+    }
     return r.ok;
-  } catch { return false; }
+  } catch (e) { console.error(`sendEmail exception for ${email}:`, e.message); return false; }
 }
 
 async function sbGet(p) { const r = await fetch(`${SUPA_URL}${p}`, { headers: SB }); return r.json(); }
