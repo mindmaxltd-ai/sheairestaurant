@@ -50,28 +50,39 @@ exports.handler = async (event) => {
       return { statusCode: 200 };
     }
 
-    const custs = await sbGet(
-      `/rest/v1/customers?is_active=eq.true&admin_approved=eq.true&select=id,full_name,phone,email,sar_category&order=id.asc&limit=${PAGE_SIZE}`
-    );
-    if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500 }; }
+    // ── স্কেল-প্রস্তুত: ভেতরেই পেজ-বাই-পেজ লুপ করে, তাই ২,০০০-এর বেশি
+    //    কাস্টমার থাকলেও সবাই এক ইনভোকেশনেই কভার হয় — বাদ পড়ে না।
+    const MAX_PAGES = 30; // 30×2000 = 60,000 কাস্টমার পর্যন্ত নিরাপত্তা-সীমা
+    let totalSent = 0, totalSkipped = 0, totalFailed = 0, offset = 0, pages = 0;
 
-    // bulk-fetch today's ai_analysis rows for everyone in this page, chunked
-    const analysisMap = await fetchAnalysisForIds(custs.map(c => c.id));
+    while (pages < MAX_PAGES) {
+      const custs = await sbGet(
+        `/rest/v1/customers?is_active=eq.true&admin_approved=eq.true&select=id,full_name,phone,email,sar_category&order=id.asc&limit=${PAGE_SIZE}&offset=${offset}`
+      );
+      if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500 }; }
+      if (custs.length === 0) break;
+      pages++;
 
-    let sent = 0, skipped = 0, failed = 0;
-    await runWithConcurrency(custs, CONCURRENCY, async (cust) => {
-      try {
-        const analysis = analysisMap[cust.id];
-        if (!analysis) { skipped++; return; }
-        await sendForCustomer(cust, analysis);
-        sent++;
-      } catch (e) {
-        failed++;
-        console.error(`failed for ${cust.id}:`, e.message);
-      }
-    });
+      // bulk-fetch today's ai_analysis rows for everyone in this page, chunked
+      const analysisMap = await fetchAnalysisForIds(custs.map(c => c.id));
 
-    console.log(`daily-report done — total:${custs.length} sent:${sent} skipped:${skipped} failed:${failed} date:${today()}`);
+      await runWithConcurrency(custs, CONCURRENCY, async (cust) => {
+        try {
+          const analysis = analysisMap[cust.id];
+          if (!analysis) { totalSkipped++; return; }
+          await sendForCustomer(cust, analysis);
+          totalSent++;
+        } catch (e) {
+          totalFailed++;
+          console.error(`failed for ${cust.id}:`, e.message);
+        }
+      });
+
+      offset += custs.length;
+      if (custs.length < PAGE_SIZE) break; // last (partial) page — no more customers
+    }
+
+    console.log(`daily-report done — pages:${pages} sent:${totalSent} skipped:${totalSkipped} failed:${totalFailed} date:${today()}`);
     return { statusCode: 200 };
   } catch (e) {
     console.error('daily-report fatal error:', e.message);
