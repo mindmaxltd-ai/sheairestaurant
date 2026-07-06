@@ -34,19 +34,11 @@ const SB = { apikey:SUPA_KEY, Authorization:`Bearer ${SUPA_KEY}`, 'Content-Type'
 // Only needed to turn a category code into a Bangla label for the SMS text.
 const CAT_BN = { DM:'ডায়াবেটিস', OB:'স্থূলতা', FL:'ফ্যাটি লিভার', IB:'IBS/গ্যাস্ট্রিক', PR:'গর্ভাবস্থা' };
 
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
 exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
-
   // Background functions: Netlify doesn't deliver this return value anywhere
   // useful (the caller already got a 202 and moved on) — we still return
   // a normal response so local testing / logs behave sensibly.
-  if (!SUPA_KEY) { console.error('Missing SUPABASE_SERVICE_KEY'); return { statusCode: 500, headers: CORS }; }
+  if (!SUPA_KEY) { console.error('Missing SUPABASE_SERVICE_KEY'); return { statusCode: 500 }; }
 
   let body = {};
   try { body = JSON.parse(event.body || '{}'); } catch {}
@@ -55,13 +47,13 @@ exports.handler = async (event) => {
     if (body.action === 'run' && body.customer_id) {
       const result = await processOne(body.customer_id);
       console.log('single result:', JSON.stringify(result));
-      return { statusCode: 200, headers: CORS };
+      return { statusCode: 200 };
     }
 
     const custs = await sbGet(
       `/rest/v1/customers?is_active=eq.true&admin_approved=eq.true&select=id,full_name,phone,email,sar_category&order=id.asc&limit=${PAGE_SIZE}`
     );
-    if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500, headers: CORS }; }
+    if (!Array.isArray(custs)) { console.error('Cannot fetch customers'); return { statusCode: 500 }; }
 
     // bulk-fetch today's ai_analysis rows for everyone in this page, chunked
     const analysisMap = await fetchAnalysisForIds(custs.map(c => c.id));
@@ -80,10 +72,10 @@ exports.handler = async (event) => {
     });
 
     console.log(`daily-report done — total:${custs.length} sent:${sent} skipped:${skipped} failed:${failed} date:${today()}`);
-    return { statusCode: 200, headers: CORS };
+    return { statusCode: 200 };
   } catch (e) {
     console.error('daily-report fatal error:', e.message);
-    return { statusCode: 500, headers: CORS };
+    return { statusCode: 500 };
   }
 };
 
@@ -133,7 +125,13 @@ async function fetchAnalysisForIds(ids) {
     const list = await sbGet(
       `/rest/v1/ai_analysis?customer_id=in.(${chunk.join(',')})&analysis_date=eq.${dateStr}&analysis_type=eq.daily_report&select=*`
     );
-    if (Array.isArray(list)) for (const row of list) out[row.customer_id] = row;
+    if (Array.isArray(list)) for (const row of list) {
+      // ইতিমধ্যে SMS+ইমেইল দুটোই পাঠানো হয়ে থাকলে বাদ — এটাই এই ফাংশনকে
+      // বারবার (প্রতি ১৫ মিনিটে) নিরাপদে চালানোর যোগ্য করে, ডুপ্লিকেট
+      // বার্তা পাঠানো ছাড়াই। AI ব্যাচ দেরিতে শেষ হলেও পরের রানেই ধরা পড়বে।
+      if (row.sms_sent && row.email_sent) continue;
+      out[row.customer_id] = row;
+    }
   }
   return out;
 }
@@ -142,41 +140,34 @@ async function sendSms(phone, name, score, catBn, url) {
   if (!phone) return false;
   const msg = `🌸 SAR ${today()} | ${name} | ${catBn} | স্কোর ${score}/100 | রিপোর্ট: ${url}`;
   try {
-    // send-sms.js expects {to, msg} — NOT {phone, message}. It also always
-    // replies HTTP 200 even on logical failure, so we must check body.sent,
-    // not just r.ok.
     const r = await fetch(`${SITE_URL}/.netlify/functions/send-sms`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: phone, msg }),
+      body: JSON.stringify({ phone, message: msg }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok || data.sent !== true) {
-      console.error('SMS not actually sent:', JSON.stringify(data));
-      return false;
-    }
-    return true;
-  } catch (e) { console.error('SMS request failed:', e.message); return false; }
+    return r.ok;
+  } catch { return false; }
 }
 
 async function sendEmail(email, name, html, url) {
-  if (!email) return false;
+  if (!email || !RESEND) return false;
   try {
-    // Route through send-email.js (already configured with the right
-    // RESEND_KEY/RESEND_API_KEY + FROM address) instead of calling Resend directly.
-    const r = await fetch(`${SITE_URL}/.netlify/functions/send-email`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ to: email, subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html }),
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND}` },
+      body: JSON.stringify({
+        from: 'SAR Health <report@sheairestaurant.com>', to: [email],
+        subject: `🌸 SAR দৈনিক রিপোর্ট — ${today()}`, html,
+      }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok || data.sent !== true) {
-      console.error('Email not actually sent:', JSON.stringify(data));
-      return false;
-    }
-    return true;
-  } catch (e) { console.error('Email request failed:', e.message); return false; }
+    return r.ok;
+  } catch { return false; }
 }
 
 async function sbGet(p) { const r = await fetch(`${SUPA_URL}${p}`, { headers: SB }); return r.json(); }
 async function sbGetOne(p) { const d = await sbGet(p); return Array.isArray(d) ? d[0] : null; }
 async function sbPatch(p, b) { await fetch(`${SUPA_URL}${p}`, { method: 'PATCH', headers: { ...SB, Prefer: 'return=minimal' }, body: JSON.stringify(b) }); }
-function today() { return new Date().toISOString().split('T')[0]; }
+function today() {
+  // ঢাকার তারিখ (UTC+6) — analyze-batch-submit/collect-এর সাথে সামঞ্জস্যপূর্ণ।
+  const dhaka = new Date(Date.now() + 6 * 60 * 60 * 1000);
+  return dhaka.toISOString().split('T')[0];
+}
