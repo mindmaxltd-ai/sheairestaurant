@@ -23,7 +23,7 @@
 
 const SUPA_URL = process.env.SUPABASE_URL  || 'https://xlkrggspepnysbouatec.supabase.co';
 const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY;
-const RESEND   = process.env.RESEND_API_KEY   || '';
+const RESEND   = process.env.RESEND_KEY || process.env.RESEND_API_KEY || '';
 const SITE_URL = process.env.URL              || 'https://sheairestaurant.com';
 
 const PAGE_SIZE   = 2000; // customers per run — matches analyze-batch-submit's page size
