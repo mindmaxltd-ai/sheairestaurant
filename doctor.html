@@ -1146,11 +1146,11 @@ async function runAIAnalysis(){
   // ── Netlify function-এর নিজস্ব gateway timeout-এর আগেই client নিজে থামিয়ে দেয় (AbortController) —
   //     পুরো ব্রাউজিং একটা ugly 504 HTML-এর জন্য দীর্ঘ সময় অপেক্ষা করে না; সাথে সাথে হালকা
   //     prompt দিয়ে একবার retry করে, তাতেও ব্যর্থ হলে rule-engine ড্রাফটই থেকে যায়। ──
-  async function callAnalyze(promptText, timeoutMs){
+  async function callDoctorAI(promptText, timeoutMs){
     const ctrl = new AbortController();
     const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
     try{
-      const r = await fetch('/.netlify/functions/analyze', {
+      const r = await fetch('/.netlify/functions/doctor', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({ prompt: promptText }),
@@ -1177,7 +1177,7 @@ async function runAIAnalysis(){
 
   try {
     // প্রথম চেষ্টা — সম্পূর্ণ বিস্তারিত prompt, ২০ সেকেন্ড বাজেট
-    const first = await callAnalyze(prompt, 20000);
+    const first = await callDoctorAI(prompt, 20000);
     diag.attempt1 = first.info;
     if(first.data && (first.data.assessment || (first.data.rx && first.data.rx.length))){
       aiData = first.data;
@@ -1186,7 +1186,7 @@ async function runAIAnalysis(){
       document.getElementById('aiAssessText').innerHTML =
         '<span class="spinner-inline"></span> ' + escH(ruleResult.assessment) +
         ' <span style="font-size:.68rem;color:#9A7A8A">(প্রথম চেষ্টা ধীর ছিল, সংক্ষিপ্ত prompt দিয়ে আবার চেষ্টা হচ্ছে...)</span>';
-      const second = await callAnalyze(compactPrompt, 15000);
+      const second = await callDoctorAI(compactPrompt, 15000);
       diag.attempt2 = second.info;
       if(second.data && (second.data.assessment || (second.data.rx && second.data.rx.length))){
         aiData = second.data;
