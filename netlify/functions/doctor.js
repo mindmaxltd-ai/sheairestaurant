@@ -28,9 +28,9 @@ const CLAUDE_KEY =
   '';
 
 const MODEL = 'claude-haiku-4-5';   // দ্রুত মডেল — doctor.html-এর sync timeout এড়ানোর জন্য বেছে নেওয়া
-const MAX_TOKENS = 3000;   // ৫টা বিস্তারিত rx আইটেম + ৮টা আরও ফিল্ড (দু'আ সহ) সম্পূর্ণ করতে যথেষ্ট বাজেট —
-                            // ১৫০০ টোকেনে rx-এর পরের ফিল্ডগুলো (general/home/ayurvedic/unani/homeopathic/
-                            // islamic/dangers/alerts) generate হওয়ার আগেই বাজেট শেষ হয়ে যাচ্ছিল
+const MAX_TOKENS = 4000;   // এখন rule-engine বাদ দিয়ে সম্পূর্ণ AI-নির্ভর, এবং কমপক্ষে ৭-১০টা
+                            // বিস্তারিত rx আইটেম + ৮টা আরও ফিল্ড (দু'আ সহ) — আগের ৩০০০-এও
+                            // মাঝেমধ্যে কাটা যাচ্ছিল, তাই বাজেট আরও বাড়ানো হয়েছে
 
 const reply = (status, body) => ({
   statusCode: status,
