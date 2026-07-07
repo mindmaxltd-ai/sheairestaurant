@@ -745,333 +745,6 @@ function robustParseAI(text){
   };
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ৯০/১০ পলিসি — RULE ENGINE (নির্ধারক, তাৎক্ষণিক, কোনো API/নেটওয়ার্ক
-// নির্ভরতা নেই) ক্লিনিক্যাল প্রেসক্রিপশন-ড্রাফটের ৯০% এখান থেকে আসে।
-// Claude (AI) শুধু চূড়ান্ত assessment/islamic ভাষা পালিশ করে (১০%) —
-// AI ব্যর্থ/ধীর হলেও ডাক্তার সম্পূর্ণ, নিরাপদ ড্রাফট তাৎক্ষণিক দেখেন।
-// sar_rule_engine.js-এর DISEASE_PROFILES/CONDITION_PROFILES-এর প্যাটার্ন
-// অনুসরণ করে সংক্ষিপ্ত আকারে এখানে বসানো হয়েছে (browser-side, dependency ছাড়া)।
-// ═══════════════════════════════════════════════════════════════
-
-// মেট্রিক্স-ভিত্তিক ঝুঁকি নিয়ম (analyze.js-এর runRuleEngine থ্রেশহোল্ডের সাথে সামঞ্জস্যপূর্ণ)
-const CLINICAL_RISK_RULES = [
-  { key:'hba1c_percent',     op:'gte',   t:8,             level:'critical', msg:'HbA1c গুরুতর উচ্চ — ডায়াবেটিক জটিলতার ঝুঁকি' },
-  { key:'hba1c_percent',     op:'range', t:6.5,  t2:7.9,   level:'high',     msg:'HbA1c নিয়ন্ত্রণের বাইরে' },
-  { key:'systolic_bp',       op:'gte',   t:160,           level:'critical', msg:'উচ্চ রক্তচাপ — জরুরি মনোযোগ প্রয়োজন' },
-  { key:'systolic_bp',       op:'range', t:140,  t2:159,   level:'high',     msg:'রক্তচাপ স্বাভাবিকের চেয়ে বেশি' },
-  { key:'hemoglobin_g_dl',   op:'lt',    t:10,            level:'high',     msg:'গুরুতর রক্তস্বল্পতা' },
-  { key:'hemoglobin_g_dl',   op:'range', t:10,   t2:10.9,  level:'medium',   msg:'হালকা রক্তস্বল্পতা' },
-  { key:'alt_u_l',           op:'gte',   t:56,            level:'medium',   msg:'লিভার এনজাইম (ALT) বেশি' },
-  { key:'total_cholesterol', op:'gte',   t:240,           level:'high',     msg:'কোলেস্টেরল উচ্চ' },
-  { key:'bmi',               op:'gte',   t:30,            level:'high',     msg:'গুরুতর স্থূলতা' },
-  { key:'triglycerides',     op:'gte',   t:200,           level:'medium',   msg:'ট্রাইগ্লিসেরাইড বেশি' },
-];
-
-function evalClinicalRisks(m){
-  const risks = [];
-  for(const r of CLINICAL_RISK_RULES){
-    const v = parseFloat(m[r.key]);
-    if(isNaN(v) || v===0) continue;
-    let hit=false;
-    if(r.op==='gte') hit = v>=r.t;
-    else if(r.op==='lt') hit = v<r.t;
-    else if(r.op==='range') hit = v>=r.t && v<=r.t2;
-    if(hit) risks.push({ msg:r.msg, level:r.level, value:v });
-  }
-  return risks;
-}
-
-// রোগ-বিভাগ (DM/OB/FL/IB/PR) baseline — sar_rule_engine.js DISEASE_PROFILES থেকে সংক্ষিপ্ত
-const DISEASE_BASELINE = {
-  DM: { name:'ডায়াবেটিস',
-    general:'Low-GI খাবার, নিয়মিত ওষুধ ও রক্তে শর্করা পরীক্ষা চালিয়ে যান।',
-    home:'নিয়মিত রক্তে শর্করা পরীক্ষা করুন, পায়ের যত্ন নিন।',
-    ayurvedic:'করলা-মেথি চূর্ণ (১ চা চামচ সকালে খালি পেটে) সহায়ক হতে পারে।',
-    unani:'জোশন্দা মেথি-করলা ইউনানি ব্যবস্থাপনায় প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Syzygium Jambolanum বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'বিদ্যমান ডায়াবেটিস ওষুধ (যেমন Metformin/Glimepiride) চালিয়ে যান', note:'বর্তমান ডোজ বহাল রাখুন — সংক্রমণ/অসুস্থতাকালে রক্তে শর্করা সাময়িক বাড়তে পারে, তাই নিবিড় পর্যবেক্ষণ প্রয়োজন; ডোজ পরিবর্তন ডাক্তার নির্ধারণ করবেন' },
-      { generic:'রক্তে শর্করা পুনরায় পরীক্ষা (FBS/HbA1c)', note:'অসুস্থতাকালে সপ্তাহে ২-৩ বার FBS মনিটর করুন; HbA1c প্রতি ৩ মাস অন্তর' },
-    ] },
-  OB: { name:'স্থূলতা',
-    general:'ক্যালরি নিয়ন্ত্রণ, উচ্চ প্রোটিন ও নিয়মিত হাঁটাচলা বজায় রাখুন।',
-    home:'নিয়মিত ওজন মাপুন, প্রক্রিয়াজাত খাবার এড়িয়ে চলুন।',
-    ayurvedic:'ত্রিফলা-গুগ্গুল চূর্ণ (রাতে ঘুমানোর আগে) বিপাক বাড়াতে সহায়ক।',
-    unani:'মাজুন সন্দল বা ইতরিফল ইউনানি চিকিৎসায় প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Fucus Vesiculosus বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'ওষুধের প্রয়োজন সাধারণত নেই', note:'জীবনযাপন পরিবর্তনই মূল চিকিৎসা; ডাক্তার প্রয়োজনে ওজন-নিয়ন্ত্রণ ওষুধ বিবেচনা করবেন' } ] },
-  FL: { name:'ফ্যাটি লিভার',
-    general:'তেল-চর্বি কম, অ্যান্টি-অক্সিডেন্ট সমৃদ্ধ খাবার খান।',
-    home:'অ্যালকোহল ও ভাজাপোড়া এড়িয়ে চলুন, নিয়মিত হাঁটুন।',
-    ayurvedic:'ভুমি আমলকী-হলুদ চূর্ণ (সকালে খালি পেটে) লিভার সুরক্ষায় সহায়ক।',
-    unani:'জোশন্দা কাসনি (চিকোরি ক্বাথ) ইউনানি চিকিৎসায় প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Chelidonium বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Vitamin E বা Ursodeoxycholic Acid', note:'লিভার এনজাইম ও প্রয়োজন অনুযায়ী ডাক্তার নির্ধারণ করবেন' } ] },
-  IB: { name:'IBS/গ্যাস্ট্রিক',
-    general:'Low-FODMAP নীতি মেনে চলুন, ছোট ছোট বেলায় খান।',
-    home:'ট্রিগার খাবার চিহ্নিত করে এড়িয়ে চলুন, ধীরে-সুস্থে খান।',
-    ayurvedic:'মৌরি-আজওয়াইন-হিং চূর্ণ (খাওয়ার পর) গ্যাস কমাতে সহায়ক।',
-    unani:'জওয়ারিশ জালিনুস ইউনানি চিকিৎসায় প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Lycopodium বা Nux Vomica বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Antispasmodic (যেমন Mebeverine)', note:'পেট খিঁচুনি/ব্যথায় প্রয়োজনে, ডাক্তার নির্ধারণ করবেন' } ] },
-  PR: { name:'গর্ভাবস্থা',
-    general:'ফোলেট ও আয়রন সমৃদ্ধ খাবার, নিয়মিত চেকআপ চালিয়ে যান।',
-    home:'নিয়মিত প্রসবপূর্ব চেকআপ করান, পর্যাপ্ত বিশ্রাম নিন।',
-    ayurvedic:'শতাবরী-মরিঙ্গা চূর্ণ (সকালে) — শুধুমাত্র ডাক্তারের অনুমতি নিয়ে।',
-    unani:'গর্ভাবস্থায় ইউনানি ওষুধ শুধুমাত্র রেজিস্টার্ড হেকিম ও গাইনোকোলজিস্টের অনুমোদনক্রমে।',
-    homeo:'গর্ভাবস্থায় হোমিওপ্যাথিক ওষুধ শুধুমাত্র রেজিস্টার্ড হোমিওপ্যাথ ও গাইনোকোলজিস্টের অনুমোদনক্রমে।',
-    rxItems:[ { generic:'গর্ভাবস্থায় যেকোনো নতুন ওষুধ', note:'শুধুমাত্র গাইনোকোলজিস্টের সরাসরি অনুমোদনক্রমে দেওয়া হবে' } ] },
-};
-
-// উপসর্গ-কিওয়ার্ড ম্যাচিং — sar_rule_engine.js CONDITION_PROFILES-এর প্যাটার্ন +
-// doctor-portal-only ত্বক/চর্মরোগ সংযোজন (মূল rule engine-এ নেই) + আয়ুর্বেদিক/ইউনানি/হোমিওপ্যাথিক
-const COMPLAINT_RULES = [
-  { key:'fever',          keywords:['জ্বর','fever','temperature'],
-    general:'হালকা, সহজপাচ্য, তরলসমৃদ্ধ খাবার দিন। Paracetamol (weight-based) বিবেচনা করুন।',
-    home:'বিশ্রাম নিন, হালকা সুতির কাপড় পরুন, কুসুম গরম পানিতে গা মুছে দিন।',
-    ayurvedic:'তুলসি-আদা-হলুদ চূর্ণ (½ চা চামচ উষ্ণ পানিতে দিনে ৩ বার)।',
-    unani:'শরবত বজুরী মু\'তাদিল ইউনানি জ্বরনাশক শরবত (হেকিমের পরামর্শে)।',
-    homeo:'Belladonna বা Ferrum Phos বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Paracetamol 500-650mg', note:'প্রতি ৬-৮ ঘণ্টা, প্রয়োজনে (weight-based dosing — ডাক্তার নিশ্চিত করবেন)' },
-      { generic:'ORS/তরল', note:'পর্যাপ্ত তরল ও ইলেক্ট্রোলাইট বজায় রাখতে' },
-    ],
-    dangers:'জ্বর ১০৩°F+, ৩ দিনের বেশি স্থায়ী, বা খিঁচুনি/অচেতনতা হলে জরুরি বিভাগে যান।' },
-  { key:'cold_cough',     keywords:['সর্দি','কাশি','cold','cough'],
-    general:'ভিটামিন-সি ও জিঙ্ক সমৃদ্ধ খাবার, গরম পানীয় বাড়ান।',
-    home:'গরম পানির ভাপ নিন, লবণ পানিতে গার্গল করুন।',
-    ayurvedic:'সিতোপালাদি-তালিসাদি চূর্ণ (উষ্ণ পানিতে দিনে ২ বার)।',
-    unani:'জোশন্দা (তুলসি-আদা-মধু ক্বাথ) ইউনানি চিকিৎসায় প্রচলিত।',
-    homeo:'Aconite বা Bryonia বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Cetirizine 10mg', note:'রাতে ১টি, সর্দির জন্য' },
-      { generic:'Dextromethorphan কাশি সিরাপ', note:'প্রয়োজনে, শুকনো কাশিতে (ডাক্তার নিশ্চিত করবেন)' },
-    ],
-    dangers:'শ্বাসকষ্ট, বুকে ব্যথা, বা ১ সপ্তাহের বেশি স্থায়ী কাশিতে ডাক্তার দেখান।' },
-  { key:'headache',       keywords:['মাথাব্যথা','headache'],
-    general:'পর্যাপ্ত পানি পান করুন, বিশ্রাম নিন, স্ক্রিন-টাইম কমান।',
-    home:'অন্ধকার-শান্ত ঘরে বিশ্রাম নিন, কপালে ঠান্ডা সেঁক দিন।',
-    ayurvedic:'ভৃঙ্গরাজ-ব্রাহ্মী চূর্ণ (½ চা চামচ দিনে ২ বার)।',
-    unani:'রওগানে বাবুনা (ক্যামোমাইল তেল) মাথায় মালিশ ইউনানি চিকিৎসায় প্রচলিত।',
-    homeo:'Belladonna বা Nux Vomica বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Paracetamol 500mg', note:'প্রয়োজনে (NSAID বিবেচনা করলে ডাক্তার contraindication যাচাই করবেন)' } ],
-    dangers:'হঠাৎ তীব্র মাথাব্যথা, দৃষ্টি সমস্যা, বা বমি সহ হলে জরুরি বিভাগে যান।' },
-  { key:'migraine',       keywords:['মাইগ্রেন','migraine'],
-    general:'ট্রিগার খাবার (পুরনো পনির, অতিরিক্ত ক্যাফেইন) এড়িয়ে চলুন।',
-    home:'উজ্জ্বল আলো ও শব্দ এড়িয়ে অন্ধকার ঘরে বিশ্রাম নিন।',
-    ayurvedic:'ভৃঙ্গরাজ-শঙ্খপুষ্পি চূর্ণ (ঘুমানোর আগে)।',
-    unani:'রওগানে বনাফশা মাথায় হালকা মালিশ ইউনানি চিকিৎসায় প্রচলিত।',
-    homeo:'Iris Versicolor বা Natrum Mur বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Naproxen বা Sumatriptan', note:'তীব্র মাইগ্রেন episode-এ, ডাক্তার নির্ধারণ করবেন' } ],
-    dangers:'নতুন ধরনের বা অস্বাভাবিক তীব্র মাইগ্রেনে ডাক্তার দেখান।' },
-  { key:'acidity',        keywords:['গ্যাস','এসিডিটি','acidity','gastric'],
-    general:'ছোট ছোট বেলায় খান, মশলাদার/সাইট্রাস কমান।',
-    home:'খাওয়ার পর সাথে সাথে শোবেন না, ছোট ছোট বেলায় খান।',
-    ayurvedic:'শতাব্দী-মুলেঠি-আমলকী চূর্ণ (খাওয়ার আগে পানিতে)।',
-    unani:'জওয়ারিশ জালিনুস বা আরক পুদিনা ইউনানি এসিডিটি চিকিৎসায় প্রচলিত।',
-    homeo:'Nux Vomica বা Carbo Veg বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Omeprazole 20mg', note:'সকালে খালি পেটে, ৭-১৪ দিন' },
-      { generic:'Antacid (তরল/চিবানো)', note:'তীব্র উপসর্গে প্রয়োজনে অতিরিক্ত' },
-    ],
-    dangers:'রক্ত বমি, কালো পায়খানা, বা তীব্র পেটে ব্যথায় জরুরি বিভাগে যান।' },
-  { key:'constipation',   keywords:['কোষ্ঠকাঠিন্য','constipation'],
-    general:'ফাইবার ও পানি বাড়ান, উষ্ণ পানীয় পান করুন।',
-    home:'সকালে উষ্ণ পানি পান করুন, নিয়মিত হাঁটাচলা করুন।',
-    ayurvedic:'ত্রিফলা-ইসবগুল চূর্ণ (রাতে ঘুমানোর আগে)।',
-    unani:'ইতরিফল বা রওগানে জাইতুন (অলিভ অয়েল) ইউনানি চিকিৎসায় প্রচলিত।',
-    homeo:'Nux Vomica বা Bryonia বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Isabgol (Psyllium Husk)', note:'রাতে ১ চামচ পর্যাপ্ত পানির সাথে' },
-      { generic:'Lactulose সিরাপ', note:'প্রয়োজনে অতিরিক্ত, ডাক্তার নিশ্চিত করবেন' },
-    ],
-    dangers:'তীব্র পেট ব্যথাসহ কোষ্ঠকাঠিন্য বা মলে রক্ত থাকলে ডাক্তার দেখান।' },
-  { key:'diarrhea',       keywords:['ডায়রিয়া','পাতলা পায়খানা','diarrhea','loose motion'],
-    general:'ORS/নারকেল পানি দিয়ে পানিশূন্যতা রোধ করুন, হালকা খাবার (BRAT) দিন।',
-    home:'ORS/ডাবের পানি ঘন ঘন পান করুন, নরম-সহজপাচ্য খাবার দিন।',
-    ayurvedic:'বেলের শাঁস-ইসবগুল চূর্ণ (ঠান্ডা পানিতে দিনে ৩ বার)।',
-    unani:'হাব্বে মুসাক্কিন ইউনানি চিকিৎসায় প্রচলিত (পানিশূন্যতা এড়াতে সতর্কতাসহ)।',
-    homeo:'Arsenicum Album বা Podophyllum বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'ORS', note:'প্রতিবার পাতলা পায়খানার পর, পানিশূন্যতা রোধে' },
-      { generic:'Zinc সালফেট', note:'১০-১৪ দিন' },
-      { generic:'Loperamide', note:'শুধুমাত্র রক্ত/জ্বর না থাকলে বিবেচনা করুন (ডাক্তার নিশ্চিত করবেন)' },
-    ],
-    dangers:'রক্তমিশ্রিত পায়খানা, তীব্র পানিশূন্যতা, বা ২ দিনের বেশি স্থায়ী হলে দ্রুত ডাক্তার দেখান।' },
-  { key:'stress',         keywords:['মানসিক চাপ','স্ট্রেস','stress','anxiety'],
-    general:'পরিশোধিত কার্ব ও ক্যাফেইন কমান, ঘুম ও বিশ্রাম নিশ্চিত করুন।',
-    home:'গভীর শ্বাস-প্রশ্বাস ব্যায়াম করুন, প্রিয়জনের সাথে কথা বলুন।',
-    ayurvedic:'অশ্বগন্ধা-ব্রাহ্মী চূর্ণ (রাতে উষ্ণ পানিতে)।',
-    unani:'খামিরা মারওয়ারিদ ইউনানি টনিক প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Ignatia বা Aconite বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'প্রধানত non-pharmacological', note:'জীবনযাপন ব্যবস্থাপনা মূল; ওষুধের প্রয়োজন হলে ডাক্তার বিবেচনা করবেন' } ],
-    dangers:'তীব্র উদ্বেগ বা আত্মহত্যার চিন্তা থাকলে অবিলম্বে মানসিক স্বাস্থ্য সহায়তা নিন।' },
-  { key:'sleep',          keywords:['ঘুম','sleep','insomnia'],
-    general:'ক্যাফেইন ও ভারী রাতের খাবার এড়িয়ে চলুন, নিয়মিত ঘুমের সময় রাখুন।',
-    home:'শোবার আগে স্ক্রিন এড়িয়ে চলুন, নিয়মিত সময়ে ঘুমাতে যান।',
-    ayurvedic:'ব্রাহ্মী-জটামাংসী চূর্ণ (ঘুমানোর ৩০ মিনিট আগে)।',
-    unani:'খামিরা গাওজাবান ইউনানি ঘুম-সহায়ক প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Coffea Cruda বা Nux Vomica বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'প্রধানত non-pharmacological', note:'ঘুমের স্বাস্থ্যবিধি মূল; দীর্ঘস্থায়ী হলে ডাক্তার ওষুধ বিবেচনা করবেন' } ],
-    dangers:'দীর্ঘস্থায়ী অনিদ্রা দৈনন্দিন কাজে প্রভাব ফেললে বিশেষজ্ঞ দেখান।' },
-  { key:'menstrual',      keywords:['মাসিক','period','cramp','cramping'],
-    general:'আয়রন ও ম্যাগনেসিয়াম সমৃদ্ধ খাবার বাড়ান, বিশ্রাম নিন।',
-    home:'পেটে উষ্ণ সেঁক দিন, পর্যাপ্ত বিশ্রাম নিন।',
-    ayurvedic:'অশোক-শতাবরী চূর্ণ (সকাল-রাত উষ্ণ পানিতে)।',
-    unani:'জোশন্দা সোঁঠ-মেথি ইউনানি চিকিৎসায় প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Mag Phos বা Pulsatilla বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Mefenamic Acid বা Ibuprofen', note:'মাসিকের ব্যথায় প্রয়োজনে (ডাক্তার নিশ্চিত করবেন)' } ],
-    dangers:'অতিরিক্ত রক্তক্ষরণ বা তীব্র ব্যথায় ডাক্তার দেখান।' },
-  { key:'menorrhagia',    keywords:['heavy bleeding','heavy mens','heavy menstrual','menorrhagia','ভারী রক্তক্ষরণ','অতিরিক্ত রক্তক্ষরণ','মাসিকে অতিরিক্ত'],
-    general:'ভারী রক্তক্ষরণে রক্তস্বল্পতার ঝুঁকি থাকে — CBC/ফেরিটিন পরীক্ষা ও কারণ নির্ণয় (PCOS, ফাইব্রয়েড, থাইরয়েড) জরুরি।',
-    home:'পর্যাপ্ত বিশ্রাম নিন, আয়রন সমৃদ্ধ খাবার (কলিজা, পালং শাক, খেজুর) বাড়ান।',
-    ayurvedic:'অশোক-লোধ্র চূর্ণ (সকাল-রাত উষ্ণ পানিতে) রক্তক্ষরণ নিয়ন্ত্রণে সহায়ক হতে পারে।',
-    unani:'জোশন্দা আকাকিয়া ইউনানি চিকিৎসায় রক্তক্ষরণ নিয়ন্ত্রণে প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Sabina বা Ipecac বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Tranexamic Acid 500mg', note:'মাসিকের ভারী রক্তক্ষরণের দিনগুলোতে দিনে ৩ বার পর্যন্ত (ডাক্তার নিশ্চিত করবেন, সর্বোচ্চ ৫ দিন)' },
-      { generic:'Mefenamic Acid 500mg', note:'দিনে ৩ বার, রক্তক্ষরণ ও ব্যথা উভয় কমাতে সহায়ক' },
-      { generic:'Iron + Folic Acid সাপ্লিমেন্ট', note:'রক্তস্বল্পতা প্রতিরোধ/চিকিৎসায়, CBC অনুযায়ী ডাক্তার ডোজ নির্ধারণ করবেন' },
-    ],
-    dangers:'অতিরিক্ত রক্তক্ষরণে মাথা ঘোরা, তীব্র দুর্বলতা, বা প্যাড ১ ঘণ্টার মধ্যে ভিজে গেলে দ্রুত ডাক্তার দেখান।' },
-  { key:'pcos',           keywords:['pcos','পিসিওএস','polycystic'],
-    general:'PCOS ব্যবস্থাপনায় ওজন নিয়ন্ত্রণ, নিয়মিত ব্যায়াম ও Low-GI খাদ্য গুরুত্বপূর্ণ — endocrinologist/gynecologist ফলোআপ প্রয়োজন।',
-    home:'নিয়মিত হাঁটাচলা করুন, চিনি/পরিশোধিত কার্ব কমান।',
-    ayurvedic:'শতাবরী-অশোক চূর্ণ (সকালে উষ্ণ পানিতে) হরমোন ভারসাম্যে সহায়ক হতে পারে।',
-    unani:'মাজুন উশ্বা ইউনানি চিকিৎসায় হরমোন ভারসাম্যে প্রচলিত (হেকিমের পরামর্শে)।',
-    homeo:'Pulsatilla বা Sepia বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের দীর্ঘমেয়াদী তত্ত্বাবধানে)।',
-    rxItems:[
-      { generic:'Metformin 500mg', note:'দিনে ১-২ বার খাবারের সাথে — ইনসুলিন রেজিস্ট্যান্স ব্যবস্থাপনায় (ডাক্তার নিশ্চিত করবেন)' },
-      { generic:'Combined Oral Contraceptive (যেমন Ethinyl Estradiol + Cyproterone)', note:'মাসিক নিয়মিত করতে ও androgen কমাতে — ⚠️ গর্ভাবস্থায় সম্পূর্ণ contraindicated, আগে গর্ভধারণ বাতিল নিশ্চিত করে গাইনোকোলজিস্ট দেবেন' },
-    ],
-    dangers:'তীব্র পেট ব্যথা, অনিয়ন্ত্রিত রক্তক্ষরণ, বা গর্ভধারণে দীর্ঘ সমস্যা হলে গাইনোকোলজিস্ট দেখান।' },
-  { key:'fatigue',        keywords:['ক্লান্তি','দুর্বলতা','fatigue','weakness'],
-    general:'আয়রন, B12 ও কমপ্লেক্স কার্ব সমৃদ্ধ খাবার বাড়ান।',
-    home:'পর্যাপ্ত ঘুম ও হালকা ব্যায়াম করুন, পানিশূন্যতা এড়ান।',
-    ayurvedic:'অশ্বগন্ধা-শিলাজিত চূর্ণ (সকালে উষ্ণ পানিতে)।',
-    unani:'খামিরা আবরেশম বা মাজুন মুকাব্বি ইউনানি টনিক প্রচলিত।',
-    homeo:'China বা Kali Phos বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[ { generic:'Iron/B12 সাপ্লিমেন্ট', note:'রক্ত পরীক্ষার (CBC/B12) পর ডাক্তার নির্ধারণ করবেন' } ],
-    dangers:'তীব্র/দীর্ঘস্থায়ী ক্লান্তি অন্য রোগের লক্ষণ হতে পারে — রক্ত পরীক্ষা করান।' },
-  // ── ত্বক/চর্মরোগ — মূল rule engine-এ নেই, doctor-portal-only সংযোজন ──
-  { key:'skin_fungal',    keywords:['tinea','ringworm','fungal','ছত্রাক','দাদ','corporis'],
-    general:'টপিকাল অ্যান্টিফাংগাল বিবেচনা করুন। স্থান শুষ্ক ও পরিষ্কার রাখুন, ঢিলা সুতির কাপড় পরুন। ডায়াবেটিস থাকলে ইমিউনিটি কম থাকায় সংক্রমণ দীর্ঘস্থায়ী/ব্যাপক হতে পারে — oral antifungal বিবেচনা করুন।',
-    home:'স্থান শুকনো রাখুন, প্রতিদিন কাপড় পরিবর্তন করুন, শেয়ার করা তোয়ালে এড়িয়ে চলুন।',
-    ayurvedic:'নিম পাতা বাটা বা নারকেল তেল+কর্পূর প্রলেপ প্রদাহ কমাতে সহায়ক হতে পারে।',
-    unani:'রওগানে চালমুগরা ইউনানি ছত্রাক চিকিৎসায় প্রচলিত (হেকিমের তত্ত্বাবধানে)।',
-    homeo:'Sepia বা Graphites বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Luliconazole 1% ক্রিম', note:'আক্রান্ত স্থানে দিনে ১ বার, ২-৪ সপ্তাহ — চারপাশে ১-২ সেমি ছাড়িয়ে লাগান, ক্লিনিক্যাল সেরে যাওয়ার পরও ১ সপ্তাহ চালিয়ে যান' },
-      { generic:'Terbinafine 250mg ট্যাবলেট', note:'দিনে ১ বার, ২-৪ সপ্তাহ — ডায়াবেটিসের কারণে ইমিউনিটি কম/ব্যাপক-পুনরাবৃত্ত সংক্রমণে বিবেচনা করুন (শুরুর আগে লিভার ফাংশন টেস্ট বেসলাইন প্রয়োজন)' },
-    ],
-    dangers:'ছড়িয়ে পড়লে, পুঁজ/লালচে ফোলাভাব বা জ্বর সহ হলে দ্রুত ডাক্তার দেখান।' },
-  { key:'skin_itch',      keywords:['itching','itch','চুলকানি','চুলকায়'],
-    general:'অ্যালার্জি, শুষ্ক ত্বক বা ছত্রাক কারণ হতে পারে — অ্যান্টিহিস্টামিন ও ময়েশ্চারাইজার বিবেচনা করুন।',
-    home:'ঠান্ডা পানিতে গোসল করুন, কড়া সাবান এড়িয়ে চলুন।',
-    ayurvedic:'অ্যালোভেরা জেল বা নারকেল তেল প্রলেপ প্রশান্তিদায়ক হতে পারে।',
-    unani:'রওগানে বনাফশা বা নিম-ভিত্তিক ইউনানি লেপ প্রচলিত।',
-    homeo:'Sulphur বা Rhus Tox বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের পরামর্শে)।',
-    rxItems:[
-      { generic:'Cetirizine 10mg বা Levocetirizine 5mg', note:'রাতে ১টি, চুলকানি উপশমে' },
-      { generic:'Calamine লোশন', note:'আক্রান্ত স্থানে দিনে ২-৩ বার, টপিকাল প্রশান্তির জন্য' },
-    ],
-    dangers:'সারা শরীরে ছড়িয়ে পড়া চুলকানি বা শ্বাসকষ্ট সহ হলে জরুরি বিভাগে যান।' },
-  { key:'skin_psoriasis', keywords:['psoriasis','সোরিয়াসিস'],
-    general:'দীর্ঘস্থায়ী অটোইমিউন ত্বক সমস্যা — চর্মরোগ বিশেষজ্ঞের নিয়মিত ফলোআপ প্রয়োজন। ⚠️ সক্রিয় ছত্রাক সংক্রমণ (tinea) থাকা অবস্থায় একা স্টেরয়েড দিলে সংক্রমণ আরও ছড়াতে পারে (tinea incognito) — আগে ছত্রাক নিয়ন্ত্রণে আনা নিরাপদ।',
-    home:'ত্বক নিয়মিত ময়েশ্চারাইজ করুন, রোদে অল্প সময় থাকুন (ডাক্তারের পরামর্শে)।',
-    ayurvedic:'নিম-হলুদ পেস্ট প্রলেপ (চিকিৎসকের অনুমতিক্রমে) বিবেচনা করা যেতে পারে।',
-    unani:'মালহাম রুতুবত (ময়েশ্চারাইজিং ইউনানি মলম) হেকিমের সরাসরি তত্ত্বাবধানে বিবেচনা করা যেতে পারে।',
-    homeo:'Arsenicum Album বা Graphites বিবেচনা করা যেতে পারে (হোমিওপ্যাথ চিকিৎসকের দীর্ঘমেয়াদী তত্ত্বাবধানে)।',
-    rxItems:[
-      { generic:'Betamethasone + Calcipotriol সম্মিলিত টপিকাল', note:'রাতে ১ বার — ছত্রাক সংক্রমণ নিয়ন্ত্রণে আসার পর শুরু করুন, চর্মরোগ বিশেষজ্ঞের তত্ত্বাবধানে' },
-      { generic:'ইমোলিয়েন্ট/ময়েশ্চারাইজার (সুগন্ধিমুক্ত)', note:'দিনে ২ বার, ত্বক আর্দ্র রাখতে ও পুনরাবৃত্তি কমাতে' },
-    ],
-    dangers:'জয়েন্টে ব্যথা/ফোলা দেখা দিলে (সোরিয়াটিক আর্থ্রাইটিস ঝুঁকি) দ্রুত বিশেষজ্ঞের কাছে যান।' },
-];
-
-function matchComplaintRules(complaintText){
-  const lc = (complaintText||'').toLowerCase();
-  return COMPLAINT_RULES.filter(r => r.keywords.some(kw => lc.includes(kw.toLowerCase())));
-}
-
-// ── কুরআন/হাদিস থেকে প্রমাণিত (authentic, cited) দু'আ — বানানো/অনুমাননির্ভর নয় ──
-// প্রতিটিতে: আরবি টেক্সট, বাংলা উচ্চারণ (transliteration — আরবি না জানলেও পড়া যাবে), বাংলা অর্থ, সূত্র
-// তারিখ-ভিত্তিক deterministic ঘূর্ণন (random নয়) — প্রতিদিন consistent একই দু'আ দেখায়
-const ISLAMIC_DUA_POOL = [
-  { ar:'اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَاسَ، اشْفِ أَنْتَ الشَّافِي، لاَ شِفَاءَ إِلاَّ شِفَاؤُكَ، شِفَاءً لاَ يُغَادِرُ سَقَمًا',
-    pron:'আল্লাহুম্মা রব্বান নাস, আয্‌হিবিল বা\'স, ইশ্‌ফি আনতাশ শাফি, লা শিফা\'আ ইল্লা শিফা\'উক, শিফা\'আন লা ইউগা-দিরু সাক্বামা',
-    bn:'হে আল্লাহ, মানুষের প্রতিপালক! কষ্ট দূর করে দাও, আরোগ্য দান করো — তুমিই প্রকৃত আরোগ্যদাতা। তোমার আরোগ্যদান ছাড়া কোনো আরোগ্য নেই, এমন আরোগ্য দাও যা কোনো রোগ অবশিষ্ট না রাখে।',
-    ref:'সহীহ বুখারী ৫৭৫০, সহীহ মুসলিম ২১৯১' },
-  { ar:'وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ',
-    pron:'ওয়া ইযা মারিদ্‌তু ফাহুওয়া ইয়াশ্‌ফীন',
-    bn:'আর যখন আমি অসুস্থ হই, তখন তিনিই (আল্লাহ) আমাকে আরোগ্য দান করেন।',
-    ref:'সূরা আশ-শু\'আরা, ২৬:৮০' },
-  { ar:'وَنُنَزِّلُ مِنَ الْقُرْآنِ مَا هُوَ شِفَاءٌ وَرَحْمَةٌ لِّلْمُؤْمِنِينَ',
-    pron:'ওয়া নুনায্‌যিলু মিনাল কুরআ-নি মা হুওয়া শিফাউন ওয়া রহমাতুল লিলমু\'মিনীন',
-    bn:'আর আমি কুরআন থেকে তা-ই অবতীর্ণ করি যা মুমিনদের জন্য নিরাময় ও রহমতস্বরূপ।',
-    ref:'সূরা বনী ইসরাঈল, ১৭:৮২' },
-  { ar:'أَنِّي مَسَّنِيَ الضُّرُّ وَأَنتَ أَرْحَمُ الرَّاحِمِينَ',
-    pron:'আন্নী মাসসানিয়াদ্‌ দুররু ওয়া আনতা আরহামুর রা-হিমীন',
-    bn:'নিশ্চয়ই আমাকে কষ্ট স্পর্শ করেছে, আর আপনিই সর্বাধিক দয়ালুদের মধ্যে শ্রেষ্ঠ দয়ালু। (নবী আইয়ুব আ.-এর দু\'আ, দীর্ঘ অসুস্থতার সময়)',
-    ref:'সূরা আল-আম্বিয়া, ২১:৮৩' },
-];
-
-function pickDua(){
-  const d = ISLAMIC_DUA_POOL[new Date().getDate() % ISLAMIC_DUA_POOL.length];
-  return `${d.ar}\n\nউচ্চারণ: ${d.pron}\n\nঅর্থ: "${d.bn}"\n\n(সূত্র: ${d.ref})\n\nসবর করুন, দু'আ করুন। পরিবারের সহায়তা নিন।`;
-}
-
-// ── রুল-ইঞ্জিন থেকে সম্পূর্ণ প্রেসক্রিপশন-ড্রাফট বানায় (৯০% — নির্ধারক, তাৎক্ষণিক, sync, কোনো fetch নেই) ──
-function computeRuleEngineResult(patientObj, complaint, metrics){
-  const cat = patientObj.category || 'DM';
-  const baseline = DISEASE_BASELINE[cat] || DISEASE_BASELINE.DM;
-  const risks = evalClinicalRisks(metrics || {});
-  const matched = matchComplaintRules(complaint);
-
-  const riskMsgs = risks.map(r=>r.msg);
-  let assessmentParts = [];
-  if(matched.length) assessmentParts.push(`অভিযোগ অনুযায়ী প্রাসঙ্গিক বিষয়: ${matched.map(m=>m.keywords[0]).join(', ')}।`);
-  if(riskMsgs.length) assessmentParts.push(`মেট্রিক্স থেকে সতর্কতা: ${riskMsgs.join('; ')}।`);
-  if(!assessmentParts.length) assessmentParts.push(`রোগীর ${baseline.name} বিভাগ ও আজকের অভিযোগ ("${complaint}") বিবেচনা করে সাধারণ ব্যবস্থাপত্র প্রস্তুত করা হয়েছে।`);
-  assessmentParts.push('ডাক্তার যাচাই করে চূড়ান্ত করবেন।');
-
-  // ── প্রতিটি ম্যাচড উপসর্গের rxItems ফ্ল্যাট করে বিস্তারিত multi-drug ড্রাফট বানায় (rule-engine,
-  //     deterministic) — PLUS রোগীর দীর্ঘমেয়াদী রোগ-বিভাগ (DM/OB/FL/IB/PR) baseline সবসময়
-  //     যোগ হয় (শুধু fallback নয়) — কারণ real ক্লিনিক্যাল কেয়ারে comorbidity সবসময় বিবেচ্য।
-  //     ডাক্তার প্রতিটি row-ই এখানে সম্পাদনা/মুছে/যোগ করতে পারেন; চূড়ান্ত অনুমোদন
-  //     consultation.html-এই হয় (sendForApproval → sign flow অক্ষত)। ──
-  const complaintRxRows = matched.flatMap(m =>
-    (m.rxItems || []).map(it => ({ cat: baseline.name, generic: it.generic, note: it.note }))
-  );
-  const baselineRxRows = (baseline.rxItems || []).map(it =>
-    ({ cat: `${baseline.name} (চলমান)`, generic: it.generic, note: it.note })
-  );
-  const rx = [...complaintRxRows, ...baselineRxRows];
-  if(!rx.length){
-    rx.push({ cat: baseline.name, generic: 'Paracetamol (প্রয়োজনে)', note: 'Weight-based dosing — ডাক্তার নিশ্চিত করুন' });
-  }
-
-  const general     = [ ...matched.map(m=>m.general),     baseline.general   ].filter(Boolean).join(' ');
-  const home        = [ ...matched.map(m=>m.home),        baseline.home      ].filter(Boolean).join(' ');
-  const ayurvedic   = [ ...matched.map(m=>m.ayurvedic),   baseline.ayurvedic ].filter(Boolean).join(' ');
-  const unani       = [ ...matched.map(m=>m.unani),       baseline.unani     ].filter(Boolean).join(' ');
-  const homeopathic = [ ...matched.map(m=>m.homeo),       baseline.homeo     ].filter(Boolean).join(' ');
-  const dangers = matched.length
-    ? matched.map(m=>m.dangers).join(' ')
-    : 'জ্বর ৩ দিনের বেশি, অচেতনতা, শ্বাসকষ্ট, বা তীব্র ব্যথায় দ্রুত ডাক্তার দেখান।';
-
-  return {
-    assessment: assessmentParts.join(' '),
-    rx, general, home, ayurvedic, unani, homeopathic,
-    islamic: pickDua(),
-    dangers,
-    alerts: 'শ্বাসকষ্ট, তীব্র ব্যথা, অচেতনতা বা কোনো জরুরি লক্ষণে দ্রুত হাসপাতালে যান।',
-    _ruleEngine: { risks, matched: matched.map(m=>m.key) },
-  };
-}
-
-
 async function runAIAnalysis(){
   const complaint = document.getElementById('complaint').value.trim();
   if(!complaint){ showToast('⚠️ আজকের অভিযোগ লিখুন'); return; }
@@ -1080,30 +753,21 @@ async function runAIAnalysis(){
 
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-inline"></span> বিশ্লেষণ চলছে...';
+  btn.innerHTML = '<span class="spinner-inline"></span> Claude AI বিশ্লেষণ করছে...';
 
   const dbgToggle = document.getElementById('aiDebugToggle');
   const dbgBox = document.getElementById('aiDebugBox');
   if(dbgToggle) dbgToggle.style.display = 'none';
   if(dbgBox){ dbgBox.style.display = 'none'; dbgBox.textContent = ''; }
 
+  document.getElementById('aiAssessText').innerHTML = '<span class="spinner-inline"></span> Claude AI সম্পূর্ণ বিশ্লেষণ তৈরি করছে...';
+
   const m = patient.metrics || {};
   const catNames = {DM:'ডায়াবেটিস',OB:'স্থূলতা/Weight Management',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
   const cat = catNames[patient.category||'DM'] || patient.category;
 
-  // ═══ ধাপ ১ — RULE ENGINE: sync, কোনো fetch/API নেই, তাৎক্ষণিক ═══
-  // এটা তাৎক্ষণিক দেখানো হয় (নেটওয়ার্কের অপেক্ষা ছাড়াই) এবং AI ব্যর্থ/ধীর হলে
-  // safety-net হিসেবে থেকে যায় — ডাক্তার কখনো খালি হাতে থাকেন না।
-  const ruleResult = computeRuleEngineResult(patient, complaint, m);
-  currentRxData = ruleResult;
-  renderAIResult(ruleResult);
-  document.getElementById('aiAssessText').innerHTML =
-    '<span class="spinner-inline"></span> ' + escH(ruleResult.assessment) +
-    ' <span style="font-size:.68rem;color:#9A7A8A">(Claude AI পূর্ণ বিশ্লেষণ করছে...)</span>';
-
-  // ═══ ধাপ ২ — CLAUDE AI: সম্পূর্ণ ক্লিনিক্যাল বিশ্লেষণ ও প্রেসক্রিপশন (medicine সহ সবকিছু
-  //     Claude নির্ধারণ করে)। ব্যর্থ হলে ধাপ ১-এর rule-engine ড্রাফটই থেকে যায়। ═══
-  const diag = { time: new Date().toISOString(), complaint, ruleEngine: ruleResult._ruleEngine };
+  // ═══ রুল-ইঞ্জিন আর ব্যবহার হয় না — সম্পূর্ণ বিশ্লেষণ Claude AI-ই করে। ═══
+  const diag = { time: new Date().toISOString(), complaint };
   let aiData = null;
 
   // মেট্রিক্স সংক্ষেপ (শুধু value থাকা কলাম)
@@ -1128,11 +792,11 @@ async function runAIAnalysis(){
     if(Array.isArray(prev) && prev[0]) prevRxStr = (prev[0].note_text_bn||'').slice(0,250);
   }catch(e){}
 
-  const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল AI সহকারী — একজন লাইসেন্সপ্রাপ্ত MBBS ডাক্তারকে সহায়তা করছ যিনি চূড়ান্ত সিদ্ধান্ত নেবেন ও sign করবেন। Mayo Clinic/Cleveland Clinic মানের সম্পূর্ণ, বাস্তব ক্লিনিক্যাল বিশ্লেষণ দাও — প্রয়োজন অনুযায়ী ততগুলো medicine দাও যতগুলো সত্যিকারের ক্লিনিক্যাল প্রয়োজন (সাধারণত জটিল/কমরবিডিটি-সহ কেসে ৫-১০টা reasonable, সাধারণ কেসে কম)।
+  const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল AI সহকারী — একজন লাইসেন্সপ্রাপ্ত MBBS ডাক্তারকে সহায়তা করছ যিনি চূড়ান্ত সিদ্ধান্ত নেবেন ও sign করবেন। Mayo Clinic/Cleveland Clinic মানের সম্পূর্ণ, বাস্তব ক্লিনিক্যাল বিশ্লেষণ দাও।
 
-⚠️ অত্যন্ত জরুরি নিয়ম #১ — প্রতিটি সমস্যার জন্য আলাদা বিশ্লেষণ: আজকের অভিযোগে একাধিক সমস্যা/রোগ উল্লেখ থাকলে (যেমন "PCOS, ভারী রক্তক্ষরণ, মাথাব্যথা"), প্রতিটাকে আলাদা আলাদাভাবে বিবেচনা করো — একটা সমস্যার জন্য ২-৩টা ওষুধ দিয়ে বাকিগুলো বাদ দেওয়া চলবে না। মনে মনে প্রতিটা সমস্যা ধরে ধরে ভাবো (ruminate): "এই সমস্যার জন্য standard treatment কী?" — তারপর সবগুলো সমস্যা মিলিয়ে সম্পূর্ণ rx list বানাও। rx array-এ প্রতিটা সমস্যার জন্য অন্তত ১-৩টা প্রাসঙ্গিক medicine থাকা উচিত।
+⚠️ অত্যন্ত জরুরি নিয়ম #১ — Medicine সংখ্যা: মোট rx array-এ কমপক্ষে ৭-১০টা medicine থাকতেই হবে, এবং আজকের অভিযোগে উল্লেখিত প্রতিটা আলাদা সমস্যা/রোগের জন্য কমপক্ষে ২-৩টা প্রাসঙ্গিক medicine থাকতে হবে (একটা সমস্যার জন্য দিয়ে বাকিগুলো বাদ দেওয়া চলবে না)। মনে মনে প্রতিটা সমস্যা আলাদা আলাদা করে ভাবো (ruminate): "এই নির্দিষ্ট সমস্যার জন্য standard treatment কী কী?" — তারপর সবগুলো সমস্যা মিলিয়ে সম্পূর্ণ rx list বানাও।
 
-⚠️ অত্যন্ত জরুরি নিয়ম #২ — সম্পূর্ণতা: নিচের ১০টা ফিল্ডের প্রতিটি সম্পূর্ণ করা বাধ্যতামূলক — কোনো ফিল্ড ফাঁকা/অনুপস্থিত রাখা যাবে না। যদি অনেক medicine (rx) থাকার কারণে জায়গার চাপ পড়ে, rx-এর প্রতিটি note ছোট/সংক্ষিপ্ত করো (medicine সংখ্যা কমানোর বদলে), যাতে general থেকে alerts পর্যন্ত বাকি সব ফিল্ডও সম্পূর্ণ লেখা হয়। সম্পূর্ণতা সবচেয়ে গুরুত্বপূর্ণ — অসম্পূর্ণ JSON দেওয়া চলবে না।
+⚠️ অত্যন্ত জরুরি নিয়ম #২ — সম্পূর্ণতা: নিচের ১০টা ফিল্ডের প্রতিটি সম্পূর্ণ করা বাধ্যতামূলক — কোনো ফিল্ড ফাঁকা/অনুপস্থিত রাখা যাবে না। জায়গার চাপ পড়লে প্রতিটা field/note সংক্ষিপ্ত করো, কিন্তু medicine সংখ্যা (৭-১০টা) কখনো কমাবে না।
 
 রোগীর তথ্য: বিভাগ: ${cat} · বয়স: ${patient.age||'অজানা'}
 স্বাস্থ্য মেট্রিক্স: ${metricsStr}
@@ -1140,39 +804,37 @@ async function runAIAnalysis(){
 আগের প্রেসক্রিপশন (সংক্ষিপ্ত): ${prevRxStr || 'নেই'}
 আজকের অভিযোগ: ${complaint}
 
-শুধু এই JSON structure দাও (সব ১০টা key-ই থাকতেই হবে), কোনো markdown code block বা অতিরিক্ত লেখা নয়:
+শুধু এই JSON structure দাও (সব ১০টা key-ই থাকতেই হবে, rx-এ কমপক্ষে ৭-১০টা আইটেম), কোনো markdown code block বা অতিরিক্ত লেখা নয়:
 {
-  "assessment": "ক্লিনিক্যাল মূল্যায়ন (বাংলায়, ২-৩ বাক্য, মূল অভিযোগ + comorbidity বিবেচনা করে — সংক্ষিপ্ত রাখো)",
+  "assessment": "ক্লিনিক্যাল মূল্যায়ন (বাংলায়, ২-৩ বাক্য, প্রতিটা সমস্যা উল্লেখ করে)",
   "rx": [
-    {"cat": "বিভাগ", "generic": "নির্দিষ্ট Generic ওষুধের নাম + strength", "note": "সংক্ষিপ্ত ডোজ/সময়কাল/সতর্কতা — ১ বাক্যে"}
+    {"cat": "কোন সমস্যার জন্য", "generic": "নির্দিষ্ট Generic ওষুধের নাম + strength", "note": "সংক্ষিপ্ত ডোজ/সময়কাল/সতর্কতা — ১ বাক্যে"}
   ],
   "general": "সাধারণ পরামর্শ (১ বাক্য)",
   "home": "ঘরোয়া প্রতিকার (১ বাক্য)",
   "ayurvedic": "আয়ুর্বেদিক পরামর্শ, নির্দিষ্ট নাম (১ বাক্য)",
   "unani": "ইউনানি পরামর্শ, নির্দিষ্ট নাম (১ বাক্য, হেকিমের পরামর্শে)",
   "homeopathic": "হোমিওপ্যাথিক পরামর্শ, নির্দিষ্ট remedy নাম (১ বাক্য, হোমিওপ্যাথ চিকিৎসকের পরামর্শে)",
-  "islamic": "কুরআন বা সহীহ হাদিস থেকে একটি নির্ভরযোগ্য, প্রকৃত দু'আ — আরবি টেক্সট + বাংলা উচ্চারণ (transliteration) + বাংলা অর্থ + সূত্র (সূরা:আয়াত বা হাদিস গ্রন্থ ও নম্বর), সংক্ষিপ্তভাবে। কখনো বানানো/অনিশ্চিত দু'আ দিও না — শুধু প্রকৃত, সুপরিচিত, যাচাইযোগ্য দু'আ।",
+  "islamic": "কুরআন বা সহীহ হাদিস থেকে একটি নির্ভরযোগ্য, প্রকৃত দু'আ — আরবি টেক্সট + বাংলা উচ্চারণ (transliteration) + বাংলা অর্থ + সূত্র (সূরা:আয়াত বা হাদিস গ্রন্থ ও নম্বর), সংক্ষিপ্তভাবে। কখনো বানানো/অনিশ্চিত দু'আ দিও না।",
   "dangers": "বিপদ সংকেত (১ বাক্য)",
   "alerts": "জরুরি সতর্কতা — কখন হাসপাতালে যাবেন (১ বাক্য)"
 }`;
 
-  const compactPrompt = `তুমি SAR ক্লিনিক্যাল AI সহকারী। সংক্ষিপ্ত কিন্তু সম্পূর্ণ ক্লিনিক্যাল বিশ্লেষণ দাও (দ্রুত উত্তর জরুরি — প্রতিটি ফিল্ড ১ বাক্যে রাখো, rx সর্বোচ্চ ৩টা আইটেম)।
+  const compactPrompt = `তুমি SAR ক্লিনিক্যাল AI সহকারী। দ্রুত কিন্তু সম্পূর্ণ বিশ্লেষণ দাও — অভিযোগে উল্লেখিত প্রতিটা সমস্যার জন্য কমপক্ষে ২টা medicine সহ মোট কমপক্ষে ৬-৮টা medicine (rx array), প্রতিটা ফিল্ড ১ বাক্যে সংক্ষিপ্ত রাখো (medicine সংখ্যা কমিও না)।
 
 বিভাগ: ${cat} · অভিযোগ: ${complaint} · মেট্রিক্স সংক্ষেপ: ${metricsStr.slice(0,200)}
 
 শুধু এই JSON দাও, markdown/ব্যাখ্যা ছাড়া:
 {
   "assessment": "১-২ বাক্য",
-  "rx": [{"cat":"বিভাগ","generic":"Generic নাম","note":"সংক্ষিপ্ত ডোজ"}],
+  "rx": [{"cat":"কোন সমস্যার জন্য","generic":"Generic নাম","note":"সংক্ষিপ্ত ডোজ"}],
   "general": "১ বাক্য", "home": "১ বাক্য",
   "ayurvedic": "১ বাক্য নির্দিষ্ট নাম", "unani": "১ বাক্য নির্দিষ্ট নাম", "homeopathic": "১ বাক্য নির্দিষ্ট নাম",
   "islamic": "১টা প্রকৃত দু'আ — আরবি + বাংলা উচ্চারণ + অর্থ + সূত্র, সংক্ষিপ্ত",
   "dangers": "১ বাক্য", "alerts": "১ বাক্য"
 }`;
 
-  // ── Netlify function-এর নিজস্ব gateway timeout-এর আগেই client নিজে থামিয়ে দেয় (AbortController) —
-  //     পুরো ব্রাউজিং একটা ugly 504 HTML-এর জন্য দীর্ঘ সময় অপেক্ষা করে না; সাথে সাথে হালকা
-  //     prompt দিয়ে একবার retry করে, তাতেও ব্যর্থ হলে rule-engine ড্রাফটই থেকে যায়। ──
+  // ── Netlify function-এর নিজস্ব gateway timeout-এর আগেই client নিজে থামিয়ে দেয় (AbortController) ──
   async function callDoctorAI(promptText, timeoutMs){
     const ctrl = new AbortController();
     const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
@@ -1209,10 +871,9 @@ async function runAIAnalysis(){
     if(first.data && (first.data.assessment || (first.data.rx && first.data.rx.length))){
       aiData = first.data;
     } else {
-      // দ্বিতীয় চেষ্টা — হালকা/সংক্ষিপ্ত prompt, ১৫ সেকেন্ড বাজেট (দ্রুত শেষ হওয়ার সম্ভাবনা বেশি)
+      // দ্বিতীয় চেষ্টা — হালকা/সংক্ষিপ্ত prompt, ১৫ সেকেন্ড বাজেট
       document.getElementById('aiAssessText').innerHTML =
-        '<span class="spinner-inline"></span> ' + escH(ruleResult.assessment) +
-        ' <span style="font-size:.68rem;color:#9A7A8A">(প্রথম চেষ্টা ধীর ছিল, সংক্ষিপ্ত prompt দিয়ে আবার চেষ্টা হচ্ছে...)</span>';
+        '<span class="spinner-inline"></span> প্রথম চেষ্টা ধীর ছিল, সংক্ষিপ্ত prompt দিয়ে আবার চেষ্টা হচ্ছে...';
       const second = await callDoctorAI(compactPrompt, 15000);
       diag.attempt2 = second.info;
       if(second.data && (second.data.assessment || (second.data.rx && second.data.rx.length))){
@@ -1225,19 +886,21 @@ async function runAIAnalysis(){
   btn.innerHTML = '🔄 পুনরায় বিশ্লেষণ করুন';
 
   if(aiData && (aiData.assessment || (aiData.rx && aiData.rx.length))){
-    // Claude সফল — সম্পূর্ণ ফলাফল rule-engine ড্রাফটের জায়গায় বসাই
+    // Claude সফল — সম্পূর্ণ ফলাফল রেন্ডার করি
     currentRxData = aiData;
     renderAIResult(aiData);
+    // সফল হলেই consultation-এ পাঠাই — ব্যর্থ/খালি ডেটা কখনো পাঠানো হয় না
+    sendForApproval();
   } else {
-    // Claude ব্যর্থ/ধীর — ধাপ ১-এর rule-engine ড্রাফট আগে থেকেই রেন্ডার করা আছে, শুধু spinner সরাই
-    document.getElementById('aiAssessText').textContent = ruleResult.assessment;
-    console.warn('SAR doctor.html — Claude AI বিশ্লেষণ ব্যর্থ (rule-engine ফলাফল অক্ষত আছে):', diag);
+    // Claude ব্যর্থ — সৎভাবে জানাই, কোনো বানানো/আংশিক ডেটা দেখাই না
+    document.getElementById('aiAssessText').innerHTML =
+      '❌ AI বিশ্লেষণ ব্যর্থ হয়েছে — অনুগ্রহ করে আবার চেষ্টা করুন। ' +
+      '<span style="font-size:.68rem;color:#9A7A8A">নিচে "কারিগরি বিবরণ" থেকে বিস্তারিত দেখুন।</span>';
+    console.warn('SAR doctor.html — Claude AI বিশ্লেষণ ব্যর্থ:', diag);
     if(dbgBox){ dbgBox.textContent = JSON.stringify(diag, null, 2); }
     if(dbgToggle){ dbgToggle.style.display = 'block'; }
+    showToast('❌ AI বিশ্লেষণ ব্যর্থ — আবার চেষ্টা করুন');
   }
-
-  // চূড়ান্ত ড্রাফট (Claude অথবা rule-engine fallback) একবারই consultation-এ পাঠাই
-  sendForApproval();
 }
 
 function renderAIResult(data){
