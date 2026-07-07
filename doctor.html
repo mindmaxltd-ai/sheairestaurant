@@ -955,9 +955,10 @@ function computeRuleEngineResult(patientObj, complaint, metrics){
   if(!assessmentParts.length) assessmentParts.push(`রোগীর ${baseline.name} বিভাগ ও আজকের অভিযোগ ("${complaint}") বিবেচনা করে সাধারণ ব্যবস্থাপত্র প্রস্তুত করা হয়েছে।`);
   assessmentParts.push('ডাক্তার যাচাই করে চূড়ান্ত করবেন।');
 
-  const rx = matched.length
-    ? matched.map(m => ({ cat: baseline.name, generic: '(উপসর্গ-ভিত্তিক — ডাক্তার নির্দিষ্ট করবেন)', note: m.general }))
-    : [{ cat: baseline.name, generic: 'Paracetamol (প্রয়োজনে)', note: 'Weight-based dosing — ডাক্তার নিশ্চিত করুন' }];
+  // ── ঔষধের নাম (generic) কখনোই AI/rule-engine ঠিক করে না — এটা সম্পূর্ণ ডাক্তারের
+  //     ক্লিনিক্যাল সিদ্ধান্ত। এখানে rx ফাঁকা রাখা হয় (ডাক্তার চাইলে ম্যানুয়ালি টাইপ করবেন),
+  //     চূড়ান্ত অনুমোদন consultation.html পেজে ডাক্তার নিজেই করেন। ──
+  const rx = [];
 
   const general     = [ ...matched.map(m=>m.general),     baseline.general   ].filter(Boolean).join(' ');
   const home        = [ ...matched.map(m=>m.home),        baseline.home      ].filter(Boolean).join(' ');
