@@ -736,6 +736,9 @@ function robustParseAI(text){
     rx,
     general: grab('general'),
     home: grab('home'),
+    ayurvedic: grab('ayurvedic'),
+    unani: grab('unani'),
+    homeopathic: grab('homeopathic'),
     islamic: grab('islamic'),
     dangers: grab('dangers'),
     alerts: grab('alerts'),
@@ -1065,80 +1068,148 @@ async function runAIAnalysis(){
   const catNames = {DM:'ডায়াবেটিস',OB:'স্থূলতা/Weight Management',FL:'ফ্যাটি লিভার',IB:'IBS/গ্যাস্ট্রিক',PR:'গর্ভাবস্থা'};
   const cat = catNames[patient.category||'DM'] || patient.category;
 
-  // ═══ ধাপ ১ — RULE ENGINE (৯০%): sync, কোনো fetch/API নেই, তাৎক্ষণিক ═══
+  // ═══ ধাপ ১ — RULE ENGINE: sync, কোনো fetch/API নেই, তাৎক্ষণিক ═══
+  // এটা তাৎক্ষণিক দেখানো হয় (নেটওয়ার্কের অপেক্ষা ছাড়াই) এবং AI ব্যর্থ/ধীর হলে
+  // safety-net হিসেবে থেকে যায় — ডাক্তার কখনো খালি হাতে থাকেন না।
   const ruleResult = computeRuleEngineResult(patient, complaint, m);
   currentRxData = ruleResult;
-  renderAIResult(ruleResult);   // ডাক্তার সাথে সাথে সম্পূর্ণ ড্রাফট দেখেন — নেটওয়ার্কের অপেক্ষা নেই
+  renderAIResult(ruleResult);
   document.getElementById('aiAssessText').innerHTML =
     '<span class="spinner-inline"></span> ' + escH(ruleResult.assessment) +
-    ' <span style="font-size:.68rem;color:#9A7A8A">(AI ভাষা পালিশ হচ্ছে...)</span>';
+    ' <span style="font-size:.68rem;color:#9A7A8A">(Claude AI পূর্ণ বিশ্লেষণ করছে...)</span>';
+
+  // ═══ ধাপ ২ — CLAUDE AI: সম্পূর্ণ ক্লিনিক্যাল বিশ্লেষণ ও প্রেসক্রিপশন (medicine সহ সবকিছু
+  //     Claude নির্ধারণ করে)। ব্যর্থ হলে ধাপ ১-এর rule-engine ড্রাফটই থেকে যায়। ═══
+  const diag = { time: new Date().toISOString(), complaint, ruleEngine: ruleResult._ruleEngine };
+  let aiData = null;
+
+  // মেট্রিক্স সংক্ষেপ (শুধু value থাকা কলাম)
+  const skipCols = ['id','customer_id','created_at','updated_at'];
+  const metricsStr = Object.entries(m)
+    .filter(([k,v]) => !skipCols.includes(k) && v!=null && v!=='' && String(v).trim()!=='')
+    .map(([k,v]) => `${k}: ${v}`)
+    .join(', ') || 'পাওয়া যায়নি';
+
+  // আজকের ai_analysis সারাংশ + আগের প্রেসক্রিপশন (সংক্ষিপ্ত প্রেক্ষাপট)
+  let todayNote = '', prevRxStr = '';
+  try{
+    const todayDate = new Date().toISOString().slice(0,10);
+    const tr = await fetch(`${SUPA_URL}/rest/v1/ai_analysis?customer_id=eq.${patient.id}&analysis_date=eq.${todayDate}&order=created_at.desc&limit=1&select=health_summary_bn,focus`, {headers:H});
+    const todayRows = tr.ok ? await tr.json() : [];
+    const t = Array.isArray(todayRows) && todayRows[0];
+    if(t && t.health_summary_bn) todayNote = t.health_summary_bn.slice(0,150);
+  }catch(e){}
+  try{
+    const pr = await fetch(`${SUPA_URL}/rest/v1/sar_notes?customer_id=eq.${patient.id}&note_type=eq.prescription&order=created_at.desc&limit=1&select=note_text_bn`, {headers:H});
+    const prev = pr.ok ? await pr.json() : [];
+    if(Array.isArray(prev) && prev[0]) prevRxStr = (prev[0].note_text_bn||'').slice(0,250);
+  }catch(e){}
+
+  const prompt = `তুমি SAR (She AI Restaurant) ক্লিনিক্যাল AI সহকারী — একজন লাইসেন্সপ্রাপ্ত MBBS ডাক্তারকে সহায়তা করছ যিনি চূড়ান্ত সিদ্ধান্ত নেবেন ও sign করবেন। Mayo Clinic/Cleveland Clinic মানের সম্পূর্ণ, বাস্তব ক্লিনিক্যাল বিশ্লেষণ দাও — প্রয়োজন অনুযায়ী ততগুলো medicine দাও যতগুলো সত্যিকারের ক্লিনিক্যাল প্রয়োজন (সাধারণত জটিল/কমরবিডিটি-সহ কেসে ৫-১০টা reasonable, সাধারণ কেসে কম)।
+
+রোগীর তথ্য: বিভাগ: ${cat} · বয়স: ${patient.age||'অজানা'}
+স্বাস্থ্য মেট্রিক্স: ${metricsStr}
+আজকের স্বয়ংক্রিয় AI সারাংশ: ${todayNote || 'নেই'}
+আগের প্রেসক্রিপশন (সংক্ষিপ্ত): ${prevRxStr || 'নেই'}
+আজকের অভিযোগ: ${complaint}
+
+শুধু এই JSON structure দাও, কোনো markdown code block বা অতিরিক্ত লেখা নয়:
+{
+  "assessment": "ক্লিনিক্যাল মূল্যায়ন (বাংলায়, ৩-৫ বাক্য, মূল অভিযোগ + comorbidity বিবেচনা করে)",
+  "rx": [
+    {"cat": "বিভাগ", "generic": "নির্দিষ্ট Generic ওষুধের নাম + strength", "note": "ডোজ, সময়কাল, সতর্কতা"}
+  ],
+  "general": "সাধারণ পরামর্শ (জীবনযাপন, খাদ্য)",
+  "home": "ঘরোয়া প্রতিকার",
+  "ayurvedic": "আয়ুর্বেদিক পরামর্শ (চূর্ণ/চাটনি সহ নির্দিষ্ট নাম)",
+  "unani": "ইউনানি পরামর্শ (নির্দিষ্ট নাম, হেকিমের পরামর্শে)",
+  "homeopathic": "হোমিওপ্যাথিক পরামর্শ (নির্দিষ্ট remedy নাম, হোমিওপ্যাথ চিকিৎসকের পরামর্শে)",
+  "islamic": "কুরআন বা সহীহ হাদিস থেকে একটি নির্ভরযোগ্য, প্রকৃত দু'আ — আরবি টেক্সট + বাংলা উচ্চারণ (উচ্চারণ transliteration) + বাংলা অর্থ + সূত্র (সূরা:আয়াত বা হাদিস গ্রন্থ ও নম্বর) স্পষ্টভাবে উল্লেখ করে। কখনো বানানো/অনিশ্চিত দু'আ দিও না — শুধু প্রকৃত, সুপরিচিত ও যাচাইযোগ্য দু'আ ব্যবহার করো।",
+  "dangers": "বিপদ সংকেত",
+  "alerts": "জরুরি সতর্কতা (কখন হাসপাতালে যাবেন)"
+}`;
+
+  const compactPrompt = `তুমি SAR ক্লিনিক্যাল AI সহকারী। সংক্ষিপ্ত কিন্তু সম্পূর্ণ ক্লিনিক্যাল বিশ্লেষণ দাও (দ্রুত উত্তর জরুরি — প্রতিটি ফিল্ড ১ বাক্যে রাখো, rx সর্বোচ্চ ৩টা আইটেম)।
+
+বিভাগ: ${cat} · অভিযোগ: ${complaint} · মেট্রিক্স সংক্ষেপ: ${metricsStr.slice(0,200)}
+
+শুধু এই JSON দাও, markdown/ব্যাখ্যা ছাড়া:
+{
+  "assessment": "১-২ বাক্য",
+  "rx": [{"cat":"বিভাগ","generic":"Generic নাম","note":"সংক্ষিপ্ত ডোজ"}],
+  "general": "১ বাক্য", "home": "১ বাক্য",
+  "ayurvedic": "১ বাক্য নির্দিষ্ট নাম", "unani": "১ বাক্য নির্দিষ্ট নাম", "homeopathic": "১ বাক্য নির্দিষ্ট নাম",
+  "islamic": "১টা প্রকৃত দু'আ — আরবি + বাংলা উচ্চারণ + অর্থ + সূত্র, সংক্ষিপ্ত",
+  "dangers": "১ বাক্য", "alerts": "১ বাক্য"
+}`;
+
+  // ── Netlify function-এর নিজস্ব gateway timeout-এর আগেই client নিজে থামিয়ে দেয় (AbortController) —
+  //     পুরো ব্রাউজিং একটা ugly 504 HTML-এর জন্য দীর্ঘ সময় অপেক্ষা করে না; সাথে সাথে হালকা
+  //     prompt দিয়ে একবার retry করে, তাতেও ব্যর্থ হলে rule-engine ড্রাফটই থেকে যায়। ──
+  async function callAnalyze(promptText, timeoutMs){
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
+    try{
+      const r = await fetch('/.netlify/functions/analyze', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ prompt: promptText }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timer);
+      if(r.ok){
+        const d = await r.json();
+        const info = { httpStatus:r.status, hasParsed:!!d.parsed, hasText:!!d.text };
+        if(d.parsed && (d.parsed.assessment || d.parsed.rx)) return { data:d.parsed, info };
+        if(d.assessment || d.rx) return { data:d, info };
+        if(d.text) return { data:robustParseAI(d.text), info };
+        return { data:null, info };
+      } else {
+        const t = await r.text().catch(()=>'');
+        return { data:null, info:{ httpStatus:r.status, errorBody:t.slice(0,300) } };
+      }
+    } catch(e){
+      clearTimeout(timer);
+      const isAbort = e.name === 'AbortError';
+      return { data:null, info:{ fetchError: isAbort ? `client timeout (${timeoutMs}ms) — Netlify সাড়া দিতে দেরি করছিল, তাই থামানো হয়েছে` : e.message } };
+    }
+  }
+
+  try {
+    // প্রথম চেষ্টা — সম্পূর্ণ বিস্তারিত prompt, ২০ সেকেন্ড বাজেট
+    const first = await callAnalyze(prompt, 20000);
+    diag.attempt1 = first.info;
+    if(first.data && (first.data.assessment || (first.data.rx && first.data.rx.length))){
+      aiData = first.data;
+    } else {
+      // দ্বিতীয় চেষ্টা — হালকা/সংক্ষিপ্ত prompt, ১৫ সেকেন্ড বাজেট (দ্রুত শেষ হওয়ার সম্ভাবনা বেশি)
+      document.getElementById('aiAssessText').innerHTML =
+        '<span class="spinner-inline"></span> ' + escH(ruleResult.assessment) +
+        ' <span style="font-size:.68rem;color:#9A7A8A">(প্রথম চেষ্টা ধীর ছিল, সংক্ষিপ্ত prompt দিয়ে আবার চেষ্টা হচ্ছে...)</span>';
+      const second = await callAnalyze(compactPrompt, 15000);
+      diag.attempt2 = second.info;
+      if(second.data && (second.data.assessment || (second.data.rx && second.data.rx.length))){
+        aiData = second.data;
+      }
+    }
+  } catch(e){ diag.unexpectedError = e.message; }
 
   btn.disabled = false;
   btn.innerHTML = '🔄 পুনরায় বিশ্লেষণ করুন';
 
-  // ═══ ধাপ ২ — AI POLISH (১০%): ছোট, দ্রুত কল — শুধু assessment+islamic-এর ভাষা
-  //     সংশ্লেষণ করে; নতুন কোনো ঔষধ/ক্লিনিক্যাল সিদ্ধান্ত নেয় না। ব্যর্থ হলেও
-  //     রুল-ইঞ্জিনের ফলাফল অক্ষত থাকে — ডাক্তার কখনো খালি হাতে থাকেন না। ═══
-  const diag = { time: new Date().toISOString(), complaint, ruleEngine: ruleResult._ruleEngine };
-  let polished = null;
-
-  try{
-    // পটভূমিতে (non-blocking) আজকের ai_analysis + আগের প্রেসক্রিপশন — শুধু polish-এর প্রেক্ষাপট সমৃদ্ধ করতে
-    let todayNote = '';
-    try{
-      const todayDate = new Date().toISOString().slice(0,10);
-      const tr = await fetch(`${SUPA_URL}/rest/v1/ai_analysis?customer_id=eq.${patient.id}&analysis_date=eq.${todayDate}&order=created_at.desc&limit=1&select=health_summary_bn,focus`, {headers:H});
-      const todayRows = tr.ok ? await tr.json() : [];
-      const t = Array.isArray(todayRows) && todayRows[0];
-      if(t && t.health_summary_bn) todayNote = t.health_summary_bn.slice(0,150);
-    }catch(e){}
-
-    const riskSummary = ruleResult._ruleEngine.risks.map(r=>r.msg).join('; ') || 'কোনো বড় ঝুঁকি ফ্ল্যাগ নেই';
-    const matchedNames = ruleResult._ruleEngine.matched.join(', ') || 'নির্দিষ্ট কিছু না';
-    const polishPrompt = `তুমি SAR ক্লিনিক্যাল সহকারী। একজন ডাক্তারের জন্য নিচের তথ্য থেকে মাত্র ২টি ছোট বাংলা টেক্সট তৈরি করো — কোনো নতুন ঔষধ/পরামর্শ নয়, শুধু ভাষাগত সংশ্লেষণ:
-
-রোগী বিভাগ: ${cat} · আজকের অভিযোগ: ${complaint}
-রুল-ইঞ্জিন থেকে সনাক্ত বিষয়: ${matchedNames}
-ঝুঁকি ফ্ল্যাগ: ${riskSummary}
-${todayNote ? `আজকের স্বয়ংক্রিয় AI সারাংশ: ${todayNote}` : ''}
-
-শুধু এই JSON দাও, কোনো markdown/ব্যাখ্যা ছাড়া:
-{"assessment":"২-৩ বাক্যের ক্লিনিক্যাল সারাংশ (বাংলায়)","islamic":"১ বাক্য ইসলামিক/আধ্যাত্মিক সান্ত্বনা (বাংলায়)"}`;
-
-    const r = await fetch('/.netlify/functions/analyze', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ prompt: polishPrompt })
-    });
-    if(r.ok){
-      const d = await r.json();
-      diag.netlify = { httpStatus:r.status, hasParsed:!!d.parsed, hasText:!!d.text };
-      if(d.parsed && d.parsed.assessment) polished = d.parsed;
-      else if(d.assessment) polished = d;
-      else if(d.text) polished = robustParseAI(d.text);
-    } else {
-      const t = await r.text().catch(()=>'');
-      diag.netlify = { httpStatus:r.status, errorBody:t.slice(0,300) };
-    }
-  }catch(e){ diag.netlify = { fetchError:e.message }; }
-
-  if(polished && polished.assessment){
-    currentRxData.assessment = polished.assessment;
-    document.getElementById('aiAssessText').textContent = polished.assessment;
-    if(polished.islamic){
-      currentRxData.islamic = polished.islamic;
-      const islamicEl = document.getElementById('rxIslamic');
-      if(islamicEl) islamicEl.value = polished.islamic;
-    }
+  if(aiData && (aiData.assessment || (aiData.rx && aiData.rx.length))){
+    // Claude সফল — সম্পূর্ণ ফলাফল rule-engine ড্রাফটের জায়গায় বসাই
+    currentRxData = aiData;
+    renderAIResult(aiData);
   } else {
-    // AI polish ব্যর্থ/ধীর — রুল-ইঞ্জিনের টেক্সটই থেকে যায়, শুধু spinner সরাই
+    // Claude ব্যর্থ/ধীর — ধাপ ১-এর rule-engine ড্রাফট আগে থেকেই রেন্ডার করা আছে, শুধু spinner সরাই
     document.getElementById('aiAssessText').textContent = ruleResult.assessment;
-    console.warn('SAR doctor.html — AI polish ব্যর্থ (rule-engine ফলাফল অক্ষত আছে):', diag);
+    console.warn('SAR doctor.html — Claude AI বিশ্লেষণ ব্যর্থ (rule-engine ফলাফল অক্ষত আছে):', diag);
     if(dbgBox){ dbgBox.textContent = JSON.stringify(diag, null, 2); }
     if(dbgToggle){ dbgToggle.style.display = 'block'; }
   }
 
-  // AI polish সফল/ব্যর্থ যাই হোক — চূড়ান্ত ড্রাফট (rule-engine + সম্ভাব্য polish) একবারই consultation-এ পাঠাই
+  // চূড়ান্ত ড্রাফট (Claude অথবা rule-engine fallback) একবারই consultation-এ পাঠাই
   sendForApproval();
 }
 
