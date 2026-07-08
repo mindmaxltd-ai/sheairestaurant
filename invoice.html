@@ -130,6 +130,24 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   padding:18px;color:#FFB4B4;font-size:14px;max-width:160mm}
 
 @media(max-width:560px){ .sheet{width:100%} .psp-grid{gap:5px} }
+
+/* ── Cash/OTP restriction modal (added) ── */
+.otp-overlay{position:fixed;inset:0;z-index:50;background:rgba(21,16,26,.72);display:none;
+  align-items:center;justify-content:center;padding:16px}
+.otp-overlay.show{display:flex}
+.otp-box{background:var(--paper);color:var(--ink);border-radius:12px;padding:20px 18px;width:100%;max-width:320px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+.otp-box h4{font-size:14px;color:var(--plum);margin-bottom:6px}
+.otp-box p{font-size:10px;color:var(--ink2);margin-bottom:12px;line-height:1.5}
+.otp-input{width:100%;padding:10px;font-size:16px;letter-spacing:6px;text-align:center;font-family:'Space Mono',monospace;
+  border:1.3px solid var(--line);border-radius:8px;margin-bottom:10px;outline:none}
+.otp-input:focus{border-color:var(--rose)}
+.otp-actions{display:flex;gap:8px}
+.otp-actions button{flex:1;padding:10px;border:none;border-radius:8px;font-family:'Hind Siliguri';font-weight:700;
+  font-size:12px;cursor:pointer}
+.otp-verify{background:var(--grad);color:#fff}
+.otp-cancel{background:#fff;border:1.3px solid var(--line)!important;color:var(--ink2)}
+.otp-err{font-size:9.5px;color:var(--red);min-height:12px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -221,6 +239,20 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
+<!-- ── Cash payment OTP verification modal (added) ── -->
+<div class="otp-overlay" id="otpOverlay">
+  <div class="otp-box">
+    <h4>🔐 ক্যাশ পেমেন্ট যাচাই</h4>
+    <p id="otpMsg">আপনার মোবাইল নম্বরে একটি OTP পাঠানো হয়েছে। পেমেন্ট সম্পন্ন করতে OTP লিখুন।</p>
+    <input type="text" id="otpInput" class="otp-input" maxlength="6" inputmode="numeric" placeholder="৬-সংখ্যার OTP">
+    <div class="otp-actions">
+      <button class="otp-cancel" onclick="cancelCashOtp()">বাতিল</button>
+      <button class="otp-verify" onclick="verifyCashOtp()">যাচাই করুন</button>
+    </div>
+    <div class="otp-err" id="otpErr"></div>
+  </div>
+</div>
+
 <!-- already paid -->
 <div id="paidView" class="sheet skip">
   <div class="pad" style="text-align:center;padding:40px 9mm">
@@ -241,6 +273,12 @@ const _sc   = JSON.parse(localStorage.getItem('sar_customer') || '{}');
 const CID   = _sc.id || localStorage.getItem('sar_customer_id');
 const CNAME = _sc.full_name || localStorage.getItem('sar_customer_name') || 'গ্রাহক';
 const CMID  = _sc.member_id || localStorage.getItem('sar_member_id') || '—';
+
+/* ── Cash payment restriction: only these two numbers may pay by Cash/COD (added) ── */
+const CASH_ALLOWED_PHONES = ['01346098892','01767626653'];
+const normPhone = p => String(p||'').replace(/\D/g,'').replace(/^880/,'0').slice(-11);
+const custPhoneAllowedForCash = () => CASH_ALLOWED_PHONES.includes(normPhone(_sc.phone||localStorage.getItem('sar_customer_phone')||''));
+let _cashOtpTxn = null, _cashOtpPhone = null;
 
 let _invoice = null, selMethod = null;
 const $ = id => document.getElementById(id);
@@ -309,6 +347,11 @@ function render(inv){
 }
 
 function selPSP(el,method){
+  // ── Cash/COD restricted to two specific mobile numbers (added) ──
+  if(method==='cod' && !custPhoneAllowedForCash()){
+    alert('দুঃখিত, ক্যাশ পেমেন্ট পদ্ধতিটি শুধুমাত্র নির্দিষ্ট মোবাইল নম্বরের জন্য উপলব্ধ।');
+    return;
+  }
   document.querySelectorAll('.psp').forEach(p=>p.classList.remove('sel'));
   el.classList.add('sel'); selMethod=method;
   const btn=$('payBtn');
@@ -322,20 +365,23 @@ async function payNow(){
   if(!selMethod){ alert('একটি পেমেন্ট পদ্ধতি বাছুন।'); return; }
   const btn=$('payBtn'); btn.disabled=true;
 
-  // ── COD/Cash: গেটওয়ে নয়; super admin প্যানেল থেকে যাচাই হবে ──
+  // ── COD/Cash: শুধু অনুমোদিত নম্বরে OTP যাচাইয়ের পর সম্পন্ন হবে (added) ──
   if(selMethod==='cod'){
-    const isDelivery = (_invoice.meta_json||{}).order_type==='delivery';
-    setStatus('⏳ অর্ডার নিশ্চিত হচ্ছে...', 's-wait');
+    if(!custPhoneAllowedForCash()){
+      setStatus('❌ ক্যাশ পেমেন্ট শুধুমাত্র নির্দিষ্ট মোবাইল নম্বরের জন্য উপলব্ধ।','s-err');
+      btn.disabled=false; return;
+    }
+    _cashOtpPhone = normPhone(_sc.phone||localStorage.getItem('sar_customer_phone')||'');
+    setStatus('⏳ OTP পাঠানো হচ্ছে...', 's-wait');
     try{
-      const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:'cod'});
-      if(!pr.ok){ console.error('createPayment(cod) failed:', pr); throw new Error('রেকর্ড তৈরি হয়নি। (' + (pr.detail||(pr.error&&pr.error.message)||pr.error||'অজানা') + ')'); }
-      const txn=pr.transaction_id;
-      // auto-verify নয় — PENDING থাকবে, super admin প্যানেল থেকে যাচাই করবে
-      const waitMsg = isDelivery
-        ? '✅ COD অর্ডার গৃহীত! ডেলিভারির সময় ক্যাশ পরিশোধ করবেন। অ্যাডমিন যাচাইয়ের পর রিসিট পাকা হবে।'
-        : '✅ ক্যাশ অর্ডার গৃহীত! রেস্তোরাঁয় ক্যাশ পরিশোধ করুন। অ্যাডমিন যাচাইয়ের পর রিসিট পাকা হবে।';
-      setStatus(waitMsg + ' রিসিটে নিয়ে যাওয়া হচ্ছে...', 's-ok');
-      setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1900);
+      // ── Netlify function-এ 'sendOtp' action যুক্ত করতে হবে (backend requirement) ──
+      const or_=await api({action:'sendOtp', phone:_cashOtpPhone, invoice_id:_invoice.id});
+      if(!or_.ok){ throw new Error('OTP পাঠানো যায়নি। (' + (or_.detail||or_.error||'অজানা') + ')'); }
+      _cashOtpTxn = or_.transaction_id || null;
+      $('otpMsg').textContent = `${_cashOtpPhone} নম্বরে একটি OTP পাঠানো হয়েছে। পেমেন্ট সম্পন্ন করতে OTP লিখুন।`;
+      $('otpInput').value=''; $('otpErr').textContent='';
+      $('otpOverlay').classList.add('show');
+      setStatus('','');
     }catch(e){ setStatus('❌ '+e.message,'s-err'); btn.disabled=false; }
     return;
   }
@@ -379,6 +425,41 @@ async function payNow(){
     setStatus('✅ অনুরোধ জমা হয়েছে! অ্যাডমিন যাচাইয়ের পর রিসিট পাবেন। রিসিট পেজে নিয়ে যাওয়া হচ্ছে...', 's-ok');
     setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1600);
   }catch(e){ setStatus('❌ '+e.message,'s-err'); btn.disabled=false; }
+}
+
+/* ── OTP verify/cancel for restricted cash payment (added) ── */
+function cancelCashOtp(){
+  $('otpOverlay').classList.remove('show');
+  setStatus('','');
+  $('payBtn').disabled=false;
+}
+
+async function verifyCashOtp(){
+  const code=$('otpInput').value.trim();
+  const errEl=$('otpErr');
+  if(!/^\d{4,6}$/.test(code)){ errEl.textContent='সঠিক OTP লিখুন।'; return; }
+  errEl.textContent='যাচাই করা হচ্ছে...';
+  try{
+    // ── Netlify function-এ 'verifyOtp' action যুক্ত করতে হবে (backend requirement) ──
+    const vr=await api({action:'verifyOtp', phone:_cashOtpPhone, code, transaction_id:_cashOtpTxn, invoice_id:_invoice.id});
+    if(!vr.ok){ errEl.textContent='❌ OTP সঠিক নয়। আবার চেষ্টা করুন।'; return; }
+
+    $('otpOverlay').classList.remove('show');
+    const isDelivery = (_invoice.meta_json||{}).order_type==='delivery';
+    setStatus('⏳ অর্ডার নিশ্চিত হচ্ছে...', 's-wait');
+    const pr=await api({action:'createPayment', invoice_id:_invoice.id, customer_id:CID, gateway:'cod'});
+    if(!pr.ok){ console.error('createPayment(cod) failed:', pr); throw new Error('রেকর্ড তৈরি হয়নি। (' + (pr.detail||(pr.error&&pr.error.message)||pr.error||'অজানা') + ')'); }
+    const txn=pr.transaction_id;
+    const waitMsg = isDelivery
+      ? '✅ OTP যাচাই সম্পন্ন! COD অর্ডার গৃহীত। ডেলিভারির সময় ক্যাশ পরিশোধ করবেন।'
+      : '✅ OTP যাচাই সম্পন্ন! ক্যাশ অর্ডার গৃহীত। রেস্তোরাঁয় ক্যাশ পরিশোধ করুন।';
+    setStatus(waitMsg + ' রিসিটে নিয়ে যাওয়া হচ্ছে...', 's-ok');
+    setTimeout(()=>location.href=`receipt.html?txn=${txn}`, 1900);
+  }catch(e){
+    errEl.textContent='';
+    setStatus('❌ '+e.message,'s-err');
+    $('payBtn').disabled=false;
+  }
 }
 
 load();
