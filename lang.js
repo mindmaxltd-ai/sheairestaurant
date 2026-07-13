@@ -99,13 +99,18 @@
   }
 
   // ---- 6. Inject a default floating toggle button (optional) ----
+  // Position/style can be overridden per-page by setting window.SAR_LANG_BTN_STYLE
+  // BEFORE loading lang.js, e.g.:
+  //   <script>window.SAR_LANG_BTN_STYLE = 'top:14px; left:14px;';</script>
+  //   <script src="lang.js"></script>
   function injectToggleButton() {
     if (document.querySelector('.lang-toggle-btn')) return; // don't duplicate
     const btn = document.createElement('button');
     btn.className = 'lang-toggle-btn';
     btn.type = 'button';
+    const posOverride = window.SAR_LANG_BTN_STYLE || 'bottom:18px; left:18px;'; // default: bottom-LEFT, clear of logo (top-left) and cart/nav (top-right)
     btn.style.cssText = `
-      position:fixed; top:14px; right:14px; z-index:9999;
+      position:fixed; ${posOverride} z-index:9999;
       padding:.4rem 1rem; border-radius:50px; border:1px solid rgba(255,255,255,.2);
       background:rgba(10,10,20,.75); color:#fff; font-size:.78rem; font-weight:700;
       cursor:pointer; backdrop-filter:blur(10px);
